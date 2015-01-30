@@ -91,11 +91,11 @@ public class MeasurementTest
 
     @Test
     public void testEquals() {
-        TestDistance d1 = new TestDistance(5.00);
-        TestDistance d2 = new TestDistance(5.004);
+        TestDistance d1 = new TestDistance(5.00, TestDistance.Unit.MILLIMETERS);
+        TestDistance d2 = new TestDistance(5.004, TestDistance.Unit.MILLIMETERS);
         Assert.assertTrue(d1.equals(d2));
 
-        TestDistance d3 = new TestDistance(5.005);
+        TestDistance d3 = new TestDistance(5.005, TestDistance.Unit.MILLIMETERS);
         Assert.assertFalse(d1.equals(d3));
 
     }
