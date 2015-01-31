@@ -1,0 +1,4 @@
+Manifest-Version: 1.2
+Main-Class: com.bdb.weather.filereader.WeatherFileReader
+Class-Path: BDB-Utils-1.0.jar mysql-connector-java-5.0.5-bin.jar WeatherSense-1.0.jar
+Created-By: 1.4 (Sun Microsystems Inc.)
