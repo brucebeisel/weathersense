@@ -101,7 +101,7 @@ public class DBConnection implements BBRunnable {
                 connection.isReadOnly();
             }
             else {
-                logger.log(Level.FINE, "Connecting to DB. URL = ''{0}'' User = ''{1}''", new Object[]{url, user});
+                logger.log(Level.FINE, "Connecting to DB. URL = {0} User = {1}", new Object[]{url, user});
                 connection = DriverManager.getConnection(url, user, passwd);
                 connection.setAutoCommit(autoCommit);
             }
