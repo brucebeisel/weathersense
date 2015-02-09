@@ -87,7 +87,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <module>Collector</module>
         <module>Common</module>
         <module>Display</module>
-        <module>ProcessMonitor</module>
+        <module>HealthMonitor</module>
     </modules>
     <dependencyManagement>
         <dependencies>

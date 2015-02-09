@@ -16,6 +16,8 @@
  */
 package com.bdb.weather.display;
 
+import com.bdb.weather.common.CurrentWeatherSubscriber;
+
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
