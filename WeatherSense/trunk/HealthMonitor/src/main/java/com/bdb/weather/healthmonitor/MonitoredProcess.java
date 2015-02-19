@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  *
  * @author Bruce
  */
-public class MonitoredProcess {
+public class MonitoredProcess implements Runnable {
     private final ProcessBuilder builder;
     private Process process;
     private boolean running = false;
@@ -36,12 +36,15 @@ public class MonitoredProcess {
     private int startCount = 0;
     private int restartCount = 0;
     private LocalDateTime lastStartTime;
+    private Thread monitor;
+    private final static Logger logger = Logger.getLogger(MonitoredProcess.class.getName());
 
     public MonitoredProcess(List<String> commandArgs, File outputFile) {
         builder = new ProcessBuilder(commandArgs);
         ProcessBuilder.Redirect redirect = ProcessBuilder.Redirect.appendTo(outputFile);
         builder.redirectErrorStream(true);
         builder.redirectOutput(redirect);
+        monitor = null;
     }
 
     public boolean isRunning() {
@@ -56,34 +59,37 @@ public class MonitoredProcess {
         return restartCount;
     }
 
-    public boolean launch() throws IOException {
-        if (restartCount > 5)
-            return false;
+    public void processDied() {
+        //try {
+            logger.log(Level.INFO, "Process died. Restart count = " + restartCount);
+            //monitor.wait();
+            if (!killing && restartCount <= 5)
+                launch();
+        //}
+        //catch (InterruptedException ex) {
+        //    logger.log(Level.INFO, "wait() call was interrupted", ex);
+       // }
+    }
 
-        process = builder.start();
-        startCount++;
-        restartCount++;
-        lastStartTime = LocalDateTime.now();
-        running = true;
-        killing = false;
-        Thread thread = new Thread(()-> {
-            while (process.isAlive()) {
-                try {
-                    if (process.waitFor(10, TimeUnit.MINUTES)) {
-                        running = false;
-                        if (!killing)
-                            launch();
-                    }
-                    else
-                        restartCount = 0;
-                }
-                catch (InterruptedException | IOException ex) {
-                    Logger.getLogger(MonitoredProcess.class.getName()).log(Level.SEVERE, null, ex);
-                }
+    public boolean launch() {
+        monitor = new Thread(this);
+
+        try {
+            process = builder.start();
+            startCount++;
+            restartCount++;
+            running = true;
+            killing = false;
+            if (process != null) {
+                monitor.start();
+                lastStartTime = LocalDateTime.now();
+                return true;
             }
-        });
-        thread.start();
-        return process != null;
+        }
+        catch (IOException e) {
+
+        }
+        return false;
     }
 
     public boolean kill() {
@@ -107,5 +113,22 @@ public class MonitoredProcess {
         }
 
         return success;
+    }
+
+    @Override
+    public void run() {
+        while (process.isAlive()) {
+            try {
+                if (process.waitFor(10, TimeUnit.MINUTES)) {
+                    running = false;
+                    processDied();
+                }
+                else
+                    restartCount = 0;
+            }
+            catch (InterruptedException ex) {
+                Logger.getLogger(MonitoredProcess.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }

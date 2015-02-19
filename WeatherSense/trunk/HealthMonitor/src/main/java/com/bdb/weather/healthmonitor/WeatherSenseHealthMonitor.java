@@ -16,9 +16,16 @@
  */
 package com.bdb.weather.healthmonitor;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 /**
  *
@@ -38,33 +45,37 @@ public class WeatherSenseHealthMonitor {
     }
 
     public void start() {
+        final String VP2_ARGS[] = { "notepad.exe" };
+        MonitoredProcess p1 = new MonitoredProcess(Arrays.asList(VP2_ARGS), new File("c:/weathersense/notepad.log"));
+        try {
+            p1.launch();
+        }
+        catch (IOException ex) {
+            Logger.getLogger(WeatherSenseHealthMonitor.class.getName()).log(Level.SEVERE, null, ex);
+        }
         Runnable runnable = () -> {
             boolean hmHealth = historyMonitor.isHealthy();
             boolean cwHealth = cwMonitor.isHealthy();
             boolean healthy = hmHealth && cwHealth;
             System.out.println("CW: " + cwHealth + "  HM: " + hmHealth);
             System.out.println("WeatherSense health: " + (healthy ? "Healthy" : "Unhealthy"));
+            System.out.println(cwMonitor);
         };
         executor.scheduleAtFixedRate(runnable, 10, 10, TimeUnit.SECONDS);
     }
 
     public static void main(String args[]) {
-            /*
         try {
-            MonitoredProcess p1 = new MonitoredProcess(Arrays.asList(VP2_ARGS), new File("/weathersense/logs/vp2.log"));
-            MonitoredProcess p2 = new MonitoredProcess(Arrays.asList(COLLECTOR_ARGS), new File("/weathersense/logs/collector.log"));
-            p1.launch();
-            p2.launch();
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                p1.kill();
-                p2.kill();
-            }));
+            InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("health_monitor_logging.properties");
+            
+            if (is != null)
+                LogManager.getLogManager().readConfiguration(is);
+
+            WeatherSenseHealthMonitor monitor = new WeatherSenseHealthMonitor();
+            monitor.start();
         }
-        catch (IOException ex) {
+        catch (IOException | SecurityException ex) {
             Logger.getLogger(WeatherSenseHealthMonitor.class.getName()).log(Level.SEVERE, null, ex);
         }
-                    */
-        WeatherSenseHealthMonitor monitor = new WeatherSenseHealthMonitor();
-        monitor.start();
     }
 }

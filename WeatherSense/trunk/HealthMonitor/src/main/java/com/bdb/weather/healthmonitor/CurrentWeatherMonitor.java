@@ -63,4 +63,9 @@ public class CurrentWeatherMonitor implements HealthMonitor, CurrentWeatherSubsc
         Duration delta = Duration.between(lastCurrentWeather, now);
         return delta.getSeconds() < toleranceSeconds;
     }
+
+    @Override
+    public String toString() {
+        return subscriber.getStatistics().toString();
+    }
 }
