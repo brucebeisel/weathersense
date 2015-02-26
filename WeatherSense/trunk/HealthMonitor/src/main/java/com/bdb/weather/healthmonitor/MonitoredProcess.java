@@ -29,6 +29,9 @@ import java.util.logging.Logger;
  * @author Bruce
  */
 public class MonitoredProcess implements Runnable {
+    public interface Monitor {
+        void processExited(MonitoredProcess process, int exitCode);
+    }
     private final ProcessBuilder builder;
     private Process process;
     private boolean running = false;
@@ -37,14 +40,16 @@ public class MonitoredProcess implements Runnable {
     private int restartCount = 0;
     private LocalDateTime lastStartTime;
     private Thread monitor;
+    private final Monitor callback;
     private final static Logger logger = Logger.getLogger(MonitoredProcess.class.getName());
 
-    public MonitoredProcess(List<String> commandArgs, File outputFile) {
+    public MonitoredProcess(List<String> commandArgs, File outputFile, Monitor callback) {
         builder = new ProcessBuilder(commandArgs);
         ProcessBuilder.Redirect redirect = ProcessBuilder.Redirect.appendTo(outputFile);
         builder.redirectErrorStream(true);
         builder.redirectOutput(redirect);
         monitor = null;
+        this.callback = callback;
     }
 
     public boolean isRunning() {
@@ -60,15 +65,8 @@ public class MonitoredProcess implements Runnable {
     }
 
     public void processDied() {
-        //try {
-            logger.log(Level.INFO, "Process died. Restart count = " + restartCount);
-            //monitor.wait();
-            if (!killing && restartCount <= 5)
-                launch();
-        //}
-        //catch (InterruptedException ex) {
-        //    logger.log(Level.INFO, "wait() call was interrupted", ex);
-       // }
+        logger.log(Level.INFO, "Process died. Restart count = " + restartCount);
+        callback.processExited(this, process.exitValue());
     }
 
     public boolean launch() {

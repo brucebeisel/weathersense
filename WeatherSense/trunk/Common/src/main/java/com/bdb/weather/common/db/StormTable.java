@@ -105,9 +105,7 @@ public class StormTable extends DBTable<Storm> {
 
             stmt.setDouble(3, record.getStormRainfall().get(DatabaseUnits.DEPTH));
 
-            stmt.executeUpdate();
-
-            return true;
+            return stmt.executeUpdate() == 1;
         }
         catch (SQLException e) {
             logger.log(Level.SEVERE, "Error saving storm data.", e);
@@ -118,8 +116,6 @@ public class StormTable extends DBTable<Storm> {
     @Override
     public boolean updateRow(Storm record) {
         String sql = "update " + TABLE_NAME + " set " + STORM_END_COLUMN + "=?," + TOTAL_RAINFALL_COLUMN + "=? where " + STORM_START_COLUMN + "=?";
-        if (!recordExists(record.getStartTime()))
-            return addRow(record);
 
         try {
             try (PreparedStatement stmt = getConnection().getConnection().prepareStatement(sql)) {
@@ -135,14 +131,21 @@ public class StormTable extends DBTable<Storm> {
         }
     }
 
+    public boolean saveStorm(Storm storm) {
+        if (!recordExists(storm.getStartTime()))
+            return addRow(storm);
+        else
+            return updateRow(storm);
+    }
+
     /**
      * Check if a storm with the specified start date already exists in the database.
      * 
      * @param startTime The start time of the storm to check for existence
      * @return True if the storm exists, else false.
      */
-    public boolean recordExists(LocalDateTime startTime) {
-        String clause = "where " + STORM_START_COLUMN + "=\"" + DBTable.dateFormatter().format(startTime) + "\"";
+    private boolean recordExists(LocalDateTime startTime) {
+        String clause = "where " + STORM_START_COLUMN + "='" + DBTable.dateTimeFormatter().format(startTime) + "'";
         List<Storm> storms = query(clause);
         return !storms.isEmpty();
     }

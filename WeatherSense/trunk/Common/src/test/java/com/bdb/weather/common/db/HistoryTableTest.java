@@ -53,7 +53,6 @@ import com.bdb.weather.common.measurement.UvIndex;
  * @author beisbr
  */
 public class HistoryTableTest {
-
     static private DBConnection dbcon;
     private final List<HistoricalRecord> historyList = new ArrayList<>();
     private static DatabaseUtilities utils;

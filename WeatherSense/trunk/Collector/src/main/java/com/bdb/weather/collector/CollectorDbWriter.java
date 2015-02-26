@@ -444,10 +444,8 @@ public class CollectorDbWriter implements WeatherDataWriter, Runnable {
                 stormStartTime = findStormStartTime(stormStartDate);
 
             Storm storm = new Storm(stormStartTime, stormRain);
-            if (stormTable.recordExists(stormStartTime))
-                stormTable.updateRow(storm);
-            else
-                stormTable.addRow(storm);
+            if (!stormTable.saveStorm(storm))
+                logger.log(Level.SEVERE, "Failed to save storm");
         }
         else if (stormStartTime != null) {
             Storm storm = stormTable.retrieveLatestStorm();
@@ -460,7 +458,9 @@ public class CollectorDbWriter implements WeatherDataWriter, Runnable {
                 //
                 if (!records.isEmpty()) {
                     storm = new Storm(stormStartTime, records.get(records.size() - 1).getTime(), storm.getStormRainfall());
-                    stormTable.updateRow(storm);
+                    if (!stormTable.saveStorm(storm))
+                        logger.log(Level.SEVERE, "Failed to save storm");
+
                     stormDopplerTable.trimStormRadarImages(storm.getStartTime(), storm.getEndTime());
                 }
                 else

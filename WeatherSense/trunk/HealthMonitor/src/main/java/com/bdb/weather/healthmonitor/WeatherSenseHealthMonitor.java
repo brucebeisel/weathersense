@@ -16,10 +16,8 @@
  */
 package com.bdb.weather.healthmonitor;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -32,27 +30,21 @@ import java.util.logging.Logger;
  * @author Bruce
  */
 public class WeatherSenseHealthMonitor {
-    //private static final String VP2_ARGS[] = { "vp2" };
-    //private static final String COLLECTOR_ARGS[] = { "java", "-jar", "weathersense-collector-2.4.jar"};
     private final CurrentWeatherMonitor cwMonitor;
     private final HistoryMonitor historyMonitor;
+    private final ProcessMonitor processMonitor;
     private final ScheduledExecutorService executor;
 
     public WeatherSenseHealthMonitor() {
         cwMonitor = CurrentWeatherMonitor.createCurrentWeatherMonitor(10);
         historyMonitor = HistoryMonitor.createHistoryMonitor("192.168.0.100", 60);
+        processMonitor = new ProcessMonitor();
         executor = Executors.newSingleThreadScheduledExecutor();
     }
 
     public void start() {
-        final String VP2_ARGS[] = { "notepad.exe" };
-        MonitoredProcess p1 = new MonitoredProcess(Arrays.asList(VP2_ARGS), new File("c:/weathersense/notepad.log"));
-        try {
-            p1.launch();
-        }
-        catch (IOException ex) {
-            Logger.getLogger(WeatherSenseHealthMonitor.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        processMonitor.startProcesses();
+
         Runnable runnable = () -> {
             boolean hmHealth = historyMonitor.isHealthy();
             boolean cwHealth = cwMonitor.isHealthy();
