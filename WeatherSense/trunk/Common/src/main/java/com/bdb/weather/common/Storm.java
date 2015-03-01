@@ -17,6 +17,7 @@
 package com.bdb.weather.common;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import com.bdb.weather.common.measurement.Depth;
 
@@ -68,4 +69,32 @@ public class Storm {
     public boolean isStormActive() {
         return endTime == null;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 83 * hash + Objects.hashCode(this.startTime);
+        hash = 83 * hash + Objects.hashCode(this.endTime);
+        hash = 83 * hash + Objects.hashCode(this.stormRainfall);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+
+        if (getClass() != obj.getClass())
+            return false;
+
+        final Storm other = (Storm)obj;
+        if (!Objects.equals(this.startTime, other.startTime))
+            return false;
+
+        if (!Objects.equals(this.endTime, other.endTime))
+            return false;
+
+        return Objects.equals(this.stormRainfall, other.stormRainfall);
+    }
+
 }

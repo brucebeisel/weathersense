@@ -18,8 +18,8 @@ package com.bdb.weather.healthmonitor;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -27,24 +27,27 @@ import java.util.logging.Logger;
  * @author Bruce
  */
 public class ProcessMonitor implements HealthMonitor, MonitoredProcess.Monitor {
-    private final Executor executor;
     private final static Logger logger = Logger.getLogger(ProcessMonitor.class.getName());
+    private Map<String,MonitoredProcess> processes = new HashMap<>();
 
     public ProcessMonitor() {
-        executor = Executors.newSingleThreadExecutor();
     }
 
     public void startProcesses() {
         final String VP2_ARGS[] = { "notepad.exe" };
-        MonitoredProcess p1 = new MonitoredProcess(Arrays.asList(VP2_ARGS), new File("c:/weathersense/notepad.log"), this);
+        MonitoredProcess p1 = new MonitoredProcess("Notepad", Arrays.asList(VP2_ARGS), new File("c:/weathersense/notepad.log"), this);
+        processes.put(p1.getName(), p1);
         p1.launch();
     }
 
     public void stopProcesses() {
     }
 
-    private void handleProcessExited(MonitoredProcess process, int exitCode) {
-        process.launch();
+    public void dumpStatus() {
+        for (MonitoredProcess process : processes.values()) {
+            System.out.println(process);
+        }
+
     }
 
     @Override
@@ -54,6 +57,17 @@ public class ProcessMonitor implements HealthMonitor, MonitoredProcess.Monitor {
 
     @Override
     public void processExited(MonitoredProcess process, int exitCode) {
-        executor.execute(()->handleProcessExited(process, exitCode));
+    }
+
+    @Override
+    public void processFinished(MonitoredProcess process) {
+    }
+
+    @Override
+    public void processFailed(MonitoredProcess process) {
+    }
+
+    @Override
+    public void processStarted(MonitoredProcess process) {
     }
 }

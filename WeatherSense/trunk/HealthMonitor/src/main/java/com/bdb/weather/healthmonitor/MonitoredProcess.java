@@ -18,8 +18,11 @@ package com.bdb.weather.healthmonitor;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,31 +34,45 @@ import java.util.logging.Logger;
 public class MonitoredProcess implements Runnable {
     public interface Monitor {
         void processExited(MonitoredProcess process, int exitCode);
+        void processFinished(MonitoredProcess process);
+        void processFailed(MonitoredProcess process);
+        void processStarted(MonitoredProcess process);
     }
     private final ProcessBuilder builder;
     private Process process;
+    private final String name;
     private boolean running = false;
+    private boolean failed = false;
     private boolean killing = false;
     private int startCount = 0;
     private int restartCount = 0;
     private LocalDateTime lastStartTime;
     private Thread monitor;
     private final Monitor callback;
+    private static final Executor executor = Executors.newSingleThreadExecutor();
     private final static Logger logger = Logger.getLogger(MonitoredProcess.class.getName());
 
-    public MonitoredProcess(List<String> commandArgs, File outputFile, Monitor callback) {
+    public MonitoredProcess(String name, List<String> commandArgs, File outputFile, Monitor callback) {
         builder = new ProcessBuilder(commandArgs);
         ProcessBuilder.Redirect redirect = ProcessBuilder.Redirect.appendTo(outputFile);
         builder.redirectErrorStream(true);
         builder.redirectOutput(redirect);
         monitor = null;
         this.callback = callback;
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public boolean isRunning() {
         return running;
     }
 
+    public boolean hasProcessFailed() {
+        return failed;
+    }
     public int getStartCount() {
         return startCount;
     }
@@ -64,12 +81,46 @@ public class MonitoredProcess implements Runnable {
         return restartCount;
     }
 
-    public void processDied() {
-        logger.log(Level.INFO, "Process died. Restart count = " + restartCount);
-        callback.processExited(this, process.exitValue());
+    public Duration uptime() {
+        return Duration.between(lastStartTime, LocalDateTime.now());
+    }
+
+    private void processDied() {
+        try {
+            logger.log(Level.INFO, "Process " + name + " died. Restart count = " + restartCount + "  Exit Code: " + process.exitValue());
+            running = false;
+            monitor.join(1000);
+            if (!killing && restartCount < 5)
+                launch();
+            else if (killing) {
+                processFinished();
+            }
+            else
+                processFailed();
+        }
+        catch (InterruptedException ex) {
+            logger.log(Level.SEVERE, "Thread wait was interrupted", ex);
+        }
+    }
+
+    private void processStarted() {
+        callback.processStarted(this);
+
+    }
+
+    private void processFailed() {
+        logger.severe("Process failed");
+        callback.processFailed(this);
+
+    }
+
+    private void processFinished() {
+        callback.processFinished(this);
     }
 
     public boolean launch() {
+        failed = false;
+        running = false;
         monitor = new Thread(this);
 
         try {
@@ -79,13 +130,14 @@ public class MonitoredProcess implements Runnable {
             running = true;
             killing = false;
             if (process != null) {
+                processStarted();
                 monitor.start();
                 lastStartTime = LocalDateTime.now();
                 return true;
             }
         }
         catch (IOException e) {
-
+            processFailed();
         }
         return false;
     }
@@ -115,18 +167,36 @@ public class MonitoredProcess implements Runnable {
 
     @Override
     public void run() {
+        logger.fine("Starting thread to monitor process");
         while (process.isAlive()) {
             try {
                 if (process.waitFor(10, TimeUnit.MINUTES)) {
                     running = false;
-                    processDied();
+                    executor.execute(()->processDied());
                 }
-                else
+                else {
+                    logger.fine("Resetting restart count for process " + name);
                     restartCount = 0;
+                }
             }
             catch (InterruptedException ex) {
                 Logger.getLogger(MonitoredProcess.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        logger.fine("Process Monitor thread exiting");
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Name: ").append(name).append("\n");
+        sb.append("Running: ").append(running);
+        if (running)
+            sb.append(" Uptime: ").append(uptime());
+        sb.append("\n");
+        sb.append("Killing: ").append(killing).append("\n");
+        sb.append("Total Start Count: ").append(startCount).append(" Restart Count: ").append(restartCount);
+
+        return sb.toString();
     }
 }

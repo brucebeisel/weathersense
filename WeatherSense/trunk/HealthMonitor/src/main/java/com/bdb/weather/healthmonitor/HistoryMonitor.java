@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.bdb.util.jdbc.DBTable;
 import com.bdb.weather.common.db.DatabaseConstants;
 
 /**
@@ -68,16 +69,19 @@ public class HistoryMonitor implements HealthMonitor {
 
     @Override
     public boolean isHealthy() {
+        logger.fine("Checking if history table is up to date");
         try (ResultSet rs = statement.executeQuery()) {
-            if (!rs.first())
+            if (!rs.first()) {
+                logger.warning("Failed to query history table");
                 return false;
+            }
 
             Timestamp ts = rs.getTimestamp(1);
             LocalDateTime time = ts.toLocalDateTime();
+            logger.fine("History table time: " + DBTable.dateTimeFormatter().format(time));
             LocalDateTime now = LocalDateTime.now();
             Duration delta = Duration.between(time, now);
             return delta.getSeconds() < toleranceSeconds;
-
         }
         catch (SQLException e) {
             logger.log(Level.SEVERE, "Failed to query history table for max date");

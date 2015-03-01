@@ -119,7 +119,11 @@ public class StormTable extends DBTable<Storm> {
 
         try {
             try (PreparedStatement stmt = getConnection().getConnection().prepareStatement(sql)) {
-                stmt.setTimestamp(1, Timestamp.valueOf(record.getEndTime()));
+                if (record.getEndTime() != null)
+                    stmt.setTimestamp(1, Timestamp.valueOf(record.getEndTime()));
+                else
+                    stmt.setNull(1, Types.TIMESTAMP);
+
                 stmt.setDouble(2, record.getStormRainfall().get(DatabaseUnits.DEPTH));
                 stmt.setTimestamp(3, Timestamp.valueOf(record.getStartTime()));
                 return stmt.executeUpdate() == 1;

@@ -88,15 +88,22 @@ public class StormTableTest {
     /**
      * Test of retrieveLatestStorm method, of class StormTable.
      */
-    //@Test
+    @Test
     public void testRetrieveLatestStorm() {
         System.out.println("retrieveLatestStorm");
-        StormTable instance = null;
-        Storm expResult = null;
+        StormTable instance = new StormTable(dbcon);
+        LocalDateTime endTime = LocalDateTime.now().minusDays(2);
+        LocalDateTime startTime = endTime.minusHours(12).minusDays(2);
+        Storm storm = new Storm(startTime, endTime, new Depth(1.0));
+        instance.addRow(storm);
+
+        startTime = startTime.plusDays(2);
+        endTime = endTime.plusDays(2);
+        storm = new Storm(startTime, endTime, new Depth(2.0));
+        instance.addRow(storm);
+
         Storm result = instance.retrieveLatestStorm();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(storm, result);
     }
 
     /**

@@ -19,28 +19,35 @@ package com.bdb.weather.display;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.text.DateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import javax.swing.JComponent;
 
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryLabelPositions;
-import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
-import org.jfree.chart.plot.CategoryMarker;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.chart.renderer.category.LineAndShapeRenderer;
-import org.jfree.chart.renderer.category.StandardBarPainter;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.labels.StandardXYToolTipGenerator;
+import org.jfree.chart.labels.XYToolTipGenerator;
+import org.jfree.chart.plot.CombinedDomainXYPlot;
+import org.jfree.chart.plot.ValueMarker;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.StandardXYBarPainter;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.time.Minute;
+import org.jfree.data.time.RegularTimePeriod;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.ui.RectangleEdge;
 
+import com.bdb.util.TimeUtils;
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.display.axis.RainRangeAxis;
 
@@ -51,23 +58,29 @@ import com.bdb.weather.display.axis.RainRangeAxis;
  *
  */
 public class RainPlot {
-    public static class RainEntry {
-        public LocalDateTime time;
-        public Depth    rainfall;
-        public Depth    rainfallRate;
-        public RainEntry(LocalDateTime time, Depth rainfall, Depth rainfallRate) {
-            this.time = time;
-            this.rainfall = rainfall;
-            this.rainfallRate = rainfallRate;
-        }
-    };
-    private static final String RAIN_DOMAIN = "Rainfall";
-    private static final String RAIN_RATE_DOMAIN_PREFIX = "Rate (%s/hr)";
-    private JFreeChart                           chart;
-    private ChartPanel                           chartPanel;
-    private CategoryPlot                         rainPlot;
-    private final String                         rateDomain;
-    private final DateTimeFormatter              formatter = DateTimeFormatter.ofPattern("HH:mm"); // TODO use preferences
+public static class RainEntry {
+    public LocalDateTime time;
+    public Depth    rainfall;
+    public Depth    rainfallRate;
+    public RainEntry(LocalDateTime time, Depth rainfall, Depth rainfallRate) {
+        this.time = time;
+        this.rainfall = rainfall;
+        this.rainfallRate = rainfallRate;
+    }
+};
+private static final String RAIN_DOMAIN = "Rainfall";
+private static final String RAIN_RATE_DOMAIN_PREFIX = "Rate (%s/hr)";
+private JFreeChart                           chart;
+private ChartPanel                           chartPanel;
+private CombinedDomainXYPlot                 plot;
+private XYPlot                               rainPlot;
+private XYPlot                               rainRatePlot;
+private TimeSeriesCollection                 rainDataset;
+private TimeSeriesCollection                 rainRateDataset;
+private TimeSeries                           rainSeries;
+private TimeSeries                           rainRateSeries;
+private final String                         rateDomain;
+private final DateTimeFormatter              formatter = DateTimeFormatter.ofPattern("HH:mm"); // TODO use preferences
     
     /**
      * Class to generate the labels for the tool tips
@@ -140,7 +153,18 @@ public class RainPlot {
     public RainPlot() {
         String unitString = Depth.getDefaultUnit().toString();
         rateDomain = String.format(RAIN_RATE_DOMAIN_PREFIX, unitString);
-        chart = ChartFactory.createBarChart("", "Time", "", null, PlotOrientation.VERTICAL, true, true, false);
+        rainPlot = new XYPlot();
+        rainPlot.setRangeAxis(new RainRangeAxis());
+        rainRatePlot = new XYPlot();
+        rainRatePlot.setRangeAxis(new RainRangeAxis());
+
+        plot = new CombinedDomainXYPlot();
+        plot.setDomainAxis(new DateAxis("Time"));
+
+        plot.add(rainRatePlot);
+        plot.add(rainPlot);
+
+        chart = new JFreeChart(plot);
         chart.getLegend().setPosition(RectangleEdge.RIGHT);
         
         chartPanel = new ChartPanel(chart);
@@ -149,37 +173,31 @@ public class RainPlot {
         chartPanel.setMinimumDrawHeight(0);
         chartPanel.setMinimumDrawWidth(0);
 
-        rainPlot = (CategoryPlot)chart.getPlot();
-        rainPlot.getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.DOWN_90);
-        rainPlot.setRangeAxis(0, new RainRangeAxis());
-        RainRangeAxis rateAxis = new RainRangeAxis();
-        rateAxis.setLabel(rateDomain);
-        rainPlot.setRangeAxis(1, rateAxis);
-        rainPlot.setDataset(0, new DefaultCategoryDataset());
-        rainPlot.setDataset(1, new DefaultCategoryDataset());
-        rainPlot.mapDatasetToRangeAxis(0, 0);
-        rainPlot.mapDatasetToRangeAxis(1, 1);
+        rainDataset = new TimeSeriesCollection();
+        rainSeries = new TimeSeries(RAIN_DOMAIN);
+        rainDataset.addSeries(rainSeries);
+        rainPlot.setDataset(rainDataset);
+
+        rainRateDataset = new TimeSeriesCollection();
+        rainRateSeries = new TimeSeries(rateDomain);
+        rainRateDataset.addSeries(rainRateSeries);
+        rainRatePlot.setDataset(rainRateDataset);
         
-        StandardCategoryToolTipGenerator tooltip = new StandardCategoryToolTipGenerator() {
-            @Override
-            public String generateToolTip(CategoryDataset dataset, int row, int column) {
-                Depth d = new Depth(dataset.getValue(row, column).doubleValue());
-                return ((PlotLabel)dataset.getColumnKey(column)).toolTip() + ", " + d;   
-            }
-        };
+        XYToolTipGenerator ttg = new StandardXYToolTipGenerator(StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT, DateFormat.getTimeInstance(), Depth.getDefaultFormatter());
         
-        BarRenderer renderer = (BarRenderer)rainPlot.getRenderer(0);
+        XYBarRenderer renderer = new XYBarRenderer();
         renderer.setShadowVisible(false);
-        renderer.setBarPainter(new StandardBarPainter());
+        renderer.setBarPainter(new StandardXYBarPainter());
         renderer.setBasePaint(Color.BLUE);
         renderer.setSeriesPaint(0, Color.BLUE);
-        renderer.setBaseToolTipGenerator(tooltip);
+        renderer.setBaseToolTipGenerator(ttg);
+        plot.setRenderer(renderer);
         
-        LineAndShapeRenderer rateRenderer = new LineAndShapeRenderer(true, false);
+        XYItemRenderer rateRenderer = new XYLineAndShapeRenderer(true, false);
         rateRenderer.setBasePaint(Color.RED);
         rateRenderer.setSeriesPaint(0, Color.RED);
-        rateRenderer.setBaseToolTipGenerator(tooltip);
-        rainPlot.setRenderer(1, rateRenderer);
+        rateRenderer.setBaseToolTipGenerator(ttg);
+        rainRatePlot.setRenderer(rateRenderer);
     }
     
     /**
@@ -197,26 +215,29 @@ public class RainPlot {
      * @param list The list of historical records for the rainfall graph.
      */
     public void setRainData(List<RainEntry> list) {
+        rainSeries.clear();
+        rainRateSeries.clear();
         
         if (list.size() > 0) {
-            DefaultCategoryDataset rainfall = new DefaultCategoryDataset();
-            DefaultCategoryDataset rate = new DefaultCategoryDataset();
-
             rainPlot.clearDomainMarkers();
             //
             // Load the graph
             //
             for (RainEntry r : list) {
-                PlotLabel plotLabel = new PlotLabel(r.time);
-                if (r.rainfall != null)
-                    rainfall.addValue(r.rainfall.get(), RAIN_DOMAIN, plotLabel);
+                RegularTimePeriod p = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(r.time), TimeZone.getDefault());
 
-                if (r.rainfallRate != null)
-                    rate.addValue(r.rainfallRate.get(), rateDomain, plotLabel); // TODO use preferences for in/hr label
+                if (r.rainfall != null) {
+                    TimeSeriesDataItem item = new TimeSeriesDataItem(p, r.rainfall.get());
+                    rainSeries.add(item);
+                }
+
+                if (r.rainfallRate != null) {
+                    TimeSeriesDataItem item = new TimeSeriesDataItem(p, r.rainfallRate.get());
+                    rainRateSeries.add(item);
+                }
             }
 
-            rainPlot.setDataset(0, rainfall);
-            rainPlot.setDataset(1, rate);
+            rainPlot.getRangeAxis().setAutoRange(true);
 
             addMarker(list.get(list.size() - 1).time);
         }
@@ -224,11 +245,13 @@ public class RainPlot {
 
     public void addMarker(LocalDateTime markerTime) {
         rainPlot.clearDomainMarkers();
-        PlotLabel plotLabel = new PlotLabel(markerTime);
+        rainRatePlot.clearDomainMarkers();
 
-        CategoryMarker marker = new CategoryMarker(plotLabel);
+        ValueMarker marker = new ValueMarker(TimeUtils.localDateTimeToEpochMillis(markerTime));
         marker.setPaint(new Color(0x8000FF00, true));
         marker.setStroke(new BasicStroke(2.0F));
         rainPlot.addDomainMarker(marker);
+        rainRatePlot.addDomainMarker(marker);
+        plot.addDomainMarker(marker);
     }
 }

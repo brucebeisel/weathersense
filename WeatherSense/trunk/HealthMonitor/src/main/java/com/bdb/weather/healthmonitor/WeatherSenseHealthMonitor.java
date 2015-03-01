@@ -37,7 +37,7 @@ public class WeatherSenseHealthMonitor {
 
     public WeatherSenseHealthMonitor() {
         cwMonitor = CurrentWeatherMonitor.createCurrentWeatherMonitor(10);
-        historyMonitor = HistoryMonitor.createHistoryMonitor("192.168.0.100", 60);
+        historyMonitor = HistoryMonitor.createHistoryMonitor("192.168.0.100", 6);
         processMonitor = new ProcessMonitor();
         executor = Executors.newSingleThreadScheduledExecutor();
     }
@@ -52,6 +52,7 @@ public class WeatherSenseHealthMonitor {
             System.out.println("CW: " + cwHealth + "  HM: " + hmHealth);
             System.out.println("WeatherSense health: " + (healthy ? "Healthy" : "Unhealthy"));
             System.out.println(cwMonitor);
+            processMonitor.dumpStatus();
         };
         executor.scheduleAtFixedRate(runnable, 10, 10, TimeUnit.SECONDS);
     }
