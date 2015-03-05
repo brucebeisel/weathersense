@@ -86,13 +86,19 @@ public class PiGlow {
         device.write(FIRST_LED_ADDR, intensities, 0, intensities.length);
     }
 
-    public void allOff() throws IOException {
-        device.write(FIRST_LED_ADDR, ALL_OFF, 0, ALL_OFF.length);
+    public void allOff() {
+        try {
+            device.write(FIRST_LED_ADDR, ALL_OFF, 0, ALL_OFF.length);
+        }
+        catch (IOException ex) {
+            Logger.getLogger(PiGlow.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public static final void main(String args[]) {
         try {
             PiGlow pg = new PiGlow();
+            Runtime.getRuntime().addShutdownHook(new Thread(()->pg.allOff()));
             pg.initialize();
             pg.setLEDIntensity(PiGlowLED.findLed(PiGlowArm.TOP, PiGlowColor.RED), (byte)128);
         }
