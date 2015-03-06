@@ -17,9 +17,12 @@
 package com.bdb.weather.healthmonitor.piglow;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
@@ -47,19 +50,26 @@ public class PiGlow {
     }
 
     public void initialize() throws IOException, InterruptedException {
+        final GpioController gpio = GpioFactory.getInstance();
+
         SystemInfo.BoardType boardType = SystemInfo.getBoardType();
-        int busNumber;
+        int busNumber = I2CBus.BUS_0;
         switch (boardType) {
-            case ModelA_Rev0:
+            case ModelA_Rev1:
             case ModelB_Rev1:
             case ModelB_Rev2:
                 busNumber = I2CBus.BUS_0;
                 break;
-            default:
+
+            case ModelA_Plus_Rev1:
+            case ModelB_Plus_Rev1:
+            case Model2B_Rev1:
                 busNumber = I2CBus.BUS_1;
                 break;
         }
 
+	busNumber = I2CBus.BUS_1;
+        System.out.println("Bus Number: " + busNumber);
         bus = I2CFactory.getInstance(busNumber);
         device = bus.getDevice(I2C_ADDR);
 
@@ -75,6 +85,7 @@ public class PiGlow {
 
     public void setLEDIntensity(PiGlowLED led, byte intensity) throws IOException {
         led.setIntensity(intensity);
+        device.write(led.getAddress(), intensity);
         commit();
     }
 
@@ -84,11 +95,14 @@ public class PiGlow {
         });
 
         device.write(FIRST_LED_ADDR, intensities, 0, intensities.length);
+        commit();
     }
 
     public void allOff() {
+        System.out.println("Turning all off");
         try {
             device.write(FIRST_LED_ADDR, ALL_OFF, 0, ALL_OFF.length);
+            commit();
         }
         catch (IOException ex) {
             Logger.getLogger(PiGlow.class.getName()).log(Level.SEVERE, null, ex);
@@ -100,7 +114,20 @@ public class PiGlow {
             PiGlow pg = new PiGlow();
             Runtime.getRuntime().addShutdownHook(new Thread(()->pg.allOff()));
             pg.initialize();
-            pg.setLEDIntensity(PiGlowLED.findLed(PiGlowArm.TOP, PiGlowColor.RED), (byte)128);
+            List<PiGlowLED> leds = PiGlowLED.allLEDs();
+            for (int i = 0; i < 10; i++) 
+		for (PiGlowLED led : leds) {
+		    pg.setLEDIntensity(led, (byte)10);
+		    Thread.sleep(100);
+		    pg.setLEDIntensity(led, (byte)0);
+		}
+
+	
+	    for (PiGlowLED led : leds)
+                led.setIntensity(1);
+
+            pg.updateLEDs();
+            Thread.sleep(2000);
         }
         catch (IOException | InterruptedException ex) {
             Logger.getLogger(PiGlow.class.getName()).log(Level.SEVERE, null, ex);
