@@ -47,7 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.bdb.piglow4J.PiGlow</mainClass>
+                            <mainClass>com.bdb.piglow4j.PiGlow</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
