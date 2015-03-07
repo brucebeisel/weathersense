@@ -45,14 +45,44 @@ public class PiGlow {
     private I2CBus bus;
     private I2CDevice device;
     private final byte[] intensities = new byte[18];
+    private static final Logger logger = Logger.getLogger(PiGlow.class.getName());
 
     public PiGlow() {
     }
 
-    public void initialize() throws IOException, InterruptedException {
-        final GpioController gpio = GpioFactory.getInstance();
+    /**
+     * This method fixes a bug in pi4j that does not report the board type correctly for RPi 2 Rev B
+     * 
+     * @return The board type
+     */
+    private SystemInfo.BoardType getBoardType() {
+        try {
+            String revision = SystemInfo.getRevision();
+            long irevision = Long.parseLong(revision, 16);
+            long scheme = (irevision >> 20) & 0xF;
+            long ram = (irevision >> 16) & 0xF;
+            long manufacturer = (irevision >> 12) & 0xF;
+            long processor = (irevision >> 8) & 0xF;
+            long type = (irevision >> 4) & 0xFF;
+            long rev = irevision & 0xF;
 
-        SystemInfo.BoardType boardType = SystemInfo.getBoardType();
+            logger.fine(String.format("Board Revision: Scheme: %d RAM: %d Manufacturer %d Processor: %d Type: %d Revision: %d",
+                                      scheme, ram, manufacturer, processor, type, rev));
+            if (scheme == 0)
+                return SystemInfo.getBoardType();
+            else if (type == 4)
+                return SystemInfo.BoardType.Model2B_Rev1;
+            else
+                return SystemInfo.BoardType.UNKNOWN;
+        }
+        catch (IOException | InterruptedException ex) {
+            logger.log(Level.SEVERE, "Failed to determine RPi board type", ex);
+            return SystemInfo.BoardType.UNKNOWN;
+        }
+    }
+
+    public void initialize() throws IOException, InterruptedException {
+        SystemInfo.BoardType boardType = getBoardType();
         int busNumber = I2CBus.BUS_0;
         switch (boardType) {
             case ModelA_Rev1:
@@ -68,8 +98,6 @@ public class PiGlow {
                 break;
         }
 
-	busNumber = I2CBus.BUS_1;
-        System.out.println("Bus Number: " + busNumber);
         bus = I2CFactory.getInstance(busNumber);
         device = bus.getDevice(I2C_ADDR);
 
