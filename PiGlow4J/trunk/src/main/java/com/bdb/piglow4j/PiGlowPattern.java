@@ -26,6 +26,6 @@ public interface PiGlowPattern {
     public void addLEDs(PiGlowLED... leds);
     public void addLEDs(List<PiGlowLED> leds);
     public void removeLED(PiGlowLED led);
-    public void start();
+    public void start(long now);
     public void stop();
 }

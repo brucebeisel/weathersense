@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
@@ -34,6 +32,7 @@ import com.pi4j.system.SystemInfo;
  */
 public class PiGlow {
     private static final int ENABLE_OUTPUT_ADDR = 0x0;
+    private static final byte ENABLE_OUTPUT = 0x1;
     private static final int FIRST_LED_ADDR = 0x1;
     private static final int ENABLE_TOP_ARM_ADDR = 0x13;
     private static final int ENABLE_LEFT_ARM_ADDR = 0x14;
@@ -84,6 +83,7 @@ public class PiGlow {
     }
 
     public void initialize() throws IOException, InterruptedException {
+        Runtime.getRuntime().addShutdownHook(new Thread(()->allOff()));
         SystemInfo.BoardType boardType = getBoardType();
         int busNumber = I2CBus.BUS_0;
         switch (boardType) {
@@ -103,7 +103,7 @@ public class PiGlow {
         bus = I2CFactory.getInstance(busNumber);
         device = bus.getDevice(I2C_ADDR);
 
-        device.write(ENABLE_OUTPUT_ADDR, (byte)0x1);
+        device.write(ENABLE_OUTPUT_ADDR, ENABLE_OUTPUT);
         device.write(ENABLE_TOP_ARM_ADDR, VALUE);
         device.write(ENABLE_LEFT_ARM_ADDR, VALUE);
         device.write(ENABLE_RIGHT_ARM_ADDR, VALUE);
@@ -129,7 +129,7 @@ public class PiGlow {
     }
 
     public void allOff() {
-        System.out.println("Turning all off");
+        logger.finer("Turning all off");
         try {
             device.write(FIRST_LED_ADDR, ALL_OFF, 0, ALL_OFF.length);
             commit();
@@ -140,10 +140,14 @@ public class PiGlow {
     }
 
     public static final void main(String args[]) {
+
         try {
             PiGlow pg = new PiGlow();
-            Runtime.getRuntime().addShutdownHook(new Thread(()->pg.allOff()));
             pg.initialize();
+            PiGlowBlinker blinker = new PiGlowBlinker(1000, 500, 0, 100, 5, true, false, 5, PiGlowLED.armLEDs(PiGlowArm.TOP));
+            PiGlowAnimator animator = new PiGlowAnimator(pg, blinker);
+            animator.start();
+            /*
             List<PiGlowLED> leds = PiGlowLED.allLEDs();
             for (int i = 0; i < 10; i++) 
 		for (PiGlowLED led : leds) {
@@ -158,6 +162,7 @@ public class PiGlow {
 
             pg.updateLEDs();
             Thread.sleep(2000);
+                    */
         }
         catch (IOException | InterruptedException ex) {
             Logger.getLogger(PiGlow.class.getName()).log(Level.SEVERE, null, ex);

@@ -16,17 +16,41 @@
  */
 package com.bdb.piglow4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
  * @author Bruce
  */
-public class PiGlowBlinker implements PiGlowPattern {
-    public PiGlowBlinker(int initialDelayMillis, int intervalMillis, int lowIntensity, int highIntensity) {
-    }
+public class PiGlowBlinker implements PiGlowPattern, PiGlowAnimation {
+    private final int delay;
+    private final int interval;
+    private final int lowIntensity;
+    private final int highIntensity;
+    private final int steps;
+    private final boolean lowToHigh;
+    private final boolean reverse;
+    private final int repetitions;
+    private final List<PiGlowLED> leds;
 
-    public PiGlowBlinker(int initialDelayMillis, int intervalMillis, int lowIntensity, int highIntensity, List<PiGlowLED> leds) {
+    private int currentStep = 0;
+    private int currentIntensity;
+    private long startTime;
+    private long nextStepTime;
+    private int deltaIntensity;
+    private int count;
+
+    public PiGlowBlinker(int delayMillis, int intervalMillis, int lowIntensity, int highIntensity, int steps, boolean lowToHigh, boolean reverse, int repetitions, List<PiGlowLED> leds) {
+        this.delay = delayMillis;
+        this.interval = intervalMillis;
+        this.lowIntensity = lowIntensity;
+        this.highIntensity = highIntensity;
+        this.steps = steps;
+        this.lowToHigh = lowToHigh;
+        this.reverse = reverse;
+        this.repetitions = repetitions;
+        this.leds = new ArrayList<>(leds);
     }
 
     @Override
@@ -42,10 +66,54 @@ public class PiGlowBlinker implements PiGlowPattern {
     }
 
     @Override
-    public void start() {
+    public void start(long now) {
+        startTime = now;
+        nextStepTime = now + delay;
     }
 
     @Override
     public void stop() {
+    }
+
+    @Override
+    public void initialize() {
+	long now = System.currentTimeMillis();
+        startTime = now;
+        nextStepTime = now + delay;
+        currentStep = 0;
+	count = 0;
+        deltaIntensity = (highIntensity - lowIntensity) / steps;
+        if (lowToHigh) {
+            currentIntensity = lowIntensity;
+        }
+        else {
+            currentIntensity = highIntensity;
+            deltaIntensity = -deltaIntensity;
+        }
+    }
+
+    @Override
+    public long nextStepMillis(long now) {
+	if (count >= repetitions)
+	    return 0;
+	else
+	    return nextStepTime - now;
+    }
+
+    @Override
+    public void executeNextStep() {
+        leds.stream().forEach((led) -> {
+            led.setIntensity(currentIntensity);
+        });
+
+        currentStep++;
+        currentIntensity += deltaIntensity;
+	nextStepTime += interval;
+        if (currentStep > steps) {
+	    currentIntensity = lowIntensity;
+	    count++;
+	    currentStep = 0;
+	}
+
     }
 }
