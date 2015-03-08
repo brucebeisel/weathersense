@@ -144,7 +144,7 @@ public class PiGlow {
         try {
             PiGlow pg = new PiGlow();
             pg.initialize();
-            PiGlowBlinker blinker = new PiGlowBlinker(1000, 500, 0, 100, 5, true, false, 5, PiGlowLED.armLEDs(PiGlowArm.TOP));
+            PiGlowBlinker blinker = new PiGlowBlinker(1000, 500, 0, 100, 5, true, false, 5, PiGlowLED.armLEDs(PiGlowArm.LEFT));
             PiGlowAnimator animator = new PiGlowAnimator(pg, blinker);
             animator.start();
             /*
