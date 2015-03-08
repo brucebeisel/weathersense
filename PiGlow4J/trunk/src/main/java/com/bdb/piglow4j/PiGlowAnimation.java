@@ -27,12 +27,12 @@ public interface PiGlowAnimation {
     public void initialize();
 
     /**
-     * How many milliseconds to wait before the next step of the animation must run
+     * How many milliseconds to wait before the next step of the animation must run.
      */
     public long nextStepMillis(long now);
 
     /**
-     * Change the LEDs
+     * Change the LEDs if the current time is equal to or past the next step time.
      */
-    public void executeNextStep();
+    public void executeNextStep(long now);
 }

@@ -95,13 +95,16 @@ public class PiGlowBlinker implements PiGlowPattern, PiGlowAnimation {
     @Override
     public long nextStepMillis(long now) {
 	if (count >= repetitions)
-	    return 0;
+	    return -1;
 	else
 	    return nextStepTime - now;
     }
 
     @Override
-    public void executeNextStep() {
+    public void executeNextStep(long now) {
+        if (now < nextStepTime)
+            return;
+
         leds.stream().forEach((led) -> {
             led.setIntensity(currentIntensity);
         });

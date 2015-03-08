@@ -65,9 +65,7 @@ public class PiGlow {
             long type = (irevision >> 4) & 0xFF;
             long rev = irevision & 0xF;
 
-            logger.fine(String.format("Board Revision: Scheme: %d RAM: %d Manufacturer %d Processor: %d Type: %d Revision: %d",
-                                      scheme, ram, manufacturer, processor, type, rev));
-            System.out.println(String.format("Board Revision: Scheme: %d RAM: %d Manufacturer %d Processor: %d Type: %d Revision: %d",
+            logger.info(String.format("Board Revision: Scheme: %d RAM: %d Manufacturer %d Processor: %d Type: %d Revision: %d",
                                       scheme, ram, manufacturer, processor, type, rev));
             if (scheme == 0)
                 return SystemInfo.getBoardType();
@@ -120,22 +118,21 @@ public class PiGlow {
     }
 
     public void updateLEDs() throws IOException {
-        PiGlowLED.allLEDs().stream().forEach((led) -> {
-            intensities[led.getAddress() - FIRST_LED_ADDR] = (byte)led.getIntensity();
-        });
+        PiGlowLED.allLEDs().forEach((led) -> intensities[led.getAddress() - FIRST_LED_ADDR] = (byte)led.getIntensity());
 
         device.write(FIRST_LED_ADDR, intensities, 0, intensities.length);
         commit();
     }
 
     public void allOff() {
-        logger.finer("Turning all off");
+        logger.info("Turning all off");
         try {
             device.write(FIRST_LED_ADDR, ALL_OFF, 0, ALL_OFF.length);
             commit();
+	    PiGlowLED.allLEDs().forEach((led) -> led.setIntensity(0));
         }
         catch (IOException ex) {
-            Logger.getLogger(PiGlow.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, "Exception turning off all LEDs", ex);
         }
     }
 
@@ -144,25 +141,25 @@ public class PiGlow {
         try {
             PiGlow pg = new PiGlow();
             pg.initialize();
-            PiGlowBlinker blinker = new PiGlowBlinker(1000, 500, 0, 100, 5, true, false, 5, PiGlowLED.armLEDs(PiGlowArm.LEFT));
-            PiGlowAnimator animator = new PiGlowAnimator(pg, blinker);
+            PiGlowBlinker leftBlinker = new PiGlowBlinker(333, 1000, 0, 25, 5, true, false, 2, PiGlowLED.armLEDs(PiGlowArm.LEFT));
+            PiGlowBlinker rightBlinker = new PiGlowBlinker(0, 1000, 0, 25, 5, true, false, 2, PiGlowLED.armLEDs(PiGlowArm.RIGHT));
+            PiGlowBlinker topBlinker = new PiGlowBlinker(667, 1000, 0, 25, 5, true, false, 2, PiGlowLED.armLEDs(PiGlowArm.TOP));
+            PiGlowAnimator animator = new PiGlowAnimator(pg);
+            animator.addAnimation(leftBlinker);
+            animator.addAnimation(rightBlinker);
+            animator.addAnimation(topBlinker);
             animator.start();
-            /*
-            List<PiGlowLED> leds = PiGlowLED.allLEDs();
-            for (int i = 0; i < 10; i++) 
-		for (PiGlowLED led : leds) {
-		    pg.setLEDIntensity(led, (byte)10);
-		    Thread.sleep(100);
-		    pg.setLEDIntensity(led, (byte)0);
-		}
 
-	
-	    for (PiGlowLED led : leds)
-                led.setIntensity(1);
+	    animator.waitForTermination(300000);
+	    pg.allOff();
 
-            pg.updateLEDs();
-            Thread.sleep(2000);
-                    */
+            animator = new PiGlowAnimator(pg);
+            PiGlowBlinker blueBlinker = new PiGlowBlinker(0, 500, 0, 25, 1, true, false, 5, PiGlowLED.colorLEDs(PiGlowColor.WHITE));
+            animator.addAnimation(blueBlinker);
+            animator.start();
+
+	    animator.waitForTermination(300000);
+	    pg.allOff();
         }
         catch (IOException | InterruptedException ex) {
             Logger.getLogger(PiGlow.class.getName()).log(Level.SEVERE, null, ex);
