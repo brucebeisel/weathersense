@@ -59,14 +59,16 @@ public class PiGlow {
         try {
             String revision = SystemInfo.getRevision();
             long irevision = Long.parseLong(revision, 16);
-            long scheme = (irevision >> 20) & 0xF;
-            long ram = (irevision >> 16) & 0xF;
-            long manufacturer = (irevision >> 12) & 0xF;
-            long processor = (irevision >> 8) & 0xF;
+            long scheme = (irevision >> 23) & 0x1;
+            long ram = (irevision >> 20) & 0x7;
+            long manufacturer = (irevision >> 16) & 0xF;
+            long processor = (irevision >> 12) & 0xF;
             long type = (irevision >> 4) & 0xFF;
             long rev = irevision & 0xF;
 
             logger.fine(String.format("Board Revision: Scheme: %d RAM: %d Manufacturer %d Processor: %d Type: %d Revision: %d",
+                                      scheme, ram, manufacturer, processor, type, rev));
+            System.out.println(String.format("Board Revision: Scheme: %d RAM: %d Manufacturer %d Processor: %d Type: %d Revision: %d",
                                       scheme, ram, manufacturer, processor, type, rev));
             if (scheme == 0)
                 return SystemInfo.getBoardType();
