@@ -63,16 +63,19 @@ public class PiGlowAnimator implements Runnable {
 
     private void scheduleNextStep(long now) {
         long millis = Long.MAX_VALUE;
-        for (PiGlowAnimation animation : animations)
-            millis = Math.min(millis, animation.nextStepMillis(now));
+        for (PiGlowAnimation animation : animations) {
+            long nextStepMillis = animation.nextStepMillis(now);
+            if (nextStepMillis >= 0)
+		millis = Math.min(millis, nextStepMillis);
+        }
 
 	logger.info("Next step in " + millis + " milliseconds");
-	if (millis > 0)
-	    executor.schedule(this, millis, TimeUnit.MILLISECONDS);
+        if (millis == Long.MAX_VALUE)
+	    executor.shutdown();
 	else if (millis == 0)
 	    executor.execute(this);
 	else
-	    executor.shutdown();
+	    executor.schedule(this, millis, TimeUnit.MILLISECONDS);
     }
 
 

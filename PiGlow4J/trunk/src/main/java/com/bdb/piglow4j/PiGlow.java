@@ -141,9 +141,9 @@ public class PiGlow {
         try {
             PiGlow pg = new PiGlow();
             pg.initialize();
-            PiGlowBlinker leftBlinker = new PiGlowBlinker(333, 1000, 0, 25, 5, true, false, 2, PiGlowLED.armLEDs(PiGlowArm.LEFT));
-            PiGlowBlinker rightBlinker = new PiGlowBlinker(0, 1000, 0, 25, 5, true, false, 2, PiGlowLED.armLEDs(PiGlowArm.RIGHT));
-            PiGlowBlinker topBlinker = new PiGlowBlinker(667, 1000, 0, 25, 5, true, false, 2, PiGlowLED.armLEDs(PiGlowArm.TOP));
+            PiGlowBlinker leftBlinker = new PiGlowBlinker(333, 1000, 0, 25, 5, true, false, 1, PiGlowLED.armLEDs(PiGlowArm.LEFT));
+            PiGlowBlinker rightBlinker = new PiGlowBlinker(0, 1000, 0, 25, 5, true, false, 1, PiGlowLED.armLEDs(PiGlowArm.RIGHT));
+            PiGlowBlinker topBlinker = new PiGlowBlinker(667, 1000, 0, 25, 5, true, false, 1, PiGlowLED.armLEDs(PiGlowArm.TOP));
             PiGlowAnimator animator = new PiGlowAnimator(pg);
             animator.addAnimation(leftBlinker);
             animator.addAnimation(rightBlinker);
@@ -160,6 +160,22 @@ public class PiGlow {
 
 	    animator.waitForTermination(300000);
 	    pg.allOff();
+
+            animator = new PiGlowAnimator(pg);
+            PiGlowAnimation animation;
+            animation = new PiGlowOneShot(0, 50, PiGlowLED.armLEDs(PiGlowArm.TOP));
+            animator.addAnimation(animation);
+            animation = new PiGlowOneShot(500, 0, PiGlowLED.armLEDs(PiGlowArm.TOP));
+            animator.addAnimation(animation);
+            animation = new PiGlowOneShot(500, 50, PiGlowLED.armLEDs(PiGlowArm.LEFT));
+            animator.addAnimation(animation);
+            animation = new PiGlowOneShot(1000, 0, PiGlowLED.armLEDs(PiGlowArm.LEFT));
+            animator.addAnimation(animation);
+            animation = new PiGlowOneShot(1000, 50, PiGlowLED.armLEDs(PiGlowArm.RIGHT));
+            animator.addAnimation(animation);
+            animation = new PiGlowOneShot(1500, 0, PiGlowLED.armLEDs(PiGlowArm.RIGHT));
+            animator.addAnimation(animation);
+            animator.start();
         }
         catch (IOException | InterruptedException ex) {
             Logger.getLogger(PiGlow.class.getName()).log(Level.SEVERE, null, ex);
