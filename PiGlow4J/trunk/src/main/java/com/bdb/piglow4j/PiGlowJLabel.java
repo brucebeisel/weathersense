@@ -16,25 +16,28 @@
  */
 package com.bdb.piglow4j;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+
 /**
  *
  * @author Bruce Beisel
  */
-public interface PiGlowAnimation {
-    public static final long ANIMATION_COMPLETE = -1;
+public class PiGlowJLabel extends JLabel {
+    private int intensities[] = new int[18];
+    public PiGlowJLabel(ImageIcon image) {
+        super(image);
+    }
 
-    /**
-     * Initialize any counters or times that are needed to track the animation.
-     */
-    public void initialize(long now);
-
-    /**
-     * How many milliseconds to wait before the next step of the animation must run.
-     */
-    public long nextStepMillis(long now);
-
-    /**
-     * Change the LEDs if the current time is equal to or past the next step time.
-     */
-    public void executeNextStep(long now);
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setColor(Color.red);
+        g2.fillRect(50, 200, 30, 15);
+    }
 }

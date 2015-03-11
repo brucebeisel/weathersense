@@ -16,25 +16,38 @@
  */
 package com.bdb.piglow4j;
 
+import java.io.IOException;
+
+import com.pi4j.io.i2c.I2CBus;
+import com.pi4j.io.i2c.I2CDevice;
+
 /**
  *
  * @author Bruce Beisel
  */
-public interface PiGlowAnimation {
-    public static final long ANIMATION_COMPLETE = -1;
+public class I2CBusSwing implements I2CBus {
 
-    /**
-     * Initialize any counters or times that are needed to track the animation.
-     */
-    public void initialize(long now);
+    @Override
+    public I2CDevice getDevice(int addr) throws IOException {
+        if (addr == 0x54)
+            return new I2CDeviceSwing();
+        else
+            return null;
+    }
 
-    /**
-     * How many milliseconds to wait before the next step of the animation must run.
-     */
-    public long nextStepMillis(long now);
+    @Override
+    public String getFileName() {
+        return "No File";
+    }
 
-    /**
-     * Change the LEDs if the current time is equal to or past the next step time.
-     */
-    public void executeNextStep(long now);
+    @Override
+    public int getFileDescriptor() {
+        return 0;
+    }
+
+    @Override
+    public void close() throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
 }

@@ -83,7 +83,7 @@ public class PiGlow {
     public void initialize() throws IOException, InterruptedException {
         Runtime.getRuntime().addShutdownHook(new Thread(()->allOff()));
         SystemInfo.BoardType boardType = getBoardType();
-        int busNumber = I2CBus.BUS_0;
+        int busNumber = I2CBus.BUS_1;
         switch (boardType) {
             case ModelA_Rev1:
             case ModelB_Rev1:
@@ -139,6 +139,7 @@ public class PiGlow {
     public static final void main(String args[]) {
 
         try {
+            I2CFactory.setFactory(new I2CFactoryProviderSwing());
             PiGlow pg = new PiGlow();
             pg.initialize();
             PiGlowBlinker leftBlinker = new PiGlowBlinker(333, 1000, 0, 25, 5, true, false, 1, PiGlowLED.armLEDs(PiGlowArm.LEFT));

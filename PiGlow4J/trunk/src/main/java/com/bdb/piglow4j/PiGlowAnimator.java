@@ -48,7 +48,7 @@ public class PiGlowAnimator implements Runnable {
     public void start() {
         long now = System.currentTimeMillis();
 	logger.info("Starting animation at " + now);
-        animations.forEach((animation)->animation.initialize());
+        animations.forEach((animation)->animation.initialize(now));
 	scheduleNextStep(now);
     }
 

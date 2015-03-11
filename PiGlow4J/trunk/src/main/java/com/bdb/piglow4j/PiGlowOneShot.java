@@ -39,16 +39,16 @@ public class PiGlowOneShot implements PiGlowAnimation {
     }
 
     @Override
-    public void initialize() {
-        fireTime = System.currentTimeMillis() + delay;
+    public void initialize(long now) {
+        fireTime = now + delay;
     }
 
     @Override
     public long nextStepMillis(long now) {
         if (hasRun)
-            return -1;
-
-        return fireTime - now;
+            return PiGlowAnimation.ANIMATION_COMPLETE;
+        else
+            return fireTime - now;
     }
 
     @Override

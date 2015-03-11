@@ -16,25 +16,20 @@
  */
 package com.bdb.piglow4j;
 
+import java.io.IOException;
+
+import com.pi4j.io.i2c.I2CBus;
+import com.pi4j.io.i2c.I2CFactoryProvider;
+
 /**
  *
  * @author Bruce Beisel
  */
-public interface PiGlowAnimation {
-    public static final long ANIMATION_COMPLETE = -1;
+public class I2CFactoryProviderSwing implements I2CFactoryProvider {
 
-    /**
-     * Initialize any counters or times that are needed to track the animation.
-     */
-    public void initialize(long now);
-
-    /**
-     * How many milliseconds to wait before the next step of the animation must run.
-     */
-    public long nextStepMillis(long now);
-
-    /**
-     * Change the LEDs if the current time is equal to or past the next step time.
-     */
-    public void executeNextStep(long now);
+    @Override
+    public I2CBus getBus(int i) throws IOException {
+        return new I2CBusSwing();
+    }
+    
 }

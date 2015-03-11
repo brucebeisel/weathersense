@@ -23,7 +23,7 @@ import java.util.List;
  *
  * @author Bruce
  */
-public class PiGlowBlinker implements PiGlowPattern, PiGlowAnimation {
+public class PiGlowBlinker implements PiGlowAnimation {
     private final int delay;
     private final int interval;
     private final int lowIntensity;
@@ -54,30 +54,7 @@ public class PiGlowBlinker implements PiGlowPattern, PiGlowAnimation {
     }
 
     @Override
-    public void addLEDs(PiGlowLED... leds) {
-    }
-
-    @Override
-    public void addLEDs(List<PiGlowLED> leds) {
-    }
-
-    @Override
-    public void removeLED(PiGlowLED led) {
-    }
-
-    @Override
-    public void start(long now) {
-        startTime = now;
-        nextStepTime = now + delay;
-    }
-
-    @Override
-    public void stop() {
-    }
-
-    @Override
-    public void initialize() {
-	long now = System.currentTimeMillis();
+    public void initialize(long now) {
         startTime = now;
         nextStepTime = now + delay;
         currentStep = 0;
@@ -95,7 +72,7 @@ public class PiGlowBlinker implements PiGlowPattern, PiGlowAnimation {
     @Override
     public long nextStepMillis(long now) {
 	if (count >= repetitions)
-	    return -1;
+	    return PiGlowAnimation.ANIMATION_COMPLETE;
 	else
 	    return nextStepTime - now;
     }
