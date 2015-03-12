@@ -74,11 +74,11 @@ public class I2CDeviceSwing implements I2CDevice {
 
     @Override
     public int read(int i, byte[] bytes, int i1, int i2) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
     public int read(byte[] bytes, int i, int i1, byte[] bytes1, int i2, int i3) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported.");
     }
 }

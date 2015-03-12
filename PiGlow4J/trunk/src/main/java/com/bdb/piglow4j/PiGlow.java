@@ -142,20 +142,21 @@ public class PiGlow {
             I2CFactory.setFactory(new I2CFactoryProviderSwing());
             PiGlow pg = new PiGlow();
             pg.initialize();
-            PiGlowBlinker leftBlinker = new PiGlowBlinker(333, 1000, 0, 25, 5, true, false, 1, PiGlowLED.armLEDs(PiGlowArm.LEFT));
-            PiGlowBlinker rightBlinker = new PiGlowBlinker(0, 1000, 0, 25, 5, true, false, 1, PiGlowLED.armLEDs(PiGlowArm.RIGHT));
-            PiGlowBlinker topBlinker = new PiGlowBlinker(667, 1000, 0, 25, 5, true, false, 1, PiGlowLED.armLEDs(PiGlowArm.TOP));
+            PiGlowBlinker leftBlinker = new PiGlowBlinker(333, 1000, 0, 255, 5, true, false, 5, PiGlowLED.armLEDs(PiGlowArm.LEFT));
+            PiGlowBlinker rightBlinker = new PiGlowBlinker(0, 1000, 0, 255, 5, true, false, 5, PiGlowLED.armLEDs(PiGlowArm.RIGHT));
+            PiGlowBlinker topBlinker = new PiGlowBlinker(667, 1000, 0, 255, 5, true, false, 5, PiGlowLED.armLEDs(PiGlowArm.TOP));
             PiGlowAnimator animator = new PiGlowAnimator(pg);
             animator.addAnimation(leftBlinker);
             animator.addAnimation(rightBlinker);
             animator.addAnimation(topBlinker);
+            Thread.sleep(2000);
             animator.start();
 
 	    animator.waitForTermination(300000);
 	    pg.allOff();
 
             animator = new PiGlowAnimator(pg);
-            PiGlowBlinker blueBlinker = new PiGlowBlinker(0, 500, 0, 25, 1, true, false, 5, PiGlowLED.colorLEDs(PiGlowColor.WHITE));
+            PiGlowBlinker blueBlinker = new PiGlowBlinker(0, 500, 0, 255, 1, true, false, 5, PiGlowLED.colorLEDs(PiGlowColor.BLUE));
             animator.addAnimation(blueBlinker);
             animator.start();
 
@@ -164,15 +165,15 @@ public class PiGlow {
 
             animator = new PiGlowAnimator(pg);
             PiGlowAnimation animation;
-            animation = new PiGlowOneShot(0, 50, PiGlowLED.armLEDs(PiGlowArm.TOP));
+            animation = new PiGlowOneShot(0, 255, PiGlowLED.armLEDs(PiGlowArm.TOP));
             animator.addAnimation(animation);
             animation = new PiGlowOneShot(500, 0, PiGlowLED.armLEDs(PiGlowArm.TOP));
             animator.addAnimation(animation);
-            animation = new PiGlowOneShot(500, 50, PiGlowLED.armLEDs(PiGlowArm.LEFT));
+            animation = new PiGlowOneShot(500, 255, PiGlowLED.armLEDs(PiGlowArm.LEFT));
             animator.addAnimation(animation);
             animation = new PiGlowOneShot(1000, 0, PiGlowLED.armLEDs(PiGlowArm.LEFT));
             animator.addAnimation(animation);
-            animation = new PiGlowOneShot(1000, 50, PiGlowLED.armLEDs(PiGlowArm.RIGHT));
+            animation = new PiGlowOneShot(1000, 255, PiGlowLED.armLEDs(PiGlowArm.RIGHT));
             animator.addAnimation(animation);
             animation = new PiGlowOneShot(1500, 0, PiGlowLED.armLEDs(PiGlowArm.RIGHT));
             animator.addAnimation(animation);

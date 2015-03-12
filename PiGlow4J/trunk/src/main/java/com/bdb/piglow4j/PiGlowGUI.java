@@ -19,6 +19,9 @@ package com.bdb.piglow4j;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,7 +38,9 @@ public class PiGlowGUI {
     private boolean topArmOn = false;
     private boolean leftArmOn = false;
     private boolean rightArmOn = false;
-    private int intensities[] = new int[18];
+    private final int intensities[] = new int[18];
+    private PiGlowJLabel label;
+    private final static Logger logger = Logger.getLogger(PiGlowGUI.class.getName());
 
     public void createElements() {
         try {
@@ -43,50 +48,58 @@ public class PiGlowGUI {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             InputStream is = ClassLoader.class.getResourceAsStream("/piglow.jpg");
             BufferedImage bufferedImage = ImageIO.read(is);
-            frame.add(new PiGlowJLabel(new ImageIcon(bufferedImage)));
+            label = new PiGlowJLabel(new ImageIcon(bufferedImage));
+            frame.add(label);
             frame.pack();
             frame.setVisible(true);
         }
         catch (IOException ex) {
-            Logger.getLogger(PiGlowGUI.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
     public void processBytes(int address, byte buffer[], int length) {
         if (address == 0x0 && buffer[0] == 0x1) {
             on = true;
-            System.out.println("PiGlow is ON");
+            logger.info("PiGlow is ON");
             return;
         }
 
         if (!on) {
-            System.out.println("Ignoring bytes because board is OFF");
+            logger.info("Ignoring bytes because board is OFF");
             return;
         }
 
         if (address == 0x13 && ((int)buffer[0] & 0xFF) == 0xFF) {
-            System.out.println("Turning on TOP arm");
+            logger.info("Turning on TOP arm");
             topArmOn = true;
         }
         else if (address == 0x14 && ((int)buffer[0] & 0xFF) == 0xFF) {
-            System.out.println("Turning on LEFT arm");
+            logger.info("Turning on LEFT arm");
             leftArmOn = true;
         }
         else if (address == 0x15 && ((int)buffer[0] & 0xFF) == 0xFF) {
-            System.out.println("Turning on RIGHT arm");
+            logger.info("Turning on RIGHT arm");
             rightArmOn = true;
         }
-
-        if (address >= 0x1 && address <= 0x12) {
-            System.out.println("Getting intensities");
-            for (int i = 0; address + i <= 0x12 && i < length; i++)
-                intensities[address + i - 1] = buffer[i];
-
-
-            for (int intensity : intensities)
-                System.out.print("" + intensity + " ");
-
-            System.out.println();
+        else if (address == 0x16 && ((int)buffer[0] & 0xFF) == 0xFF) {
+            logger.info("Committing");
+            label.commit();
         }
+        else if (address >= 0x1 && address <= 0x12) {
+            logger.info("Getting intensities");
+            for (int i = 0; address + i <= 0x12 && i < length; i++)
+                intensities[address + i - 1] = ((int)buffer[i] & 0xFF);
+
+            label.setIntensities(intensities);
+
+            String s = "";
+            for (int intensity : intensities)
+                s += "" + intensity + " ";
+
+            logger.info(s);
+        }
+        else
+            logger.warning("Received bytes for unknown address: " + address);
     }
 }
