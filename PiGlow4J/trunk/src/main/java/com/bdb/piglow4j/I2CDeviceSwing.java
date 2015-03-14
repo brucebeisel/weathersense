@@ -17,6 +17,7 @@
 package com.bdb.piglow4j;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 import javax.swing.SwingUtilities;
@@ -31,8 +32,13 @@ public class I2CDeviceSwing implements I2CDevice {
     private PiGlowGUI gui;
 
     public I2CDeviceSwing() {
-        gui = new PiGlowGUI();
-        SwingUtilities.invokeLater(()->gui.createElements());
+        try {
+            gui = new PiGlowGUI();
+            SwingUtilities.invokeAndWait(()->gui.createElements());
+        }
+        catch (InvocationTargetException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

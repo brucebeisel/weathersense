@@ -142,6 +142,7 @@ public class PiGlow {
             I2CFactory.setFactory(new I2CFactoryProviderSwing());
             PiGlow pg = new PiGlow();
             pg.initialize();
+
             PiGlowBlinker leftBlinker = new PiGlowBlinker(333, 1000, 0, 255, 5, true, false, 5, PiGlowLED.armLEDs(PiGlowArm.LEFT));
             PiGlowBlinker rightBlinker = new PiGlowBlinker(0, 1000, 0, 255, 5, true, false, 5, PiGlowLED.armLEDs(PiGlowArm.RIGHT));
             PiGlowBlinker topBlinker = new PiGlowBlinker(667, 1000, 0, 255, 5, true, false, 5, PiGlowLED.armLEDs(PiGlowArm.TOP));
@@ -149,7 +150,6 @@ public class PiGlow {
             animator.addAnimation(leftBlinker);
             animator.addAnimation(rightBlinker);
             animator.addAnimation(topBlinker);
-            Thread.sleep(2000);
             animator.start();
 
 	    animator.waitForTermination(300000);
@@ -178,6 +178,10 @@ public class PiGlow {
             animation = new PiGlowOneShot(1500, 0, PiGlowLED.armLEDs(PiGlowArm.RIGHT));
             animator.addAnimation(animation);
             animator.start();
+	    animator.waitForTermination(300000);
+
+	    PiGlowLED.allLEDs().forEach((led) -> led.setIntensity(255));
+            pg.updateLEDs();
         }
         catch (IOException | InterruptedException ex) {
             Logger.getLogger(PiGlow.class.getName()).log(Level.SEVERE, null, ex);

@@ -19,9 +19,6 @@ package com.bdb.piglow4j;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +36,7 @@ public class PiGlowGUI {
     private boolean leftArmOn = false;
     private boolean rightArmOn = false;
     private final int intensities[] = new int[18];
-    private PiGlowJLabel label;
+    private PiGlowJComponent component;
     private final static Logger logger = Logger.getLogger(PiGlowGUI.class.getName());
 
     public void createElements() {
@@ -48,8 +45,8 @@ public class PiGlowGUI {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             InputStream is = ClassLoader.class.getResourceAsStream("/piglow.jpg");
             BufferedImage bufferedImage = ImageIO.read(is);
-            label = new PiGlowJLabel(new ImageIcon(bufferedImage));
-            frame.add(label);
+            component = new PiGlowJComponent(new ImageIcon(bufferedImage));
+            frame.add(component);
             frame.pack();
             frame.setVisible(true);
         }
@@ -84,14 +81,14 @@ public class PiGlowGUI {
         }
         else if (address == 0x16 && ((int)buffer[0] & 0xFF) == 0xFF) {
             logger.info("Committing");
-            label.commit();
+            component.commit();
         }
         else if (address >= 0x1 && address <= 0x12) {
             logger.info("Getting intensities");
             for (int i = 0; address + i <= 0x12 && i < length; i++)
                 intensities[address + i - 1] = ((int)buffer[i] & 0xFF);
 
-            label.setIntensities(intensities);
+            component.setIntensities(intensities);
 
             String s = "";
             for (int intensity : intensities)
