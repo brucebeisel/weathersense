@@ -40,6 +40,7 @@ public class PiGlowBlinker implements PiGlowAnimation {
     private int currentIntensity;
     private long nextStepTime;
     private int deltaIntensity;
+    private int initialIntensity;
     private int count;
 
     /**
@@ -72,14 +73,20 @@ public class PiGlowBlinker implements PiGlowAnimation {
         nextStepTime = now + delay;
         currentStep = 0;
 	count = 0;
+        initializeIntensities();
+    }
+
+    private void initializeIntensities() {
         deltaIntensity = (highIntensity - lowIntensity) / steps;
+
         if (lowToHigh) {
-            currentIntensity = lowIntensity;
+            initialIntensity = lowIntensity;
         }
         else {
-            currentIntensity = highIntensity;
+            initialIntensity = highIntensity;
             deltaIntensity = -deltaIntensity;
         }
+        currentIntensity = initialIntensity;
     }
 
     @Override
@@ -95,15 +102,26 @@ public class PiGlowBlinker implements PiGlowAnimation {
         if (now < nextStepTime)
             return;
 
-        leds.forEach((led) -> led.setIntensity(currentIntensity) );
+        leds.forEach((led) -> led.setIntensity(currentIntensity));
 
         currentStep++;
         currentIntensity += deltaIntensity;
 	nextStepTime += interval;
         if (currentStep > steps) {
-	    currentIntensity = lowIntensity;
-	    count++;
-	    currentStep = 0;
+            if (reverse) {
+                if (currentStep > steps * 2) {
+                    initializeIntensities();
+                    currentStep = 0;
+                    count++;
+                }
+                else if (currentStep - 1 == steps)
+                    deltaIntensity = -deltaIntensity;
+            }
+            else {
+                initializeIntensities();
+                currentStep = 0;
+                count++;
+            }
 	}
     }
 }
