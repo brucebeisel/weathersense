@@ -26,12 +26,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
- *
+ * The main Swing component that displays the PiGlow image and updates the simulated LEDs.
+ * 
  * @author Bruce Beisel
  */
 @SuppressWarnings("serial")
 public class PiGlowJComponent extends JPanel {
-    private final LedInfo leds[] = new LedInfo[18];
+    private final LedInfo leds[] = new LedInfo[PiGlow.PIGLOW_LED_COUNT];
     private final Color whites[] = new Color[256];
     private final Color blues[] = new Color[256];
     private final Color yellows[] = new Color[256];
@@ -41,52 +42,67 @@ public class PiGlowJComponent extends JPanel {
     private final ImageIcon background;
     private static final Logger logger = Logger.getLogger(PiGlowJComponent.class.getName());
 
+    /**
+     * Class the hold the information about each simulated LED.
+     */
     private class LedInfo {
         public PiGlowArm arm;
         public PiGlowColor color;
-        public int x;
-        public int y;
         public int intensity;
         public Color[] colors;
         public JLabel label;
         public LedInfo(PiGlowArm arm, PiGlowColor color, int x, int y, Color[] colors) {
             this.arm = arm;
             this.color = color;
-            this.x = x;
-            this.y = y;
             this.colors = colors;
             label = new JLabel();
             label.setOpaque(true);
-            label.setSize(15, 15);
-            label.setPreferredSize(new Dimension(15, 15));
+            label.setSize(25, 25);
+            label.setPreferredSize(new Dimension(25, 25));
             label.setLocation(x, y);
             label.setBackground(colors[0]);
         }
     }
 
+    /**
+     * Constructor.
+     * 
+     * @param image the PiGlow board image
+     */
     public PiGlowJComponent(ImageIcon image) {
         setLayout(null);
         setBackground(Color.BLACK);
         background = image;
+
+        //
+        // Build the 256 intensities for each LED color
+        //
         buildColors(whites, Color.WHITE);
         buildColors(blues, Color.BLUE);
         buildColors(yellows, Color.YELLOW);
         buildColors(greens, Color.GREEN);
         buildColors(oranges, Color.ORANGE);
         buildColors(reds, Color.RED);
-        LedInfo info = new LedInfo(PiGlowArm.TOP, PiGlowColor.WHITE, 210, 432, whites);
-        leds[PiGlowLED.findLed(PiGlowArm.TOP, PiGlowColor.WHITE).getAddress() - 1] = info;
-        info = new LedInfo(PiGlowArm.TOP, PiGlowColor.BLUE, 155, 415, blues);
-        leds[PiGlowLED.findLed(PiGlowArm.TOP, PiGlowColor.BLUE).getAddress() - 1] = info;
+
+        //
+        // Create the LEDs for the top LED arm
+        //
+        LedInfo info = new LedInfo(PiGlowArm.TOP, PiGlowColor.RED, 225, 220, reds);
+        leds[PiGlowLED.findLed(PiGlowArm.TOP, PiGlowColor.RED).getAddress() - 1] = info;
+        info = new LedInfo(PiGlowArm.TOP, PiGlowColor.ORANGE, 173, 255, oranges);
+        leds[PiGlowLED.findLed(PiGlowArm.TOP, PiGlowColor.ORANGE).getAddress() - 1] = info;
+        info = new LedInfo(PiGlowArm.TOP, PiGlowColor.YELLOW, 138, 305, yellows);
+        leds[PiGlowLED.findLed(PiGlowArm.TOP, PiGlowColor.YELLOW).getAddress() - 1] = info;
         info = new LedInfo(PiGlowArm.TOP, PiGlowColor.GREEN, 135, 360, greens);
         leds[PiGlowLED.findLed(PiGlowArm.TOP, PiGlowColor.GREEN).getAddress() - 1] = info;
-        info = new LedInfo(PiGlowArm.TOP, PiGlowColor.YELLOW, 135, 305, yellows);
-        leds[PiGlowLED.findLed(PiGlowArm.TOP, PiGlowColor.YELLOW).getAddress() - 1] = info;
-        info = new LedInfo(PiGlowArm.TOP, PiGlowColor.ORANGE, 170, 255, oranges);
-        leds[PiGlowLED.findLed(PiGlowArm.TOP, PiGlowColor.ORANGE).getAddress() - 1] = info;
-        info = new LedInfo(PiGlowArm.TOP, PiGlowColor.RED, 225, 220, reds);
-        leds[PiGlowLED.findLed(PiGlowArm.TOP, PiGlowColor.RED).getAddress() - 1] = info;
+        info = new LedInfo(PiGlowArm.TOP, PiGlowColor.BLUE, 155, 415, blues);
+        leds[PiGlowLED.findLed(PiGlowArm.TOP, PiGlowColor.BLUE).getAddress() - 1] = info;
+        info = new LedInfo(PiGlowArm.TOP, PiGlowColor.WHITE, 205, 432, whites);
+        leds[PiGlowLED.findLed(PiGlowArm.TOP, PiGlowColor.WHITE).getAddress() - 1] = info;
 
+        //
+        // Create the LEDs for the left LED arm
+        //
         info = new LedInfo(PiGlowArm.LEFT, PiGlowColor.RED, 50, 500, reds);
         leds[PiGlowLED.findLed(PiGlowArm.LEFT, PiGlowColor.RED).getAddress() - 1] = info;
         info = new LedInfo(PiGlowArm.LEFT, PiGlowColor.ORANGE, 115, 520, oranges);
@@ -97,9 +113,12 @@ public class PiGlowJComponent extends JPanel {
         leds[PiGlowLED.findLed(PiGlowArm.LEFT, PiGlowColor.GREEN).getAddress() - 1] = info;
         info = new LedInfo(PiGlowArm.LEFT, PiGlowColor.BLUE, 265, 460, blues);
         leds[PiGlowLED.findLed(PiGlowArm.LEFT, PiGlowColor.BLUE).getAddress() - 1] = info;
-        info = new LedInfo(PiGlowArm.LEFT, PiGlowColor.WHITE, 260, 405, whites);
+        info = new LedInfo(PiGlowArm.LEFT, PiGlowColor.WHITE, 260, 400, whites);
         leds[PiGlowLED.findLed(PiGlowArm.LEFT, PiGlowColor.WHITE).getAddress() - 1] = info;
 
+        //
+        // Create the LEDs for the right LED arm
+        //
         info = new LedInfo(PiGlowArm.RIGHT, PiGlowColor.RED, 385, 504, reds);
         leds[PiGlowLED.findLed(PiGlowArm.RIGHT, PiGlowColor.RED).getAddress() - 1] = info;
         info = new LedInfo(PiGlowArm.RIGHT, PiGlowColor.ORANGE, 380, 445, oranges);
@@ -108,11 +127,14 @@ public class PiGlowJComponent extends JPanel {
         leds[PiGlowLED.findLed(PiGlowArm.RIGHT, PiGlowColor.YELLOW).getAddress() - 1] = info;
         info = new LedInfo(PiGlowArm.RIGHT, PiGlowColor.GREEN, 310, 355, greens);
         leds[PiGlowLED.findLed(PiGlowArm.RIGHT, PiGlowColor.GREEN).getAddress() - 1] = info;
-        info = new LedInfo(PiGlowArm.RIGHT, PiGlowColor.BLUE, 260, 340, blues);
+        info = new LedInfo(PiGlowArm.RIGHT, PiGlowColor.BLUE, 255, 340, blues);
         leds[PiGlowLED.findLed(PiGlowArm.RIGHT, PiGlowColor.BLUE).getAddress() - 1] = info;
-        info = new LedInfo(PiGlowArm.RIGHT, PiGlowColor.WHITE, 205, 375, whites);
+        info = new LedInfo(PiGlowArm.RIGHT, PiGlowColor.WHITE, 202, 372, whites);
         leds[PiGlowLED.findLed(PiGlowArm.RIGHT, PiGlowColor.WHITE).getAddress() - 1] = info;
 
+        //
+        // Add the LED JLabels
+        //
         for (LedInfo led : leds)
             add(led.label);
 
@@ -120,37 +142,52 @@ public class PiGlowJComponent extends JPanel {
     }
 
     private void buildColors(Color[] colors, Color baseColor) {
-
-        for (int i = 0; i <= 255; i++) {
-            float ratio = (float)i / 255.0F;
+        //
+        // Multiply each red, green and blue portion by the 0 - 255 ratio, then create a new color with the results
+        //
+        for (int i = 0; i <= PiGlow.MAX_INTENSITY; i++) {
+            float ratio = i / (float)PiGlow.MAX_INTENSITY;
             if (ratio > 1.0F)
                 ratio = 1.0F;
 
-            int red = (int)((float)baseColor.getRed() * ratio);
-            int green = (int)((float)baseColor.getGreen() * ratio);
-            int blue = (int)((float)baseColor.getBlue() * ratio);
+            int red = (int)(baseColor.getRed() * ratio);
+            int green = (int)(baseColor.getGreen() * ratio);
+            int blue = (int)(baseColor.getBlue() * ratio);
             colors[i] = new Color(red, green, blue);
         }
     }
 
+    /**
+     * Set the intensities for all of the simulated LEDs.
+     * 
+     * @param intensities The intensities
+     */
     public void setIntensities(int[] intensities) {
         logger.info("Receiving intensities");
         for (int i = 0; i < leds.length; i++) {
             leds[i].intensity = intensities[i];
-            System.out.print("" + intensities[i] + " ");
         }
-        System.out.println();
     }
 
+    /**
+     * Commit the new intensity values for all of the LEDs.
+     */
     public void commit() {
         logger.info("Committing");
+        //
+        // Set the background color of each LED JLabel
+        //
         for (LedInfo led : leds)
             led.label.setBackground(led.colors[led.intensity]);
     }
 
+    /**
+     * Force the PiGlow board image to be drawn.
+     * 
+     * @param g The graphics used to draw the image
+     */
     @Override
     public void paintComponent(Graphics g) {
         g.drawImage(background.getImage(), 0, 0, null);
     }
-    
 }

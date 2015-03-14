@@ -22,6 +22,7 @@ import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactoryProvider;
 
 /**
+ * I2CFactoryProvider that creates the I2CBus that create the PiGlow simulator GUI.
  *
  * @author Bruce Beisel
  */
@@ -31,5 +32,4 @@ public class I2CFactoryProviderSwing implements I2CFactoryProvider {
     public I2CBus getBus(int i) throws IOException {
         return new I2CBusSwing();
     }
-    
 }

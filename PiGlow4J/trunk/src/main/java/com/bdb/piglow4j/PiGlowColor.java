@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Bruce
+ * Copyright (C) 2015 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,8 @@
 package com.bdb.piglow4j;
 
 /**
- *
+ * Enumeration for the LED colors on the PiGlow.
+ * 
  * @author Bruce
  */
 public enum PiGlowColor {

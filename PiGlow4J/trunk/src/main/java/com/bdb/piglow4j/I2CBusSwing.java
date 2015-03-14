@@ -22,6 +22,7 @@ import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 
 /**
+ * A mock I2CDevice for creating a GUI the simulates the PiGlow.
  *
  * @author Bruce Beisel
  */
@@ -47,7 +48,7 @@ public class I2CBusSwing implements I2CBus {
 
     @Override
     public void close() throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported.");
     }
     
 }

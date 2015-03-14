@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Bruce
+ * Copyright (C) 2015 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,21 @@
 package com.bdb.piglow4j;
 
 /**
- *
+ * The different PiGlow arms of LEDs.
+ * 
  * @author Bruce
  */
 public enum PiGlowArm {
+    /**
+     * The arm of LEDs whose red LED is at the top of the PiGlow board.
+     */
     TOP,
+    /**
+     * The arm of LEDs whose red LED is on the right of the PiGlow board.
+     */
     RIGHT,
+    /**
+     * The arm of LEDs whose red LED is on the left of the PiGlow board.
+     */
     LEFT
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Bruce
+ * Copyright (C) 2015 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 /**
+ * Main class for the PiGlow simulator GUI.
  *
  * @author Bruce
  */
@@ -35,10 +36,13 @@ public class PiGlowGUI {
     private boolean topArmOn = false;
     private boolean leftArmOn = false;
     private boolean rightArmOn = false;
-    private final int intensities[] = new int[18];
+    private final int intensities[] = new int[PiGlow.PIGLOW_LED_COUNT];
     private PiGlowJComponent component;
     private final static Logger logger = Logger.getLogger(PiGlowGUI.class.getName());
 
+    /**
+     * Create the elements of the PiGlow simulator GUI
+     */
     public void createElements() {
         try {
             JFrame frame = new JFrame();
@@ -55,13 +59,26 @@ public class PiGlowGUI {
         }
     }
 
+    /**
+     * Process the bytes that were written to the I2C device.
+     * 
+     * @param address The address to which the bytes were written
+     * @param buffer The buffer of bytes
+     * @param length The number of bytes in the buffer
+     */
     public void processBytes(int address, byte buffer[], int length) {
+        //
+        // Turn on the PiGlow board
+        //
         if (address == 0x0 && buffer[0] == 0x1) {
             on = true;
             logger.info("PiGlow is ON");
             return;
         }
 
+        //
+        // If the board is not on, then any other command is ignored
+        //
         if (!on) {
             logger.info("Ignoring bytes because board is OFF");
             return;
@@ -89,12 +106,6 @@ public class PiGlowGUI {
                 intensities[address + i - 1] = ((int)buffer[i] & 0xFF);
 
             component.setIntensities(intensities);
-
-            String s = "";
-            for (int intensity : intensities)
-                s += "" + intensity + " ";
-
-            logger.info(s);
         }
         else
             logger.warning("Received bytes for unknown address: " + address);

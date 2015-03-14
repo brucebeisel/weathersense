@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Bruce
+ * Copyright (C) 2015 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 package com.bdb.piglow4j;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +30,12 @@ import com.pi4j.system.SystemInfo;
  * @author Bruce
  */
 public class PiGlow {
+    /**
+     * The number of LEDs that are on the PiGlow
+     */
+    public static final int PIGLOW_LED_COUNT = 18;
+    public static final int MIN_INTENSITY = 0;
+    public static final int MAX_INTENSITY = 255;
     private static final int ENABLE_OUTPUT_ADDR = 0x0;
     private static final byte ENABLE_OUTPUT = 0x1;
     private static final int FIRST_LED_ADDR = 0x1;
@@ -43,14 +48,19 @@ public class PiGlow {
     private static final byte ALL_OFF[] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
     private I2CBus bus;
     private I2CDevice device;
-    private final byte[] intensities = new byte[18];
+    private final byte[] intensities;
     private static final Logger logger = Logger.getLogger(PiGlow.class.getName());
 
+    /**
+     * Constructor.
+     */
     public PiGlow() {
+        intensities = new byte[PIGLOW_LED_COUNT];
     }
 
     /**
-     * This method fixes a bug in pi4j that does not report the board type correctly for RPi 2 Rev B
+     * This method fixes a bug in pi4j that does not report the board type correctly for RPi 2 Rev B.
+     * This method can be delete when the pi4j code is fixed.
      * 
      * @return The board type
      */
@@ -65,7 +75,7 @@ public class PiGlow {
             long type = (irevision >> 4) & 0xFF;
             long rev = irevision & 0xF;
 
-            logger.info(String.format("Board Revision: Scheme: %d RAM: %d Manufacturer %d Processor: %d Type: %d Revision: %d",
+            logger.fine(String.format("Board Revision: Scheme: %d RAM: %d Manufacturer %d Processor: %d Type: %d Revision: %d",
                                       scheme, ram, manufacturer, processor, type, rev));
             if (scheme == 0)
                 return SystemInfo.getBoardType();
@@ -75,12 +85,17 @@ public class PiGlow {
                 return SystemInfo.BoardType.UNKNOWN;
         }
         catch (IOException | InterruptedException ex) {
-            logger.log(Level.SEVERE, "Failed to determine RPi board type", ex);
+            logger.log(Level.SEVERE, "Failed to determine Raspberry Pi board type", ex);
             return SystemInfo.BoardType.UNKNOWN;
         }
     }
 
-    public void initialize() throws IOException, InterruptedException {
+    /**
+     * Initialize the PiGlow interface.
+     * 
+     * @return True of the PiGlow initialized successfully
+     */
+    public boolean initialize() {
         Runtime.getRuntime().addShutdownHook(new Thread(()->allOff()));
         SystemInfo.BoardType boardType = getBoardType();
         int busNumber = I2CBus.BUS_1;
@@ -98,34 +113,63 @@ public class PiGlow {
                 break;
         }
 
-        bus = I2CFactory.getInstance(busNumber);
-        device = bus.getDevice(I2C_ADDR);
+        try {
+            bus = I2CFactory.getInstance(busNumber);
+            device = bus.getDevice(I2C_ADDR);
 
-        device.write(ENABLE_OUTPUT_ADDR, ENABLE_OUTPUT);
-        device.write(ENABLE_TOP_ARM_ADDR, VALUE);
-        device.write(ENABLE_LEFT_ARM_ADDR, VALUE);
-        device.write(ENABLE_RIGHT_ARM_ADDR, VALUE);
+            device.write(ENABLE_OUTPUT_ADDR, ENABLE_OUTPUT);
+            device.write(ENABLE_TOP_ARM_ADDR, VALUE);
+            device.write(ENABLE_LEFT_ARM_ADDR, VALUE);
+            device.write(ENABLE_RIGHT_ARM_ADDR, VALUE);
+            return true;
+        }
+        catch (IOException e) {
+            logger.log(Level.SEVERE, "Failed to initialize the PiGlow", e);
+            return false;
+        }
     }
 
+    /**
+     * Commit the changes to the PiGlow.
+     * 
+     * @throws IOException 
+     */
     public void commit() throws IOException {
         device.write(COMMIT_ADDR, VALUE);
     }
 
+    /**
+     * Set the intensity of a single LED.
+     * 
+     * @param led The LED whose intensity is to be changed
+     * @param intensity the new intensity
+     * 
+     * @throws IOException Failed to write to the Raspberry Pi I2C
+     */
     public void setLEDIntensity(PiGlowLED led, byte intensity) throws IOException {
         led.setIntensity(intensity);
         device.write(led.getAddress(), intensity);
         commit();
     }
 
+    /**
+     * Write the new LED intensities to the PiGlow.
+     * 
+     * @throws IOException Failed to write to the Raspberry Pi I2C
+     */
     public void updateLEDs() throws IOException {
+        logger.fine("Updating the LED intensities");
         PiGlowLED.allLEDs().forEach((led) -> intensities[led.getAddress() - FIRST_LED_ADDR] = (byte)led.getIntensity());
 
         device.write(FIRST_LED_ADDR, intensities, 0, intensities.length);
         commit();
     }
 
+    /**
+     * Turn off all of the LEDs
+     */
     public void allOff() {
-        logger.info("Turning all off");
+        logger.fine("Turning all off");
         try {
             device.write(FIRST_LED_ADDR, ALL_OFF, 0, ALL_OFF.length);
             commit();
@@ -141,7 +185,8 @@ public class PiGlow {
         try {
             I2CFactory.setFactory(new I2CFactoryProviderSwing());
             PiGlow pg = new PiGlow();
-            pg.initialize();
+            if (!pg.initialize())
+                System.exit(1);
 
             PiGlowBlinker leftBlinker = new PiGlowBlinker(333, 1000, 0, 255, 5, true, false, 5, PiGlowLED.armLEDs(PiGlowArm.LEFT));
             PiGlowBlinker rightBlinker = new PiGlowBlinker(0, 1000, 0, 255, 5, true, false, 5, PiGlowLED.armLEDs(PiGlowArm.RIGHT));

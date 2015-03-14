@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Bruce
+ * Copyright (C) 2015 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * @author Bruce
+ * Animation that blinks one or more LEDs. The blinking can be a simple on off, or the increase in intensity can be stepped both
+ * upward and downward.
+ * 
+ * @author Bruce Beisel
  */
 public class PiGlowBlinker implements PiGlowAnimation {
     private final int delay;
@@ -36,11 +38,23 @@ public class PiGlowBlinker implements PiGlowAnimation {
 
     private int currentStep = 0;
     private int currentIntensity;
-    private long startTime;
     private long nextStepTime;
     private int deltaIntensity;
     private int count;
 
+    /**
+     * Constructor.
+     * 
+     * @param delayMillis The initial delay before the animation starts
+     * @param intervalMillis The interval between repetitions
+     * @param lowIntensity The starting intensity
+     * @param highIntensity The highest intensity
+     * @param steps The number of steps required to go from the low to the high intensity. Note that (high - low) % step must equal 0
+     * @param lowToHigh Whether to animate low to high or high to low
+     * @param reverse Whether the animation will reverse when the high intensity is reached.
+     * @param repetitions The number of times the animation will repeat
+     * @param leds The list of LEDs that will be animated
+     */
     public PiGlowBlinker(int delayMillis, int intervalMillis, int lowIntensity, int highIntensity, int steps, boolean lowToHigh, boolean reverse, int repetitions, List<PiGlowLED> leds) {
         this.delay = delayMillis;
         this.interval = intervalMillis;
@@ -55,7 +69,6 @@ public class PiGlowBlinker implements PiGlowAnimation {
 
     @Override
     public void initialize(long now) {
-        startTime = now;
         nextStepTime = now + delay;
         currentStep = 0;
 	count = 0;
@@ -82,9 +95,7 @@ public class PiGlowBlinker implements PiGlowAnimation {
         if (now < nextStepTime)
             return;
 
-        leds.stream().forEach((led) -> {
-            led.setIntensity(currentIntensity);
-        });
+        leds.forEach((led) -> led.setIntensity(currentIntensity) );
 
         currentStep++;
         currentIntensity += deltaIntensity;
@@ -94,6 +105,5 @@ public class PiGlowBlinker implements PiGlowAnimation {
 	    count++;
 	    currentStep = 0;
 	}
-
     }
 }
