@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2015 Bruce Beisel
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xs:element name="weather">
+        <xs:annotation>
+            <xs:documentation>Comment describing your root element</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="station">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="station_id"/>
+                            <xs:element name="location">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="latitude"/>
+                                        <xs:element name="longitude"/>
+                                        <xs:element name="altitude"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="record">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="time"/>
+                            <xs:element name="data">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="outdoor">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element ref="humidity"/>
+                                                    <xs:element ref="temperature"/>
+                                                    <xs:element name="pressure">
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element name="barometric" type="pressure"/>
+                                                                <xs:element name="atmospheric" type="pressure"/>
+                                                            </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                    <xs:element name="wind">
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element name="speed">
+                                                                    <xs:complexType>
+                                                                        <xs:sequence>
+                                                                            <xs:element name="sustained"/>
+                                                                            <xs:element name="gusts"/>
+                                                                        </xs:sequence>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                                <xs:element name="direction"/>
+                                                            </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                    <xs:element name="precipitation"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element name="indoor">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element ref="temperature"/>
+                                                    <xs:element ref="humidity"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="temperature">
+        <xs:complexType>
+            <xs:attribute name="units" use="required">
+                <xs:simpleType>
+                    <xs:list itemType="xs:token"/>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="humidity"/>
+    <xs:complexType name="pressure">
+        <xs:simpleContent>
+            <xs:extension base="xs:double"/>
+        </xs:simpleContent>
+    </xs:complexType>
+</xs:schema>

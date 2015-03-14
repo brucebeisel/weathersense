@@ -1,0 +1,747 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2015 Bruce Beisel
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<xmlg>
+  <timers/>
+  <subroutines/>
+  <rootpane>
+    <menubar>
+      <menu text="File">
+        <menuitem text="Exit"/>
+      </menu>
+      <menu text="Tools">
+        <menuitem text="Options..."/>
+      </menu>
+      <menu text="Help">
+        <menuitem text="About WeatherSense"/>
+      </menu>
+    </menubar>
+    <contentpane>
+      <component>
+        <border>
+          <titledborder title="Weather Sense">
+            <lineborder/>
+          </titledborder>
+        </border>
+        <panel>
+          <layout>
+            <borderlayout/>
+          </layout>
+          <component name="date" constraint="North">
+            <titledborder title="Date">
+              <lineborder/>
+            </titledborder>
+            <panel>
+              <component>
+                <titledborder title="Presets">
+                  <lineborder/>
+                </titledborder>
+                <panel>
+                  <component>
+                    <combobox maxRowCount="20">
+                      <comboboxitem text="Today"/>
+                      <comboboxitem text="Yesterday"/>
+                      <comboboxitem text="This Week"/>
+                      <comboboxitem text="Last Week"/>
+                      <comboboxitem text="This Month"/>
+                      <comboboxitem text="Last Month"/>
+                      <comboboxitem text="This Season"/>
+                      <comboboxitem text="Last Season"/>
+                      <comboboxitem text="This Year"/>
+                      <comboboxitem text="Last Year"/>
+                      <comboboxitem text="Custom">
+                        <actions>
+                          <script action="select">
+                            <attribute component="start date" enabled="true"/>
+                            <attribute component="end date" enabled="true"/>
+                          </script>
+                          <script action="deselect">
+                            <attribute component="start date" enabled="false"/>
+                            <attribute component="end date" enabled="false"/>
+                          </script>
+                        </actions>
+                      </comboboxitem>
+                    </combobox>
+                  </component>
+                </panel>
+              </component>
+              <component name="start date panel">
+                <titledborder title="Start Date">
+                  <lineborder/>
+                </titledborder>
+                <panel>
+                  <component name="start date" enabled="false">
+                    <datebutton/>
+                  </component>
+                </panel>
+              </component>
+              <component name="end date panel">
+                <titledborder title="End Date">
+                  <lineborder/>
+                </titledborder>
+                <panel>
+                  <component name="end date" enabled="false">
+                    <datebutton/>
+                  </component>
+                </panel>
+              </component>
+              <component name = "load">
+                <button text="Load Data"/>
+              </component>
+            </panel>
+          </component>
+          <component constraint="Center">
+            <border>
+              <titledborder title="Weather Data">
+                <lineborder/>
+              </titledborder>
+            </border>
+            <panel>
+              <layout>
+                <boxlayout axis="Y"/>
+              </layout>
+              <component name="thermal data">
+                <border>
+                  <titledborder title="Thermal Data">
+                    <lineborder/>
+                  </titledborder>
+                </border>
+                <panel>
+                  <layout>
+                    <boxlayout axis="Y"/>
+                  </layout>
+                  <component>
+                    <border>
+                      <titledborder title="Outdoor Temperature">
+                        <etchedborder/>
+                      </titledborder>
+                    </border>
+                    <panel>
+                      <layout>
+                        <boxlayout axis="Y"/>
+                      </layout>
+                      <component name="outdoor high/low panel">
+                        <panel>
+                          <component name="outdoor high temperature panel">
+                            <border>
+                              <titledborder title="High" titleColor="FF0000">
+                                <bevelborder/>
+                              </titledborder>
+                            </border>
+                            <panel>
+                              <layout>
+                                <boxlayout axis="Y"/>
+                              </layout>
+                              <component background="000000">
+                                <border>
+                                  <etchedborder etchType="raised" highlightColor="A0A0FF" shadowColor="000080"/>
+                                </border>
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component foreground="00FF00">
+                                    <label text="Max:"/>
+                                  </component>
+                                  <component font="microsoft san serif" background="000000" foreground="00FFFF">
+                                    <border>
+                                      <etchedborder etchType="raised" highlightColor="A0A0FF" shadowColor="000080"/>
+                                    </border>
+                                    <textfield value="110.3" columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                              <component>
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component>
+                                    <label text="Min:"/>
+                                  </component>
+                                  <component>
+                                    <textfield columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                              <component horizontalAlignment="right">
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component>
+                                    <label text="Avg:"/>
+                                  </component>
+                                  <component horizontalAlignment="right">
+                                    <textfield columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                            </panel>
+                          </component>
+                          <component name="outdoor low temperature panel">
+                            <border>
+                              <titledborder title="Low" titleColor="0000FF">
+                                <lineborder/>
+                              </titledborder>
+                            </border>
+                            <panel>
+                              <layout>
+                                <boxlayout axis="Y"/>
+                              </layout>
+                              <component>
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component>
+                                    <label text="Max:"/>
+                                  </component>
+                                  <component>
+                                    <textfield value="110.3" columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                              <component>
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component>
+                                    <label text="Min:"/>
+                                  </component>
+                                  <component>
+                                    <textfield columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                              <component horizontalAlignment="right">
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component>
+                                    <label text="Avg:"/>
+                                  </component>
+                                  <component horizontalAlignment="right">
+                                    <textfield columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                            </panel>
+                          </component>
+                          <component>
+                            <border>
+                              <titledborder title="Dew Point">
+                                <lineborder/>
+                              </titledborder>
+                            </border>
+                            <panel>
+                              <layout>
+                                <boxlayout axis="Y"/>
+                              </layout>
+                              <component>
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component>
+                                    <label text="Min:"/>
+                                  </component>
+                                  <component name="min dew point">
+                                    <textfield columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                              <component>
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component>
+                                    <label text="Max:"/>
+                                  </component>
+                                  <component name="max dew point">
+                                    <textfield columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                              <component>
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component name="avg dew point">
+                                    <label text="Avg:"/>
+                                  </component>
+                                  <component>
+                                    <textfield columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                            </panel>
+                          </component>
+                          <component>
+                            <border>
+                              <titledborder title="Humidity">
+                                <lineborder/>
+                              </titledborder>
+                            </border>
+                            <panel>
+                              <layout>
+                                <boxlayout axis="Y"/>
+                              </layout>
+                              <component>
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component>
+                                    <label text="Min:"/>
+                                  </component>
+                                  <component name="min humidity">
+                                    <textfield columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                              <component>
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component>
+                                    <label text="Max:"/>
+                                  </component>
+                                  <component name="max humidity">
+                                    <textfield columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                              <component>
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component name="avg humidity">
+                                    <label text="Avg:"/>
+                                  </component>
+                                  <component>
+                                    <textfield columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                            </panel>
+                          </component>
+                        </panel>
+                      </component>
+                      <component>
+                        <panel>
+                          <component>
+                            <label text="Average Temperature:"/>
+                          </component>
+                          <component name="outdoor avg temp">
+                            <textfield columns="4" editable="false"/>
+                          </component>
+                        </panel>
+                      </component>
+                      <component>
+                        <panel>
+                          <component>
+                            <border>
+                              <titledborder title="Heat Index" titleColor="FF0000">
+                                <lineborder/>
+                              </titledborder>
+                            </border>
+                            <panel>
+                              <layout>
+                                <boxlayout axis="Y"/>
+                              </layout>
+                              <component>
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component>
+                                    <label text="Max:"/>
+                                  </component>
+                                  <component name="min heat index">
+                                    <textfield columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                              <component>
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component>
+                                    <label text="Avg:"/>
+                                  </component>
+                                  <component>
+                                    <textfield columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                            </panel>
+                          </component>
+                          <component>
+                            <border>
+                              <titledborder title="Wind Chill" titleColor="0000FF">
+                                <lineborder/>
+                              </titledborder>
+                            </border>
+                            <panel>
+                              <layout>
+                                <boxlayout axis="Y"/>
+                              </layout>
+                              <component>
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component>
+                                    <label text="Min:"/>
+                                  </component>
+                                  <component name="min wind chill">
+                                    <textfield columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                              <component>
+                                <panel>
+                                  <layout>
+                                    <flowlayout alignment="right"/>
+                                  </layout>
+                                  <component>
+                                    <label text="Avg:"/>
+                                  </component>
+                                  <component>
+                                    <textfield columns="4" editable="false"/>
+                                  </component>
+                                </panel>
+                              </component>
+                            </panel>
+                          </component>
+                        </panel>
+                      </component>
+                    </panel>
+                  </component>
+                  <component>
+                    <border>
+                      <titledborder title="Indoor"/>
+                    </border>
+                    <panel>
+                      <layout>
+                        <borderlayout/>
+                      </layout>
+                      <component name="indoor temperature panel" constraint="West">
+                        <border>
+                          <titledborder title="Temperature">
+                            <lineborder/>
+                          </titledborder>
+                        </border>
+                        <panel>
+                          <layout>
+                            <boxlayout axis="Y"/>
+                          </layout>
+                          <component>
+                            <panel>
+                              <layout>
+                                <flowlayout alignment="right"/>
+                              </layout>
+                              <component>
+                                <label text="High:"/>
+                              </component>
+                              <component name="indoor high temp">
+                                <textfield columns="4" editable="false"/>
+                              </component>
+                            </panel>
+                          </component>
+                          <component>
+                            <panel>
+                              <layout>
+                                <flowlayout alignment="right"/>
+                              </layout>
+                              <component>
+                                <label text="Low:"/>
+                              </component>
+                              <component name="indoor low temp">
+                                <textfield columns="4" editable="false"/>
+                              </component>
+                            </panel>
+                          </component>
+                          <component>
+                            <panel>
+                              <layout>
+                                <flowlayout alignment="right"/>
+                              </layout>
+                              <component>
+                                <label text="Avg:"/>
+                              </component>
+                              <component name="indoor avg temp">
+                                <textfield columns="4" editable="false"/>
+                              </component>
+                            </panel>
+                          </component>
+                        </panel>
+                      </component>
+                      <component constraint="East">
+                        <border>
+                          <titledborder title="Humidity">
+                            <lineborder/>
+                          </titledborder>
+                        </border>
+                        <panel>
+                          <layout>
+                            <boxlayout axis="Y"/>
+                          </layout>
+                          <component>
+                            <panel>
+                              <layout>
+                                <flowlayout alignment="right"/>
+                              </layout>
+                              <component>
+                                <label text="Min:"/>
+                              </component>
+                              <component name="min humidity">
+                                <textfield columns="4" editable="false"/>
+                              </component>
+                            </panel>
+                          </component>
+                          <component>
+                            <panel>
+                              <layout>
+                                <flowlayout alignment="right"/>
+                              </layout>
+                              <component>
+                                <label text="Max:"/>
+                              </component>
+                              <component name="max humidity">
+                                <textfield columns="4" editable="false"/>
+                              </component>
+                            </panel>
+                          </component>
+                          <component>
+                            <panel>
+                              <layout>
+                                <flowlayout alignment="right"/>
+                              </layout>
+                              <component name="avg humidity">
+                                <label text="Avg:"/>
+                              </component>
+                              <component>
+                                <textfield columns="4" editable="false"/>
+                              </component>
+                            </panel>
+                          </component>
+                        </panel>
+                      </component>
+                    </panel>
+                  </component>
+                  <component constraint="Center">
+                    <panel/>
+                  </component>
+                </panel>
+              </component>
+              <component>
+                <panel>
+                  <layout>
+                    <gridlayout rows="1"/>
+                  </layout>
+                  <component>
+                    <border>
+                      <titledborder title="Wind">
+                        <lineborder/>
+                      </titledborder>
+                    </border>
+                    <panel>
+                      <layout>
+                        <borderlayout/>
+                      </layout>
+                      <component constraint="West">
+                        <label icon="wind.gif"/>
+                      </component>
+                      <component constraint="Center">
+                        <panel>
+                          <layout>
+                            <boxlayout axis="Y"/>
+                          </layout>
+                          <component>
+                            <panel>
+                              <layout>
+                                <flowlayout alignment="right"/>
+                              </layout>
+                              <component>
+                                <label text="Avg:"/>
+                              </component>
+                              <component name="avg wind">
+                                <textfield columns="4" editable="false"/>
+                              </component>
+                            </panel>
+                          </component>
+                          <component>
+                            <panel>
+                              <layout>
+                                <flowlayout alignment="right"/>
+                              </layout>
+                              <component>
+                                <label text="Max:"/>
+                              </component>
+                              <component name="max wind">
+                                <textfield columns="4" editable="false"/>
+                              </component>
+                            </panel>
+                          </component>
+                          <component>
+                            <panel>
+                              <layout>
+                                <flowlayout alignment="right"/>
+                              </layout>
+                              <component>
+                                <label text="Max Gust:"/>
+                              </component>
+                              <component name="max wind gust">
+                                <textfield columns="4" editable="false"/>
+                              </component>
+                            </panel>
+                          </component>
+                        </panel>
+                      </component>
+                    </panel>
+                  </component>
+                  <component>
+                    <border>
+                      <titledborder title="Rain">
+                        <lineborder/>
+                      </titledborder>
+                    </border>
+                    <panel>
+                      <layout>
+                        <borderlayout/>
+                      </layout>
+                      <component constraint="West">
+                        <label icon="rain.gif"/>
+                      </component>
+                      <component constraint="Center">
+                        <panel>
+                          <layout>
+                            <boxlayout axis="Y"/>
+                          </layout>
+                          <component>
+                            <panel>
+                              <layout>
+                                <flowlayout alignment="right"/>
+                              </layout>
+                              <component>
+                                <label text="Total:"/>
+                              </component>
+                              <component name="total rain">
+                                <textfield columns="4" editable="false"/>
+                              </component>
+                            </panel>
+                          </component>
+                          <component>
+                            <panel>
+                              <layout>
+                                <flowlayout alignment="right"/>
+                              </layout>
+                              <component>
+                                <label text="Rain Days:"/>
+                              </component>
+                              <component name="rain days">
+                                <textfield columns="4" editable="false"/>
+                              </component>
+                            </panel>
+                          </component>
+                          <component>
+                            <panel>
+                              <layout>
+                                <flowlayout alignment="right"/>
+                              </layout>
+                              <component>
+                                <label text="Daily Avg:"/>
+                              </component>
+                              <component name="daily rain avg">
+                                <textfield columns="4" editable="false"/>
+                              </component>
+                            </panel>
+                          </component>
+                        </panel>
+                      </component>
+                    </panel>
+                  </component>
+                  <component>
+                    <border>
+                      <titledborder title="Barometer">
+                        <lineborder/>
+                      </titledborder>
+                    </border>
+                    <panel>
+                      <layout>
+                        <boxlayout axis="Y"/>
+                      </layout>
+                      <component>
+                        <panel>
+                          <layout>
+                            <flowlayout alignment="right"/>
+                          </layout>
+                          <component>
+                            <label text="Min:"/>
+                          </component>
+                          <component name="min pressure">
+                            <textfield columns="4" editable="false"/>
+                          </component>
+                        </panel>
+                      </component>
+                      <component>
+                        <panel>
+                          <layout>
+                            <flowlayout alignment="right"/>
+                          </layout>
+                          <component>
+                            <label text="Max:"/>
+                          </component>
+                          <component name="max pressure">
+                            <textfield columns="4" editable="false"/>
+                          </component>
+                        </panel>
+                      </component>
+                      <component>
+                        <panel>
+                          <layout>
+                            <flowlayout alignment="right"/>
+                          </layout>
+                          <component name="avg pressure">
+                            <label text="Avg:"/>
+                          </component>
+                          <component>
+                            <textfield columns="4" editable="false"/>
+                          </component>
+                        </panel>
+                      </component>
+                    </panel>
+                  </component>
+                </panel>
+              </component>
+            </panel>
+          </component>
+        </panel>
+      </component>
+    </contentpane>
+  </rootpane>
+</xmlg>
