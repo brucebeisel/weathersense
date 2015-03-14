@@ -1,0 +1,2 @@
+The software that comes with home weather stations is not of the best quality. WeatherSense is a feature rich product for collecting, uploading and displaying data from home weather stations. The current version only works with the Davis Vantage Pro 2, but the design will allow for other weather stations to be supported.
+WeatherSense is capable of being run on a Raspberry Pi. This is the platform I use at home.
