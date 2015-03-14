@@ -163,7 +163,7 @@ public class PiGlowJComponent extends JPanel {
      * @param intensities The intensities
      */
     public void setIntensities(int[] intensities) {
-        logger.info("Receiving intensities");
+        logger.fine("Receiving intensities");
         for (int i = 0; i < leds.length; i++) {
             leds[i].intensity = intensities[i];
         }
@@ -173,7 +173,7 @@ public class PiGlowJComponent extends JPanel {
      * Commit the new intensity values for all of the LEDs.
      */
     public void commit() {
-        logger.info("Committing");
+        logger.fine("Committing");
         //
         // Set the background color of each LED JLabel
         //

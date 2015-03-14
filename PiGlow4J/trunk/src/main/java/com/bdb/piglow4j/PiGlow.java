@@ -188,7 +188,7 @@ public class PiGlow {
             if (!pg.initialize())
                 System.exit(1);
 
-            PiGlowBlinker leftBlinker = new PiGlowBlinker(333, 1000, 0, 255, 5, true, true, 2, PiGlowLED.armLEDs(PiGlowArm.LEFT));
+            PiGlowBlinker leftBlinker = new PiGlowBlinker(333, 1000, 0, 255, 5, false, true, 2, PiGlowLED.armLEDs(PiGlowArm.LEFT));
             PiGlowBlinker rightBlinker = new PiGlowBlinker(0, 1000, 0, 255, 5, true, true, 2, PiGlowLED.armLEDs(PiGlowArm.RIGHT));
             PiGlowBlinker topBlinker = new PiGlowBlinker(667, 1000, 0, 255, 5, true, true, 2, PiGlowLED.armLEDs(PiGlowArm.TOP));
             PiGlowAnimator animator = new PiGlowAnimator(pg);

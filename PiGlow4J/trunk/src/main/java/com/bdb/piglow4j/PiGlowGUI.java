@@ -97,11 +97,11 @@ public class PiGlowGUI {
             rightArmOn = true;
         }
         else if (address == 0x16 && ((int)buffer[0] & 0xFF) == 0xFF) {
-            logger.info("Committing");
+            logger.fine("Committing");
             component.commit();
         }
         else if (address >= 0x1 && address <= 0x12) {
-            logger.info("Getting intensities");
+            logger.fine("Getting intensities");
             for (int i = 0; address + i <= 0x12 && i < length; i++)
                 intensities[address + i - 1] = ((int)buffer[i] & 0xFF);
 

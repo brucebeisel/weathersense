@@ -37,6 +37,7 @@ public class PiGlowBlinker implements PiGlowAnimation {
     private final List<PiGlowLED> leds;
 
     private int currentStep = 0;
+    private int frame;
     private int currentIntensity;
     private long nextStepTime;
     private int deltaIntensity;
@@ -73,10 +74,8 @@ public class PiGlowBlinker implements PiGlowAnimation {
         nextStepTime = now + delay;
         currentStep = 0;
 	count = 0;
-        initializeIntensities();
-    }
+        frame = 0;
 
-    private void initializeIntensities() {
         deltaIntensity = (highIntensity - lowIntensity) / steps;
 
         if (lowToHigh) {
@@ -86,6 +85,7 @@ public class PiGlowBlinker implements PiGlowAnimation {
             initialIntensity = highIntensity;
             deltaIntensity = -deltaIntensity;
         }
+
         currentIntensity = initialIntensity;
     }
 
@@ -99,29 +99,36 @@ public class PiGlowBlinker implements PiGlowAnimation {
 
     @Override
     public void executeNextStep(long now) {
+        //
+        // Do nothing if the time of the next change has not been reached yet
+        //
         if (now < nextStepTime)
             return;
 
+        //
+        // Set the intensities for the LEDs in this animation
+        //
         leds.forEach((led) -> led.setIntensity(currentIntensity));
 
+        //
+        // Calculate the intensities and time for the next step
+        //
         currentStep++;
-        currentIntensity += deltaIntensity;
+        if (currentStep <= steps)
+            frame++;
+        else
+            frame--;
+
+        currentIntensity = initialIntensity + (frame * deltaIntensity);
 	nextStepTime += interval;
-        if (currentStep > steps) {
-            if (reverse) {
-                if (currentStep > steps * 2) {
-                    initializeIntensities();
-                    currentStep = 0;
-                    count++;
-                }
-                else if (currentStep - 1 == steps)
-                    deltaIntensity = -deltaIntensity;
-            }
-            else {
-                initializeIntensities();
-                currentStep = 0;
-                count++;
-            }
-	}
+
+        //
+        // Figure out if the animation cycle has finished and needs to be restarted
+        //
+        if ((reverse && frame == 0) || (!reverse && frame == steps)) {
+            currentStep = 0;
+            count++;
+            currentIntensity = initialIntensity;
+        }
     }
 }
