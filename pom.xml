@@ -29,7 +29,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </properties>
 
     <scm>
-        <developerConnection>scm:svn:http://localhost/svn/bdb/WeatherSense/trunk</developerConnection>
+        <connection>scm:git:git@github.com/brucebeisel/weathersense.git</connection>
+        <url>scm:git:git@github.com/brucebeisel/weathersense.git</url>
+        <developerConnection>scm:git:git@github.com/brucebeisel/weathersense.git</developerConnection>
     </scm>
 
     <build>
@@ -52,11 +54,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.1</version>
-                <configuration>
-                    <tagBase>
-                        http://localhost/svn/bdb/WeatherSense/tags
-                    </tagBase>
-                </configuration>
             </plugin>
            <plugin>
              <groupId>org.jacoco</groupId>
@@ -99,7 +96,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             </dependency>
             <dependency>
                 <groupId>com.bdb.utils</groupId>
-                <artifactId>BDB-Utilities</artifactId>
+                <artifactId>bdb-utilities</artifactId>
                 <version>2.0-SNAPSHOT</version>
                 <scope>compile</scope>
             </dependency>

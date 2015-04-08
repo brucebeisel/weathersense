@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.2</version>
+                <version>2.6</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -51,7 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         </dependency>
         <dependency>
             <groupId>com.bdb.utils</groupId>
-            <artifactId>BDB-Utilities</artifactId>
+            <artifactId>bdb-utilities</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -61,7 +61,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         </dependency>
         <dependency>
             <groupId>org.jfree</groupId>
-            <artifactId>JFreeChart</artifactId>
+            <artifactId>jfreechart</artifactId>
             <version>1.0.19</version>
             <scope>compile</scope>
         </dependency>
