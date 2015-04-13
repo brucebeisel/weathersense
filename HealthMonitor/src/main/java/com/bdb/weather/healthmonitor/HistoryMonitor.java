@@ -67,8 +67,7 @@ public class HistoryMonitor implements HealthMonitor {
         return true;
     }
 
-    @Override
-    public boolean isHealthy() {
+    private boolean checkHistory() {
         logger.fine("Checking if history table is up to date");
         try (ResultSet rs = statement.executeQuery()) {
             if (!rs.first()) {
@@ -87,5 +86,17 @@ public class HistoryMonitor implements HealthMonitor {
             logger.log(Level.SEVERE, "Failed to query history table for max date");
             return false;
         }
+    }
+
+    private boolean checkBatteries() {
+        return true;
+    }
+
+    @Override
+    public boolean isHealthy() {
+        boolean historyHealth = checkHistory();
+        boolean batteryHealth = checkBatteries();
+
+        return historyHealth && batteryHealth;
     }
 }

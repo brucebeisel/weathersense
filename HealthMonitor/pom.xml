@@ -50,6 +50,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.bdb.utils</groupId>
+            <artifactId>bdb-utilities</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>com.bdb.weather</groupId>
             <artifactId>weathersense-common</artifactId>
             <scope>compile</scope>

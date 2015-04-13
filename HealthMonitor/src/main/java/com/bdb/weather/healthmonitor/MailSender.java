@@ -17,6 +17,8 @@
 package com.bdb.weather.healthmonitor;
 
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -46,18 +48,29 @@ public class MailSender {
 //Step2		
         getMailSession = Session.getDefaultInstance(mailServerProperties, null);
         generateMailMessage = new MimeMessage(getMailSession);
-        generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress("test1@crunchify.com"));
-        generateMailMessage.addRecipient(Message.RecipientType.CC, new InternetAddress("test2@crunchify.com"));
-        generateMailMessage.setSubject("Greetings from Crunchify..");
-        String emailBody = "Test email by Crunchify.com JavaMail API example. " + "<br><br> Regards, <br>Crunchify Admin";
+        generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress("brucebeisel@gmail.com"));
+        //generateMailMessage.addRecipient(Message.RecipientType.CC, new InternetAddress("test2@crunchify.com"));
+        generateMailMessage.setSubject("WeatherSense Notification");
+        String emailBody = "Something is wrong with your weather station";
         generateMailMessage.setContent(emailBody, "text/html");
 
 //Step3		
         Transport transport = getMailSession.getTransport("smtp");
         
         // Enter your correct gmail UserID and Password (XXXApp Shah@gmail.com)
-        transport.connect("smtp.gmail.com", "<-- your gmail USERNAME -->", "<-- your gmail PASSWORD -->");
+        transport.connect("smtp.gmail.com", "weathersense@gmail.com", "w3ath3rs3ns3");
         transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
         transport.close();
+    }
+
+    public static void main(String args[]) {
+
+        try {
+            MailSender sender = new MailSender();
+            sender.generateAndSendEmail();
+        }
+        catch (MessagingException ex) {
+            Logger.getLogger(MailSender.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
