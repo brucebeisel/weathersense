@@ -21,10 +21,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.bdb.util.Pair;
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.util.jdbc.DBTable;
 
@@ -127,6 +129,42 @@ public class SensorStationStatusTable extends DBTable<SensorStationStatus> {
         return false;
     }
 
+    /**
+     * Get the battery status for all of the sensor stations.
+     * 
+     * @return The list of battery statuses
+     */
+    List<Pair<Integer,Boolean>> getLatestBatteryStatus() {
+        String sql = "select max(" + TIME_COLUMN + ") from " + TABLE_NAME;
+                     
+        List<LocalDateTime> list = executeQuery(sql, (ResultSet rs, Object... args) -> {
+            LocalDateTime time = null;
+            java.sql.Timestamp ts = rs.getTimestamp(1);
+            if (ts != null)
+                time = ts.toLocalDateTime();
+            return time;
+        });
+
+        if (list.isEmpty())
+            return null;
+
+        LocalDateTime time = list.get(0);
+
+        String whereClause = " where " + TIME_COLUMN + "='" + DBTable.dateTimeFormatter().format(time) + "'";
+        List<SensorStationStatus> statusList = query(whereClause);
+        
+        List<Pair<Integer,Boolean>> rv = new ArrayList<>();
+        for (SensorStationStatus status : statusList)
+            rv.add(new Pair<>(status.getSensorStationId(), status.isBatteryOk()));
+
+        return rv;
+    }
+
+    /**
+     * Update the sensor station status for each sensor station in the list.
+     * 
+     * @param list The list of sensor station status
+     */
     public void updateSensorStationStatus(List<SensorStationStatus> list) {
         getConnection().startTransaction();
         list.stream().forEach((sensorStationStatus) -> {
