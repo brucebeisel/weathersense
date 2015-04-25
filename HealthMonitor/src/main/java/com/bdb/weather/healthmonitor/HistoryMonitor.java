@@ -35,21 +35,25 @@ import com.bdb.weather.common.db.DatabaseConstants;
  * @author Bruce Beisel
  */
 public class HistoryMonitor implements HealthMonitor {
-    private Connection connection;
-    private PreparedStatement statement;
-    private int toleranceSeconds;
-    private final String SQL = "select max(date) from " + DatabaseConstants.DATABASE_NAME + ".history";
+    private final String host;
+    private Connection connection = null;
+    private PreparedStatement historyStatement;
+    private PreparedStatement sensorStationStatusStatement;
+    private final int toleranceSeconds;
+    private final String HISTORY_SQL = "select max(date) from " + DatabaseConstants.DATABASE_NAME + ".history";
+    private final String SENSOR_STATION_MAX_TIME_SQL = "select max(time) from " + DatabaseConstants.DATABASE_NAME + ".sensor_station_status";
     private static final Logger logger = Logger.getLogger(HistoryMonitor.class.getName());
 
     public static HistoryMonitor createHistoryMonitor(String host, int toleranceMinutes) {
-        HistoryMonitor monitor = new HistoryMonitor(toleranceMinutes);
+        HistoryMonitor monitor = new HistoryMonitor(host, toleranceMinutes);
         if (monitor.init(host))
             return monitor;
         else
             return null;
     }
 
-    private HistoryMonitor(int toleranceMinutes) {
+    private HistoryMonitor(String host, int toleranceMinutes) {
+        this.host = host;
         this.toleranceSeconds = toleranceMinutes * 60;
     }
 
@@ -57,7 +61,8 @@ public class HistoryMonitor implements HealthMonitor {
         try {
             String url = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, host, DatabaseConstants.DATABASE_PORT, DatabaseConstants.DATABASE_NAME);
             connection = DriverManager.getConnection(url, DatabaseConstants.DATABASE_USER, DatabaseConstants.DATABASE_PASSWORD);
-            statement = connection.prepareStatement(SQL);
+            historyStatement = connection.prepareStatement(HISTORY_SQL);
+            sensorStationStatusStatement = connection.prepareStatement(SENSOR_STATION_MAX_TIME_SQL);
         }
         catch (SQLException ex) {
             logger.log(Level.SEVERE, "Failed to open database", ex);
@@ -67,12 +72,12 @@ public class HistoryMonitor implements HealthMonitor {
         return true;
     }
 
-    private boolean checkHistory() {
+    private boolean checkHistory() throws SQLException {
         logger.fine("Checking if history table is up to date");
-        try (ResultSet rs = statement.executeQuery()) {
+        try (ResultSet rs = historyStatement.executeQuery()) {
             if (!rs.first()) {
                 logger.warning("Failed to query history table");
-                return false;
+                throw new SQLException("Unexpected empty history table");
             }
 
             Timestamp ts = rs.getTimestamp(1);
@@ -82,21 +87,71 @@ public class HistoryMonitor implements HealthMonitor {
             Duration delta = Duration.between(time, now);
             return delta.getSeconds() < toleranceSeconds;
         }
-        catch (SQLException e) {
-            logger.log(Level.SEVERE, "Failed to query history table for max date");
-            return false;
-        }
     }
 
-    private boolean checkBatteries() {
-        return true;
+    private boolean checkBatteries() throws SQLException {
+        LocalDateTime time = LocalDateTime.now();
+        try (ResultSet rs = sensorStationStatusStatement.executeQuery()) {
+            if (!rs.first()) {
+                logger.warning("Failed to query sensor station status table");
+                throw new SQLException("Unexpected empty sensor station status table");
+            }
+
+            Timestamp ts = rs.getTimestamp(1);
+            time = ts.toLocalDateTime();
+        }
+
+
+        String select = "select sensor_station_id,battery_ok from " + DatabaseConstants.DATABASE_NAME + ".sensor_station_status" +
+                        " where time='" + DBTable.dateTimeFormatter().format(time) + "'";
+
+        PreparedStatement selectStatement = connection.prepareStatement(select);
+
+        boolean batteriesOK = true;
+        try (ResultSet rs = selectStatement.executeQuery()) {
+            if (!rs.first()) {
+                logger.warning("Failed to query sensor station status table");
+                throw new SQLException("Unexpected empty sensor station status table");
+            }
+
+            do {
+                int sensorStationId = rs.getInt(1);
+                boolean batteryOK = rs.getBoolean(2);
+                batteriesOK = batteriesOK && batteryOK;
+
+                if (!batteryOK) 
+                    logger.info("Battery for sensor station " + sensorStationId + " is going bad");
+                else
+                    logger.fine("Battery for sensor station " + sensorStationId + " is good");
+            } while (rs.next());
+        }
+
+        return batteriesOK;
     }
 
     @Override
     public boolean isHealthy() {
-        boolean historyHealth = checkHistory();
-        boolean batteryHealth = checkBatteries();
+        try {
+            if (connection == null)
+                init(host);
+            
+            boolean historyHealth = checkHistory();
+            boolean batteryHealth = checkBatteries();
+            
+            return historyHealth && batteryHealth;
+        }
+        catch (SQLException ex) {
+            try {
+                logger.log(Level.SEVERE, "Failed to get history or battery status", ex);
+                connection.close();
+                connection = null;
+                return false;
+            }
+            catch (SQLException ex1) {
+                logger.log(Level.INFO, "Failed to close database connection", ex1);
+            }
+        }
 
-        return historyHealth && batteryHealth;
+        return false;
     }
 }

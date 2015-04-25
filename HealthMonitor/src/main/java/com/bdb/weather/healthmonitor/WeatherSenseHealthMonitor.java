@@ -46,18 +46,18 @@ public class WeatherSenseHealthMonitor implements Runnable {
     private final PiGlow piglow;
     private static final Logger logger = Logger.getLogger(WeatherSenseHealthMonitor.class.getName());
     private final PiGlowAnimator animator;
-    private PiGlowAnimation healthyAnimation;
+    private final PiGlowAnimation healthyAnimation;
 
     public WeatherSenseHealthMonitor() {
         cwMonitor = CurrentWeatherMonitor.createCurrentWeatherMonitor(10);
-        historyMonitor = HistoryMonitor.createHistoryMonitor("127.0.0.1", 6);
+        historyMonitor = HistoryMonitor.createHistoryMonitor("192.168.0.100", 6);
         processMonitor = new ProcessMonitor();
         executor = Executors.newSingleThreadScheduledExecutor();
         I2CFactory.setFactory(new I2CFactoryProviderSwing());
         piglow = PiGlow.getInstance();
         
         animator = new PiGlowAnimator(piglow);
-        healthyAnimation = new PiGlowBlinker(0, 1000, 200, 5, 255, 25, true, true, 10000, PiGlowLED.colorLEDs(PiGlowColor.GREEN));
+        healthyAnimation = new PiGlowBlinker(0, 1000, 10000, 5, 255, 25, true, true, 10000, PiGlowLED.colorLEDs(PiGlowColor.GREEN));
         animator.addAnimation(healthyAnimation);
     }
 
