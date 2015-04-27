@@ -35,6 +35,7 @@ import com.bdb.weather.common.db.DatabaseConstants;
  * @author Bruce Beisel
  */
 public class HistoryMonitor implements HealthMonitor {
+    private static final String MONITOR_NAME = "History Monitor";
     private final String host;
     private Connection connection = null;
     private PreparedStatement historyStatement;
@@ -153,5 +154,15 @@ public class HistoryMonitor implements HealthMonitor {
         }
 
         return false;
+    }
+
+    @Override
+    public String getMonitorName() {
+        return MONITOR_NAME;
+    }
+
+    @Override
+    public String getMailMessage() {
+        return null;
     }
 }

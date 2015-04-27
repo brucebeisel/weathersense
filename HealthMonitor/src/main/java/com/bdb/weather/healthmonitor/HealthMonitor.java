@@ -21,5 +21,7 @@ package com.bdb.weather.healthmonitor;
  * @author Bruce Beisel
  */
 public interface HealthMonitor {
+    String getMonitorName();
+    String getMailMessage();
     boolean isHealthy();
 }

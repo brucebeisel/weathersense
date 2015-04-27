@@ -52,7 +52,7 @@ public class MonitoredProcess implements Runnable {
     private static final Executor executor = Executors.newSingleThreadExecutor();
     private final static Logger logger = Logger.getLogger(MonitoredProcess.class.getName());
 
-    public MonitoredProcess(String name, List<String> commandArgs, File outputFile, Monitor callback) {
+    public MonitoredProcess(String name, List<String> commandArgs, File outputFile, File startDirectory, Monitor callback) {
         builder = new ProcessBuilder(commandArgs);
         ProcessBuilder.Redirect redirect = ProcessBuilder.Redirect.appendTo(outputFile);
         builder.redirectErrorStream(true);

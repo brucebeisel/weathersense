@@ -28,6 +28,7 @@ import com.bdb.weather.common.CurrentWeatherSubscriber;
  * @author Bruce Beisel
  */
 public class CurrentWeatherMonitor implements HealthMonitor, CurrentWeatherSubscriber.CurrentWeatherHandler {
+    private static final String MONITOR_NAME = "Current Weather Monitor";
     private CurrentWeatherSubscriber subscriber;
     private LocalDateTime lastCurrentWeather;
     private final int toleranceSeconds;
@@ -62,6 +63,16 @@ public class CurrentWeatherMonitor implements HealthMonitor, CurrentWeatherSubsc
         LocalDateTime now = LocalDateTime.now();
         Duration delta = Duration.between(lastCurrentWeather, now);
         return delta.getSeconds() < toleranceSeconds;
+    }
+
+    @Override
+    public String getMonitorName() {
+        return MONITOR_NAME;
+    }
+
+    @Override
+    public String getMailMessage() {
+        return null;
     }
 
     @Override
