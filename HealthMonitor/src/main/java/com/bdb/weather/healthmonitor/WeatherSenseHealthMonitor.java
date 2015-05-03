@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import com.bdb.piglow4j.PiGlow;
 import com.bdb.piglow4j.PiGlowAnimation;
 import com.bdb.piglow4j.PiGlowAnimator;
+import com.bdb.piglow4j.PiGlowArm;
 import com.bdb.piglow4j.PiGlowBlinker;
 import com.bdb.piglow4j.PiGlowColor;
 import com.bdb.piglow4j.PiGlowLED;
@@ -46,8 +47,8 @@ public class WeatherSenseHealthMonitor implements Runnable {
     private final ProcessMonitor processMonitor;
     private final ScheduledExecutorService executor;
     private final PiGlow piglow;
-    private final PiGlowAnimator animator;
-    private final PiGlowAnimation healthyAnimation;
+    private final PiGlowAnimator healthyAnimator;
+    private final PiGlowAnimator unhealthyAnimator;
     private final List<HealthMonitor> monitors = new ArrayList<>();
     private static final Logger logger = Logger.getLogger(WeatherSenseHealthMonitor.class.getName());
 
@@ -61,31 +62,37 @@ public class WeatherSenseHealthMonitor implements Runnable {
      * @throws IOException Processes could not be start or the specified directories could not be found
      */
     public WeatherSenseHealthMonitor(String baseDirectory, String dbHost, boolean realPiGlow) throws IOException {
-        cwMonitor = CurrentWeatherMonitor.createCurrentWeatherMonitor(10);
+        if (!realPiGlow)
+            I2CFactory.setFactory(new I2CFactoryProviderSwing());
+
+        piglow = PiGlow.getInstance();
+
+        cwMonitor = CurrentWeatherMonitor.createCurrentWeatherMonitor(piglow, 10);
         historyMonitor = HistoryMonitor.createHistoryMonitor(dbHost, 6);
         processMonitor = new ProcessMonitor(baseDirectory);
         monitors.add(cwMonitor);
         monitors.add(historyMonitor);
         monitors.add(processMonitor);
 
-        if (!realPiGlow)
-            I2CFactory.setFactory(new I2CFactoryProviderSwing());
 
         executor = Executors.newSingleThreadScheduledExecutor();
-        piglow = PiGlow.getInstance();
         
-        animator = new PiGlowAnimator(piglow);
-        healthyAnimation = new PiGlowBlinker(0, 1000, 10000, 5, 255, 25, true, true, 10000, PiGlowLED.colorLEDs(PiGlowColor.GREEN));
-        animator.addAnimation(healthyAnimation);
+        healthyAnimator = new PiGlowAnimator(piglow);
+        healthyAnimator.addAnimation(new PiGlowBlinker(0, 1000, 10000, 5, 255, 25, true, true, 10000, PiGlowLED.colorLEDs(PiGlowColor.GREEN)));
+
+        unhealthyAnimator = new PiGlowAnimator(piglow);
+        unhealthyAnimator.addAnimation(new PiGlowBlinker(0, 3000, 0, 255, 999999, PiGlowLED.findLED(PiGlowArm.TOP, PiGlowColor.RED)));
+        unhealthyAnimator.addAnimation(new PiGlowBlinker(1000, 3000, 0, 255, 999999, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.RED)));
+        unhealthyAnimator.addAnimation(new PiGlowBlinker(2000, 3000, 0, 255, 999999, PiGlowLED.findLED(PiGlowArm.RIGHT, PiGlowColor.RED)));
     }
 
     /**
      * Start the processes and the monitors.
      */
     public void start() {
-        processMonitor.startProcesses();
+        //processMonitor.startProcesses();
         executor.scheduleAtFixedRate(this, 10, 10, TimeUnit.SECONDS);
-        animator.start();
+        healthyAnimator.start();
     }
 
     /**
@@ -93,8 +100,8 @@ public class WeatherSenseHealthMonitor implements Runnable {
      */
     public void stop() {
         try {
-            animator.stop();
-            animator.waitForTermination(500);
+            healthyAnimator.stop();
+            healthyAnimator.waitForTermination(500);
         }
         catch (InterruptedException ex) {
             logger.log(Level.INFO, "Timed out waiting for PiGlow animator to terminator");
@@ -123,6 +130,18 @@ public class WeatherSenseHealthMonitor implements Runnable {
         logger.info("WeatherSense health: " + (healthy ? "Healthy" : "Unhealthy"));
         logger.info("" + cwMonitor);
         processMonitor.dumpStatus();
+        if (healthy) {
+            if (!healthyAnimator.isRunning()) {
+                unhealthyAnimator.stop();
+                healthyAnimator.start();
+            }
+        }
+        else {
+            if (!unhealthyAnimator.isRunning()) {
+                healthyAnimator.stop();
+                unhealthyAnimator.start();
+            }
+        }
     }
 
     public static void main(String args[]) {
@@ -134,7 +153,7 @@ public class WeatherSenseHealthMonitor implements Runnable {
 
             boolean realPiGlow = true;
             String baseDirectory = "/weathersense";
-            String dbHost = "127.0.0.1";
+            String dbHost = "192.168.0.100";
                     
             for (String arg : args) {
                 switch (arg) {
