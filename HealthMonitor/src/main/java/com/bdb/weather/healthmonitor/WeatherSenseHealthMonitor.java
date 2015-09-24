@@ -38,7 +38,28 @@ import com.bdb.piglow4j.sim.I2CFactoryProviderSwing;
 import com.pi4j.io.i2c.I2CFactory;
 
 /**
- *
+ * The LEDs are used for the following:
+ * LEFT   WHITE
+ * LEFT   BLUE     Flash 2 Hz when battery low
+ * LEFT   GREEN    Flash 1 Hz while healthy
+ * LEFT   YELLOW   Flash 1 Hz when degraded
+ * LEFT   ORANGE   
+ * LEFT   RED      Flash 1 Hz when unhealthy
+ * 
+ * RIGHT  WHITE    Archive 1 minute old
+ * RIGHT  BLUE     Archive 2 minutes old
+ * RIGHT  GREEN    Archive 4 minutes old
+ * RIGHT  YELLOW   Archive 8 minutes old
+ * RIGHT  ORANGE   Archive 16 minutes old
+ * RIGHT  RED      Archive 32 minutes old
+ * 
+ * TOP    WHITE    Current Weather dancer
+ * TOP    BLUE     Current Weather dancer
+ * TOP    GREEN    Current Weather dancer
+ * TOP    YELLOW   Current Weather dancer
+ * TOP    ORANGE   Current Weather dancer
+ * TOP    RED      Current Weather dancer
+ * 
  * @author Bruce
  */
 public class WeatherSenseHealthMonitor implements Runnable {
@@ -67,8 +88,8 @@ public class WeatherSenseHealthMonitor implements Runnable {
 
         piglow = PiGlow.getInstance();
 
-        cwMonitor = CurrentWeatherMonitor.createCurrentWeatherMonitor(piglow, 10);
-        historyMonitor = HistoryMonitor.createHistoryMonitor(dbHost, 6);
+        cwMonitor = CurrentWeatherMonitor.createCurrentWeatherMonitor(piglow, PiGlowLED.armLEDs(PiGlowArm.TOP), 10);
+        historyMonitor = HistoryMonitor.createHistoryMonitor(dbHost, PiGlowLED.armLEDs(PiGlowArm.RIGHT), 6);
         processMonitor = new ProcessMonitor(baseDirectory);
         monitors.add(cwMonitor);
         monitors.add(historyMonitor);
@@ -153,7 +174,7 @@ public class WeatherSenseHealthMonitor implements Runnable {
 
             boolean realPiGlow = true;
             String baseDirectory = "/weathersense";
-            String dbHost = "192.168.0.100";
+            String dbHost = "192.168.1.100";
                     
             for (String arg : args) {
                 switch (arg) {

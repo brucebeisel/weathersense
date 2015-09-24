@@ -26,6 +26,7 @@ import com.bdb.piglow4j.PiGlowColor;
 import com.bdb.piglow4j.PiGlowLED;
 import com.bdb.weather.common.CurrentWeather;
 import com.bdb.weather.common.CurrentWeatherSubscriber;
+import java.util.ArrayList;
 
 /**
  *
@@ -40,14 +41,16 @@ public class CurrentWeatherMonitor implements HealthMonitor, CurrentWeatherSubsc
     private int counter = 0;
     private List<PiGlowLED> leds;
 
-    public static CurrentWeatherMonitor createCurrentWeatherMonitor(PiGlow piGlow, int toleranceMinutes) {
-        CurrentWeatherMonitor monitor = new CurrentWeatherMonitor(piGlow, toleranceMinutes);
+    public static CurrentWeatherMonitor createCurrentWeatherMonitor(PiGlow piGlow, List<PiGlowLED> leds, int toleranceMinutes) {
+        List<PiGlowLED> list = new ArrayList<>(leds);
+        CurrentWeatherMonitor monitor = new CurrentWeatherMonitor(piGlow, list, toleranceMinutes);
         monitor.init();
         return monitor;
     }
 
-    private CurrentWeatherMonitor(PiGlow piGlow, int toleranceMinutes) {
+    private CurrentWeatherMonitor(PiGlow piGlow, List<PiGlowLED> leds, int toleranceMinutes) {
         this.piGlow = piGlow;
+        this.leds = leds;
         this.toleranceSeconds = toleranceMinutes * 60;
         lastCurrentWeather = LocalDateTime.now();
     }
@@ -59,7 +62,6 @@ public class CurrentWeatherMonitor implements HealthMonitor, CurrentWeatherSubsc
     private void init() {
         subscriber = CurrentWeatherSubscriber.createSubscriber(this);
         lastCurrentWeather = LocalDateTime.now();
-        leds = PiGlowLED.colorLEDs(PiGlowColor.BLUE);
     }
 
     @Override
@@ -67,7 +69,8 @@ public class CurrentWeatherMonitor implements HealthMonitor, CurrentWeatherSubsc
         lastCurrentWeather = cw.getTime();
         counter++;
         leds.forEach((led)->led.setIntensity(0));
-        leds.get(counter % 3).setIntensity(128);
+        leds.get(0).setIntensity(PiGlowLED.MAX_INTENSITY);
+        leds.add(leds.remove(0));
     }
 
     @Override

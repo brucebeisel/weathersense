@@ -16,6 +16,7 @@
  */
 package com.bdb.weather.healthmonitor;
 
+import com.bdb.piglow4j.PiGlowLED;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -29,6 +30,7 @@ import java.util.logging.Logger;
 
 import com.bdb.util.jdbc.DBTable;
 import com.bdb.weather.common.db.DatabaseConstants;
+import java.util.List;
 
 /**
  *
@@ -41,20 +43,22 @@ public class HistoryMonitor implements HealthMonitor {
     private PreparedStatement historyStatement;
     private PreparedStatement sensorStationStatusStatement;
     private final int toleranceSeconds;
+    private final List<PiGlowLED> leds;
     private final String HISTORY_SQL = "select max(date) from " + DatabaseConstants.DATABASE_NAME + ".history";
     private final String SENSOR_STATION_MAX_TIME_SQL = "select max(time) from " + DatabaseConstants.DATABASE_NAME + ".sensor_station_status";
     private static final Logger logger = Logger.getLogger(HistoryMonitor.class.getName());
 
-    public static HistoryMonitor createHistoryMonitor(String host, int toleranceMinutes) {
-        HistoryMonitor monitor = new HistoryMonitor(host, toleranceMinutes);
+    public static HistoryMonitor createHistoryMonitor(String host, List<PiGlowLED> leds, int toleranceMinutes) {
+        HistoryMonitor monitor = new HistoryMonitor(host, leds, toleranceMinutes);
         if (monitor.init(host))
             return monitor;
         else
             return null;
     }
 
-    private HistoryMonitor(String host, int toleranceMinutes) {
+    private HistoryMonitor(String host, List<PiGlowLED> leds, int toleranceMinutes) {
         this.host = host;
+	this.leds = leds;
         this.toleranceSeconds = toleranceMinutes * 60;
     }
 
@@ -86,6 +90,12 @@ public class HistoryMonitor implements HealthMonitor {
             logger.fine("History table time: " + DBTable.dateTimeFormatter().format(time));
             LocalDateTime now = LocalDateTime.now();
             Duration delta = Duration.between(time, now);
+	    long minutes = delta.toMinutes();
+	    leds.forEach((led)->led.setIntensity(0));
+	    for (int i = 0; i < leds.size(); i++) {
+		if (Math.pow(2.0, i) <= minutes)
+		    leds.get(i).setIntensity(PiGlowLED.MAX_INTENSITY);
+	    }
             return delta.getSeconds() < toleranceSeconds;
         }
     }
