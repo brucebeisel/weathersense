@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         </dependency>
         <dependency>
             <groupId>com.bdb.utils</groupId>
-            <artifactId>bdb-utilities</artifactId>
+            <artifactId>BDB-Utilities</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>

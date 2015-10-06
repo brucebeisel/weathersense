@@ -99,12 +99,12 @@ public class WeatherSenseHealthMonitor implements Runnable {
         executor = Executors.newSingleThreadScheduledExecutor();
         
         healthyAnimator = new PiGlowAnimator(piglow);
-        healthyAnimator.addAnimation(new PiGlowBlinker(0, 1000, 10000, 5, 255, 25, true, true, 10000, PiGlowLED.colorLEDs(PiGlowColor.GREEN)));
+        //healthyAnimator.addAnimation(new PiGlowBlinker(0, 1000, 10000, 5, 255, 25, true, true, 10000, PiGlowLED.colorLEDs(PiGlowColor.GREEN)));
 
         unhealthyAnimator = new PiGlowAnimator(piglow);
-        unhealthyAnimator.addAnimation(new PiGlowBlinker(0, 3000, 0, 255, 999999, PiGlowLED.findLED(PiGlowArm.TOP, PiGlowColor.RED)));
-        unhealthyAnimator.addAnimation(new PiGlowBlinker(1000, 3000, 0, 255, 999999, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.RED)));
-        unhealthyAnimator.addAnimation(new PiGlowBlinker(2000, 3000, 0, 255, 999999, PiGlowLED.findLED(PiGlowArm.RIGHT, PiGlowColor.RED)));
+        //unhealthyAnimator.addAnimation(new PiGlowBlinker(0, 3000, 0, 255, 999999, PiGlowLED.findLED(PiGlowArm.TOP, PiGlowColor.RED)));
+        //unhealthyAnimator.addAnimation(new PiGlowBlinker(1000, 3000, 0, 255, 999999, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.RED)));
+        //unhealthyAnimator.addAnimation(new PiGlowBlinker(2000, 3000, 0, 255, 999999, PiGlowLED.findLED(PiGlowArm.RIGHT, PiGlowColor.RED)));
     }
 
     /**

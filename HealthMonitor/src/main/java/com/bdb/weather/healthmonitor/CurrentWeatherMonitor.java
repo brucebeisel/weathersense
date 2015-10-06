@@ -17,6 +17,7 @@
 package com.bdb.weather.healthmonitor;
 
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -69,8 +70,12 @@ public class CurrentWeatherMonitor implements HealthMonitor, CurrentWeatherSubsc
         lastCurrentWeather = cw.getTime();
         counter++;
         leds.forEach((led)->led.setIntensity(0));
-        leds.get(0).setIntensity(PiGlowLED.MAX_INTENSITY);
+        leds.get(0).setIntensity(PiGlowLED.MAX_INTENSITY / 2);
         leds.add(leds.remove(0));
+        try {
+	    piGlow.updateLEDs();
+        }
+        catch (IOException e) {}
     }
 
     @Override

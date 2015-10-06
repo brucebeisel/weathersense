@@ -94,7 +94,7 @@ public class HistoryMonitor implements HealthMonitor {
 	    leds.forEach((led)->led.setIntensity(0));
 	    for (int i = 0; i < leds.size(); i++) {
 		if (Math.pow(2.0, i) <= minutes)
-		    leds.get(i).setIntensity(PiGlowLED.MAX_INTENSITY);
+		    leds.get(i).setIntensity(PiGlowLED.MAX_INTENSITY / 2);
 	    }
             return delta.getSeconds() < toleranceSeconds;
         }
