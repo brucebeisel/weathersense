@@ -101,6 +101,7 @@ public class HistoryMonitor implements HealthMonitor {
     }
 
     private boolean checkBatteries() throws SQLException {
+        logger.fine("Checking if batteries are good");
         LocalDateTime time = LocalDateTime.now();
         try (ResultSet rs = sensorStationStatusStatement.executeQuery()) {
             if (!rs.first()) {
@@ -136,6 +137,8 @@ public class HistoryMonitor implements HealthMonitor {
                     logger.fine("Battery for sensor station " + sensorStationId + " is good");
             } while (rs.next());
         }
+
+	selectStatement.close();
 
         return batteriesOK;
     }

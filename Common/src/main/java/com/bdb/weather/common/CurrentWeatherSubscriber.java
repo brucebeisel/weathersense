@@ -71,7 +71,12 @@ public class CurrentWeatherSubscriber implements Runnable {
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append("Start Time: ").append(dtf.format(collectionStartTime)).append("\n");
-            sb.append("Time of Last Current Weather: ").append(dtf.format(lastValidPacketTime)).append("\n");
+            sb.append("Time of Last Current Weather: ");
+	    if (lastValidPacketTime != null)
+		sb.append(dtf.format(lastValidPacketTime)).append("\n");
+	    else
+		sb.append("N/A\n");
+
             sb.append(String.format("Valid Packets Received: %d, Invalid Packets Received %d\n", validPacketsReceived, invalidPacketsReceived));
             sb.append(String.format("Packets Received this Hour: %d", packetsReceivedThisHour));
 

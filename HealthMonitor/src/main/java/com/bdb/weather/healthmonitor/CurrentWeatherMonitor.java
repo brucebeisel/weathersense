@@ -72,14 +72,17 @@ public class CurrentWeatherMonitor implements HealthMonitor, CurrentWeatherSubsc
         leds.forEach((led)->led.setIntensity(0));
         leds.get(0).setIntensity(PiGlowLED.MAX_INTENSITY / 2);
         leds.add(leds.remove(0));
-        try {
-	    piGlow.updateLEDs();
-        }
-        catch (IOException e) {}
+//        try {
+//	    piGlow.updateLEDs();
+//        }
+//        catch (IOException e) {}
     }
 
     @Override
     public boolean isHealthy() {
+	if (lastCurrentWeather == null)
+	    return false;
+
         LocalDateTime now = LocalDateTime.now();
         Duration delta = Duration.between(lastCurrentWeather, now);
         return delta.getSeconds() < toleranceSeconds;

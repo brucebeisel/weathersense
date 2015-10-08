@@ -36,6 +36,7 @@ import com.bdb.piglow4j.PiGlowColor;
 import com.bdb.piglow4j.PiGlowLED;
 import com.bdb.piglow4j.sim.I2CFactoryProviderSwing;
 import com.pi4j.io.i2c.I2CFactory;
+import java.util.Collections;
 
 /**
  * The LEDs are used for the following:
@@ -69,8 +70,8 @@ public class WeatherSenseHealthMonitor implements Runnable {
     private final ScheduledExecutorService executor;
     private final PiGlow piglow;
     private final PiGlowAnimator healthyAnimator;
-    private final PiGlowAnimator unhealthyAnimator;
     private final List<HealthMonitor> monitors = new ArrayList<>();
+    private final PiGlowAnimation cwUnhealthyAnimation;
     private static final Logger logger = Logger.getLogger(WeatherSenseHealthMonitor.class.getName());
 
     /**
@@ -87,24 +88,26 @@ public class WeatherSenseHealthMonitor implements Runnable {
             I2CFactory.setFactory(new I2CFactoryProviderSwing());
 
         piglow = PiGlow.getInstance();
+	List<PiGlowLED> cwLedList = PiGlowLED.armLEDs(PiGlowArm.TOP);
 
-        cwMonitor = CurrentWeatherMonitor.createCurrentWeatherMonitor(piglow, PiGlowLED.armLEDs(PiGlowArm.TOP), 10);
-        historyMonitor = HistoryMonitor.createHistoryMonitor(dbHost, PiGlowLED.armLEDs(PiGlowArm.RIGHT), 6);
+        cwMonitor = CurrentWeatherMonitor.createCurrentWeatherMonitor(piglow, cwLedList, 1);
+        cwUnhealthyAnimation = new PiGlowBlinker(0, 1000, 0, 100, Integer.MAX_VALUE, cwLedList);
+	cwUnhealthyAnimation.setEnabled(false);
+
+	List<PiGlowLED> leds = new ArrayList<>(PiGlowLED.armLEDs(PiGlowArm.RIGHT));
+	Collections.reverse(leds);
+
+        historyMonitor = HistoryMonitor.createHistoryMonitor(dbHost, leds, 6);
         processMonitor = new ProcessMonitor(baseDirectory);
         monitors.add(cwMonitor);
         monitors.add(historyMonitor);
         monitors.add(processMonitor);
 
-
         executor = Executors.newSingleThreadScheduledExecutor();
         
         healthyAnimator = new PiGlowAnimator(piglow);
-        //healthyAnimator.addAnimation(new PiGlowBlinker(0, 1000, 10000, 5, 255, 25, true, true, 10000, PiGlowLED.colorLEDs(PiGlowColor.GREEN)));
-
-        unhealthyAnimator = new PiGlowAnimator(piglow);
-        //unhealthyAnimator.addAnimation(new PiGlowBlinker(0, 3000, 0, 255, 999999, PiGlowLED.findLED(PiGlowArm.TOP, PiGlowColor.RED)));
-        //unhealthyAnimator.addAnimation(new PiGlowBlinker(1000, 3000, 0, 255, 999999, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.RED)));
-        //unhealthyAnimator.addAnimation(new PiGlowBlinker(2000, 3000, 0, 255, 999999, PiGlowLED.findLED(PiGlowArm.RIGHT, PiGlowColor.RED)));
+        healthyAnimator.addAnimation(new PiGlowBlinker(0, 1000, 0, 100, Integer.MAX_VALUE, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.GREEN)));
+	healthyAnimator.addAnimation(cwUnhealthyAnimation);
     }
 
     /**
@@ -142,15 +145,19 @@ public class WeatherSenseHealthMonitor implements Runnable {
      */
     @Override
     public void run() {
+	logger.info("Checking health");
         boolean healthy = true;
         for (HealthMonitor monitor : monitors) {
+            logger.info("Checking health of " + monitor.getMonitorName());
             healthy = healthy && monitor.isHealthy();
             logger.info(monitor.getMonitorName() + " is " + (monitor.isHealthy() ? "Healthy" : "Unhealthy"));
         }
 
         logger.info("WeatherSense health: " + (healthy ? "Healthy" : "Unhealthy"));
         logger.info("" + cwMonitor);
-        processMonitor.dumpStatus();
+	cwUnhealthyAnimation.setEnabled(!cwMonitor.isHealthy());
+        //processMonitor.dumpStatus();
+	/*
         if (healthy) {
             if (!healthyAnimator.isRunning()) {
                 unhealthyAnimator.stop();
@@ -163,6 +170,7 @@ public class WeatherSenseHealthMonitor implements Runnable {
                 unhealthyAnimator.start();
             }
         }
+		*/
     }
 
     public static void main(String args[]) {
