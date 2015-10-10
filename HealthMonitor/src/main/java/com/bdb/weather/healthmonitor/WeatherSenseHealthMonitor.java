@@ -72,6 +72,7 @@ public class WeatherSenseHealthMonitor implements Runnable {
     private final PiGlowAnimator healthyAnimator;
     private final List<HealthMonitor> monitors = new ArrayList<>();
     private final PiGlowAnimation cwUnhealthyAnimation;
+    private final PiGlowAnimation badBatteryAnimation;
     private static final Logger logger = Logger.getLogger(WeatherSenseHealthMonitor.class.getName());
 
     /**
@@ -94,6 +95,9 @@ public class WeatherSenseHealthMonitor implements Runnable {
         cwUnhealthyAnimation = new PiGlowBlinker(0, 1000, 0, 100, Integer.MAX_VALUE, cwLedList);
 	cwUnhealthyAnimation.setEnabled(false);
 
+        badBatteryAnimation = new PiGlowBlinker(0, 500, 0, 100, Integer.MAX_VALUE, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.BLUE));
+	//badBatteryAnimation.setEnabled(false);
+
 	List<PiGlowLED> leds = new ArrayList<>(PiGlowLED.armLEDs(PiGlowArm.RIGHT));
 	Collections.reverse(leds);
 
@@ -108,6 +112,7 @@ public class WeatherSenseHealthMonitor implements Runnable {
         healthyAnimator = new PiGlowAnimator(piglow);
         healthyAnimator.addAnimation(new PiGlowBlinker(0, 1000, 0, 100, Integer.MAX_VALUE, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.GREEN)));
 	healthyAnimator.addAnimation(cwUnhealthyAnimation);
+	healthyAnimator.addAnimation(badBatteryAnimation);
     }
 
     /**
@@ -145,32 +150,41 @@ public class WeatherSenseHealthMonitor implements Runnable {
      */
     @Override
     public void run() {
-	logger.info("Checking health");
-        boolean healthy = true;
-        for (HealthMonitor monitor : monitors) {
-            logger.info("Checking health of " + monitor.getMonitorName());
-            healthy = healthy && monitor.isHealthy();
-            logger.info(monitor.getMonitorName() + " is " + (monitor.isHealthy() ? "Healthy" : "Unhealthy"));
-        }
+	//
+	// Without this try/catch block there is no feedback if an exception is thrown.
+	// In addition the repeating timer will stop if an uncaught exception is propogated up.
+	//
+	try {
+	    logger.info("Checking health");
+	    boolean healthy = true;
+	    for (HealthMonitor monitor : monitors) {
+		logger.info("Checking health of " + monitor.getMonitorName());
+		healthy = healthy && monitor.isHealthy();
+		logger.info(monitor.getMonitorName() + " is " + (monitor.isHealthy() ? "Healthy" : "Unhealthy"));
+	    }
 
-        logger.info("WeatherSense health: " + (healthy ? "Healthy" : "Unhealthy"));
-        logger.info("" + cwMonitor);
-	cwUnhealthyAnimation.setEnabled(!cwMonitor.isHealthy());
-        //processMonitor.dumpStatus();
-	/*
-        if (healthy) {
-            if (!healthyAnimator.isRunning()) {
-                unhealthyAnimator.stop();
-                healthyAnimator.start();
-            }
-        }
-        else {
-            if (!unhealthyAnimator.isRunning()) {
-                healthyAnimator.stop();
-                unhealthyAnimator.start();
-            }
-        }
-		*/
+	    logger.info("WeatherSense health: " + (healthy ? "Healthy" : "Unhealthy"));
+	    logger.info("" + cwMonitor);
+	    cwUnhealthyAnimation.setEnabled(!cwMonitor.isHealthy());
+	    //processMonitor.dumpStatus();
+	    /*
+	    if (healthy) {
+		if (!healthyAnimator.isRunning()) {
+		    unhealthyAnimator.stop();
+		    healthyAnimator.start();
+		}
+	    }
+	    else {
+		if (!unhealthyAnimator.isRunning()) {
+		    healthyAnimator.stop();
+		    unhealthyAnimator.start();
+		}
+	    }
+		    */
+	}
+	catch (Exception e) {
+	    logger.log(Level.SEVERE, "Caught unexpected exception ", e);
+	}
     }
 
     public static void main(String args[]) {
