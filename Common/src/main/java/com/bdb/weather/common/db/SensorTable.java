@@ -68,8 +68,7 @@ public class SensorTable extends DBTable<Sensor> {
                      " (" + SENSOR_ID_COLUMN + "," + TYPE_COLUMN + "," + NAME_COLUMN + ") " +
                      "values (?,?,?)";
                                       
-        try {
-            PreparedStatement stmt = getConnection().getConnection().prepareStatement(sql);
+        try (PreparedStatement stmt = getConnection().getConnection().prepareStatement(sql)) {
             stmt.setInt(1, sensor.getSensorId());
             stmt.setString(2, sensor.getType().getCode());
             stmt.setString(3, sensor.getName());
@@ -88,8 +87,7 @@ public class SensorTable extends DBTable<Sensor> {
                                       NAME_COLUMN + "=?," +
                                       TYPE_COLUMN + "=?" +
                                       " where " + SENSOR_ID_COLUMN + "=?";
-        try {
-            PreparedStatement stmt = getConnection().getConnection().prepareStatement(sql);
+        try (PreparedStatement stmt = getConnection().getConnection().prepareStatement(sql)) {
             stmt.setString(1, sensor.getName());
             stmt.setString(2, sensor.getType().getCode());
             stmt.setInt(3, sensor.getSensorId());

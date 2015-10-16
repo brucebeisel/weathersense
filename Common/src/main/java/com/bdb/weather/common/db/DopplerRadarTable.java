@@ -112,6 +112,7 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
             catch (IOException e) {
                 logger.log(Level.SEVERE, "Caught IOException", e);
             }
+	    blob.free();
             return image;
         });
         
@@ -156,7 +157,8 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
     
     public boolean addRadarImage(DopplerRadarImage image) {
         boolean success;
-        try {
+	String stmtString = "insert into " + TABLE_NAME + " values(?,?,?)";
+        try (PreparedStatement stmt = getConnection().getConnection().prepareStatement(stmtString)) {
             Blob blob = imageToBlob(image.getImage());
 
             int sequence = getNewestSequence();
@@ -166,8 +168,6 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
             else
                 sequence++;
 
-            String stmtString = "insert into " + TABLE_NAME + " values(?,?,?)";
-            PreparedStatement stmt = getConnection().getConnection().prepareStatement(stmtString);
             stmt.setInt(1, sequence);
             stmt.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
             stmt.setBlob(3, blob);

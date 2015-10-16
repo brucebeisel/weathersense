@@ -97,9 +97,8 @@ public class TemperatureBinTable extends DBTable<TemperatureBin> {
         boolean success = false;
         logger.fine("Adding row to TemperatureBin table: " + row);
         
-        try {
-            String stmtString = "insert into " + TABLE_NAME + " values(?,?,?)";
-            PreparedStatement stmt = getConnection().getConnection().prepareStatement(stmtString);
+	String stmtString = "insert into " + TABLE_NAME + " values(?,?,?)";
+        try (PreparedStatement stmt = getConnection().getConnection().prepareStatement(stmtString)) {
             stmt.setInt(1, row.getBinId());
             stmt.setString(2, row.getThresholdType().toString());
             stmt.setDouble(3, row.getThreshold().get(DatabaseUnits.TEMPERATURE));

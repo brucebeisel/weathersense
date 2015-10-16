@@ -128,8 +128,7 @@ public class DailyAveragesTable extends DBTable<WeatherAverage> {
         boolean success;
         String sql = "insert into " + TABLE_NAME + " values (?,?,?,?,?,?)";
 
-        try {
-            PreparedStatement stmt = getConnection().getConnection().prepareStatement(sql);
+        try (PreparedStatement stmt = getConnection().getConnection().prepareStatement(sql)) {
             stmt.setInt(1, row.getMonth().getValue());
             stmt.setInt(2, row.getDay());
             stmt.setDouble(3, row.getLowTemperature().get(DatabaseUnits.TEMPERATURE));

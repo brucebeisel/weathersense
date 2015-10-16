@@ -175,13 +175,11 @@ public class DailyRecordsTable extends DBTable<DailyRecords> {
      */
     private boolean saveNewRecord(Extreme<? extends Measurement, ?> extreme, String valueColumn, String yearColumn, Unit unit) {
         boolean success;
-        PreparedStatement stmt;
-        try {
-            LocalDate c = extreme.getDate();
-            String sql = "update " + TABLE_NAME + " set " + valueColumn + "=?, " + yearColumn + "=?" + " where " +
-                         MONTH_COLUMN + "=" + c.getMonth().getValue() + " and " + DAY_COLUMN + "=" + c.getDayOfMonth();
+	LocalDate c = extreme.getDate();
+	String sql = "update " + TABLE_NAME + " set " + valueColumn + "=?, " + yearColumn + "=?" + " where " +
+		     MONTH_COLUMN + "=" + c.getMonth().getValue() + " and " + DAY_COLUMN + "=" + c.getDayOfMonth();
 
-            stmt = getConnection().getConnection().prepareStatement(sql);
+        try (PreparedStatement stmt = getConnection().getConnection().prepareStatement(sql)) {
             stmt.setDouble(1, extreme.getValue().get(unit));
             stmt.setInt(2, c.getYear());
 

@@ -112,11 +112,10 @@ public class StormDopplerRadarTable extends DBTable<DopplerRadarImage> {
     
     public boolean addRadarImage(LocalDateTime stormStart, DopplerRadarImage image) {
         boolean success;
-        try {
+	String stmtString = "insert into " + TABLE_NAME + " values(?,?,?)";
+        try (PreparedStatement stmt = getConnection().getConnection().prepareStatement(stmtString)) {
             Blob blob = DopplerRadarTable.imageToBlob(image.getImage());
 
-            String stmtString = "insert into " + TABLE_NAME + " values(?,?,?)";
-            PreparedStatement stmt = getConnection().getConnection().prepareStatement(stmtString);
             stmt.setTimestamp(1, Timestamp.valueOf(stormStart));
             stmt.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
             stmt.setBlob(3, blob);
