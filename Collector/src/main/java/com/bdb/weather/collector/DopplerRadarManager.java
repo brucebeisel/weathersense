@@ -116,7 +116,7 @@ public class DopplerRadarManager {
      * 
      * @throws SQLException See JDBC documentation
      */
-    private void checkForNewRadarImage() {
+    void checkForNewRadarImage() {
         logger.log(Level.FINE, "Checking for new Doppler Radar image");
         if (imageUrl == null)
             return;

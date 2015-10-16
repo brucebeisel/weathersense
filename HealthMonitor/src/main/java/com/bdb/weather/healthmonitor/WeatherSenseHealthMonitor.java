@@ -64,15 +64,16 @@ import java.util.Collections;
  * @author Bruce
  */
 public class WeatherSenseHealthMonitor implements Runnable {
-    private final CurrentWeatherMonitor cwMonitor;
-    private final HistoryMonitor historyMonitor;
-    private final ProcessMonitor processMonitor;
+    private boolean initialized = false;
+    private CurrentWeatherMonitor cwMonitor;
+    private HistoryMonitor historyMonitor;
+    private ProcessMonitor processMonitor;
     private final ScheduledExecutorService executor;
-    private final PiGlow piglow;
-    private final PiGlowAnimator healthyAnimator;
-    private final List<HealthMonitor> monitors = new ArrayList<>();
-    private final PiGlowAnimation cwUnhealthyAnimation;
-    private final PiGlowAnimation badBatteryAnimation;
+    private PiGlow piglow;
+    private PiGlowAnimator healthyAnimator;
+    private List<HealthMonitor> monitors = new ArrayList<>();
+    private PiGlowAnimation cwUnhealthyAnimation;
+    private PiGlowAnimation badBatteryAnimation;
     private static final Logger logger = Logger.getLogger(WeatherSenseHealthMonitor.class.getName());
 
     /**
@@ -85,43 +86,58 @@ public class WeatherSenseHealthMonitor implements Runnable {
      * @throws IOException Processes could not be start or the specified directories could not be found
      */
     public WeatherSenseHealthMonitor(String baseDirectory, String dbHost, boolean realPiGlow) throws IOException {
-        if (!realPiGlow)
-            I2CFactory.setFactory(new I2CFactoryProviderSwing());
+	executor = Executors.newSingleThreadScheduledExecutor();
+	    
+	try {
+	    if (!realPiGlow)
+		I2CFactory.setFactory(new I2CFactoryProviderSwing());
 
-        piglow = PiGlow.getInstance();
-	List<PiGlowLED> cwLedList = PiGlowLED.armLEDs(PiGlowArm.TOP);
+	    piglow = PiGlow.getInstance();
 
-        cwMonitor = CurrentWeatherMonitor.createCurrentWeatherMonitor(piglow, cwLedList, 1);
-        cwUnhealthyAnimation = new PiGlowBlinker(0, 1000, 0, 100, Integer.MAX_VALUE, cwLedList);
-	cwUnhealthyAnimation.setEnabled(false);
+	    List<PiGlowLED> cwLedList = PiGlowLED.armLEDs(PiGlowArm.TOP);
 
-        badBatteryAnimation = new PiGlowBlinker(0, 500, 0, 100, Integer.MAX_VALUE, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.BLUE));
-	//badBatteryAnimation.setEnabled(false);
+	    cwMonitor = CurrentWeatherMonitor.createCurrentWeatherMonitor(piglow, cwLedList, 1);
+	    cwUnhealthyAnimation = new PiGlowBlinker(0, 1000, 0, 100, Integer.MAX_VALUE, cwLedList);
+	    cwUnhealthyAnimation.setEnabled(false);
 
-	List<PiGlowLED> leds = new ArrayList<>(PiGlowLED.armLEDs(PiGlowArm.RIGHT));
-	Collections.reverse(leds);
+	    badBatteryAnimation = new PiGlowBlinker(0, 500, 0, 100, Integer.MAX_VALUE, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.BLUE));
+	    //badBatteryAnimation.setEnabled(false);
 
-        historyMonitor = HistoryMonitor.createHistoryMonitor(dbHost, leds, 6);
-        processMonitor = new ProcessMonitor(baseDirectory);
-        monitors.add(cwMonitor);
-        monitors.add(historyMonitor);
-        monitors.add(processMonitor);
+	    List<PiGlowLED> leds = new ArrayList<>(PiGlowLED.armLEDs(PiGlowArm.RIGHT));
+	    Collections.reverse(leds);
 
-        executor = Executors.newSingleThreadScheduledExecutor();
-        
-        healthyAnimator = new PiGlowAnimator(piglow);
-        healthyAnimator.addAnimation(new PiGlowBlinker(0, 1000, 0, 100, Integer.MAX_VALUE, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.GREEN)));
-	healthyAnimator.addAnimation(cwUnhealthyAnimation);
-	healthyAnimator.addAnimation(badBatteryAnimation);
+	    historyMonitor = HistoryMonitor.createHistoryMonitor(dbHost, leds, 6);
+	    if (historyMonitor == null) {
+		logger.log(Level.SEVERE, "Failed to create history monitor");
+		throw new NullPointerException("history monitor");
+	    }
+	    processMonitor = new ProcessMonitor(baseDirectory);
+	    monitors.add(cwMonitor);
+	    monitors.add(historyMonitor);
+	    monitors.add(processMonitor);
+
+	    healthyAnimator = new PiGlowAnimator(piglow);
+	    healthyAnimator.addAnimation(new PiGlowBlinker(0, 1000, 0, 100, Integer.MAX_VALUE, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.GREEN)));
+	    healthyAnimator.addAnimation(cwUnhealthyAnimation);
+	    healthyAnimator.addAnimation(badBatteryAnimation);
+	    initialized = true;
+	}
+	catch (Exception e) {
+	    PiGlowAnimator animator = new PiGlowAnimator(PiGlow.getInstance());
+	    animator.addAnimation(new PiGlowBlinker(0, 250, 0, 100, Integer.MAX_VALUE, PiGlowLED.allLEDs()));
+	    animator.start();
+	}
     }
 
     /**
      * Start the processes and the monitors.
      */
     public void start() {
-        //processMonitor.startProcesses();
-        executor.scheduleAtFixedRate(this, 10, 10, TimeUnit.SECONDS);
-        healthyAnimator.start();
+	if (initialized) {
+	    //processMonitor.startProcesses();
+	    executor.scheduleAtFixedRate(this, 10, 10, TimeUnit.SECONDS);
+	    healthyAnimator.start();
+	}
     }
 
     /**
