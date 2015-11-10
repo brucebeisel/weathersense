@@ -3,3 +3,4 @@
 /Display/target/
 /HealthMonitor/target/
 *.log
+/WeatherSenseDisplayJavaFX/target/
