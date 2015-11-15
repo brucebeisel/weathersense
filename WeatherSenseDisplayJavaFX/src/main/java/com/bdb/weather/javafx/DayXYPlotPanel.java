@@ -56,6 +56,8 @@ import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.WeatherStation;
 import java.time.LocalTime;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingNode;
@@ -63,6 +65,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
@@ -436,7 +439,7 @@ abstract public class DayXYPlotPanel implements ActionListener {
         }
     }
 
-    private static class SeriesEntry implements Callback<HistoricalRecord,String> {
+    private static class SeriesEntry implements Callback<CellDataFeatures<HistoricalRecord,String>,ObservableValue<String>> {
         public HistoricalSeriesInfo seriesInfo;
         public TimeSeries           timeSeries;
         public int                  tableColumn;
@@ -452,12 +455,15 @@ abstract public class DayXYPlotPanel implements ActionListener {
         }
 
 	@Override
-	public String call(HistoricalRecord r) {
+	public ObservableValue<String> call(CellDataFeatures<HistoricalRecord,String> cdf) {
+	    HistoricalRecord r = cdf.getValue();
 	    Measurement m = seriesInfo.getValue(r);
-	    if (m == null)
-		return DisplayConstants.UNKNOWN_VALUE_STRING;
-	    else
-		return m.toString();
+
+	    String value = DisplayConstants.UNKNOWN_VALUE_STRING;
+	    if (m != null)
+		value = m.toString();
+
+	    return new ReadOnlyObjectWrapper(value);
 	}
     }
 }
