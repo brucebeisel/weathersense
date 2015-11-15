@@ -29,10 +29,6 @@ import java.util.TimeZone;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -59,11 +55,16 @@ import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.WeatherStation;
+import java.time.LocalTime;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingNode;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.util.Callback;
 
 /**
  * An XY Plot for a single day of data. This class provides a tabbed pane, one pane for the plot
@@ -80,15 +81,14 @@ abstract public class DayXYPlotPanel implements ActionListener {
     private XYPlot               plot;
     private JFreeChart           chart;
     private ChartPanel           chartPanel;
-    private TableView            dataTable;
     private DateAxis             dateAxis;
     private final ValueAxis      leftAxis;
     private final ValueAxis      rightAxis;
-    private DefaultTableModel    tableModel;
     private JMenu                displayMenu;
     private boolean              displayDayNightIndicators = true;
     private JCheckBoxMenuItem    dayNightItem;
     private LocalDate            currentDate;
+    private TableView<HistoricalRecord> dataTable;
     private final TimeSeriesCollection datasetLeft;
     private final TimeSeriesCollection datasetRight;
     private List<SeriesEntry>    entries;
@@ -108,7 +108,6 @@ abstract public class DayXYPlotPanel implements ActionListener {
         // Set up the Domain Axis (X)
         //
         plot = new XYPlot();
-        tableModel = new DefaultTableModel();
         component = new TabPane();
         dateAxis = new DateAxis("Time");
         dateAxis.setAutoRange(false);
@@ -170,14 +169,7 @@ abstract public class DayXYPlotPanel implements ActionListener {
         //
         // Build the table for the data tab
         //
-        DefaultTableColumnModel colModel = new DefaultTableColumnModel();
-        
         dataTable = new TableView();
-        dataTable.setModel(tableModel);
-        dataTable.setColumnModel(colModel);
-
-        dataTable.setAutoCreateColumnsFromModel(false);
-
 
 	tab = new Tab(DisplayConstants.DATA_TAB_NAME);
 	tab.setContent(p);
@@ -195,17 +187,14 @@ abstract public class DayXYPlotPanel implements ActionListener {
         displayMenu.add(dayNightItem);
         dayNightItem.addActionListener(this);
 
-        TableColumn col = new TableColumn();
-        col.setHeaderValue(TIME_HEADING);
-        col.setModelIndex(TIME_COLUMN);
-        colModel.addColumn(col);
-        doConfigure(displayMenu, colModel);
+        TableColumn<HistoricalRecord,LocalTime> col = new TableColumn<>(TIME_HEADING);
+	dataTable.getColumns().add(col);
+        doConfigure(displayMenu);
 
-        tableModel.setColumnCount(entries.size() + 1);
-        dataTable.setRowSorter(new TableRowSorter<>(tableModel));
+        //dataTable.setRowSorter(new TableRowSorter<>(tableModel));
     }
     
-    private void doConfigure(JMenu menu, DefaultTableColumnModel colModel) {
+    private void doConfigure(JMenu menu) {
         List<SeriesControl> controls = configure(displayMenu);
         int tableColumn = 1;
         for (SeriesControl control : controls) {
@@ -217,10 +206,9 @@ abstract public class DayXYPlotPanel implements ActionListener {
                 SeriesEntry entry = new SeriesEntry(info, timeSeries, tableColumn, menuItem, control.leftAxis);
                 entries.add(entry);
 
-                TableColumn col = new TableColumn();
-                col.setHeaderValue(entry.seriesInfo.getSeriesName());
-                col.setModelIndex(tableColumn);
-                colModel.addColumn(col);
+                TableColumn<HistoricalRecord,String> col = new TableColumn<>(entry.seriesInfo.getSeriesName());
+		col.setCellValueFactory(entry);
+                dataTable.getColumns().add(col);
 
                 menu.add(menuItem);
                 menuItem.addActionListener(this);
@@ -291,29 +279,26 @@ abstract public class DayXYPlotPanel implements ActionListener {
      * Load the data into the JFreeChart time series and into the Table Model
      * 
      * @param records The list of historical records
-     * @param tableModel The table model to be loaded
      */
-    protected void loadDataSeries(List<HistoricalRecord> records, DefaultTableModel tableModel) {
+    protected void loadDataSeries(List<HistoricalRecord> records) {
         entries.stream().forEach((entry) -> {
             entry.timeSeries.clear();
         });
+
+	ObservableList<HistoricalRecord> dataModel = FXCollections.observableList(records);
+	dataTable.setItems(dataModel);
         
         getPlot().getRangeAxis().setAutoRange(true);
 
 	int n = 0;
 
 	for (HistoricalRecord r : records) {
-	    tableModel.setValueAt(DisplayConstants.formatTime(r.getTime().toLocalTime()), n, TIME_COLUMN);
 	    RegularTimePeriod p = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(r.getTime()), TimeZone.getDefault());
 
             for(SeriesEntry entry : entries) {
                 Measurement m = entry.seriesInfo.getValue(r);
-                if (m != null) {
+                if (m != null)
                     entry.timeSeries.add(p, m.get());
-                    tableModel.setValueAt(m, n, entry.tableColumn);
-                }
-                else
-                    tableModel.setValueAt(DisplayConstants.UNKNOWN_VALUE_STRING, n, entry.tableColumn);
             }
 	    n++;
         }
@@ -404,13 +389,12 @@ abstract public class DayXYPlotPanel implements ActionListener {
      * @param averages
      */
     public void loadData(LocalDate date, List<HistoricalRecord> list, SummaryRecord summaryRecord, DailyRecords records, WeatherAverage averages) {
-        tableModel.setRowCount(list.size());
         
         currentDate = date;
         updateDomainAxis(currentDate);
         addSunriseSunsetMarkers();
         addExtremeMarkers(plot, records, averages);
-        loadDataSeries(list, tableModel);
+        loadDataSeries(list);
 
         addAnnotations(plot, summaryRecord);
         finishLoadData();
@@ -452,7 +436,7 @@ abstract public class DayXYPlotPanel implements ActionListener {
         }
     }
 
-    private static class SeriesEntry {
+    private static class SeriesEntry implements Callback<HistoricalRecord,String> {
         public HistoricalSeriesInfo seriesInfo;
         public TimeSeries           timeSeries;
         public int                  tableColumn;
@@ -466,5 +450,14 @@ abstract public class DayXYPlotPanel implements ActionListener {
             checkbox = cb;
             datasetLeft = left;
         }
+
+	@Override
+	public String call(HistoricalRecord r) {
+	    Measurement m = seriesInfo.getValue(r);
+	    if (m == null)
+		return DisplayConstants.UNKNOWN_VALUE_STRING;
+	    else
+		return m.toString();
+	}
     }
 }
