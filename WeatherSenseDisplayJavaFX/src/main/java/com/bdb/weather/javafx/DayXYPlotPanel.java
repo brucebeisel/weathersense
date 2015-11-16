@@ -112,6 +112,7 @@ abstract public class DayXYPlotPanel implements ActionListener {
         //
         plot = new XYPlot();
         component = new TabPane();
+	component.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         dateAxis = new DateAxis("Time");
         dateAxis.setAutoRange(false);
         dateAxis.setTickUnit(new DateTickUnit(DateTickUnitType.HOUR, 1, new SimpleDateFormat("h a")));
@@ -166,16 +167,15 @@ abstract public class DayXYPlotPanel implements ActionListener {
 	p.setContent(chartPanel);
 
 	Tab tab = new Tab(DisplayConstants.GRAPH_TAB_NAME);
-	tab.setContent(null);
+	tab.setContent(p);
         component.getTabs().add(tab);
 
         //
         // Build the table for the data tab
         //
         dataTable = new TableView();
-
 	tab = new Tab(DisplayConstants.DATA_TAB_NAME);
-	tab.setContent(p);
+	tab.setContent(dataTable);
         component.getTabs().add(tab);
 
         //
@@ -193,6 +193,7 @@ abstract public class DayXYPlotPanel implements ActionListener {
         TableColumn<HistoricalRecord,LocalTime> col = new TableColumn<>(TIME_HEADING);
 	dataTable.getColumns().add(col);
         doConfigure(displayMenu);
+	component.layout();
 
         //dataTable.setRowSorter(new TableRowSorter<>(tableModel));
     }

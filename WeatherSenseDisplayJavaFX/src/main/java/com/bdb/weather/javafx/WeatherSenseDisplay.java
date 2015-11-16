@@ -1,9 +1,10 @@
 package com.bdb.weather.javafx;
 
+import com.bdb.weather.common.WeatherStation;
+import static com.bdb.weather.javafx.DayTemperaturePlot.createDayTemperaturePlot;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -12,12 +13,16 @@ public class WeatherSenseDisplay extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
+        //Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
+	Group root = new Group();
         
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/Styles.css");
+	WeatherStation ws = new WeatherStation();
+	DayTemperaturePlot plot = createDayTemperaturePlot(ws);
+	root.getChildren().add(plot.getNode());
         
-        stage.setTitle("JavaFX and Maven");
+        stage.setTitle("WeatherSense JavaFX");
         stage.setScene(scene);
         stage.show();
     }

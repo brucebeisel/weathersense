@@ -5,6 +5,7 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import com.bdb.weather.javafx.*?>
 
 <AnchorPane id="AnchorPane" prefHeight="200" prefWidth="320" xmlns:fx="http://javafx.com/fxml" fx:controller="com.bdb.weather.javafx.FXMLController">
     <children>
@@ -13,7 +14,5 @@
 		<MenuItem text="Exit"/>
 	    </Menu>
 	</MenuBar>
-        <Button layoutX="126" layoutY="90" text="Click Me!" onAction="#handleButtonAction" fx:id="button" />
-        <Label layoutX="126" layoutY="120" minHeight="16" minWidth="69" fx:id="label" />
     </children>
 </AnchorPane>
