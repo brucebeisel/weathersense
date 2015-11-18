@@ -55,8 +55,10 @@ import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.WeatherStation;
+
 import java.time.LocalTime;
-import javafx.beans.property.ReadOnlyObjectWrapper;
+
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -173,7 +175,7 @@ abstract public class DayXYPlotPanel implements ActionListener {
         //
         // Build the table for the data tab
         //
-        dataTable = new TableView();
+        dataTable = new TableView<>();
 	tab = new Tab(DisplayConstants.DATA_TAB_NAME);
 	tab.setContent(dataTable);
         component.getTabs().add(tab);
@@ -190,7 +192,9 @@ abstract public class DayXYPlotPanel implements ActionListener {
         displayMenu.add(dayNightItem);
         dayNightItem.addActionListener(this);
 
-        TableColumn<HistoricalRecord,LocalTime> col = new TableColumn<>(TIME_HEADING);
+        TableColumn<HistoricalRecord,String> col = new TableColumn<>(TIME_HEADING);
+        col.setCellValueFactory((rec)->new ReadOnlyStringWrapper(DisplayConstants.formatTime(rec.getValue().getTime().toLocalTime())));
+
 	dataTable.getColumns().add(col);
         doConfigure(displayMenu);
 	component.layout();
@@ -464,7 +468,7 @@ abstract public class DayXYPlotPanel implements ActionListener {
 	    if (m != null)
 		value = m.toString();
 
-	    return new ReadOnlyObjectWrapper(value);
+            return new ReadOnlyStringWrapper(value);
 	}
     }
 }
