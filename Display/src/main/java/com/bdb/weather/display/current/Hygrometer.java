@@ -20,8 +20,10 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 import java.text.DecimalFormat;
 
-import javax.swing.JComponent;
 import javax.swing.border.BevelBorder;
+
+import javafx.embed.swing.SwingNode;
+import javafx.scene.Node;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -45,7 +47,7 @@ import com.bdb.weather.common.WeatherTrend;
  * @author Bruce
  *
  */
-public class Hygrometer {
+public class Hygrometer extends SwingNode {
     private final DefaultValueDataset humidityDataset = new DefaultValueDataset(50.0);
     private final DialPlot            humidityPlot = new DialPlot(humidityDataset);
     private final StandardDialRange   range;
@@ -105,6 +107,8 @@ public class Hygrometer {
         chartPanel.setMinimumDrawWidth(200);
         chartPanel.setBackground(Color.GRAY);
         chartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
+
+	this.setContent(chartPanel);
     }
     
     /**
@@ -112,8 +116,8 @@ public class Hygrometer {
      * 
      * @return The swing container
      */
-    public JComponent getComponent() {
-        return chartPanel;
+    public Node getComponent() {
+        return this;
     }
     
     /**

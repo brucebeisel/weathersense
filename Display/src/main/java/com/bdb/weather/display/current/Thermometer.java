@@ -20,8 +20,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GradientPaint;
 
-import javax.swing.JComponent;
 import javax.swing.border.BevelBorder;
+
+import javafx.embed.swing.SwingNode;
+import javafx.scene.Node;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -36,7 +38,7 @@ import com.bdb.weather.common.measurement.Temperature;
  * @author Bruce
  *
  */
-public class Thermometer {
+public class Thermometer extends SwingNode {
     private final DefaultValueDataset temperatureDataset = new DefaultValueDataset(0.0);
     private final ThermometerPlot     thermometerPlot = new ThermometerPlot(temperatureDataset);
     private final ChartPanel          chartPanel;
@@ -83,6 +85,8 @@ public class Thermometer {
         chartPanel.setPreferredSize(new Dimension(100, 200));
         chartPanel.setBackground(Color.GRAY);
         chartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
+
+	this.setContent(chartPanel);
     }
     
     /**
@@ -90,8 +94,8 @@ public class Thermometer {
      * 
      * @return The swing container
      */
-    public JComponent getComponent() {
-        return chartPanel;
+    public Node getComponent() {
+        return this;
     }
 
     /**

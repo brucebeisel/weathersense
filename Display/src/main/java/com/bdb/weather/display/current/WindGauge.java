@@ -22,9 +22,11 @@ import java.awt.GradientPaint;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import javax.swing.JComponent;
 import javax.swing.Timer;
 import javax.swing.border.BevelBorder;
+
+import javafx.embed.swing.SwingNode;
+import javafx.scene.Node;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -50,7 +52,7 @@ import com.bdb.weather.display.DisplayConstants;
  * @author Bruce
  * 
  */
-public class WindGauge {
+public class WindGauge extends SwingNode {
     private static final int WIND_SPEED_DATASET_INDEX = 0;
     private static final int WIND_GUST_DATASET_INDEX = 1;
     private static final int MAX_WIND_SPEED_DATASET_INDEX = 2;
@@ -200,6 +202,7 @@ public class WindGauge {
         chartPanel.setMaximumDrawWidth(300);
         chartPanel.setBackground(Color.GRAY);
         chartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
+	this.setContent(chartPanel);
     }
 
     /**
@@ -207,8 +210,8 @@ public class WindGauge {
      * 
      * @return The swing container
      */
-    public JComponent getComponent() {
-        return chartPanel;
+    public Node getComponent() {
+        return this;
     }
 
     /**

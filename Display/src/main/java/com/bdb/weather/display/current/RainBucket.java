@@ -24,7 +24,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
 
 import com.bdb.weather.common.measurement.Depth;
-import com.bdb.weather.display.JRainBucket;
 import com.bdb.weather.display.JScalableLabel;
 
 /**
@@ -34,7 +33,7 @@ import com.bdb.weather.display.JScalableLabel;
  *
  */
 public class RainBucket {
-    private JRainBucket    rainBucket;
+    private com.bdb.weather.display.RainBucket    rainBucket;
     private JScalableLabel label;
     private final JPanel   panel = new JPanel(new BorderLayout());
     
@@ -48,7 +47,7 @@ public class RainBucket {
      */
     public RainBucket(String labelString, Depth maxValue, Depth average, Depth averageToDate) {
         Depth.Unit unit = Depth.getDefaultUnit();
-        rainBucket = new JRainBucket(maxValue.get(), unit.getFormatter(), unit.toString(), average.get(), averageToDate.get());
+        rainBucket = new com.bdb.weather.display.RainBucket(maxValue.get(), unit.getFormatter(), unit.toString(), average.get(), averageToDate.get());
         rainBucket.setBorder(new EtchedBorder(EtchedBorder.RAISED));
         label = new JScalableLabel(labelString);
         label.setHorizontalAlignment(SwingConstants.CENTER);
