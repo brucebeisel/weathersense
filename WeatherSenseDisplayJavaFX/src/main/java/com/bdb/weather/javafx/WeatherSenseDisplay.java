@@ -2,6 +2,8 @@ package com.bdb.weather.javafx;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.swing.JOptionPane;
 
@@ -21,8 +23,9 @@ import com.bdb.weather.common.db.WeatherStationTable;
 import static com.bdb.weather.javafx.DayTemperaturePlot.createDayTemperaturePlot;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
-import javafx.scene.Group;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 
@@ -39,15 +42,36 @@ public class WeatherSenseDisplay extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        Locale.setDefault(Locale.US);
+
         openDatabase();
-        //Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
-	Group root = new Group();
-        root.setAutoSizeChildren(true);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Scene.fxml"), ResourceBundle.getBundle("com.bdb.weathersense.Localization"));
+        loader.load();
+        BorderPane root = loader.getRoot();
         
         Scene scene = new Scene(root, 800, 800);
         scene.getStylesheets().add("/styles/Styles.css");
 	plot = createDayTemperaturePlot(ws);
-	root.getChildren().add(plot.getNode());
+	root.setCenter(plot.getNode());
+        
+        stage.setTitle("WeatherSense JavaFX");
+        stage.setScene(scene);
+        FXMLController controller = loader.getController();
+        controller.setDisplay(this);
+        stage.sizeToScene();
+        stage.show();
+
+        loadData();
+    }
+
+    public void newWindow() throws Exception {
+        Stage stage = new Stage();
+        BorderPane root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"), ResourceBundle.getBundle("com.bdb.weathersense.Localization"));
+        
+        Scene scene = new Scene(root, 800, 800);
+        scene.getStylesheets().add("/styles/Styles.css");
+	plot = createDayTemperaturePlot(ws);
+	root.setCenter(plot.getNode());
         
         stage.setTitle("WeatherSense JavaFX");
         stage.setScene(scene);
@@ -55,6 +79,7 @@ public class WeatherSenseDisplay extends Application {
         stage.show();
 
         loadData();
+
     }
 
     public void loadData() {
