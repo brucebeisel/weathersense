@@ -17,7 +17,6 @@
 package com.bdb.weather.display.current;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.beans.PropertyChangeEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -40,6 +39,10 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.TilePane;
 
 import com.bdb.util.Pair;
 import com.bdb.util.jdbc.DBConnection;
@@ -126,24 +129,24 @@ public class CurrentWeatherPanel implements ComponentContainer, CurrentWeatherPr
         BorderPane b0 = new BorderPane();
         b0.setTop(radar.getComponent());
         
-        Box b1 = new Box(BoxLayout.X_AXIS);
-        b1.add(outdoorThermometer.getComponent());
-        b1.add(indoorThermometer.getComponent());
-        b0.add(b1, BorderLayout.CENTER);
+        HBox b1 = new HBox();
+        b1.getChildren().add(outdoorThermometer.getComponent());
+        b1.getChildren().add(indoorThermometer.getComponent());
+        b0.setCenter(b1);
         
-        JPanel p1 = new JPanel(new GridLayout(2,0));
-        p1.add(outdoorHumidity.getComponent());
-        p1.add(barometerPanel.getComponent());
-        p1.add(indoorHumidity.getComponent());
-        p1.add(windPanel.getComponent());
+        TilePane p1 = new TilePane();
+        p1.setPrefRows(2);
+        p1.getChildren().add(outdoorHumidity.getComponent());
+        p1.getChildren().add(barometerPanel.getComponent());
+        p1.getChildren().add(indoorHumidity.getComponent());
+        p1.getChildren().add(windPanel.getComponent());
         
-        Box b2 = new Box(BoxLayout.X_AXIS);
-        b2.add(b0);
-        b2.add(p1);
+        HBox b2 = new HBox();
+        b2.getChildren().addAll(b0, p1);
         
-        JPanel upperPanel = new JPanel(new BorderLayout());
-        upperPanel.add(b2, BorderLayout.CENTER);
-        upperPanel.add(forecastRuleTF, BorderLayout.SOUTH);
+        BorderPane upperPanel = new BorderPane();
+        upperPanel.setCenter(b2);
+        upperPanel.setBottom(forecastRuleTF);
         
         component.add(upperPanel);
         
@@ -175,7 +178,7 @@ public class CurrentWeatherPanel implements ComponentContainer, CurrentWeatherPr
         
         rainPanel = new CurrentWeatherRainPanel(ws, thisMonthAverage, lastMonthAverage, yearlyAverage, calendarYearAverageToDate, weatherYearAverageToDate);
         
-        component.add(rainPanel.getComponent());
+        component.getChildren().add(rainPanel.getComponent());
 
         int dividerLocation = prefs.getInt(USER_DIVIDER_LOCATION_PROPERTY, 50);
         component.setDividerLocation(dividerLocation);
