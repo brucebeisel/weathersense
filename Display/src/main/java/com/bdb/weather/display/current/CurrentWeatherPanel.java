@@ -123,8 +123,8 @@ public class CurrentWeatherPanel implements ComponentContainer, CurrentWeatherPr
         outdoorThermometer = new Thermometer("Outdoor", ws.getThermometerMin(), ws.getThermometerMax());
         indoorThermometer = new Thermometer("Indoor", ws.getThermometerMin(), ws.getThermometerMax());
 
-        JPanel b0 = new JPanel(new BorderLayout());
-        b0.add(radar.getComponent(), BorderLayout.NORTH);
+        BorderPane b0 = new BorderPane();
+        b0.setTop(radar.getComponent());
         
         Box b1 = new Box(BoxLayout.X_AXIS);
         b1.add(outdoorThermometer.getComponent());

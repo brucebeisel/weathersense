@@ -26,7 +26,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
 
-import javax.swing.JComponent;
+import javafx.embed.swing.SwingNode;
+import javafx.scene.Node;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -57,7 +58,7 @@ import com.bdb.weather.display.axis.RainRangeAxis;
  * @author Bruce
  *
  */
-public class RainPlot {
+public class RainPlot extends SwingNode {
 public static class RainEntry {
     public LocalDateTime time;
     public Depth    rainfall;
@@ -70,17 +71,17 @@ public static class RainEntry {
 };
 private static final String RAIN_DOMAIN = "Rainfall";
 private static final String RAIN_RATE_DOMAIN_PREFIX = "Rate (%s/hr)";
-private JFreeChart                           chart;
-private ChartPanel                           chartPanel;
-private CombinedDomainXYPlot                 plot;
-private XYPlot                               rainPlot;
-private XYPlot                               rainRatePlot;
-private TimeSeriesCollection                 rainDataset;
-private TimeSeriesCollection                 rainRateDataset;
-private TimeSeries                           rainSeries;
-private TimeSeries                           rainRateSeries;
-private final String                         rateDomain;
-private final DateTimeFormatter              formatter = DateTimeFormatter.ofPattern("HH:mm"); // TODO use preferences
+private final JFreeChart           chart;
+private final ChartPanel           chartPanel;
+private final CombinedDomainXYPlot plot;
+private final XYPlot               rainPlot;
+private final XYPlot               rainRatePlot;
+private final TimeSeriesCollection rainDataset;
+private final TimeSeriesCollection rainRateDataset;
+private final TimeSeries           rainSeries;
+private final TimeSeries           rainRateSeries;
+private final String               rateDomain;
+private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:mm"); // TODO use preferences
     
     /**
      * Class to generate the labels for the tool tips
@@ -198,6 +199,8 @@ private final DateTimeFormatter              formatter = DateTimeFormatter.ofPat
         rateRenderer.setSeriesPaint(0, Color.RED);
         rateRenderer.setBaseToolTipGenerator(ttg);
         rainRatePlot.setRenderer(rateRenderer);
+
+        setContent(chartPanel);
     }
     
     /**
@@ -205,8 +208,8 @@ private final DateTimeFormatter              formatter = DateTimeFormatter.ofPat
      * 
      * @return The swing container
      */
-    public JComponent getComponent() {
-        return chartPanel;
+    public Node getComponent() {
+        return this;
     }
     
     /**

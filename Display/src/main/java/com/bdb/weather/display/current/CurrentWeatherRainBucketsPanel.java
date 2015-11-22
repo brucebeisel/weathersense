@@ -16,10 +16,10 @@
  */
 package com.bdb.weather.display.current;
 
-import java.awt.GridLayout;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
+import javafx.scene.Node;
+
+import javafx.scene.layout.TilePane;
 
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.WeatherStation;
@@ -30,15 +30,14 @@ import com.bdb.weather.common.WeatherStation;
  * @author Bruce
  *
  */
-public class CurrentWeatherRainBucketsPanel {
-    private final JComponent    component = new JPanel(new GridLayout(1,0));
-    private final RainBucket    lastHour;
-    private final RainBucket    today;
-    private final RainBucket    last24Hours;
-    private final RainBucket    currentMonth;
-    private final RainBucket    lastMonth;
-    private final RainBucket    currentYear;
-    private final RainBucket    weatherYear;
+public class CurrentWeatherRainBucketsPanel extends TilePane {
+    private final RainBucketNode    lastHour;
+    private final RainBucketNode    today;
+    private final RainBucketNode    last24Hours;
+    private final RainBucketNode    currentMonth;
+    private final RainBucketNode    lastMonth;
+    private final RainBucketNode    currentYear;
+    private final RainBucketNode    weatherYear;
     
     /**
      * Constructor.
@@ -51,21 +50,21 @@ public class CurrentWeatherRainBucketsPanel {
      * @param calendarYearAverageToDate  The amount of rain that should have fallen so far this calendar year
      */
     public CurrentWeatherRainBucketsPanel(WeatherStation ws, Depth thisMonthAverage, Depth lastMonthAverage, Depth yearlyAverage, Depth weatherYearAverageToDate, Depth calendarYearAverageToDate) {
-        lastHour = new RainBucket("Last Hour", ws.getDailyRainMax());
-        today = new RainBucket("Today", ws.getDailyRainMax());
-        last24Hours = new RainBucket("24 Hours", ws.getDailyRainMax());
-        currentMonth = new RainBucket("Month", ws.getMonthlyRainMax(), thisMonthAverage);
-        lastMonth = new RainBucket("Last Month", ws.getMonthlyRainMax(), lastMonthAverage);
-        currentYear = new RainBucket("YTD", ws.getYearlyRainMax(), yearlyAverage, calendarYearAverageToDate);
-        weatherYear = new RainBucket("Weather Year", ws.getYearlyRainMax(), yearlyAverage, weatherYearAverageToDate);
+        lastHour = new RainBucketNode("Last Hour", ws.getDailyRainMax());
+        today = new RainBucketNode("Today", ws.getDailyRainMax());
+        last24Hours = new RainBucketNode("24 Hours", ws.getDailyRainMax());
+        currentMonth = new RainBucketNode("Month", ws.getMonthlyRainMax(), thisMonthAverage);
+        lastMonth = new RainBucketNode("Last Month", ws.getMonthlyRainMax(), lastMonthAverage);
+        currentYear = new RainBucketNode("YTD", ws.getYearlyRainMax(), yearlyAverage, calendarYearAverageToDate);
+        weatherYear = new RainBucketNode("Weather Year", ws.getYearlyRainMax(), yearlyAverage, weatherYearAverageToDate);
         
-        component.add(lastHour.getComponent());
-        component.add(today.getComponent());
-        component.add(last24Hours.getComponent());
-        component.add(currentMonth.getComponent());
-        component.add(lastMonth.getComponent());
-        component.add(currentYear.getComponent());
-        component.add(weatherYear.getComponent());
+        this.getChildren().add(lastHour.getComponent());
+        this.getChildren().add(today.getComponent());
+        this.getChildren().add(last24Hours.getComponent());
+        this.getChildren().add(currentMonth.getComponent());
+        this.getChildren().add(lastMonth.getComponent());
+        this.getChildren().add(currentYear.getComponent());
+        this.getChildren().add(weatherYear.getComponent());
     }
     
     /**
@@ -73,8 +72,8 @@ public class CurrentWeatherRainBucketsPanel {
      * 
      * @return The swing container
      */
-    public JComponent getComponent() {
-        return component;
+    public Node getComponent() {
+        return this;
     }
     
     /**

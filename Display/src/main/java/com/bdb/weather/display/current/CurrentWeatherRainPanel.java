@@ -16,11 +16,10 @@
  */
 package com.bdb.weather.display.current;
 
-import java.awt.BorderLayout;
 import java.util.List;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
+import javafx.scene.Node;
+import javafx.scene.layout.BorderPane;
 
 import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.measurement.Depth;
@@ -42,8 +41,7 @@ import com.bdb.weather.display.RainPlot.RainEntry;
  * @author Bruce
  *
  */
-public class CurrentWeatherRainPanel {
-    private final JComponent                     component = new JPanel(new BorderLayout());
+public class CurrentWeatherRainPanel extends BorderPane {
     private final CurrentWeatherRainBucketsPanel bucketsPanel;
     private final RainPlot                       rainPlot;
     
@@ -60,10 +58,10 @@ public class CurrentWeatherRainPanel {
     @SuppressWarnings("serial")
     public CurrentWeatherRainPanel(WeatherStation ws, Depth thisMonthAverage, Depth lastMonthAverage, Depth yearlyAverage, Depth calendarYearAverageToDate, Depth weatherYearAverageToDate) {
         rainPlot = new RainPlot();
-        JComponent panel = rainPlot.getComponent();
-        component.add(panel, BorderLayout.CENTER);
+        Node panel = rainPlot.getComponent();
+        this.setCenter(panel);
         bucketsPanel = new CurrentWeatherRainBucketsPanel(ws, thisMonthAverage, lastMonthAverage, yearlyAverage, weatherYearAverageToDate, calendarYearAverageToDate);
-        component.add(bucketsPanel.getComponent(), BorderLayout.SOUTH);
+        this.setBottom(bucketsPanel.getComponent());
     }
     
     /**
@@ -71,8 +69,8 @@ public class CurrentWeatherRainPanel {
      * 
      * @return The swing container
      */
-    public JComponent getComponent() {
-        return component;
+    public Node getComponent() {
+        return this;
     }
     
     /**

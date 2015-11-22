@@ -16,54 +16,58 @@
  */
 package com.bdb.weather.display;
 
-import javafx.scene.canvas.Canvas;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GradientPaint;
-import java.awt.Paint;
-import java.awt.geom.Rectangle2D;
 import java.text.NumberFormat;
 
+import javafx.geometry.Dimension2D;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Paint;
+import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
-
-import java.awt.Graphics2D;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 
 
 public final class RainBucket extends Canvas {
     private static final long serialVersionUID = -4981948661829987749L;
 
-    private final GraphicsContext gc;
-    private double       value = 0.0;
-    private final double       maxValue; 
-    private final double       tickIncrement;
-    private String       unitLabel;
-    private int          valueTop = GUAGE_BOTTOM;
-    private Font         origFont = null;
-    private Font         boldFont = null;
-    private final NumberFormat formatter;
-    private double       average;
-    private double       toDateAverage;
+    private GraphicsContext         gc;
+    private double                  value = 0.0;
+    private final double            maxValue; 
+    private final double            tickIncrement;
+    private String                  unitLabel;
+    private double                  valueTop = GUAGE_BOTTOM;
+    private Font                    origFont = null;
+    private Font                    defaultFont = null;
+    private final NumberFormat      formatter;
+    private double                  average;
+    private double                  toDateAverage;
 
-    private static final int       INSET               = 5;
-    private static final int       GUAGE_HEIGHT        = 100;
-    private static final int       GUAGE_WIDTH         = 50;
-    private static final int       TOP_Y               = 15;
-    private static final int       BOTTOM_Y            = GUAGE_HEIGHT + TOP_Y;
-    private static final int       LEFT_X              = INSET;
-    private static final int       RIGHT_X             = LEFT_X + GUAGE_WIDTH;
-    private static final int       GUAGE_BOTTOM        = BOTTOM_Y;
-    private static final int       OVAL_HEIGHT         = 10;
-    private static final int       PREFERRED_HEIGHT    = TOP_Y + GUAGE_HEIGHT + INSET + 20;
-    private static final int       PREFERRED_WIDTH     = INSET + GUAGE_WIDTH + 5 + 10 + 5 + 20;
-    private static final int       TICK_LINE_LENGTH    = 5;
-    private static final Dimension PREFERRED_SIZE      = new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-    private static final Color     BEAKER_COLOR        = new Color(100, 100, 255);
-    private static final Paint     WATER_PAINT         = new GradientPaint(0.0f, 0.0f, new Color(0, 0, 255, 50), 35.0f, 0.0f, Color.WHITE, true);
-    private static final Paint     SURFACE_PAINT       = new GradientPaint(0.0f, 0.0f, new Color(150, 150, 255), 35.0f, 0.0f, Color.WHITE, true);
-    private static final Paint     BELOW_AVERAGE_PAINT = new GradientPaint(0.0f, 0.0f, new Color(255, 150, 150), 35.0f, 0.0f, Color.WHITE, true);
-    private static final Paint     ABOVE_AVERAGE_PAINT = new GradientPaint(0.0f, 0.0f, new Color(150, 255, 150), 35.0f, 0.0f, Color.WHITE, true);
+    private static final double      INSET               = 5;
+    private static final double      GUAGE_HEIGHT        = 100;
+    private static final double      GUAGE_WIDTH         = 50;
+    private static final double      TOP_Y               = 15;
+    private static final double      BOTTOM_Y            = GUAGE_HEIGHT + TOP_Y;
+    private static final double      LEFT_X              = INSET;
+    private static final double      RIGHT_X             = LEFT_X + GUAGE_WIDTH;
+    private static final double      GUAGE_BOTTOM        = BOTTOM_Y;
+    private static final double      OVAL_HEIGHT         = 10;
+    private static final double      PREFERRED_HEIGHT    = TOP_Y + GUAGE_HEIGHT + INSET + 20;
+    private static final double      PREFERRED_WIDTH     = INSET + GUAGE_WIDTH + 5 + 10 + 5 + 20;
+    private static final double      TICK_LINE_LENGTH    = 5;
+    private static final Dimension2D PREFERRED_SIZE      = new Dimension2D(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+    private static final Color       BEAKER_COLOR        = new Color(.4, .4, 1.0, 1.0);
+    private static final Stop[]      WATER_STOPS         = {new Stop(0, new Color(0, 0, 1.0, .5)), new Stop(1, Color.WHITE)};
+    private static final Paint       WATER_PAINT         = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, WATER_STOPS);
+    private static final Stop[]      SURFACE_STOPS       = {new Stop(0, new Color(.6, .5, 1.0, 1)), new Stop(1, Color.WHITE)};
+    private static final Paint       SURFACE_PAINT       = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, SURFACE_STOPS);
+    private static final Stop[]      BELOW_AVG_STOPS     = {new Stop(0, new Color(1.0, .6, .6, 1)), new Stop(1, Color.WHITE)};
+    private static final Paint       BELOW_AVERAGE_PAINT = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, BELOW_AVG_STOPS);
+    private static final Stop[]      ABOVE_AVG_STOPS     = {new Stop(0, new Color(.6, 1, .6, 1)), new Stop(1, Color.WHITE)};
+    private static final Paint       ABOVE_AVERAGE_PAINT = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, ABOVE_AVG_STOPS);
 
     /**
      * Constructor.
@@ -77,6 +81,8 @@ public final class RainBucket extends Canvas {
      * @throws IllegalArgumentException maxValue or average are less than zero
      */
     public RainBucket(double maxValue, NumberFormat formatter, String unitLabel, double average, double toDateAverage) throws IllegalArgumentException {
+        super(PREFERRED_SIZE.getWidth(), PREFERRED_SIZE.getHeight());
+
         if (maxValue < 0.0)
             throw new IllegalArgumentException("maxValue must be >= 0.0");
 
@@ -92,7 +98,6 @@ public final class RainBucket extends Canvas {
         setRainfallAmount(0.0);
         //setPreferredSize(PREFERRED_SIZE);
         //setMaximumSize(PREFERRED_SIZE);
-	gc = this.getGraphicsContext2D();
     }
     
     /**
@@ -146,20 +151,20 @@ public final class RainBucket extends Canvas {
      * @param value The value for which to calculate the pixel location
      * @return The pixel location
      */
-    private int valueLocation(double value) {
+    private double valueLocation(double value) {
         value = Math.min(value, maxValue);
-        int offset = (int)Math.round((double)GUAGE_HEIGHT * (value / maxValue));
+        double offset = Math.round(GUAGE_HEIGHT * (value / maxValue));
         return GUAGE_BOTTOM - offset;
     }
     
-    private void paintAverage(Graphics2D g2, double average, double actual) {
+    private void paintAverage(double average, double actual) {
         if (average > 0.0) {
             if (average > actual)
-                g2.setPaint(BELOW_AVERAGE_PAINT);
+                gc.setFill(BELOW_AVERAGE_PAINT);
             else
-                g2.setPaint(ABOVE_AVERAGE_PAINT);
+                gc.setFill(ABOVE_AVERAGE_PAINT);
             
-            g2.fillOval(INSET, valueLocation(average) - (OVAL_HEIGHT / 2), GUAGE_WIDTH, OVAL_HEIGHT);
+            gc.fillOval(INSET, valueLocation(average) - (OVAL_HEIGHT / 2), GUAGE_WIDTH, OVAL_HEIGHT);
         }
 
     }
@@ -169,22 +174,26 @@ public final class RainBucket extends Canvas {
      * @see javax.swing.JComponent#paint(java.awt.Graphics)
      */
     public void paint() {
+        System.out.println("Painting");
+	gc = this.getGraphicsContext2D();
+        gc.clearRect(0, 0, getWidth(), getHeight());
 
         if (origFont == null) {
             origFont = gc.getFont();
-            boldFont = origFont.deriveFont(Font.BOLD);
+            //defaultFont = Font.font(origFont.getFamily(), FontWeight.BOLD, origFont.getSize());
+            defaultFont = origFont;
         }
 
-        Dimension actualSize = getSize();
+        Dimension2D actualSize = new Dimension2D(getWidth(), getHeight());
 
-        int translateX = 0;
-        int translateY = 0;
+        double translateX = 0;
+        double translateY = 0;
 
-        if (actualSize.width > PREFERRED_SIZE.width)
-            translateX = (actualSize.width - PREFERRED_SIZE.width) / 2;
+        if (actualSize.getWidth() > PREFERRED_SIZE.getWidth())
+            translateX = (actualSize.getWidth() - PREFERRED_SIZE.getWidth()) / 2;
 
-        if (actualSize.height > PREFERRED_SIZE.height)
-            translateY = (actualSize.height - PREFERRED_SIZE.height) / 2;
+        if (actualSize.getHeight() > PREFERRED_SIZE.getHeight())
+            translateY = (actualSize.getHeight() - PREFERRED_SIZE.getHeight()) / 2;
 
         gc.translate(translateX, translateY);
 
@@ -193,8 +202,8 @@ public final class RainBucket extends Canvas {
         // TODO Determine why the if below was commented out
         //if (actualSize.width < PREFERRED_SIZE.width || actualSize.height < PREFERRED_SIZE.height)
         //{
-        double wscale = (double)actualSize.width / (double)PREFERRED_SIZE.width;
-        double hscale = (double)actualSize.height / (double)PREFERRED_SIZE.height;
+        double wscale = actualSize.getWidth() / PREFERRED_SIZE.getWidth();
+        double hscale = actualSize.getHeight() / PREFERRED_SIZE.getHeight();
         double scale = Math.min(wscale, hscale);
         gc.scale(scale, scale);
         //}
@@ -214,120 +223,62 @@ public final class RainBucket extends Canvas {
         //
         // Draw an oval on the top to give the appearance of a beaker
         //
-        gc.setPaint(BEAKER_COLOR);
-        gc.drawOval(INSET, TOP_Y - (OVAL_HEIGHT / 2), GUAGE_WIDTH, OVAL_HEIGHT);
+        gc.setStroke(BEAKER_COLOR);
+        gc.strokeOval(INSET, TOP_Y - (OVAL_HEIGHT / 2), GUAGE_WIDTH, OVAL_HEIGHT);
 
         //
         // Now draw tick marks
         //
-        gc.setPaint(Color.black);
+        gc.setStroke(Color.BLACK);
 
         for (double tickValue = 0; tickValue <= maxValue; tickValue += tickIncrement) {
-            String valueString = formatter.format(tickValue);
-            Rectangle2D rect = gc.getFont().getStringBounds(valueString, gc.getFontRenderContext());
-            int tickY = valueLocation(tickValue);
-            gc.drawLine(RIGHT_X + 5, tickY, RIGHT_X + 5 + TICK_LINE_LENGTH, tickY);
-            gc.drawString(valueString, RIGHT_X + TICK_LINE_LENGTH + 5 + 5, tickY - Math.round(rect.getCenterY()));
+            Text valueString = new Text(formatter.format(tickValue));
+            valueString.setFont(gc.getFont());
+            double tickY = valueLocation(tickValue);
+            gc.strokeLine(RIGHT_X + 5, tickY, RIGHT_X + 5 + TICK_LINE_LENGTH, tickY);
+            gc.strokeText(valueString.getText(), RIGHT_X + TICK_LINE_LENGTH + 5 + 5, tickY + Math.round(valueString.getLayoutBounds().getHeight() / 4));
         }
 
         //
         // Draw the water that fills the beaker based on the current value
         //
-        gc.setPaint(WATER_PAINT);
+        gc.setFill(WATER_PAINT);
         gc.fillRect(INSET, valueTop, GUAGE_WIDTH, GUAGE_BOTTOM - valueTop);
 
         //
         // Draw the surface of the water
         //
-        gc.setPaint(SURFACE_PAINT);
+        gc.setFill(SURFACE_PAINT);
         gc.fillOval(INSET, valueTop - (OVAL_HEIGHT / 2), GUAGE_WIDTH, OVAL_HEIGHT);
 
-        paintAverage(gc, average, value);
-        paintAverage(gc, toDateAverage, value);
+        paintAverage(average, value);
+        paintAverage(toDateAverage, value);
 
         //
         // Draw the current value
         //
-        gc.setPaint(Color.BLACK);
-        String valueString = formatter.format(value) + unitLabel; 
-        gc.setFont(boldFont);
-        Rectangle2D rect = gc.getFont().getStringBounds(valueString, gc.getFontRenderContext());
-        gc.drawString(valueString, LEFT_X + (GUAGE_WIDTH / 2) - (Math.round(rect.getWidth()) / 2), BOTTOM_Y - INSET);
+        gc.setStroke(Color.BLACK);
+        Text valueString = new Text(formatter.format(value) + unitLabel); 
+        gc.setFont(defaultFont);
+        gc.strokeText(valueString.getText(), LEFT_X + (GUAGE_WIDTH / 2) - (Math.round(valueString.getLayoutBounds().getWidth()) / 2), BOTTOM_Y - INSET);
 
         //
         // Draw the average values
         //
         if (average > 0.0) {
-            valueString = formatter.format(average) + unitLabel;
-            rect = gc.getFont().getStringBounds(valueString, gc.getFontRenderContext());
-            gc.drawString(valueString, LEFT_X + (GUAGE_WIDTH / 2) - (Math.round(rect.getWidth()) / 2), TOP_Y + OVAL_HEIGHT + (Math.round(rect.getHeight()) / 2));
+            valueString = new Text(formatter.format(average) + unitLabel);
+            valueString.setFont(gc.getFont());
+            gc.strokeText(valueString.getText(), LEFT_X + (GUAGE_WIDTH / 2) - (Math.round(valueString.getLayoutBounds().getWidth()) / 2), TOP_Y + OVAL_HEIGHT + (Math.round(valueString.getLayoutBounds().getHeight()) / 2));
         }
 
         if (toDateAverage > 0.0) {
-            valueString = formatter.format(toDateAverage) + unitLabel;
-            rect = gc.getFont().getStringBounds(valueString, g2.getFontRenderContext());
-            gc.drawString(valueString,
-                          LEFT_X + (GUAGE_WIDTH / 2) - (Math.round(rect.getWidth()) / 2),
-                          TOP_Y + OVAL_HEIGHT + (Math.round(rect.getHeight()) / 2) + (GUAGE_HEIGHT / 2) - (boldFont.getSize() / 2));
+            valueString = new Text(formatter.format(toDateAverage) + unitLabel);
+            valueString.setFont(gc.getFont());
+            gc.strokeText(valueString.getText(),
+                          LEFT_X + (GUAGE_WIDTH / 2) - (Math.round(valueString.getLayoutBounds().getWidth()) / 2),
+                          TOP_Y + OVAL_HEIGHT + (Math.round(valueString.getLayoutBounds().getHeight()) / 2) + (GUAGE_HEIGHT / 2) - (defaultFont.getSize() / 2));
         }
         gc.setFont(origFont);
 
     }
-
-    /*
-     * (non-Javadoc)
-     * @see javax.swing.JComponent#setVisible(boolean)
-     */
-    @Override
-    public void setVisible(boolean v) {
-        setSize(PREFERRED_SIZE);
-        super.setVisible(v);
-    }
-
-    /*
-    public static final void main(String args[]) {
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-        frame.getContentPane().setLayout(new GridLayout(1, 0));
-
-        RainBucket btmp = null;
-
-        for (int i = 0; i < 5; i++) {
-            btmp = new RainBucket(10.0, new DecimalFormat("0.0"), "\"", 8.0, 5.0);
-            final Double amount = 6.0;
-            btmp.setRainfallAmount(amount);
-            frame.getContentPane().add(btmp);
-        }
-
-        final RainBucket b = btmp;
-
-        frame.setSize(200, 200);
-
-        frame.setVisible(true);
-
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        SwingUtilities.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                b.setRainfallAmount(b.getRainfallAmount() + .1);
-                                if (b.getRainfallAmount() >= 12.0)
-                                    b.setRainfallAmount(0.0);
-                            }
-                        });
-
-                        Thread.sleep(1000);
-                    }
-                    catch (Exception e) {
-                    }
-                }
-            }
-        });
-        t.start();
-    }
-    */
 }

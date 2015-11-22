@@ -19,8 +19,10 @@ package com.bdb.weather.display.current;
 import java.awt.Color;
 import java.awt.GradientPaint;
 
-import javax.swing.JComponent;
 import javax.swing.border.BevelBorder;
+
+import javafx.embed.swing.SwingNode;
+import javafx.scene.Node;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -44,7 +46,7 @@ import com.bdb.weather.common.WeatherTrend;
  * @author Bruce
  * 
  */
-public class Barometer {
+public class Barometer extends SwingNode {
     private final DefaultValueDataset dataset = new DefaultValueDataset(50.0);
     private final DialPlot            plot = new DialPlot(dataset);
     private final StandardDialRange   range;
@@ -107,6 +109,7 @@ public class Barometer {
 
         chartPanel.setBackground(Color.GRAY);
         chartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        this.setContent(chartPanel);
     }
     
     /**
@@ -114,8 +117,8 @@ public class Barometer {
      * 
      * @return The swing component
      */
-    public JComponent getComponent() {
-        return chartPanel;
+    public Node getComponent() {
+        return this;
     }
 
     /**
