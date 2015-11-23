@@ -20,7 +20,6 @@ import com.bdb.weather.common.db.DailySummaryTable;
 import com.bdb.weather.common.db.DatabaseConstants;
 import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.common.db.WeatherStationTable;
-import static com.bdb.weather.javafx.DayTemperaturePlot.createDayTemperaturePlot;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
@@ -51,13 +50,14 @@ public class WeatherSenseDisplay extends Application {
         
         Scene scene = new Scene(root, 800, 800);
         scene.getStylesheets().add("/styles/Styles.css");
-	plot = createDayTemperaturePlot(ws);
-	root.setCenter(plot.getNode());
+	//plot = createDayTemperaturePlot(ws);
+	//root.setCenter(plot.getNode());
         
         stage.setTitle("WeatherSense JavaFX");
         stage.setScene(scene);
         FXMLController controller = loader.getController();
         controller.setDisplay(this);
+        plot = controller.getPlot();
         stage.sizeToScene();
         stage.show();
 
@@ -70,8 +70,7 @@ public class WeatherSenseDisplay extends Application {
         
         Scene scene = new Scene(root, 800, 800);
         scene.getStylesheets().add("/styles/Styles.css");
-	plot = createDayTemperaturePlot(ws);
-	root.setCenter(plot.getNode());
+	//root.setCenter(plot.getNode());
         
         stage.setTitle("WeatherSense JavaFX");
         stage.setScene(scene);

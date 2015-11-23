@@ -56,8 +56,6 @@ import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.WeatherStation;
 
-import java.time.LocalTime;
-
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -78,11 +76,10 @@ import javafx.util.Callback;
  * 
  * @author Bruce
  */
-abstract public class DayXYPlotPanel implements ActionListener {
+abstract public class DayXYPlotPanel extends TabPane implements ActionListener {
     protected static final String TIME_HEADING = "Time";
     protected static final int TIME_COLUMN = 0;
 
-    private TabPane              component;
     private XYPlot               plot;
     private JFreeChart           chart;
     private ChartPanel           chartPanel;
@@ -113,8 +110,7 @@ abstract public class DayXYPlotPanel implements ActionListener {
         // Set up the Domain Axis (X)
         //
         plot = new XYPlot();
-        component = new TabPane();
-	component.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+	this.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         dateAxis = new DateAxis("Time");
         dateAxis.setAutoRange(false);
         dateAxis.setTickUnit(new DateTickUnit(DateTickUnitType.HOUR, 1, new SimpleDateFormat("h a")));
@@ -170,7 +166,7 @@ abstract public class DayXYPlotPanel implements ActionListener {
 
 	Tab tab = new Tab(DisplayConstants.GRAPH_TAB_NAME);
 	tab.setContent(p);
-        component.getTabs().add(tab);
+        this.getTabs().add(tab);
 
         //
         // Build the table for the data tab
@@ -178,7 +174,7 @@ abstract public class DayXYPlotPanel implements ActionListener {
         dataTable = new TableView<>();
 	tab = new Tab(DisplayConstants.DATA_TAB_NAME);
 	tab.setContent(dataTable);
-        component.getTabs().add(tab);
+        this.getTabs().add(tab);
 
         //
         // Add the Day/Night indicator option to the chart panels context menu
@@ -197,7 +193,7 @@ abstract public class DayXYPlotPanel implements ActionListener {
 
 	dataTable.getColumns().add(col);
         doConfigure(displayMenu);
-	component.layout();
+	this.layout();
 
         //dataTable.setRowSorter(new TableRowSorter<>(tableModel));
     }
@@ -234,7 +230,7 @@ abstract public class DayXYPlotPanel implements ActionListener {
      * @return The component
      */
     public Node getNode() {
-        return component;
+        return this;
     }
 
     /**
@@ -376,7 +372,7 @@ abstract public class DayXYPlotPanel implements ActionListener {
         //
         if (!displayDayNightIndicators)
             return;
-
+/*
         LocalDateTime sunrise = ws.sunriseFor(currentDate);
         LocalDateTime sunset = ws.sunsetFor(currentDate);
 
@@ -385,6 +381,7 @@ abstract public class DayXYPlotPanel implements ActionListener {
         marker.setPaint(color);
 
         plot.addDomainMarker(marker);
+        */
     }
 
     /**

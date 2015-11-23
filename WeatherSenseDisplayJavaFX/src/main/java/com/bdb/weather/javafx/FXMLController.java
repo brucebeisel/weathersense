@@ -11,9 +11,15 @@ import javafx.fxml.Initializable;
 
 public class FXMLController implements Initializable {
     private WeatherSenseDisplay display;
+    @FXML
+    private DayTemperaturePlot plot;
     
     public void setDisplay(WeatherSenseDisplay display) {
         this.display = display;
+    }
+    
+    public DayTemperaturePlot getPlot() {
+        return plot;
     }
 
     @FXML

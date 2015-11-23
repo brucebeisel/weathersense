@@ -63,6 +63,10 @@ public class DayTemperaturePlot extends DayXYPlotPanel implements ActionListener
         plot.createElements();
         return plot;
     }
+    public DayTemperaturePlot() {
+        this(null);
+        createElements();
+    }
     /**
      * Constructor.
      * 
@@ -86,9 +90,9 @@ public class DayTemperaturePlot extends DayXYPlotPanel implements ActionListener
         controls.add(new SeriesControl(HistoricalSeriesInfo.HEAT_INDEX_SERIES, false));
         controls.add(new SeriesControl(HistoricalSeriesInfo.WIND_CHILL_SERIES, false));
         
-        ws.getSensorManager().getExtraSensors(SensorType.THERMOMETER).stream().forEach((sensor) -> {
-            controls.add(new SeriesControl(sensor.getName(), false));
-        });
+//        ws.getSensorManager().getExtraSensors(SensorType.THERMOMETER).stream().forEach((sensor) -> {
+//            controls.add(new SeriesControl(sensor.getName(), false));
+//        });
 
         XYToolTipGenerator ttg = new StandardXYToolTipGenerator(StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT, DateFormat.getTimeInstance(), Temperature.getDefaultFormatter());
         getPlot().getRenderer().setBaseToolTipGenerator(ttg);
