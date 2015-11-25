@@ -54,7 +54,6 @@ import com.bdb.weather.common.DailyRecords;
 import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherAverage;
-import com.bdb.weather.common.WeatherStation;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
@@ -68,6 +67,9 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
+
+import org.jfree.chart.renderer.xy.XYLine3DRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 
 /**
  * An XY Plot for a single day of data. This class provides a tabbed pane, one pane for the plot
@@ -90,14 +92,14 @@ abstract public class DayXYPlotPanel extends TabPane implements ActionListener {
     private boolean              displayDayNightIndicators = true;
     private JCheckBoxMenuItem    dayNightItem;
     private LocalDate            currentDate;
+    private LocalDateTime        sunrise;
+    private LocalDateTime        sunset;
     private TableView<HistoricalRecord> dataTable;
     private final TimeSeriesCollection datasetLeft;
     private final TimeSeriesCollection datasetRight;
     private List<SeriesEntry>    entries;
-    private final WeatherStation ws;
 
-    protected DayXYPlotPanel(WeatherStation ws, ValueAxis leftAxis, ValueAxis rightAxis) {
-        this.ws = ws;
+    protected DayXYPlotPanel(ValueAxis leftAxis, ValueAxis rightAxis) {
         this.leftAxis = leftAxis;
         this.rightAxis = rightAxis;
         datasetLeft = new TimeSeriesCollection();
@@ -105,7 +107,7 @@ abstract public class DayXYPlotPanel extends TabPane implements ActionListener {
         entries = new ArrayList<>();
     }
         
-    public void createElements() {
+    protected final void createElements() {
         //
         // Set up the Domain Axis (X)
         //
@@ -128,16 +130,16 @@ abstract public class DayXYPlotPanel extends TabPane implements ActionListener {
         //
         // Set up the renderer to generate tool tips, not show shapes
         //
-        DefaultXYItemRenderer renderer = new DefaultXYItemRenderer();
+        XYLineAndShapeRenderer renderer = new XYLine3DRenderer();
         renderer.setBaseShapesVisible(false);
         renderer.setBaseToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
-        renderer.setDefaultEntityRadius(1);
+        //renderer.setDefaultEntityRadius(1);
         plot.setRenderer(0, renderer);
 
-        renderer = new DefaultXYItemRenderer();
+        renderer = new XYLine3DRenderer();
         renderer.setBaseShapesVisible(false);
         renderer.setBaseToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
-        renderer.setDefaultEntityRadius(1);
+        //renderer.setDefaultEntityRadius(1);
         plot.setRenderer(1, renderer);
 
         //
@@ -194,8 +196,6 @@ abstract public class DayXYPlotPanel extends TabPane implements ActionListener {
 	dataTable.getColumns().add(col);
         doConfigure(displayMenu);
 	this.layout();
-
-        //dataTable.setRowSorter(new TableRowSorter<>(tableModel));
     }
     
     private void doConfigure(JMenu menu) {
@@ -372,16 +372,13 @@ abstract public class DayXYPlotPanel extends TabPane implements ActionListener {
         //
         if (!displayDayNightIndicators)
             return;
-/*
-        LocalDateTime sunrise = ws.sunriseFor(currentDate);
-        LocalDateTime sunset = ws.sunsetFor(currentDate);
 
         IntervalMarker marker = new IntervalMarker((double)TimeUtils.localDateTimeToEpochMillis(sunrise), (double)TimeUtils.localDateTimeToEpochMillis(sunset));
         Color color = new Color(Color.YELLOW.getRed(), Color.YELLOW.getGreen(), Color.YELLOW.getBlue(), 60);
         marker.setPaint(color);
 
         plot.addDomainMarker(marker);
-        */
+        
     }
 
     /**
@@ -392,11 +389,15 @@ abstract public class DayXYPlotPanel extends TabPane implements ActionListener {
      * @param summaryRecord The summary record for the day of the data
      * @param records
      * @param averages
+     * @param sunrise The sunrise for the provided date
+     * @param sunset The sunset for the provided date
      */
-    public void loadData(LocalDate date, List<HistoricalRecord> list, SummaryRecord summaryRecord, DailyRecords records, WeatherAverage averages) {
+    public void loadData(LocalDate date, List<HistoricalRecord> list, SummaryRecord summaryRecord, DailyRecords records, WeatherAverage averages, LocalDateTime sunrise, LocalDateTime sunset) {
         
         currentDate = date;
         updateDomainAxis(currentDate);
+        this.sunrise = sunrise;
+        this.sunset = sunset;
         addSunriseSunsetMarkers();
         addExtremeMarkers(plot, records, averages);
         loadDataSeries(list);

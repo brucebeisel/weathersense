@@ -16,7 +16,6 @@
  */
 package com.bdb.weather.display.current;
 
-import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -33,13 +32,10 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.JTextField;
 
+import javafx.scene.Node;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
@@ -74,7 +70,7 @@ import com.bdb.weather.display.WeatherSense;
  * @author Bruce
  *
  */
-public class CurrentWeatherPanel implements ComponentContainer, CurrentWeatherProcessor {
+public class CurrentWeatherPanel extends BorderPane implements ComponentContainer, CurrentWeatherProcessor {
     private static final String           USER_DIVIDER_LOCATION_PROPERTY = "cw_divider_loc";
     private final JSplitPane              component = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     private final HistoryTable            historyTable;
@@ -84,7 +80,7 @@ public class CurrentWeatherPanel implements ComponentContainer, CurrentWeatherPr
     private final WeatherStation          ws;
     private final CurrentWeatherRainPanel rainPanel;
     private final Thermometer             outdoorThermometer;
-    private final JTextField              forecastRuleTF = new JTextField();
+    private final TextField               forecastRuleTF = new TextField();
     private final Thermometer             indoorThermometer;
     private final Hygrometer              outdoorHumidity = new Hygrometer("Outdoor");
     private final Hygrometer              indoorHumidity = new Hygrometer("Indoor");
@@ -148,7 +144,7 @@ public class CurrentWeatherPanel implements ComponentContainer, CurrentWeatherPr
         upperPanel.setCenter(b2);
         upperPanel.setBottom(forecastRuleTF);
         
-        component.add(upperPanel);
+        this.setTop(upperPanel);
         
         LocalDate thisMonth = LocalDate.now();
         LocalDate lastMonth = thisMonth.minusMonths(1);
@@ -178,7 +174,7 @@ public class CurrentWeatherPanel implements ComponentContainer, CurrentWeatherPr
         
         rainPanel = new CurrentWeatherRainPanel(ws, thisMonthAverage, lastMonthAverage, yearlyAverage, calendarYearAverageToDate, weatherYearAverageToDate);
         
-        component.getChildren().add(rainPanel.getComponent());
+        this.setCenter(rainPanel);
 
         int dividerLocation = prefs.getInt(USER_DIVIDER_LOCATION_PROPERTY, 50);
         component.setDividerLocation(dividerLocation);
@@ -209,20 +205,8 @@ public class CurrentWeatherPanel implements ComponentContainer, CurrentWeatherPr
      * @return The swing container
      */
     @Override
-    public JComponent getComponent() {
-        return component;
-    }
-    
-    /**
-     * Make this component visible or invisible.
-     * 
-     * @param b Whether to show or hide the component
-     */
-    public void setVisible(boolean b) {
-        component.setVisible(b);
-        component.setDividerLocation(.50);
-
-        logger.log(Level.FINE, "Setting current weather panel visiblity to {0}", b);
+    public Node getComponent() {
+        return this;
     }
 
     @SuppressWarnings("unchecked")

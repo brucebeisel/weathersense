@@ -50,9 +50,6 @@ public class WeatherSenseDisplay extends Application {
         
         Scene scene = new Scene(root, 800, 800);
         scene.getStylesheets().add("/styles/Styles.css");
-	//plot = createDayTemperaturePlot(ws);
-	//root.setCenter(plot.getNode());
-        
         stage.setTitle("WeatherSense JavaFX");
         stage.setScene(scene);
         FXMLController controller = loader.getController();
@@ -70,8 +67,6 @@ public class WeatherSenseDisplay extends Application {
         
         Scene scene = new Scene(root, 800, 800);
         scene.getStylesheets().add("/styles/Styles.css");
-	//root.setCenter(plot.getNode());
-        
         stage.setTitle("WeatherSense JavaFX");
         stage.setScene(scene);
         stage.sizeToScene();
@@ -90,7 +85,7 @@ public class WeatherSenseDisplay extends Application {
         temperatureBinMgr.refresh();
         SummaryRecord summaryRecord = dailySummaryTable.retrieveTodaysSummary(ws.getWindParameters(), temperatureBinMgr);
 
-        plot.loadData(date, list, summaryRecord, records, averages);
+        plot.loadData(date, list, summaryRecord, records, averages, ws.sunriseFor(date), ws.sunsetFor(date));
     }
 
     public void openDatabase() {
@@ -113,7 +108,12 @@ public class WeatherSenseDisplay extends Application {
 	dailyRecordsTable = new DailyRecordsTable(connection);
 	dailyAveragesTable = new DailyAveragesTable(connection);
 	temperatureBinMgr = new TemperatureBinMgr(connection);
-
+        //
+        // Having to do this is just wrong. Perhaps there should be a weathersense
+        // initialize method that would set up the weather station and all the sensors
+        // and sensor stations.
+        //
+        HistoricalSeriesInfo.addExtraSensors(ws.getSensorManager().getAllSensors());
     }
 
     /**
