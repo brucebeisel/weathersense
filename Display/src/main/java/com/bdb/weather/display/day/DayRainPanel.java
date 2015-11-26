@@ -16,30 +16,27 @@
  */
 package com.bdb.weather.display.day;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingNode;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -69,9 +66,7 @@ import com.bdb.weather.display.axis.RainRangeAxis;
  *
  */
 public class DayRainPanel extends TabPane {
-    private static final int HOUR_COLUMN = 0;
-    private static final int RAINFALL_COLUMN = 1;
-    private static final int ET_COLUMN = 2;
+    private static final String HOUR_ROW_KEY = "Hour";
     private static final String RAIN_ROW_KEY = "Rain";
     private static final String ET_ROW_KEY = "ET";
 
@@ -82,12 +77,63 @@ public class DayRainPanel extends TabPane {
     private final NumberAxis          valueAxis = new RainRangeAxis();
     private final DateTimeFormatter   hourFormatter = DateTimeFormatter.ofPattern("h a");
     private LocalDateTime             timeCache = LocalDate.now().atStartOfDay();
-    private final String              tableHeadings[] = {
-        "Hour",
-        "Rainfall",
-        "ET"
-    };
 
+    private final class Row {
+        private IntegerProperty hour;
+        private DoubleProperty rainfall;
+        private DoubleProperty et;
+        
+        public Row(int hour, double rainfall, double ET) {
+            setHour(hour);
+            setRainfall(rainfall);
+            setET(ET);
+        }
+        
+        public IntegerProperty hourProperty() {
+            if (hour == null)
+                hour = new SimpleIntegerProperty(this, HOUR_ROW_KEY);
+            
+            return hour;
+        }
+        
+        public void setHour(int hour) {
+            hourProperty().set(hour);
+        }
+        
+        public int getHour() {
+            return hour.getValue();
+        }
+        
+        public DoubleProperty rainfallProperty() {
+            if (rainfall == null)
+                rainfall = new SimpleDoubleProperty(this, RAIN_ROW_KEY);
+            
+            return rainfall;
+        }
+        
+        public void setRainfall(double rainfall) {
+            rainfallProperty().set(rainfall);
+        }
+        
+        public double getRainfall() {
+            return rainfall.getValue();
+        }
+        
+        public DoubleProperty etProperty() {
+            if (et == null)
+                et = new SimpleDoubleProperty(this, ET_ROW_KEY);
+            
+            return et;
+        }
+        
+        public void setET(double et) {
+            etProperty().set(et);
+        }
+        
+        public double getET() {
+            return et.getValue();
+        }
+    }
     /**
      * Constructor.
      */
@@ -124,17 +170,20 @@ public class DayRainPanel extends TabPane {
         node.setContent(chartPanel);
         tab.setContent(node);
         
-        DefaultTableColumnModel colModel = new DefaultTableColumnModel();
-
         dataTable = new TableView();
-
-        for (int i = 0; i < tableHeadings.length; i++) {
-            TableColumn col = new TableColumn();
-            col.setHeaderValue(tableHeadings[i]);
-            col.setModelIndex(i);
-            colModel.addColumn(col);
-        }
-
+       
+        TableColumn<Row,Integer> hourColumn = new TableColumn<>(HOUR_ROW_KEY);
+        hourColumn.setCellValueFactory(new PropertyValueFactory(HOUR_ROW_KEY));
+        dataTable.getColumns().add(hourColumn);
+        
+        TableColumn<Row,Double> rainfallColumn = new TableColumn<>(RAIN_ROW_KEY);
+        rainfallColumn.setCellValueFactory(new PropertyValueFactory(RAIN_ROW_KEY));
+        dataTable.getColumns().add(rainfallColumn);
+        
+        TableColumn<Row,Double> etColumn = new TableColumn<>(ET_ROW_KEY);
+        rainfallColumn.setCellValueFactory(new PropertyValueFactory(ET_ROW_KEY));
+        dataTable.getColumns().add(etColumn);
+        
         tab = new Tab(DisplayConstants.DATA_TAB_NAME);
         tab.setContent(dataTable);
     }
@@ -172,41 +221,29 @@ public class DayRainPanel extends TabPane {
             return;
         }
         
-        ObservableList<HistoricalRecord> dataModel = FXCollections.observableList(records);
-        dataTable.setItems(dataModel);
-        
+        List<Row> rows = new ArrayList<>();
         DefaultCategoryDataset rainDataset = new DefaultCategoryDataset();
-
         DayHourRain hourlyRain = data.getHourlyRainfall();
 
         int n = 0;
 
         Set<Integer> hours = hourlyRain.getHourValues();
-        Depth totalET = new Depth(0.0);
-
         for (int hour : hours) {
             String label = buildHourLabel(hour);
             rainDataset.addValue(hourlyRain.getRain(hour).get(), RAIN_ROW_KEY, label);
-            tableModel.setValueAt(label, n, HOUR_COLUMN);
-            tableModel.setValueAt(hourlyRain.getRain(hour), n, RAINFALL_COLUMN);
             Depth et = new Depth(0.0);
             for (HistoricalRecord record : records) {
                 if (record.getTime().getHour() == n && record.getEvapotranspiration() != null)
                     et = et.add(record.getEvapotranspiration());
             }
-            if (et.get() > 0.0)
-                tableModel.setValueAt(et, n, ET_COLUMN);
-            else
-                tableModel.setValueAt(DisplayConstants.UNKNOWN_VALUE_STRING, n, ET_COLUMN);
 
             rainDataset.addValue(et.get(), ET_ROW_KEY, label);
 
             n++;
-            totalET = totalET.add(et);
+            Row row = new Row(hour, hourlyRain.getRain(hour).get(), et.get());
+            rows.add(row);
         }
-
-        //rainDataset.addValue(data.getTotalRainfall().get(), RAIN_ROW_KEY, "Total");
-        //rainDataset.addValue(totalET.get(), ET_ROW_KEY, "Total");
+        dataTable.setItems(FXCollections.observableList(rows));
 
         rainPlot.setDataset(rainDataset);
     }

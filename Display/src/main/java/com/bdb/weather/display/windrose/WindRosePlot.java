@@ -18,7 +18,6 @@ package com.bdb.weather.display.windrose;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Composite;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;

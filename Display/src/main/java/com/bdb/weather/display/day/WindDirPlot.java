@@ -24,9 +24,14 @@ import java.text.DecimalFormat;
 import java.time.temporal.ChronoField;
 import java.util.List;
 
+import javafx.embed.swing.SwingNode;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TableView;
+
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.PolarChartPanel;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.labels.XYToolTipGenerator;
@@ -40,6 +45,7 @@ import org.jfree.util.ShapeUtilities;
 import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.Wind;
 import com.bdb.weather.display.CompassPolarItemRenderer;
+import com.bdb.weather.display.DisplayConstants;
 
 class ItemRenderer extends CompassPolarItemRenderer {
     private static final long serialVersionUID = 6655248313645839714L;
@@ -94,18 +100,19 @@ class ItemRenderer extends CompassPolarItemRenderer {
     }
 }
 
-public class WindDirPlot extends PolarChartPanel {
+public class WindDirPlot extends TabPane {
     private static final long serialVersionUID = -3945455610185595801L;
     
     private PolarPlot   plot;
     private JFreeChart  chart;
+    private TableView   table;
     private XYSeries    windDirSeries = new XYSeries("Wind Direction", false);
     
     
     public WindDirPlot() {
-        super(ChartFactory.createPolarChart(null, null, false, true, false));
+        this.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+        chart = ChartFactory.createPolarChart(null, null, false, true, false);
         
-        chart = getChart();
         ChartFactory.getChartTheme().apply(chart);
 
         plot = (PolarPlot)chart.getPlot();
@@ -131,6 +138,16 @@ public class WindDirPlot extends PolarChartPanel {
                     return super.valueToString(number / 60.0);
             }
         });
+        
+        SwingNode node = new SwingNode();
+        node.setContent(new ChartPanel(chart));
+        Tab tab = new Tab(DisplayConstants.GRAPH_TAB_NAME);
+        tab.setContent(node);
+        this.getTabs().add(tab);
+        
+        tab = new Tab(DisplayConstants.DATA_TAB_NAME);
+        tab.setContent(table);
+        this.getTabs().add(tab);
 
         //plot.setAngleTicks(Arrays.asList(TICKS));
         plot.setDataset(new XYSeriesCollection(windDirSeries));

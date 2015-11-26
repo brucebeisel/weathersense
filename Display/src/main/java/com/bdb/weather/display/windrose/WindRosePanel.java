@@ -16,27 +16,26 @@
  */
 package com.bdb.weather.display.windrose;
 
-import java.awt.BorderLayout;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
 
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import javafx.embed.swing.SwingNode;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.PolarChartPanel;
-
-import com.bdb.util.LabeledFieldPanel;
 
 import com.bdb.weather.common.SpeedBin;
 import com.bdb.weather.common.WindRoseData;
@@ -44,6 +43,7 @@ import com.bdb.weather.common.WindSlice;
 import com.bdb.weather.common.measurement.Heading;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.display.DisplayConstants;
+import com.bdb.weather.display.LabeledFieldPane;
 
 /**
  * Container that displays a Wind Rose
@@ -51,16 +51,15 @@ import com.bdb.weather.display.DisplayConstants;
  * @author Bruce
  *
  */
-public class WindRosePanel {
-    private final JTabbedPane             component = new JTabbedPane();
+public class WindRosePanel extends TabPane {
     private final WindRosePlot 	          windRosePlot = new WindRosePlot();
     private final JFreeChart	 	  chart = new JFreeChart(windRosePlot);
     private final PolarChartPanel	  chartPanel = new PolarChartPanel(chart);
-    private final JTable		  dataTable;
+    private final TableView		  dataTable;
     private final DefaultTableModel	  tableModel = new DefaultTableModel();
     private final DefaultTableColumnModel columnModel = new DefaultTableColumnModel();
-    private final JTextField		  timeField = new JTextField(10);
-    private final JTextField		  calmField = new JTextField(5);
+    private final TextField		  timeField = new TextField();
+    private final TextField		  calmField = new TextField();
     private boolean                       initialized = false;
     private static final int              HEADING_COLUMN = 0;
     private static final int              PERCENT_OF_WIND_COLUMN = 1;
@@ -78,44 +77,36 @@ public class WindRosePanel {
      * Constructor.
      */
     public WindRosePanel() {
+        this.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         ChartFactory.getChartTheme().apply(chart);
         chartPanel.setMinimumDrawHeight(10);
         chartPanel.setMinimumDrawWidth(10);
 
-        component.addTab(DisplayConstants.GRAPH_TAB_NAME, chartPanel);
+        SwingNode node = new SwingNode();
+        node.setContent(chartPanel);
+        Tab tab = new Tab(DisplayConstants.GRAPH_TAB_NAME);
+        tab.setContent(node);
+        this.getTabs().add(tab);
 
-        dataTable = new JTable();
-        dataTable.setModel(tableModel);
-        dataTable.setColumnModel(columnModel);
+        dataTable = new TableView();
 
-        dataTable.setAutoCreateColumnsFromModel(false);
-        
-        JScrollPane sp = new JScrollPane(dataTable);
+        FlowPane summaryPanel = new FlowPane();
 
-        JPanel summaryPanel = new JPanel();
-
-        summaryPanel.add(new LabeledFieldPanel<>("Date:", timeField));
+        summaryPanel.getChildren().add(new LabeledFieldPane<>("Date:", timeField));
         timeField.setEditable(false);
-        summaryPanel.add(new LabeledFieldPanel<>("% Winds are calm:", calmField));
+        summaryPanel.getChildren().add(new LabeledFieldPane<>("% Winds are calm:", calmField));
         calmField.setEditable(false);
 
-        summaryPanel.add(new JLabel("Speeds are in " + Speed.getDefaultUnit()));
+        summaryPanel.getChildren().add(new Label("Speeds are in " + Speed.getDefaultUnit()));
 
-        JPanel p = new JPanel(new BorderLayout());
+        BorderPane p = new BorderPane();
 
-        p.add(sp, BorderLayout.CENTER);
-        p.add(summaryPanel, BorderLayout.NORTH);
-
-        component.addTab(DisplayConstants.DATA_TAB_NAME, p);
-    }
-    
-    /**
-     * Get the swing component that contains the wind rose.
-     * 
-     * @return The swing container
-     */
-    public JComponent getComponent() {
-        return component;
+        p.setCenter(dataTable);
+        p.setTop(summaryPanel);
+        
+        tab = new Tab(DisplayConstants.DATA_TAB_NAME);
+        tab.setContent(p);
+        this.getTabs().add(tab);
     }
     
     /**
