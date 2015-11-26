@@ -28,7 +28,6 @@ import org.jfree.ui.TextAnchor;
 
 import com.bdb.util.TimeUtils;
 import com.bdb.weather.common.SummaryRecord;
-import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.measurement.Humidity;
 import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.axis.HumidityRangeAxis;
@@ -42,19 +41,12 @@ import com.bdb.weather.display.axis.HumidityRangeAxis;
 public class DayHumidityPanel extends DayXYPlotPanel {
     private static final long serialVersionUID = -8608928921655446678L;
     
-    public static DayHumidityPanel createDayHumidityPanel(WeatherStation ws) {
-        DayHumidityPanel panel = new DayHumidityPanel(ws);
-        panel.createElements();
-        return panel;
-    }
-
     /**
      * Constructor.
-     * 
-     * @param ws The weather station whose data will be plotted
      */
-    private DayHumidityPanel(WeatherStation ws) {
-        super(ws, new HumidityRangeAxis(), null);
+    public DayHumidityPanel() {
+        super(new HumidityRangeAxis(), null);
+        createElements();
     }
     
     /**

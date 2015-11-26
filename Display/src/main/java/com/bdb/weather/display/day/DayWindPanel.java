@@ -24,7 +24,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.JMenu;
-import javax.swing.table.DefaultTableModel;
 
 import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
@@ -68,21 +67,14 @@ public class DayWindPanel extends DayXYPlotPanel {
     private final TimeSeries gustSeries = new TimeSeries(COLUMN_LABELS[GUST_COLUMN]);
     private TimeSeriesCollection dataset;
 
-    public static DayWindPanel createDayWindPanel(WeatherStation ws) {
-        DayWindPanel plot = new DayWindPanel(ws);
-        plot.createElements();
-        return plot;
-    }
-    
     /**
      * Constructor.
      * 
      * @param ws The weather station for which the data is being plotted
      */
-    private DayWindPanel(WeatherStation ws) {
-        super(ws, new WindSpeedRangeAxis(), null);
-
-        
+    public DayWindPanel(WeatherStation ws) {
+        super(new WindSpeedRangeAxis(), null);
+        createElements();
     }
 
     @Override
@@ -137,8 +129,8 @@ public class DayWindPanel extends DayXYPlotPanel {
      * @see com.bdb.weather.display.day.DayXYPlotPanel#loadDataSeries(java.util.List, org.jfree.data.time.TimeSeriesCollection, javax.swing.table.DefaultTableModel)
      */
     @Override
-    protected void loadDataSeries(List<HistoricalRecord> list, DefaultTableModel tableModel) {
-        super.loadDataSeries(list, tableModel);
+    protected void loadDataSeries(List<HistoricalRecord> list) {
+        super.loadDataSeries(list);
         speedSeries.clear();
         gustSeries.clear();
 

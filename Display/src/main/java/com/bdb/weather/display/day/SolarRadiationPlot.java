@@ -21,7 +21,6 @@ import java.util.List;
 
 import javax.swing.JMenu;
 
-import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.display.axis.SolarRadiationAxis;
 import com.bdb.weather.display.axis.UvIndexAxis;
 
@@ -32,11 +31,9 @@ import com.bdb.weather.display.axis.UvIndexAxis;
 public class SolarRadiationPlot extends DayXYPlotPanel {
     /**
      * Constructor.
-     *
-     * @param ws The weather station for which the temperature data is being displayed
      */
-    public SolarRadiationPlot(WeatherStation ws) {
-        super(ws, new SolarRadiationAxis(), new UvIndexAxis());
+    public SolarRadiationPlot() {
+        super(new SolarRadiationAxis(), new UvIndexAxis());
     }
 
     @Override

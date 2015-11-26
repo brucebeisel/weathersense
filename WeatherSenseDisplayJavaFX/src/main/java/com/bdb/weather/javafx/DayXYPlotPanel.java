@@ -40,7 +40,6 @@ import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.IntervalMarker;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.DefaultXYItemRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.RegularTimePeriod;

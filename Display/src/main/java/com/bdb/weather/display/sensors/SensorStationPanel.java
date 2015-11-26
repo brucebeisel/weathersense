@@ -16,14 +16,13 @@
  */
 package com.bdb.weather.display.sensors;
 
-import java.awt.BorderLayout;
 import java.util.List;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+
+import javafx.scene.Node;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
 
 import com.bdb.util.jdbc.DBConnection;
 
@@ -36,28 +35,23 @@ import com.bdb.weather.display.DisplayConstants;
  *
  * @author Bruce
  */
-public class SensorStationPanel implements ComponentContainer {
-    private final JComponent panel;
-    private final JTable table;
-    private final DefaultTableModel tableModel;
+public class SensorStationPanel extends BorderPane implements ComponentContainer {
+    private final TableView<SensorStationStatus> table;
     private final SensorStationStatusTable sensorStationStatusTable;
     private static final String COLUMN_HEADINGS[] = {
         "Time", "Sensor Station ID", "Battery Voltage", "Battery Status", "Link Quality"
     };
 
     public SensorStationPanel(DBConnection connection) {
-        panel = new JPanel(new BorderLayout());
+        table = new TableView<>();
         sensorStationStatusTable = new SensorStationStatusTable(connection);
-        tableModel = new DefaultTableModel();
-        tableModel.setColumnIdentifiers(COLUMN_HEADINGS);
-        table = new JTable(tableModel);
-        JScrollPane pane = new JScrollPane(table);
-        panel.add(pane, BorderLayout.CENTER);
+        //tableModel.setColumnIdentifiers(COLUMN_HEADINGS);
+        this.setCenter(table);
     }
 
     @Override
-    public JComponent getComponent() {
-        return panel;
+    public Node getComponent() {
+        return this;
     }
 
     public void loadData() {

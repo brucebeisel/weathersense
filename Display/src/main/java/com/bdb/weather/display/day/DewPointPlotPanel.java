@@ -21,12 +21,9 @@ import java.util.List;
 
 import javax.swing.JMenu;
 
-import org.jfree.chart.axis.AxisLocation;
-import org.jfree.chart.plot.XYPlot;
-
-import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.display.axis.HumidityRangeAxis;
 import com.bdb.weather.display.axis.TemperatureRangeAxis;
+
 
 /**
  *
@@ -35,14 +32,9 @@ import com.bdb.weather.display.axis.TemperatureRangeAxis;
 public class DewPointPlotPanel extends DayXYPlotPanel {
     /**
      * Constructor.
-     *
-     * @param ws The weather station for which the temperature data is being displayed
      */
-    public DewPointPlotPanel(WeatherStation ws) {
-        super(ws, new TemperatureRangeAxis(), null);
-        XYPlot plot = getPlot();
-        plot.setRangeAxis(1, new HumidityRangeAxis());
-        plot.setRangeAxisLocation(AxisLocation.BOTTOM_OR_RIGHT);
+    public DewPointPlotPanel() {
+        super(new TemperatureRangeAxis(), new HumidityRangeAxis());
     }
 
     @Override

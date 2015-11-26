@@ -17,7 +17,6 @@
 package com.bdb.weather.display.summary;
 
 import java.awt.BorderLayout;
-import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -43,8 +42,6 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.DateTickMarkPosition;
-import org.jfree.chart.axis.DateTickUnit;
-import org.jfree.chart.axis.DateTickUnitType;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.XYItemEntity;
@@ -219,15 +216,22 @@ public abstract class HighLowPanel<T extends Measurement> implements ChartMouseL
 
             LocalDate date = record.getDate();
             // TODO: Figure out how to create a time period based on the specified interval
-            RegularTimePeriod period;
-            if (interval == SummaryInterval.DAY_INTERVAL)
-                period = new Hour(seriesIndex * 4, date.getDayOfMonth(), date.getMonth().getValue(), date.getYear());
-            else if (interval == SummaryInterval.MONTH_INTERVAL)
-                period = new Day(seriesIndex * 4 + 1,  date.getMonth().getValue(), date.getYear());
-            else if (interval == SummaryInterval.YEAR_INTERVAL)
-                period = new Year(date.getYear());
-            else
-                period = null;
+            RegularTimePeriod period = null;
+            if (null != interval)
+                switch (interval) {
+                    case DAY_INTERVAL:
+                        period = new Hour(seriesIndex * 4, date.getDayOfMonth(), date.getMonth().getValue(), date.getYear());
+                        break;
+                    case MONTH_INTERVAL:
+                        period = new Day(seriesIndex * 4 + 1,  date.getMonth().getValue(), date.getYear());
+                        break;
+                    case YEAR_INTERVAL:
+                        period = new Year(date.getYear());
+                        break;
+                    default:
+                        period = null;
+                        break;
+            }
 
             if (avg != null && min != null && max != null) {
                 series.add(period, avg.get(), max.get(), min.get(), min.get());

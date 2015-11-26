@@ -25,6 +25,9 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import javafx.scene.Node;
+import javafx.scene.layout.GridPane;
+
 import com.bdb.weather.common.DailyRecords;
 import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.SummaryRecord;
@@ -39,7 +42,7 @@ import com.bdb.weather.display.windrose.WindRosePanel;
  * @author Bruce
  *
  */
-public class DayGraphPanel implements ComponentContainer {
+public class DayGraphPanel extends GridPane implements ComponentContainer {
     private final JComponent       component;
     private final DayHumidityPanel humidityPanel;
     private final DayRainPanel     rainPanel;
@@ -57,11 +60,11 @@ public class DayGraphPanel implements ComponentContainer {
     public DayGraphPanel(WeatherStation ws) {
         component = new JPanel();
         windRose = new WindRosePanel();
-        temperaturePanel = DayTemperaturePlot.createDayTemperaturePlot(ws);
-        humidityPanel = DayHumidityPanel.createDayHumidityPanel(ws);
-        pressurePanel = DayPressurePanel.createDayPressurePanel(ws);
+        temperaturePanel = new DayTemperaturePlot();
+        humidityPanel = new DayHumidityPanel();
+        pressurePanel = new DayPressurePanel();
         rainPanel = new DayRainPanel();
-        windPanel = DayWindPanel.createDayWindPanel(ws);
+        windPanel = DayWindPanel.createDayWindPanel();
         windDirPanel = new WindDirPlot();
 
         component.setBackground(Color.BLACK);
@@ -72,17 +75,17 @@ public class DayGraphPanel implements ComponentContainer {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = .5;
         gbc.weighty = 1.0;
-        component.add(temperaturePanel.getComponent(), gbc);
+        component.add(temperaturePanel gbc);
         gbc.gridx = 1;
         gbc.gridwidth = 2;
-        component.add(humidityPanel.getComponent(), gbc);
+        component.add(humidityPanel, gbc);
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 1;
         component.add(rainPanel.getComponent(), gbc);
         gbc.gridx = 1;
         gbc.gridwidth = 2;
-        component.add(pressurePanel.getComponent(), gbc);
+        component.add(pressurePanel, gbc);
 
         gbc.gridwidth = 1;
         gbc.gridx = 0;
@@ -103,8 +106,8 @@ public class DayGraphPanel implements ComponentContainer {
      * @return The Swing container
      */
     @Override
-    public JComponent getComponent() {
-        return component;
+    public Node getComponent() {
+        return this;
     }
 
     /**

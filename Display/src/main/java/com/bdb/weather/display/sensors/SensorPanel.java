@@ -16,16 +16,17 @@
  */
 package com.bdb.weather.display.sensors;
 
-import java.awt.BorderLayout;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+
+import javafx.scene.Node;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
 
 import com.bdb.util.jdbc.DBConnection;
 
@@ -37,19 +38,16 @@ import com.bdb.weather.display.ComponentContainer;
  *
  * @author Bruce
  */
-public class SensorPanel implements ComponentContainer {
-    private JPanel panel;
-    private final JTable table;
+public class SensorPanel extends BorderPane implements ComponentContainer {
+    private final TableView<Sensor> table;
     private final SensorTable sensorTable;
     private static final String COLUMN_HEADINGS[] = {
         "Sensor ID", "Sensor Type", "Sensor Name", ""
     };
 
     public SensorPanel(DBConnection connection) {
-        panel = new JPanel(new BorderLayout());
         sensorTable = new SensorTable(connection);
         List<Sensor> sensors = sensorTable.getSensorList();
-        DefaultTableModel model = new DefaultTableModel();
         model.setColumnIdentifiers(COLUMN_HEADINGS);
         model.setRowCount(sensors.size());
         
@@ -60,19 +58,18 @@ public class SensorPanel implements ComponentContainer {
             model.setValueAt("Change Name", i, 3);
         }
 
-        table = new JTable(model);
+        table = new TableView<>();
         TableColumn column = table.getColumn("");
         column.setCellRenderer((JTable table1, Object value, boolean isSelected, boolean hasFocus, int row, int col) -> {
             JButton button = new JButton(value.toString());
             return button;
         });
 
-        JScrollPane pane = new JScrollPane(table);
-        panel.add(pane, BorderLayout.CENTER);
+        this.setCenter(table);
     }
 
     @Override
-    public JComponent getComponent() {
-        return panel;
+    public Node getComponent() {
+        return this;
     }
 }

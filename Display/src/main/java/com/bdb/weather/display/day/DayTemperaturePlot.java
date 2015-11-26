@@ -38,10 +38,10 @@ import org.jfree.ui.TextAnchor;
 import com.bdb.util.TimeUtils;
 
 import com.bdb.weather.common.DailyRecords;
+import com.bdb.weather.common.SensorManager;
 import com.bdb.weather.common.SensorType;
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherAverage;
-import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.axis.TemperatureRangeAxis;
@@ -56,23 +56,15 @@ import com.bdb.weather.display.preferences.UserPreferences;
 public class DayTemperaturePlot extends DayXYPlotPanel implements ActionListener {
     private Temperature             recordLow;
     private Temperature             recordHigh;
-    private final WeatherStation    ws;
     private final JCheckBoxMenuItem minMaxLabelsItem = new JCheckBoxMenuItem("Min/Max Labels", true);
     private SummaryRecord           summary;
     
-    public static DayTemperaturePlot createDayTemperaturePlot(WeatherStation ws) {
-        DayTemperaturePlot plot = new DayTemperaturePlot(ws);
-        plot.createElements();
-        return plot;
-    }
     /**
      * Constructor.
-     * 
-     * @param ws The weather station for which the temperature data is being displayed
      */
-    private DayTemperaturePlot(WeatherStation ws) {
-	super(ws, new TemperatureRangeAxis(), null);
-        this.ws = ws;
+    public DayTemperaturePlot() {
+	super(new TemperatureRangeAxis(), null);
+        createElements();
     }
     
     @Override
@@ -88,7 +80,7 @@ public class DayTemperaturePlot extends DayXYPlotPanel implements ActionListener
         controls.add(new SeriesControl(HistoricalSeriesInfo.HEAT_INDEX_SERIES, false));
         controls.add(new SeriesControl(HistoricalSeriesInfo.WIND_CHILL_SERIES, false));
         
-        ws.getSensorManager().getExtraSensors(SensorType.THERMOMETER).stream().forEach((sensor) -> {
+        SensorManager.getInstance().getExtraSensors(SensorType.THERMOMETER).stream().forEach((sensor) -> {
             controls.add(new SeriesControl(sensor.getName(), false));
         });
 

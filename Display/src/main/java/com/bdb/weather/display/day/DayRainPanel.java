@@ -25,15 +25,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingNode;
+import javafx.scene.Node;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TableView;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -62,20 +68,18 @@ import com.bdb.weather.display.axis.RainRangeAxis;
  * @author Bruce
  *
  */
-public class DayRainPanel {
+public class DayRainPanel extends TabPane {
     private static final int HOUR_COLUMN = 0;
     private static final int RAINFALL_COLUMN = 1;
     private static final int ET_COLUMN = 2;
     private static final String RAIN_ROW_KEY = "Rain";
     private static final String ET_ROW_KEY = "ET";
 
-    private final JTabbedPane         component = new JTabbedPane();
     private final CategoryPlot        rainPlot;
     private final JFreeChart          chart;
     private final ChartPanel          chartPanel;
-    private final JTable              dataTable;
+    private final TableView           dataTable;
     private final NumberAxis          valueAxis = new RainRangeAxis();
-    private final DefaultTableModel   tableModel = new DefaultTableModel();
     private final DateTimeFormatter   hourFormatter = DateTimeFormatter.ofPattern("h a");
     private LocalDateTime             timeCache = LocalDate.now().atStartOfDay();
     private final String              tableHeadings[] = {
@@ -88,6 +92,7 @@ public class DayRainPanel {
      * Constructor.
      */
     public DayRainPanel() {
+        this.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         chart = ChartFactory.createBarChart("Water Cycle", "Hour", "", null, PlotOrientation.VERTICAL, true, true, false);
 
         chartPanel = new ChartPanel(chart);
@@ -114,16 +119,14 @@ public class DayRainPanel {
         rainPlot.setRangeAxis(valueAxis);
         rainPlot.getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
 
-        component.addTab(DisplayConstants.GRAPH_TAB_NAME, chartPanel);
-
+        Tab tab = new Tab(DisplayConstants.GRAPH_TAB_NAME);
+        SwingNode node = new SwingNode();
+        node.setContent(chartPanel);
+        tab.setContent(node);
+        
         DefaultTableColumnModel colModel = new DefaultTableColumnModel();
 
-        dataTable = new JTable();
-        dataTable.setModel(tableModel);
-        dataTable.setColumnModel(colModel);
-        dataTable.setRowSorter(new TableRowSorter<>(tableModel));
-
-        dataTable.setAutoCreateColumnsFromModel(false);
+        dataTable = new TableView();
 
         for (int i = 0; i < tableHeadings.length; i++) {
             TableColumn col = new TableColumn();
@@ -132,15 +135,8 @@ public class DayRainPanel {
             colModel.addColumn(col);
         }
 
-        tableModel.setColumnCount(tableHeadings.length);
-
-        JScrollPane sp = new JScrollPane(dataTable);
-
-        JPanel p = new JPanel(new BorderLayout());
-
-        p.add(sp, BorderLayout.CENTER);
-
-        component.addTab(DisplayConstants.DATA_TAB_NAME, p);
+        tab = new Tab(DisplayConstants.DATA_TAB_NAME);
+        tab.setContent(dataTable);
     }
     
     /**
@@ -148,8 +144,8 @@ public class DayRainPanel {
      * 
      * @return The swing component
      */
-    public JComponent getComponent() {
-        return component;
+    public Node getComponent() {
+        return this;
     }
     
     /**
@@ -171,10 +167,13 @@ public class DayRainPanel {
      */
     public void loadData(SummaryRecord data, List<HistoricalRecord> records) {
         if (data == null) {
-            tableModel.setRowCount(0);
+            dataTable.setItems(null);
             rainPlot.setDataset(null);
             return;
         }
+        
+        ObservableList<HistoricalRecord> dataModel = FXCollections.observableList(records);
+        dataTable.setItems(dataModel);
         
         DefaultCategoryDataset rainDataset = new DefaultCategoryDataset();
 
@@ -183,7 +182,6 @@ public class DayRainPanel {
         int n = 0;
 
         Set<Integer> hours = hourlyRain.getHourValues();
-        tableModel.setRowCount(hours.size());
         Depth totalET = new Depth(0.0);
 
         for (int hour : hours) {

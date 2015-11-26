@@ -47,18 +47,12 @@ import com.bdb.weather.display.axis.SolarRadiationAxis;
 public class DayPressurePanel extends DayXYPlotPanel implements ActionListener {
     private static final long serialVersionUID = 4553915836873397344L;
 
-    public static DayPressurePanel createDayPressurePanel(WeatherStation ws) {
-        DayPressurePanel panel = new DayPressurePanel(ws);
-        panel.createElements();
-        return panel;
-    }
     /**
      * Constructor.
-     * 
-     * @param ws The weather station for which the pressure data is being displayed
      */
-    private DayPressurePanel(WeatherStation ws) {
-        super(ws, new PressureRangeAxis(), new SolarRadiationAxis());
+    public DayPressurePanel() {
+        super(new PressureRangeAxis(), new SolarRadiationAxis());
+        createElements();
     }
     
     @Override

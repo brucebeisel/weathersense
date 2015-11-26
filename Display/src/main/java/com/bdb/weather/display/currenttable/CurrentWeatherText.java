@@ -34,6 +34,10 @@ import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.layout.BorderPane;
+
 import com.bdb.util.Pair;
 
 import com.bdb.weather.common.CurrentWeather;
@@ -47,14 +51,14 @@ import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.CurrentWeatherProcessor;
 import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.WeatherSense;
+import java.io.IOException;
 
 /**
  *
  * @author Bruce
  */
-public class CurrentWeatherText implements ComponentContainer, CurrentWeatherProcessor {
+public class CurrentWeatherText extends BorderPane implements ComponentContainer, CurrentWeatherProcessor {
     private String frameTitle = null;
-    private final JPanel panel = new JPanel();
     private final JTextField indoorTemperature = new JTextField(DisplayConstants.UNKNOWN_VALUE_STRING);
     private final JTextField outdoorTemperature = new JTextField(DisplayConstants.UNKNOWN_VALUE_STRING);
     private final JTextField heatIndex = new JTextField(DisplayConstants.UNKNOWN_VALUE_STRING);
@@ -103,6 +107,16 @@ public class CurrentWeatherText implements ComponentContainer, CurrentWeatherPro
 
     public CurrentWeatherText(WeatherStation ws) {
         sensorManager = ws.getSensorManager();
+         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("custom_control.fxml"));
+        fxmlLoader.setRoot(this);
+        fxmlLoader.setController(this);
+
+        try {
+            fxmlLoader.load();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+        
         List<Pair<String,? extends JComponent>> rainComponents = new ArrayList<>();
         rainComponents.add(new Pair<>("Rain Rate: ", rainRate));
         rainComponents.add(new Pair<>("15 Minute Rain: ", rain15Minute));
@@ -218,8 +232,8 @@ public class CurrentWeatherText implements ComponentContainer, CurrentWeatherPro
     }
 
     @Override
-    public JComponent getComponent() {
-        return panel;
+    public Node getComponent() {
+        return this;
     }
 
     private void addFields(JPanel panel, List<Pair<String,? extends JComponent>> components) {
