@@ -34,7 +34,7 @@ import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.display.ComponentContainer;
-import com.bdb.weather.display.windrose.WindRosePanel;
+import com.bdb.weather.display.windrose.WindRosePane;
 
 /**
  * Main container class for all plots that display a day's worth of historical data.
@@ -50,7 +50,7 @@ public class DayGraphPanel extends GridPane implements ComponentContainer {
     private final DayXYPlotPanel   pressurePanel;
     private final DayWindPanel     windPanel;
     private final WindDirPlot      windDirPanel;
-    private final WindRosePanel    windRose;
+    private final WindRosePane    windRose;
 
     /**
      * Constructor.
@@ -59,7 +59,7 @@ public class DayGraphPanel extends GridPane implements ComponentContainer {
      */
     public DayGraphPanel(WeatherStation ws) {
         component = new JPanel();
-        windRose = new WindRosePanel();
+        windRose = new WindRosePane();
         temperaturePanel = new DayTemperaturePlot();
         humidityPanel = new DayHumidityPanel();
         pressurePanel = new DayPressurePanel();

@@ -28,7 +28,7 @@ import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherAverages;
 import com.bdb.weather.common.WindRoseData;
 import com.bdb.weather.display.ViewLauncher;
-import com.bdb.weather.display.windrose.WindRosePanel;
+import com.bdb.weather.display.windrose.WindRosePane;
 
 public class SummariesGraphPanel {
     private final JComponent                     component = new JPanel(new BorderLayout());
@@ -36,7 +36,7 @@ public class SummariesGraphPanel {
     private final TemperatureDeviationPlotPanel  deltaPanel;
     private final RainSummary                    rainPanel;
     private final WindSummary                    windPanel;
-    private final WindRosePanel                  windRosePanel;
+    private final WindRosePane                  windRosePanel;
     private final HighLowHumidityPanel           highLowHumidityPanel;
     private final HighLowPressurePanel           highLowPressurePanel;
 
@@ -45,7 +45,7 @@ public class SummariesGraphPanel {
         deltaPanel = new TemperatureDeviationPlotPanel(interval, launcher, supporter);
         rainPanel = new RainSummary(interval, launcher, supporter);
         windPanel = new WindSummary(interval, launcher, supporter);
-        windRosePanel = new WindRosePanel();
+        windRosePanel = new WindRosePane();
         highLowHumidityPanel = new HighLowHumidityPanel(interval, launcher, supporter);
         highLowPressurePanel = new HighLowPressurePanel(interval, launcher, supporter);
 

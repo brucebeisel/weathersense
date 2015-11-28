@@ -78,12 +78,12 @@ public class DayRainPanel extends TabPane {
     private final DateTimeFormatter   hourFormatter = DateTimeFormatter.ofPattern("h a");
     private LocalDateTime             timeCache = LocalDate.now().atStartOfDay();
 
-    private final class Row {
+    private final class RainItem {
         private IntegerProperty hour;
         private DoubleProperty rainfall;
         private DoubleProperty et;
         
-        public Row(int hour, double rainfall, double ET) {
+        public RainItem(int hour, double rainfall, double ET) {
             setHour(hour);
             setRainfall(rainfall);
             setET(ET);
@@ -172,15 +172,15 @@ public class DayRainPanel extends TabPane {
         
         dataTable = new TableView();
        
-        TableColumn<Row,Integer> hourColumn = new TableColumn<>(HOUR_ROW_KEY);
+        TableColumn<RainItem,Integer> hourColumn = new TableColumn<>(HOUR_ROW_KEY);
         hourColumn.setCellValueFactory(new PropertyValueFactory(HOUR_ROW_KEY));
         dataTable.getColumns().add(hourColumn);
         
-        TableColumn<Row,Double> rainfallColumn = new TableColumn<>(RAIN_ROW_KEY);
+        TableColumn<RainItem,Double> rainfallColumn = new TableColumn<>(RAIN_ROW_KEY);
         rainfallColumn.setCellValueFactory(new PropertyValueFactory(RAIN_ROW_KEY));
         dataTable.getColumns().add(rainfallColumn);
         
-        TableColumn<Row,Double> etColumn = new TableColumn<>(ET_ROW_KEY);
+        TableColumn<RainItem,Double> etColumn = new TableColumn<>(ET_ROW_KEY);
         rainfallColumn.setCellValueFactory(new PropertyValueFactory(ET_ROW_KEY));
         dataTable.getColumns().add(etColumn);
         
@@ -221,7 +221,7 @@ public class DayRainPanel extends TabPane {
             return;
         }
         
-        List<Row> rows = new ArrayList<>();
+        List<RainItem> rows = new ArrayList<>();
         DefaultCategoryDataset rainDataset = new DefaultCategoryDataset();
         DayHourRain hourlyRain = data.getHourlyRainfall();
 
@@ -240,7 +240,7 @@ public class DayRainPanel extends TabPane {
             rainDataset.addValue(et.get(), ET_ROW_KEY, label);
 
             n++;
-            Row row = new Row(hour, hourlyRain.getRain(hour).get(), et.get());
+            RainItem row = new RainItem(hour, hourlyRain.getRain(hour).get(), et.get());
             rows.add(row);
         }
         dataTable.setItems(FXCollections.observableList(rows));

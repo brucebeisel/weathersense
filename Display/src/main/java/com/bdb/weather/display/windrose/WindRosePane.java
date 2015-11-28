@@ -51,7 +51,7 @@ import com.bdb.weather.display.LabeledFieldPane;
  * @author Bruce
  *
  */
-public class WindRosePanel extends TabPane {
+public class WindRosePane extends TabPane {
     private final WindRosePlot 	          windRosePlot = new WindRosePlot();
     private final JFreeChart	 	  chart = new JFreeChart(windRosePlot);
     private final PolarChartPanel	  chartPanel = new PolarChartPanel(chart);
@@ -76,7 +76,7 @@ public class WindRosePanel extends TabPane {
     /**
      * Constructor.
      */
-    public WindRosePanel() {
+    public WindRosePane() {
         this.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         ChartFactory.getChartTheme().apply(chart);
         chartPanel.setMinimumDrawHeight(10);
