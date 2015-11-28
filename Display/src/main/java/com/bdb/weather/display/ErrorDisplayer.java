@@ -16,10 +16,12 @@
  */
 package com.bdb.weather.display;
 
-import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 
 /**
  *
@@ -40,26 +42,25 @@ public class ErrorDisplayer {
         return instance;
     }
 
-    public void displayMessageLater(final String message, final int messageType) {
-        try {
-            SwingUtilities.invokeAndWait(() -> {
-                JOptionPane.showMessageDialog(null, message, "Internal Error", messageType);
-            });
-        }
-        catch (InterruptedException | InvocationTargetException e) {
-            // Can't do anything about these exceptions
-        }
+    public void displayMessageLater(final String message, Alert.AlertType alertType) {
+	Platform.runLater(() -> {;
+	    Alert alert = new Alert(alertType, message, ButtonType.OK);
+	    alert.showAndWait();
+	});
     }
     
     public void displayInformation(String message) {
-        JOptionPane.showMessageDialog(null, message, "Internal Error", JOptionPane.INFORMATION_MESSAGE);
+	Alert alert = new Alert(Alert.AlertType.INFORMATION, message, ButtonType.OK);
+	alert.showAndWait();
     }
     
     public void displayWarning(String message) {
-        JOptionPane.showMessageDialog(null, message, "Internal Error", JOptionPane.WARNING_MESSAGE);
+	Alert alert = new Alert(Alert.AlertType.WARNING, message, ButtonType.OK);
+	alert.showAndWait();
     }
     
     public void displayError(String message) {
-        JOptionPane.showMessageDialog(null, message, "Internal Error", JOptionPane.ERROR_MESSAGE);
+	Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
+	alert.showAndWait();
     }
 }

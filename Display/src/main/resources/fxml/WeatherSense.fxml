@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns:fx="http://javafx.com/fxml/1" xmlns:fx="http://javafx.com/fxml/1" id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" fx:controller="com.bdb.weather.display.WeatherSenseController">
+    <top>
+	<MenuBar>
+	    <Menu text="Weather Sense">
+		<MenuItem text="Exit" onAction="#exit"/>
+	    </Menu>
+	    <Menu text="Data">
+		<MenuItem text="Edit Archive" onAction="#launchArchiveEditorView"/>
+	    </Menu>
+	    <Menu text="Views">
+		<MenuItem text="Current Weather" onAction="#launchCurrentWeatherView" />
+		<MenuItem text="Current Weather (Table)" onAction="#launchCurrentWeatherTextView"/>
+		<MenuItem text="Archive Table" onAction="launchArchiveTable"/> 
+		<SeparatorMenuItem />
+		<MenuItem text="Today" onAction="#launchTodayView" />
+		<MenuItem text="Storms" onAction="#launchStormsView"/>
+		<MenuItem text="Day Summary" onAction="#launchDaySummaryView"/> 
+		<MenuItem text="Daily Summaries" onAction="#launchDailySummariesView"/> 
+		<MenuItem text="Monthly Summaries" onAction="#launchMonthlySummariesView"/>
+		<MenuItem text="Yearly Summaries" onAction="#launchYearlySummariesView"/>
+		<SeparatorMenuItem />
+		<MenuItem text="Archive Free Plot" onAction="#launchHistoricalFreePlotView"/> 
+		<MenuItem text="Day Summary Free Plot" onAction="#launchDailyFreePlotView"/>
+		<MenuItem text="Month Summary Free Plot" onAction="#launchMonthlyFreePlotView"/>
+		<SeparatorMenuItem />
+		<MenuItem text="Strip Chart" onAction="#launchStripChart"/> 
+	    </Menu>
+	    <Menu text="Preferences">
+		<MenuItem text="Color..." onAction="#launchColorPreference"/>
+		<MenuItem text="Units..." onAction="#launchUnitsPreference" />
+	    </Menu>
+	    <Menu text="Configuration">
+		<MenuItem text="Weather Station..." onAction="#launchWeatherStation"/>
+		<MenuItem text="Sensors..." onAction="#launchSensors"/>
+		<MenuItem text="Sensor Stations..." onAction="#launchSensorStations"/>
+		<MenuItem text="Seasonal Averages..." onAction="#launchSeasonalAverages"/>
+	    </Menu>
+	    <Menu text="Help">
+		<MenuItem text="About Weather Sense..." onAction="#launchAbout"/>
+	    </Menu>
+	</MenuBar>
+    </top>
+    <center>
+	<GridPane fx:id="grid"/> 
+    </center>
+    <stylesheets>
+        <URL value="@/styles/weathersense.css"/>
+    </stylesheets>
+</BorderPane>
