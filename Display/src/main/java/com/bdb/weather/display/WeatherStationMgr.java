@@ -36,16 +36,18 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
+
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.TilePane;
 
 import com.bdb.util.LabeledFieldPanel;
 import com.bdb.util.RadioButtonPanel;
@@ -71,35 +73,35 @@ import com.bdb.weather.common.measurement.Temperature;
  * @author Bruce
  */
 @SuppressWarnings("serial")
-public class WeatherStationMgr extends JDialog implements ActionListener {
+public class WeatherStationMgr extends Dialog implements ActionListener {
     private static final String[] WIND_SLICE_OPTIONS = {"8", "16", "360"};
     private static final String[] WIND_SPEED_BIN_COUNT_OPTIONS = {"3", "4", "5", "6"};
     private final WeatherStationTable wsTable;
     private final TemperatureBinTable binTable;
     private final CollectorCommandsTable commandTable;
     private WeatherStation ws;
-    private final JTextField manufacturerTF = new JTextField(50);
-    private final JTextField modelTF = new JTextField(50);
-    private final JTextField firmwareDateTF = new JTextField(50);
-    private final JTextField firmwareVersionTF = new JTextField(50);
-    private final JTextField locationCodeTF = new JTextField(20);
-    private final JTextField locationDescriptionTF = new JTextField(50);
-    private final JTextField latitudeTF = new JFormattedTextField(new DecimalFormat("##.######"));
-    private final JTextField longitudeTF = new JFormattedTextField(new DecimalFormat("###.######"));
-    private final JTextField altitudeTF = new JFormattedTextField(Distance.getDefaultFormatter());
-    private final JTextField minThermometerValueTF = new JFormattedTextField(Temperature.getDefaultFormatter());
-    private final JTextField maxThermometerValueTF = new JFormattedTextField(Temperature.getDefaultFormatter());
-    private final JTextField minBarometerValueTF = new JFormattedTextField(Pressure.getDefaultFormatter());
-    private final JTextField maxBarometerValueTF = new JFormattedTextField(Pressure.getDefaultFormatter());
-    private final JTextField maxDailyRainTF = new JFormattedTextField(Depth.getDefaultFormatter());
-    private final JTextField maxMonthlyRainTF = new JFormattedTextField(Depth.getDefaultFormatter());
-    private final JTextField maxYearlyRainTF = new JFormattedTextField(Depth.getDefaultFormatter());
+    private final TextField manufacturerTF = new TextField(50);
+    private final TextField modelTF = new TextField(50);
+    private final TextField firmwareDateTF = new TextField(50);
+    private final TextField firmwareVersionTF = new TextField(50);
+    private final TextField locationCodeTF = new TextField(20);
+    private final TextField locationDescriptionTF = new TextField(50);
+    private final TextField latitudeTF = new FormattedTextField(new DecimalFormat("##.######"));
+    private final TextField longitudeTF = new FormattedTextField(new DecimalFormat("###.######"));
+    private final TextField altitudeTF = new FormattedTextField(Distance.getDefaultFormatter());
+    private final TextField minThermometerValueTF = new FormattedTextField(Temperature.getDefaultFormatter());
+    private final TextField maxThermometerValueTF = new FormattedTextField(Temperature.getDefaultFormatter());
+    private final TextField minBarometerValueTF = new FormattedTextField(Pressure.getDefaultFormatter());
+    private final TextField maxBarometerValueTF = new FormattedTextField(Pressure.getDefaultFormatter());
+    private final TextField maxDailyRainTF = new FormattedTextField(Depth.getDefaultFormatter());
+    private final TextField maxMonthlyRainTF = new FormattedTextField(Depth.getDefaultFormatter());
+    private final TextField maxYearlyRainTF = new FormattedTextField(Depth.getDefaultFormatter());
     private final RadioButtonPanel windSliceCountRB = new RadioButtonPanel(WIND_SLICE_OPTIONS);
     private final RadioButtonPanel windSpeedBinCountRB = new RadioButtonPanel(WIND_SPEED_BIN_COUNT_OPTIONS);
-    private final JTextField windSpeedBinIntervalTF = new JFormattedTextField(Speed.getDefaultFormatter());
-    private final JTextField dopplerRadarUrlTF = new JTextField(50);
-    private final JTextField weatherUndergroundIdTF = new JTextField(20);
-    private final JTextField weatherUndergroundPasswordTF = new JTextField(20);
+    private final TextField windSpeedBinIntervalTF = new FormattedTextField(Speed.getDefaultFormatter());
+    private final TextField dopplerRadarUrlTF = new TextField(50);
+    private final TextField weatherUndergroundIdTF = new TextField(20);
+    private final TextField weatherUndergroundPasswordTF = new TextField(20);
     private final TemperatureBinEditor temperatureBinEditor = new TemperatureBinEditor();
     private String origWindSpeedInterval;
     private int origSpeedBins;
@@ -108,18 +110,17 @@ public class WeatherStationMgr extends JDialog implements ActionListener {
     private JButton urlTest;
     private final Frame frame;
 
-    private WeatherStationMgr(Frame frame, DBConnection con, WeatherStation ws) {
-        super(frame, "Weather Station", false);
+    private WeatherStationMgr(DBConnection con, WeatherStation ws) {
+	//super(frame, "Weather Station", false);
 
         connection = con;
         this.ws = ws;
-        this.frame = frame;
         wsTable = new WeatherStationTable(connection);
         commandTable = new CollectorCommandsTable(connection);
         binTable = new TemperatureBinTable(connection);
     }
 
-    private void createElements(Frame frame) {
+    private void createElements() {
         JPanel paramPanel = new JPanel();
         BoxLayout boxLayout = new BoxLayout(paramPanel, BoxLayout.Y_AXIS);
         paramPanel.setLayout(boxLayout);
@@ -223,7 +224,7 @@ public class WeatherStationMgr extends JDialog implements ActionListener {
         locationPanel.add(altitudeTF, gbc);
         altitudeTF.setToolTipText("Altitude is used to calculate barometric pressure offset");
         
-        JPanel innerPanel = new JPanel(new GridLayout(1, 0));
+        TilePane innerPanel = new TilePane(1, 0);
         JPanel windPanel = new JPanel(new GridBagLayout());
         setDefaultBorder(windPanel, "Wind Parameters");
         gbc.gridx = 0;
@@ -321,19 +322,19 @@ public class WeatherStationMgr extends JDialog implements ActionListener {
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(paramPanel, BorderLayout.CENTER);
 
-        JPanel buttonPanel = new JPanel();
+        BorderPane buttonPanel = new JPanel();
         buttonPanel.setBorder(new LineBorder(Color.black));
-        JButton b = new JButton("OK");
+        Button b = new Button("OK");
         b.addActionListener(this);
         b.setActionCommand("OK");
         buttonPanel.add(b);
 
-        b = new JButton("Cancel");
+        b = new Button("Cancel");
         b.addActionListener(this);
         b.setActionCommand("Cancel");
         buttonPanel.add(b);
 
-        b = new JButton("Help");
+        b = new Button("Help");
         b.addActionListener(this);
         b.setActionCommand("Help");
         buttonPanel.add(b);
@@ -578,11 +579,11 @@ public class WeatherStationMgr extends JDialog implements ActionListener {
 
     }
 
-    public static void editWeatherStation(JFrame frame, DBConnection connection) {
+    public static void editWeatherStation(DBConnection connection) {
         WeatherStationTable table = new WeatherStationTable(connection);
         WeatherStation station = table.getWeatherStation();
-        WeatherStationMgr dialog = new WeatherStationMgr(frame, connection, station);
-        dialog.createElements(frame);
-        dialog.setVisible(true);
+        WeatherStationMgr dialog = new WeatherStationMgr(connection, station);
+        dialog.createElements();
+	dialog.showAndWait();
     }
 }

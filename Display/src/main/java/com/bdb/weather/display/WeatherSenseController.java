@@ -16,7 +16,6 @@
  */
 package com.bdb.weather.display;
 
-import javax.swing.JInternalFrame;
 
 import javafx.fxml.FXML;
 
@@ -24,30 +23,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import javafx.fxml.Initializable;
-
-import com.bdb.weather.common.DateRange;
-import com.bdb.weather.display.current.CurrentWeatherPanel;
-import com.bdb.weather.display.currenttable.CurrentWeatherText;
-import com.bdb.weather.display.day.DaySummaryGraphPanel;
-import com.bdb.weather.display.day.TodayGraphPanel;
-import com.bdb.weather.display.freeplot.DailyFreePlot;
-import com.bdb.weather.display.freeplot.HistoricalFreePlot;
-import com.bdb.weather.display.freeplot.MonthlyFreePlot;
-import com.bdb.weather.display.freeplot.SummaryFreePlot;
-import com.bdb.weather.display.historyeditor.HistoryEditorPanel;
-import com.bdb.weather.display.historytable.DayHistoryTable;
-import com.bdb.weather.display.sensors.SensorPanel;
-import com.bdb.weather.display.sensors.SensorStationPanel;
-import com.bdb.weather.display.storm.StormPanel;
-import com.bdb.weather.display.stripchart.StripChartPanel;
-import com.bdb.weather.display.summary.DailySummariesPanel;
-import com.bdb.weather.display.summary.MonthlySummariesPanel;
-import com.bdb.weather.display.summary.YearlySummariesPanel;
-
-import java.awt.Dimension;
-import java.time.LocalDate;
-import java.time.Month;
-
 import javafx.application.Platform;
 
 /**
@@ -154,6 +129,7 @@ public class WeatherSenseController implements Initializable {
 	Platform.exit();
     }
 
+    /*
     private JInternalFrame launchView(String title, ComponentContainer container, Dimension geometry, boolean maximize) {
         return null;
     }
@@ -283,4 +259,5 @@ public class WeatherSenseController implements Initializable {
         sensorStationPanel.loadData();
         launchView("Sensor Stations", sensorStationPanel, new Dimension(800, 600), false);
     }
+*/
 }

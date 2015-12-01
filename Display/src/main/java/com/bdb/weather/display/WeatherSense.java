@@ -46,23 +46,78 @@ import com.bdb.weather.common.db.WeatherStationTable;
 import com.bdb.weather.display.day.HistoricalSeriesInfo;
 import com.bdb.weather.display.preferences.UserPreferences;
 
-public class WeatherSense extends Application implements Runnable, CurrentWeatherSubscriber.CurrentWeatherHandler {
+public class WeatherSense extends Application implements CurrentWeatherSubscriber.CurrentWeatherHandler {
     private static final int REFRESH_INTERVAL = 30;
-    private final DBConnection connection;
-    private final WeatherStationTable stationTable;
+    private DBConnection connection;
+    private WeatherStationTable stationTable;
     private WeatherStation ws;
     private final List<Refreshable> refreshList = new ArrayList<>();
     private ScheduledThreadPoolExecutor timer;
-    private final Preferences rootPref = Preferences.userNodeForPackage(WeatherSense.class);
-    private final Preferences prefs = rootPref.node("window-geometry");
     private final List<CurrentWeatherProcessor> cwpList = new ArrayList<>();
     private static final Logger logger = Logger.getLogger(WeatherSense.class.getName());
 
+    private void openDatabase(List<String> args) {
+	String databaseHost;
+
+	if (!args.isEmpty())
+	    databaseHost = args.get(0);
+	else
+	    databaseHost = DatabaseConstants.DATABASE_HOST;
+
+        String databaseUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, databaseHost, DatabaseConstants.DATABASE_PORT, DatabaseConstants.DATABASE_NAME);
+
+        connection = new DBConnection(databaseUrl,
+                                      DatabaseConstants.DATABASE_USER,
+                                      DatabaseConstants.DATABASE_PASSWORD);
+
+        connection.connect();
+    }
+
+    @Override
+    public void init() {
+        try (InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("logging.properties")) {
+
+            if (is != null)
+                LogManager.getLogManager().readConfiguration(is);
+        }
+        catch (IOException | SecurityException e) {
+            ErrorDisplayer.getInstance().displayMessageLater("Failed to initialize (" + e.getMessage() + ")", Alert.AlertType.ERROR);
+            Platform.exit();
+        }
+
+	Application.Parameters params = getParameters();
+	List<String> args = params.getRaw();
+	openDatabase(args);
+        
+
+        CurrentWeatherSubscriber.createSubscriber(this);
+
+	timer = new ScheduledThreadPoolExecutor(1);
+	timer.scheduleAtFixedRate(() -> {
+	    logger.info("Refreshing screens");
+	    refreshList.stream().forEach((refresh) -> refresh.refresh());
+	}, REFRESH_INTERVAL, REFRESH_INTERVAL, TimeUnit.SECONDS);
+
+    }
+
     @Override
     public void start(Stage stage) throws Exception {
-        CurrentWeatherSubscriber.createSubscriber(this);
-	timer = new ScheduledThreadPoolExecutor(1);
-	timer.scheduleAtFixedRate(this, REFRESH_INTERVAL, REFRESH_INTERVAL, TimeUnit.SECONDS);
+	if (connection.getConnection() == null) {
+	    Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to connect to the data. Please contact your administrator", ButtonType.OK);
+	    alert.showAndWait();
+	    Platform.exit();
+	}
+
+        //
+        // If there is no weather station in the database, then prompt user for the weather station information
+        //
+        stationTable = new WeatherStationTable(connection);
+        ws = stationTable.getWeatherStation();
+        if (ws == null) {
+            WeatherStationMgr.editWeatherStation(connection);
+        }
+        else
+	    HistoricalSeriesInfo.addExtraSensors(ws.getSensorManager().getAllSensors());
 
 	Image icon = new Image("com/bdb/weathersense/WeatherSense.jpg");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/WeatherSense.fxml"), ResourceBundle.getBundle("com.bdb.weathersense.Localization"));
@@ -77,42 +132,6 @@ public class WeatherSense extends Application implements Runnable, CurrentWeathe
         WeatherSenseController controller = loader.getController();
         stage.sizeToScene();
         stage.show();
-
-        //
-        // If there is no weather station in the database, then prompt user for the weather station information
-        //
-        //if (ws == null) {
-        //    WeatherStationMgr.editWeatherStation(frame, connection);
-        //}
-        //else
-	HistoricalSeriesInfo.addExtraSensors(ws.getSensorManager().getAllSensors());
-    }
-
-    public WeatherSense(String databaseHost) {
-        
-        
-        String databaseUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, databaseHost, DatabaseConstants.DATABASE_PORT, DatabaseConstants.DATABASE_NAME);
-
-        connection = new DBConnection(databaseUrl,
-                                        DatabaseConstants.DATABASE_USER,
-                                        DatabaseConstants.DATABASE_PASSWORD);
-
-
-        if (!connection.connect()) {
-	    Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to connect to the data. Please contact your administrator", ButtonType.OK);
-	    alert.showAndWait();
-            System.exit(1);
-        }
-        
-        stationTable = new WeatherStationTable(connection);
-        ws = stationTable.getWeatherStation();
-    }
-
-
-    @Override
-    public void run() {
-	logger.info("Refreshing screens");
-	refreshList.stream().forEach((refresh) -> { refresh.refresh(); });
     }
 
     @Override
@@ -124,23 +143,6 @@ public class WeatherSense extends Application implements Runnable, CurrentWeathe
     }
 
     public static void main(String args[]) {
-        try { InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("logging.properties");
-
-            if (is != null)
-                LogManager.getLogManager().readConfiguration(is);
-
-            UserPreferences.getInstance();
-
-            String dbHost = DatabaseConstants.DATABASE_HOST;
-
-            if (args.length > 0)
-                dbHost = args[0];
-
-	    launch(args);
-        }
-        catch (IOException | SecurityException e) {
-            ErrorDisplayer.getInstance().displayMessageLater("Failed to initialize (" + e.getMessage() + ")", Alert.AlertType.ERROR);
-            System.exit(1);
-        }
+	launch(args);
     }
 }
