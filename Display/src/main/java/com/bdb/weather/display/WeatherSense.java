@@ -54,6 +54,7 @@ public class WeatherSense extends Application implements CurrentWeatherSubscribe
     private final List<Refreshable> refreshList = new ArrayList<>();
     private ScheduledThreadPoolExecutor timer;
     private final List<CurrentWeatherProcessor> cwpList = new ArrayList<>();
+    private CurrentWeatherSubscriber subscriber;
     private static final Logger logger = Logger.getLogger(WeatherSense.class.getName());
 
     private void openDatabase(List<String> args) {
@@ -87,10 +88,10 @@ public class WeatherSense extends Application implements CurrentWeatherSubscribe
 
 	Application.Parameters params = getParameters();
 	List<String> args = params.getRaw();
-	openDatabase(args);
+	//openDatabase(args);
         
 
-        CurrentWeatherSubscriber.createSubscriber(this);
+        subscriber = CurrentWeatherSubscriber.createSubscriber(this);
 
 	timer = new ScheduledThreadPoolExecutor(1);
 	timer.scheduleAtFixedRate(() -> {
@@ -102,15 +103,16 @@ public class WeatherSense extends Application implements CurrentWeatherSubscribe
 
     @Override
     public void start(Stage stage) throws Exception {
-	if (connection.getConnection() == null) {
-	    Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to connect to the data. Please contact your administrator", ButtonType.OK);
-	    alert.showAndWait();
-	    Platform.exit();
-	}
+	//if (connection.getConnection() == null) {
+	//    Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to connect to the data. Please contact your administrator", ButtonType.OK);
+	//    alert.showAndWait();
+	//    Platform.exit();
+        //}
 
         //
         // If there is no weather station in the database, then prompt user for the weather station information
         //
+	/*
         stationTable = new WeatherStationTable(connection);
         ws = stationTable.getWeatherStation();
         if (ws == null) {
@@ -118,6 +120,7 @@ public class WeatherSense extends Application implements CurrentWeatherSubscribe
         }
         else
 	    HistoricalSeriesInfo.addExtraSensors(ws.getSensorManager().getAllSensors());
+	*/
 
 	Image icon = new Image("com/bdb/weathersense/WeatherSense.jpg");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/WeatherSense.fxml"), ResourceBundle.getBundle("com.bdb.weathersense.Localization"));
@@ -132,6 +135,12 @@ public class WeatherSense extends Application implements CurrentWeatherSubscribe
         WeatherSenseController controller = loader.getController();
         stage.sizeToScene();
         stage.show();
+    }
+
+    @Override
+    public void stop() {
+	timer.shutdownNow();
+	subscriber.requestExit();
     }
 
     @Override

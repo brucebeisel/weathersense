@@ -16,71 +16,34 @@
  */
 package com.bdb.weather.display;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URL;
-import java.text.DecimalFormat;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
-import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.TilePane;
-
-import com.bdb.util.LabeledFieldPanel;
-import com.bdb.util.RadioButtonPanel;
 import com.bdb.util.jdbc.DBConnection;
-import com.bdb.weather.common.CollectorCommand;
-
-import com.bdb.weather.common.GeographicLocation;
-import com.bdb.weather.common.TemperatureBinMgr;
 import com.bdb.weather.common.WeatherStation;
-import com.bdb.weather.common.WindParameters;
-import com.bdb.weather.common.db.CollectorCommandsTable;
-import com.bdb.weather.common.db.TemperatureBinTable;
 import com.bdb.weather.common.db.WeatherStationTable;
-import com.bdb.weather.common.measurement.AngularMeasurement;
-import com.bdb.weather.common.measurement.Depth;
-import com.bdb.weather.common.measurement.Distance;
-import com.bdb.weather.common.measurement.Pressure;
-import com.bdb.weather.common.measurement.Speed;
-import com.bdb.weather.common.measurement.Temperature;
 
 /**
  *
  * @author Bruce
  */
 @SuppressWarnings("serial")
-public class WeatherStationMgr extends Dialog implements ActionListener {
+public class WeatherStationMgr {
+    /*
     private static final String[] WIND_SLICE_OPTIONS = {"8", "16", "360"};
     private static final String[] WIND_SPEED_BIN_COUNT_OPTIONS = {"3", "4", "5", "6"};
-    private final WeatherStationTable wsTable;
-    private final TemperatureBinTable binTable;
-    private final CollectorCommandsTable commandTable;
+    private WeatherStationTable wsTable;
+    private TemperatureBinTable binTable;
+    private CollectorCommandsTable commandTable;
     private WeatherStation ws;
-    private final TextField manufacturerTF = new TextField(50);
+    private final TextField manufacturerTF = new TextField();
     private final TextField modelTF = new TextField(50);
     private final TextField firmwareDateTF = new TextField(50);
     private final TextField firmwareVersionTF = new TextField(50);
@@ -107,20 +70,32 @@ public class WeatherStationMgr extends Dialog implements ActionListener {
     private int origSpeedBins;
     private int origWindSlices;
     private final DBConnection connection;
-    private JButton urlTest;
-    private final Frame frame;
+    */
 
     private WeatherStationMgr(DBConnection con, WeatherStation ws) {
 	//super(frame, "Weather Station", false);
 
-        connection = con;
-        this.ws = ws;
-        wsTable = new WeatherStationTable(connection);
-        commandTable = new CollectorCommandsTable(connection);
-        binTable = new TemperatureBinTable(connection);
+        //connection = con;
+        //this.ws = ws;
+        //wsTable = new WeatherStationTable(connection);
+        //commandTable = new CollectorCommandsTable(connection);
+        //binTable = new TemperatureBinTable(connection);
     }
 
-    private void createElements() {
+    private void createElements() throws IOException {
+        Stage stage = new Stage();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/WeatherStationMgr.fxml"));
+        loader.load();
+        VBox root = loader.getRoot();
+        Scene scene = new Scene(root, 600, 600);
+        scene.getStylesheets().add("/styles/weathersense.css");
+        stage.setTitle("Weather Station Editor");
+        //stage.setResizable(false);
+        stage.setScene(scene);
+        stage.sizeToScene();
+        stage.show();
+
+        /*
         JPanel paramPanel = new JPanel();
         BoxLayout boxLayout = new BoxLayout(paramPanel, BoxLayout.Y_AXIS);
         paramPanel.setLayout(boxLayout);
@@ -346,8 +321,10 @@ public class WeatherStationMgr extends Dialog implements ActionListener {
         setLocationRelativeTo(frame);
 
         loadWsData();
+*/
     }
 
+    /*
     private void loadWsData() {
         if (ws == null) {
             ws = new WeatherStation();
@@ -562,28 +539,32 @@ public class WeatherStationMgr extends Dialog implements ActionListener {
 
         switch (command) {
             case "Cancel":
-                setVisible(false);
+                this.hide();
                 break;
 
             case "OK":
             default:
-                saveWsData();
-                setVisible(false);
+                //saveWsData();
+                this.hide();
                 break;
 
         }
     }
 
-    private void setDefaultBorder(JPanel p, String title) {
-        p.setBorder(new TitledBorder(new BevelBorder(BevelBorder.LOWERED), title));
+    private void setDefaultBorder(Region r) {
+        //r.setBorder(new Border(BorderStroke.THICK));
 
     }
+*/
 
     public static void editWeatherStation(DBConnection connection) {
-        WeatherStationTable table = new WeatherStationTable(connection);
-        WeatherStation station = table.getWeatherStation();
-        WeatherStationMgr dialog = new WeatherStationMgr(connection, station);
-        dialog.createElements();
-	dialog.showAndWait();
+        try {
+            //WeatherStationTable table = new WeatherStationTable(connection);
+            //WeatherStation station = table.getWeatherStation();
+            WeatherStationMgr dialog = new WeatherStationMgr(connection, null);
+            dialog.createElements();
+        } catch (IOException ex) {
+            Logger.getLogger(WeatherStationMgr.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

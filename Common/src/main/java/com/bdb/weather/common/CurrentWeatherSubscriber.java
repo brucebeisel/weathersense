@@ -86,7 +86,7 @@ public class CurrentWeatherSubscriber implements Runnable {
     
     private static final String DEFAULT_ADDRESS = "224.0.0.120";
     private static final int DEFAULT_PORT = 11461;
-    private static final int RECEIVE_TIMEOUT_MILLIS = 10000;
+    private static final int RECEIVE_TIMEOUT_MILLIS = 2000;
     private final MulticastSocket socket;
     private final CurrentWeatherHandler handler;
     private Thread thread;

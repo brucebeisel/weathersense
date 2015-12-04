@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox  xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="400.0" fx:controller="com.bdb.weather.display.WeatherStationMgrController">
+    <TitledPane text="Weather Station Information" collapsible="false">
+        <GridPane hgap="5" vgap="5">
+            <Label text="Manufacturer:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <TextField fx:id="Manufacturer" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2" />
+            <Label text="Model:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <TextField fx:id="Model" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2" />
+            <Label text="Firmware Date:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <TextField fx:id="FirmwareDate" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="2" />
+            <Label text="Firmware Version:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <TextField fx:id="FirmwareVerion" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="2" />
+        </GridPane>
+    </TitledPane>
+    <TitledPane text="Location Information" collapsible="false">
+        <GridPane hgap="5" vgap="5">
+            <Label text="Location Code:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <TextField fx:id="LocationCode" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2">
+                <!--tooltip text="The location code (zip code) is used to load the seasonal averages and extremes."/>-->
+            </TextField>
+            <Label text="Location Description:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <TextField fx:id="LocationDescription" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="3" />
+            <Label text="Latitude:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <TextField fx:id="Latitude" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="1" />
+            <Label text="Longitude:" GridPane.halignment="RIGHT" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <TextField fx:id="Longitude" GridPane.columnIndex="3" GridPane.rowIndex="2" GridPane.columnSpan="1" />
+            <Label text="Altitude:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <TextField fx:id="Altitude" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="1" >
+                <!--tooltip text="Altitude is used to calculate barometric pressure offset"/> -->
+            </TextField>
+        </GridPane>
+    </TitledPane> 
+    <TilePane orientation="HORIZONTAL" prefColumns="2" >
+        <TitledPane text="Wind Parameters" collapsible="false">
+            <GridPane hgap="5" vgap="5">
+                <Label text="Number Of Wind Direction Slices:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <TextField fx:id="WindDirectionSlices" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="1" />
+                <Label text="Number Of Wind Speed Bins:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <TextField fx:id="WindSpeedBins" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="1" />
+                <Label text="Wind Speed Bin Interval:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <TextField fx:id="WindSpeedBinInterval" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="1" />
+            </GridPane>
+        </TitledPane>
+        <TitledPane text="Temperature Bins" collapsible="false">
+            <GridPane hgap="5" vgap="5">
+                <TitledPane text="Below Temperatures" GridPane.rowIndex="0" GridPane.columnIndex="0">
+                    <ListView/>
+                </TitledPane>
+            </GridPane>
+        </TitledPane>
+    </TilePane>
+</VBox>
