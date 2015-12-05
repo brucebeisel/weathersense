@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.bdb.weather.display.currenttable;
+package com.bdb.weather.display.current;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -51,13 +51,17 @@ import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.CurrentWeatherProcessor;
 import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.WeatherSense;
+
 import java.io.IOException;
+
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 /**
  *
  * @author Bruce
  */
-public class CurrentWeatherText extends BorderPane implements ComponentContainer, CurrentWeatherProcessor {
+public class CurrentWeatherForm extends BorderPane implements ComponentContainer, CurrentWeatherProcessor {
     private String frameTitle = null;
     private final JTextField indoorTemperature = new JTextField(DisplayConstants.UNKNOWN_VALUE_STRING);
     private final JTextField outdoorTemperature = new JTextField(DisplayConstants.UNKNOWN_VALUE_STRING);
@@ -105,14 +109,20 @@ public class CurrentWeatherText extends BorderPane implements ComponentContainer
     private final JTextField stormRain = new JTextField(DisplayConstants.UNKNOWN_VALUE_STRING);
     private final SensorManager sensorManager;
 
-    public CurrentWeatherText(WeatherStation ws) {
-        sensorManager = ws.getSensorManager();
-         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("custom_control.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
-
+    public CurrentWeatherForm(WeatherStation ws) {
         try {
-            fxmlLoader.load();
+            sensorManager = ws.getSensorManager();
+            Stage stage = new Stage();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("CurrentWeatherForm.fxml"));
+            loader.load();
+            BorderPane root = loader.getRoot();
+            Scene scene = new Scene(root, 900, 600);
+            scene.getStylesheets().add("/styles/weathersense.css");
+            stage.setTitle("Current Weather Form");
+            //stage.setResizable(false);
+            stage.setScene(scene);
+            stage.sizeToScene();
+            stage.show();
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
@@ -262,7 +272,7 @@ public class CurrentWeatherText extends BorderPane implements ComponentContainer
     @Override
     public void updateCurrentWeather(CurrentWeather cw) {
         if (frameTitle == null)
-            frameTitle = WeatherSense.getFrameTitle(panel);
+            frameTitle = WeatherSense.getStageTitle(this);
 
         rainRate.setText(cw.getRainRate().toString());
         rain15Minute.setText(cw.getRain15Minute().toString());

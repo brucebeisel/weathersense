@@ -16,7 +16,6 @@
  */
 package com.bdb.weather.display.current;
 
-import java.beans.PropertyChangeEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -29,16 +28,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-
-import javax.swing.JSplitPane;
 
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import com.bdb.util.Pair;
 import com.bdb.util.jdbc.DBConnection;
@@ -60,7 +58,6 @@ import com.bdb.weather.common.measurement.Humidity;
 import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.CurrentWeatherProcessor;
-import com.bdb.weather.display.ErrorDisplayer;
 import com.bdb.weather.display.RainPlot;
 import com.bdb.weather.display.WeatherSense;
 
@@ -70,9 +67,8 @@ import com.bdb.weather.display.WeatherSense;
  * @author Bruce
  *
  */
-public class CurrentWeatherPanel extends BorderPane implements ComponentContainer, CurrentWeatherProcessor {
+public class CurrentWeatherCharts extends BorderPane implements ComponentContainer, CurrentWeatherProcessor {
     private static final String           USER_DIVIDER_LOCATION_PROPERTY = "cw_divider_loc";
-    private final JSplitPane              component = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     private final HistoryTable            historyTable;
     private final DailySummaryTable       summaryTable;
     private final TemperatureBinMgr       temperatureBinMgr;
@@ -89,7 +85,7 @@ public class CurrentWeatherPanel extends BorderPane implements ComponentContaine
     private final DopplerRadar            radar;
     private final Month                   weatherYearStartMonth;
     private String                        frameTitle = null;
-    private static final Logger           logger = Logger.getLogger(CurrentWeatherPanel.class.getName());
+    private static final Logger           logger = Logger.getLogger(CurrentWeatherCharts.class.getName());
     private final Preferences             rootPref = Preferences.userNodeForPackage(WeatherSense.class);
     private final Preferences             prefs = rootPref.node("window-geometry");
     
@@ -99,7 +95,7 @@ public class CurrentWeatherPanel extends BorderPane implements ComponentContaine
      * @param ws The weather station
      * @param connection The database connection
      */
-    public CurrentWeatherPanel(WeatherStation ws, DBConnection connection) {
+    public CurrentWeatherCharts(WeatherStation ws, DBConnection connection) {
         this.ws = ws;
         barometerPanel = new Barometer("Barometer", ws.getBarometerMin(), ws.getBarometerMax());
         historyTable = new HistoryTable(connection);
@@ -175,28 +171,6 @@ public class CurrentWeatherPanel extends BorderPane implements ComponentContaine
         rainPanel = new CurrentWeatherRainPanel(ws, thisMonthAverage, lastMonthAverage, yearlyAverage, calendarYearAverageToDate, weatherYearAverageToDate);
         
         this.setCenter(rainPanel);
-
-        int dividerLocation = prefs.getInt(USER_DIVIDER_LOCATION_PROPERTY, 50);
-        component.setDividerLocation(dividerLocation);
-        
-        component.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent evt) -> {
-            //
-            // This is a temporary attempt to save the divider locations so they can be reset when the screen is started again
-            // TODO Decide if this needs to be in all top-level containers that have splitters.
-            //
-            if (evt.getPropertyName().equals(JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
-                int divLocation = component.getDividerLocation();
-                prefs.putInt(USER_DIVIDER_LOCATION_PROPERTY, divLocation);
-                try {
-                    prefs.flush();
-                    logger.log(Level.FINE,"Setting property " + USER_DIVIDER_LOCATION_PROPERTY + " to {0}", divLocation);
-                }
-                catch (BackingStoreException e) {
-                    ErrorDisplayer.getInstance().displayInformation("Failed to store size of inner panes.");
-                    logger.log(Level.INFO, "Backing store of divider locations failed", e);
-                }       
-            }
-        });
     }
     
     /**
@@ -239,8 +213,7 @@ public class CurrentWeatherPanel extends BorderPane implements ComponentContaine
      * @throws SQLException See JDBC documentation
      */
     public void loadData(CurrentWeather cw) throws SQLException {
-        if (frameTitle == null)
-            frameTitle = WeatherSense.getFrameTitle(component);
+        frameTitle = WeatherSense.getStageTitle(this);
 
         // TODO check the age of the current weather. if it is more that about 20 minutes old, ignore it
         LocalDateTime now = LocalDateTime.now();
@@ -380,7 +353,7 @@ public class CurrentWeatherPanel extends BorderPane implements ComponentContaine
 
         String date = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.MEDIUM).format(cw.getTime());
         String ammendedFrameTitle = frameTitle + " " + date;
-        WeatherSense.setFrameTitle(component, ammendedFrameTitle);
+        WeatherSense.setStageTitle(this, ammendedFrameTitle);
     }
 
     @Override

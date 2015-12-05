@@ -25,17 +25,17 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.weather.common.CurrentWeather;
@@ -43,8 +43,6 @@ import com.bdb.weather.common.CurrentWeatherSubscriber;
 import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.db.DatabaseConstants;
 import com.bdb.weather.common.db.WeatherStationTable;
-import com.bdb.weather.display.day.HistoricalSeriesInfo;
-import com.bdb.weather.display.preferences.UserPreferences;
 
 public class WeatherSense extends Application implements CurrentWeatherSubscriber.CurrentWeatherHandler {
     private static final int REFRESH_INTERVAL = 30;
@@ -149,6 +147,19 @@ public class WeatherSense extends Application implements CurrentWeatherSubscribe
         logger.fine(String.format("Updating %s current weather processors", cwpList.size()));
         
         Platform.runLater(() -> { cwpList.stream().forEach((cwp) -> { cwp.updateCurrentWeather(curWeather); }); });
+    }
+
+    public static void setStageTitle(Node node, String title) {
+        Window window = node.getScene().getWindow();
+        if (window instanceof Stage)
+            ((Stage)window).setTitle(title);
+    }
+    public static String getStageTitle(Node node) {
+        Window window = node.getScene().getWindow();
+        if (window instanceof Stage)
+            return ((Stage)window).getTitle();
+        else
+            return "";
     }
 
     public static void main(String args[]) {

@@ -17,18 +17,16 @@
 package com.bdb.weather.display;
 
 import java.io.IOException;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.weather.common.WeatherStation;
-import com.bdb.weather.common.db.WeatherStationTable;
 
 /**
  *
@@ -86,8 +84,8 @@ public class WeatherStationMgr {
         Stage stage = new Stage();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/WeatherStationMgr.fxml"));
         loader.load();
-        VBox root = loader.getRoot();
-        Scene scene = new Scene(root, 600, 600);
+        BorderPane root = loader.getRoot();
+        Scene scene = new Scene(root, 900, 600);
         scene.getStylesheets().add("/styles/weathersense.css");
         stage.setTitle("Weather Station Editor");
         //stage.setResizable(false);

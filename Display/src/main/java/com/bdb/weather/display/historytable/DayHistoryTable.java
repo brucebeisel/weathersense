@@ -20,7 +20,6 @@ import java.awt.BorderLayout;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -28,6 +27,8 @@ import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+
+import javafx.scene.Node;
 
 import com.bdb.util.jdbc.DBConnection;
 
@@ -43,7 +44,7 @@ import com.bdb.weather.display.DisplayConstants;
  * TODO Provide mechanism to export to a CSV file
  * @author Bruce
  */
-public class DayHistoryTable implements ComponentContainer, DateChangedListener {
+public class DayHistoryTable implements DateChangedListener {
     private static final String TABLE_HEADINGS[] = {
         "Time",
         "Low Outdoor Temperature",
@@ -194,16 +195,6 @@ public class DayHistoryTable implements ComponentContainer, DateChangedListener 
             tableModel.setValueAt(DisplayConstants.UNKNOWN_VALUE_STRING, row, col++);
             tableModel.setValueAt(DisplayConstants.UNKNOWN_VALUE_STRING, row, col++);
         }
-    }
-
-    /**
-     * Get the component that is the main window of this view.
-     * 
-     * @return The component
-     */
-    @Override
-    public JComponent getComponent() {
-        return panel;
     }
 
     /**

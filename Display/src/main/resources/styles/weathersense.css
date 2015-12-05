@@ -2,6 +2,6 @@
  * Empty Stylesheet file.
  */
 
-.mainFxmlClass {
-
+.label {
+    -fx-underline: true;
 }
