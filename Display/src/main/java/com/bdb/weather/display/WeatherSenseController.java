@@ -106,7 +106,7 @@ public class WeatherSenseController implements Initializable {
 
     @FXML
     public void launchWeatherStation() {
-        WeatherStationMgr.editWeatherStation(null);
+        WeatherStationMgr.editWeatherStation();
     }
 
     @FXML

@@ -32,6 +32,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -43,6 +44,7 @@ import com.bdb.weather.common.CurrentWeatherSubscriber;
 import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.db.DatabaseConstants;
 import com.bdb.weather.common.db.WeatherStationTable;
+import com.bdb.weather.display.day.HistoricalSeriesInfo;
 
 public class WeatherSense extends Application implements CurrentWeatherSubscriber.CurrentWeatherHandler {
     private static final int REFRESH_INTERVAL = 30;
@@ -61,7 +63,8 @@ public class WeatherSense extends Application implements CurrentWeatherSubscribe
 	if (!args.isEmpty())
 	    databaseHost = args.get(0);
 	else
-	    databaseHost = DatabaseConstants.DATABASE_HOST;
+	    //databaseHost = DatabaseConstants.DATABASE_HOST;
+            databaseHost = "192.168.1.100";
 
         String databaseUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, databaseHost, DatabaseConstants.DATABASE_PORT, DatabaseConstants.DATABASE_NAME);
 
@@ -86,8 +89,8 @@ public class WeatherSense extends Application implements CurrentWeatherSubscribe
 
 	Application.Parameters params = getParameters();
 	List<String> args = params.getRaw();
-	//openDatabase(args);
-        
+	openDatabase(args);
+        WeatherStationMgr.initialize(connection);
 
         subscriber = CurrentWeatherSubscriber.createSubscriber(this);
 
@@ -101,24 +104,22 @@ public class WeatherSense extends Application implements CurrentWeatherSubscribe
 
     @Override
     public void start(Stage stage) throws Exception {
-	//if (connection.getConnection() == null) {
-	//    Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to connect to the data. Please contact your administrator", ButtonType.OK);
-	//    alert.showAndWait();
-	//    Platform.exit();
-        //}
+	if (connection.getConnection() == null) {
+	    Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to connect to the data. Please contact your administrator", ButtonType.OK);
+	    alert.showAndWait();
+	    Platform.exit();
+        }
 
         //
         // If there is no weather station in the database, then prompt user for the weather station information
         //
-	/*
         stationTable = new WeatherStationTable(connection);
         ws = stationTable.getWeatherStation();
         if (ws == null) {
-            WeatherStationMgr.editWeatherStation(connection);
+            WeatherStationMgr.editWeatherStation();
         }
         else
 	    HistoricalSeriesInfo.addExtraSensors(ws.getSensorManager().getAllSensors());
-	*/
 
 	Image icon = new Image("com/bdb/weathersense/WeatherSense.jpg");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/WeatherSense.fxml"), ResourceBundle.getBundle("com.bdb.weathersense.Localization"));

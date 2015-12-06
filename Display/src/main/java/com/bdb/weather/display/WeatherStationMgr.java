@@ -17,30 +17,40 @@
 package com.bdb.weather.display;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.weather.common.WeatherStation;
+import com.bdb.weather.common.db.CollectorCommandsTable;
+import com.bdb.weather.common.db.TemperatureBinTable;
+import com.bdb.weather.common.db.WeatherStationTable;
 
 /**
  *
  * @author Bruce
  */
 @SuppressWarnings("serial")
-public class WeatherStationMgr {
-    /*
-    private static final String[] WIND_SLICE_OPTIONS = {"8", "16", "360"};
-    private static final String[] WIND_SPEED_BIN_COUNT_OPTIONS = {"3", "4", "5", "6"};
+public class WeatherStationMgr implements Initializable {
+    private static DBConnection connection;
+    
     private WeatherStationTable wsTable;
     private TemperatureBinTable binTable;
     private CollectorCommandsTable commandTable;
     private WeatherStation ws;
+    //@FXML
+    private TextField manufacturer;
+    /*
     private final TextField manufacturerTF = new TextField();
     private final TextField modelTF = new TextField(50);
     private final TextField firmwareDateTF = new TextField(50);
@@ -70,15 +80,24 @@ public class WeatherStationMgr {
     private final DBConnection connection;
     */
 
-    private WeatherStationMgr(DBConnection con, WeatherStation ws) {
-	//super(frame, "Weather Station", false);
-
-        //connection = con;
-        //this.ws = ws;
-        //wsTable = new WeatherStationTable(connection);
-        //commandTable = new CollectorCommandsTable(connection);
-        //binTable = new TemperatureBinTable(connection);
+    private WeatherStationMgr() {
+        wsTable = new WeatherStationTable(connection);
+        ws = wsTable.getWeatherStation();
+        commandTable = new CollectorCommandsTable(connection);
+        binTable = new TemperatureBinTable(connection);
     }
+    
+//    public void setManufacturer(String value) {
+//        manufacturer.setValue(value);
+//    }
+//    
+//    public String getManufacturer() {
+//        return manufacturer.getValue();
+//    }
+//    
+//    public StringProperty manufacturerProperty() {
+//        return manufacturer;
+//    }
 
     private void createElements() throws IOException {
         Stage stage = new Stage();
@@ -374,8 +393,12 @@ public class WeatherStationMgr {
         temperatureBinEditor.loadValues(mgr.getAllBins());
 
     }
-
-    private void saveWsData() {
+*/
+    @FXML
+    public void saveWsData() {
+        System.out.println("Manufacturer: " + manufacturer.getText());
+    }
+        /*
         if (ws == null)
             ws = new WeatherStation();
 
@@ -554,15 +577,20 @@ public class WeatherStationMgr {
 
     }
 */
+    public static void initialize(DBConnection connection) {
+        WeatherStationMgr.connection = connection;
+    }
 
-    public static void editWeatherStation(DBConnection connection) {
+    public static void editWeatherStation() {
         try {
-            //WeatherStationTable table = new WeatherStationTable(connection);
-            //WeatherStation station = table.getWeatherStation();
-            WeatherStationMgr dialog = new WeatherStationMgr(connection, null);
+            WeatherStationMgr dialog = new WeatherStationMgr();
             dialog.createElements();
         } catch (IOException ex) {
-            Logger.getLogger(WeatherStationMgr.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(WeatherStationMgr.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
     }
 }

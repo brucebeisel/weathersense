@@ -12,8 +12,8 @@
             <VBox>
                 <TitledPane text="Weather Station Information" collapsible="false">
                     <GridPane hgap="5" vgap="5">
-                        <Label fx:id="test" text="Manufacturer:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                        <TextField fx:id="Manufacturer" prefColumnCount="20"  GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2" />
+                        <Label text="Manufacturer:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <TextField fx:id="manufacturer" prefColumnCount="20"  GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2" />
                         <Label text="Model:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                         <TextField fx:id="Model" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2" />
                         <Label text="Firmware Date:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="2" />
@@ -132,7 +132,7 @@
     </center>
     <bottom>
         <FlowPane>
-            <Button text="OK"/>
+            <Button text="OK" onAction="#saveWsData" />
             <Button text="Cancel"/>
         </FlowPane>
     </bottom>

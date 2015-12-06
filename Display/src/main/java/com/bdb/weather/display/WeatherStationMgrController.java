@@ -18,7 +18,10 @@ package com.bdb.weather.display;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.TextField;
 
 /**
  * FXML Controller class
@@ -27,12 +30,22 @@ import javafx.fxml.Initializable;
  */
 public class WeatherStationMgrController implements Initializable {
 
+    @FXML private TextField manufacturer;
+    private final WeatherStationModel wsm = new WeatherStationModel();
+    
     /**
      * Initializes the controller class.
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        wsm.manufacturerProperty().bindBidirectional(manufacturer.textProperty());
     }    
+    
+    @FXML
+    public void saveWsData() {
+        System.out.println("Manufacturer: " + wsm.getManufacturer());
+    }
     
 }
