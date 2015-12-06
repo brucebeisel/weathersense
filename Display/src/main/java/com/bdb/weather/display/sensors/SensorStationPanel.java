@@ -56,6 +56,7 @@ public class SensorStationPanel extends BorderPane implements ComponentContainer
 
     public void loadData() {
         List<SensorStationStatus> stations = sensorStationStatusTable.query();
+        /*
         tableModel.setRowCount(stations.size());
 
         int row = 0;
@@ -67,5 +68,6 @@ public class SensorStationPanel extends BorderPane implements ComponentContainer
             tableModel.setValueAt(status.getLinkQuality(), row, 4);
             row++;
         }
+*/
     }
 }

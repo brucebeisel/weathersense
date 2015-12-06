@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 
-import javax.swing.JComponent;
+import javafx.scene.Node;
 
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DefaultXYItemRenderer;
@@ -120,8 +120,8 @@ public abstract class SummaryFreePlot implements ComponentContainer, SeriesFacto
      * @return The swing container
      */
     @Override
-    public JComponent getComponent() {
-        return freePlot.getComponent();
+    public Node getComponent() {
+        return null;
     }
     
    /*

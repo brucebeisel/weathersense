@@ -48,7 +48,7 @@ public class DayGraphPanel extends GridPane implements ComponentContainer {
     private final DayRainPanel     rainPanel;
     private final DayXYPlotPanel   temperaturePanel;
     private final DayXYPlotPanel   pressurePanel;
-    private final DayWindPanel     windPanel;
+    private DayWindPanel     windPanel;
     private final WindDirPlot      windDirPanel;
     private final WindRosePane    windRose;
 
@@ -64,7 +64,7 @@ public class DayGraphPanel extends GridPane implements ComponentContainer {
         humidityPanel = new DayHumidityPanel();
         pressurePanel = new DayPressurePanel();
         rainPanel = new DayRainPanel();
-        windPanel = DayWindPanel.createDayWindPanel();
+        //windPanel = DayWindPanel.createDayWindPanel();
         windDirPanel = new WindDirPlot();
 
         component.setBackground(Color.BLACK);
@@ -75,29 +75,29 @@ public class DayGraphPanel extends GridPane implements ComponentContainer {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = .5;
         gbc.weighty = 1.0;
-        component.add(temperaturePanel gbc);
+        //component.add(temperaturePanel gbc);
         gbc.gridx = 1;
         gbc.gridwidth = 2;
-        component.add(humidityPanel, gbc);
+        //component.add(humidityPanel, gbc);
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 1;
-        component.add(rainPanel.getComponent(), gbc);
+        //component.add(rainPanel.getComponent(), gbc);
         gbc.gridx = 1;
         gbc.gridwidth = 2;
-        component.add(pressurePanel, gbc);
+        //component.add(pressurePanel, gbc);
 
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 2;
-        component.add(windPanel.getComponent(), gbc);
+        //component.add(windPanel.getComponent(), gbc);
 
         gbc.gridwidth = 1;
         gbc.gridx = 1;
         gbc.weightx = .25;
-        component.add(windDirPanel, gbc);
+        //component.add(windDirPanel, gbc);
         gbc.gridx = 2;
-        component.add(windRose.getComponent(), gbc);
+        //component.add(windRose.getComponent(), gbc);
     }
 
     /**
@@ -128,10 +128,10 @@ public class DayGraphPanel extends GridPane implements ComponentContainer {
         else
             windRose.loadData(null);
         
-        temperaturePanel.loadData(date, list, summaryRecord, records, averages);
-        pressurePanel.loadData(date, list, summaryRecord, records, averages);
-        windPanel.loadData(date, list, summaryRecord, records, averages);
-        humidityPanel.loadData(date, list, summaryRecord, records, averages);
+//        temperaturePanel.loadData(date, list, summaryRecord, records, averages);
+//        pressurePanel.loadData(date, list, summaryRecord, records, averages);
+//        windPanel.loadData(date, list, summaryRecord, records, averages);
+//        humidityPanel.loadData(date, list, summaryRecord, records, averages);
         rainPanel.loadData(summaryRecord, list);
         windDirPanel.loadData(list);
     }

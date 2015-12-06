@@ -66,14 +66,14 @@ public class TodayGraphPanel extends DayGraphPanel implements Refreshable {
         wsTable = new WeatherStationTable(connection);
     }
 
-    /**
-     * Make this component visible or not.
-     * 
-     * @param flag The visible flag
-     */
-    public void setVisible(boolean flag) {
-        getComponent().setVisible(flag);
-    }
+//    /**
+//     * Make this component visible or not.
+//     * 
+//     * @param flag The visible flag
+//     */
+//    public void setVisible(boolean flag) {
+//        getComponent().setVisible(flag);
+//    }
 
     /*
      * (non-Javadoc)

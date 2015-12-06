@@ -25,10 +25,11 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
+
+import javafx.scene.Node;
 
 import com.bdb.util.LabeledFieldPanel;
 import com.bdb.util.jdbc.DBConnection;
@@ -76,8 +77,8 @@ public class StripChartPanel extends JPanel implements ComponentContainer, Curre
     }
 
     @Override
-    public JComponent getComponent() {
-        return this;
+    public Node getComponent() {
+        return null;
     }
 
     private void createOptionPanelComponents() {

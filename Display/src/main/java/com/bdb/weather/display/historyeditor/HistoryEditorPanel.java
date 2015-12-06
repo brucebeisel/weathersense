@@ -18,11 +18,12 @@ package com.bdb.weather.display.historyeditor;
 
 import java.awt.BorderLayout;
 
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+
+import javafx.scene.Node;
 
 import com.bdb.util.DateButton;
 import com.bdb.util.jdbc.DBConnection;
@@ -52,8 +53,8 @@ public class HistoryEditorPanel implements ComponentContainer {
     }
     
     @Override
-    public JComponent getComponent() {
-        return panel;
+    public Node getComponent() {
+        return null;
     }
 
 }

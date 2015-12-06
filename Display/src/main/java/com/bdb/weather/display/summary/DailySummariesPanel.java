@@ -39,6 +39,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
+import javafx.scene.Node;
+
 import com.bdb.util.jdbc.DBConnection;
 
 import com.bdb.weather.common.DateRange;
@@ -136,8 +138,8 @@ public final class DailySummariesPanel implements ComponentContainer, ActionList
     }
     
     @Override
-    public JComponent getComponent() {
-        return component;
+    public Node getComponent() {
+        return null;
     }
 
     @SuppressWarnings("empty-statement")

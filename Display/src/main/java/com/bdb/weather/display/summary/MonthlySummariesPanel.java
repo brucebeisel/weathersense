@@ -34,6 +34,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import javafx.scene.Node;
+
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.weather.common.DateRange;
 import com.bdb.weather.common.SpeedBin;
@@ -110,14 +112,14 @@ public class MonthlySummariesPanel implements ComponentContainer, ActionListener
     }
     
     @Override
-    public JComponent getComponent() {
-        return component;
+    public Node getComponent() {
+        return null;
     }
 
     public void setWindowTitle() {
         DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
         String dateString = df.format(startDate) + " - " + df.format(endDate);
-        WeatherSense.setFrameTitle(component, dateString);
+        //WeatherSense.setFrameTitle(component, dateString);
     }
 
     private void loadData(LocalDate startDate, LocalDate endDate) {

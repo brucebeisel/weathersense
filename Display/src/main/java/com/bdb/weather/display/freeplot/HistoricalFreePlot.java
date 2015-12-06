@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 
-import javax.swing.JComponent;
+import javafx.scene.Node;
 
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DefaultXYItemRenderer;
@@ -116,8 +116,9 @@ public class HistoricalFreePlot implements ComponentContainer, SeriesFactory, Se
      * @return The swing container
      */
     @Override
-    public JComponent getComponent() {
-        return freePlot.getComponent();
+    public Node getComponent() {
+        //return freePlot.getComponent();
+        return null;
     }
 
     /*

@@ -32,6 +32,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import javafx.scene.Node;
+
 import com.bdb.util.jdbc.DBConnection;
 
 import com.bdb.weather.common.DateRange;
@@ -113,8 +115,8 @@ public class YearlySummariesPanel implements ComponentContainer, SummarySupporte
     }
     
     @Override
-    public JComponent getComponent() {
-        return component;
+    public Node getComponent() {
+        return null;
     }
 
     @SuppressWarnings("empty-statement")

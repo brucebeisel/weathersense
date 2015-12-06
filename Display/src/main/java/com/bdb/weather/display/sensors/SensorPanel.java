@@ -18,12 +18,6 @@ package com.bdb.weather.display.sensors;
 
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-
 import javafx.scene.Node;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
@@ -39,8 +33,8 @@ import com.bdb.weather.display.ComponentContainer;
  * @author Bruce
  */
 public class SensorPanel extends BorderPane implements ComponentContainer {
-    private final TableView<Sensor> table;
-    private final SensorTable sensorTable;
+    private TableView<Sensor> table;
+    private SensorTable sensorTable;
     private static final String COLUMN_HEADINGS[] = {
         "Sensor ID", "Sensor Type", "Sensor Name", ""
     };
@@ -48,6 +42,7 @@ public class SensorPanel extends BorderPane implements ComponentContainer {
     public SensorPanel(DBConnection connection) {
         sensorTable = new SensorTable(connection);
         List<Sensor> sensors = sensorTable.getSensorList();
+        /*
         model.setColumnIdentifiers(COLUMN_HEADINGS);
         model.setRowCount(sensors.size());
         
@@ -65,7 +60,9 @@ public class SensorPanel extends BorderPane implements ComponentContainer {
             return button;
         });
 
+
         this.setCenter(table);
+*/
     }
 
     @Override

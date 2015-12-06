@@ -31,6 +31,8 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 
+import javafx.scene.Node;
+
 import com.bdb.util.DateButton;
 import com.bdb.util.jdbc.DBConnection;
 
@@ -87,7 +89,7 @@ public class DaySummaryGraphPanel implements ComponentContainer, ActionListener,
 
         graphPanel = new DayGraphPanel(ws);
         
-        component.add(graphPanel.getComponent(), BorderLayout.CENTER);
+//        component.add(graphPanel.getComponent(), BorderLayout.CENTER);
 
         JPanel cmdPanel = new JPanel();
 
@@ -119,8 +121,8 @@ public class DaySummaryGraphPanel implements ComponentContainer, ActionListener,
      * @return The swing c
      */
     @Override
-    public JComponent getComponent() {
-        return component;
+    public Node getComponent() {
+        return null;
     }
     
     /**

@@ -50,20 +50,20 @@ public class SummariesGraphPanel {
         highLowPressurePanel = new HighLowPressurePanel(interval, launcher, supporter);
 
         JSplitPane sp1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, temperaturePanel.getComponent(), deltaPanel.getComponent());
-        JSplitPane sp2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, windPanel.getComponent(), windRosePanel.getComponent());       
-        JSplitPane sp3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, rainPanel.getComponent(), sp2);
-        JSplitPane sp4 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, sp1, sp3);
-        JSplitPane sp5 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, highLowHumidityPanel.getComponent(), highLowPressurePanel.getComponent());
-        JSplitPane sp6 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, sp4, sp5);
+        //JSplitPane sp2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, windPanel.getComponent(), windRosePanel.getComponent());       
+//        JSplitPane sp3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, rainPanel.getComponent(), sp2);
+//        JSplitPane sp4 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, sp1, sp3);
+//        JSplitPane sp5 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, highLowHumidityPanel.getComponent(), highLowPressurePanel.getComponent());
+//        JSplitPane sp6 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, sp4, sp5);
         
-        component.add(sp6, BorderLayout.CENTER);
+//        component.add(sp6, BorderLayout.CENTER);
         
         sp1.setResizeWeight(.5);
-        sp2.setResizeWeight(.7);
-        sp3.setResizeWeight(.5);
-        sp4.setResizeWeight(.5);
-        sp5.setResizeWeight(.5);
-        sp6.setResizeWeight(.7);
+        //sp2.setResizeWeight(.7);
+//        sp3.setResizeWeight(.5);
+//        sp4.setResizeWeight(.5);
+//        sp5.setResizeWeight(.5);
+//        sp6.setResizeWeight(.7);
     }
     
     public JComponent getComponent() {

@@ -26,12 +26,13 @@ import java.util.TreeMap;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
+
+import javafx.scene.Node;
 
 import com.bdb.util.BBTable;
 import com.bdb.util.Pair;
@@ -53,7 +54,7 @@ import com.bdb.weather.display.RainPlot.RainEntry;
  *
  * @author Bruce
  */
-public class StormPanel implements ComponentContainer {
+public class StormPanel extends JPanel implements ComponentContainer {
     private static final int ANIMATION_INTERVAL = 100;
     private final JPanel panel = new JPanel();
     private final JLabel animationStatus = new JLabel();
@@ -104,7 +105,7 @@ public class StormPanel implements ComponentContainer {
         JPanel p = new JPanel(new GridLayout(2,1));
         rainPlot = new RainPlot();
         p.add(imageLabel);
-        p.add(rainPlot.getComponent());
+        //p.add(rainPlot.getComponent());
         animationPanel.add(animationControlPanel, BorderLayout.NORTH);
         animationPanel.add(p, BorderLayout.CENTER);
         panel.add(animationPanel, BorderLayout.CENTER);
@@ -113,8 +114,8 @@ public class StormPanel implements ComponentContainer {
     }
 
     @Override
-    public JComponent getComponent() {
-        return panel;
+    public Node getComponent() {
+        return null;
     }
 
     private void loadStormData() {

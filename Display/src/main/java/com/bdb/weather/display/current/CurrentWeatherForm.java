@@ -185,7 +185,7 @@ public class CurrentWeatherForm extends BorderPane implements ComponentContainer
         conditionsComponents.add(new Pair<>("Forecast: ", forecast));
         conditionsComponents.add(new Pair<>("Forecast Rule: ", forecastRule));
 
-        panel.setLayout(new GridBagLayout());
+        //panel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         JPanel temperaturePanel = new JPanel(new GridBagLayout());
         temperaturePanel.setBorder(new TitledBorder(new LineBorder(Color.BLACK), "Temperatures"));
@@ -205,30 +205,30 @@ public class CurrentWeatherForm extends BorderPane implements ComponentContainer
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridheight = 2;
-        panel.add(temperaturePanel, gbc);
+        //panel.add(temperaturePanel, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.gridheight = 1;
-        panel.add(humidityPanel, gbc);
+        //panel.add(humidityPanel, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 1;
-        panel.add(sunPanel, gbc);
+        //panel.add(sunPanel, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 2;
-        panel.add(rainPanel, gbc);
+        //panel.add(rainPanel, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridheight = 1;
-        panel.add(windPanel, gbc);
+        //panel.add(windPanel, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 3;
-        panel.add(conditionsPanel, gbc);
+        //panel.add(conditionsPanel, gbc);
 
         addFields(rainPanel, rainComponents);
         addFields(temperaturePanel, temperatureComponents);
@@ -388,6 +388,6 @@ public class CurrentWeatherForm extends BorderPane implements ComponentContainer
 
         String date = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.MEDIUM).format(cw.getTime());
         String ammendedFrameTitle = frameTitle + " " + date;
-        WeatherSense.setFrameTitle(panel, ammendedFrameTitle);
+        //WeatherSense.setFrameTitle(panel, ammendedFrameTitle);
     }
 }

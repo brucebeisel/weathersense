@@ -130,6 +130,7 @@ public class DayWindPanel extends DayXYPlotPanel {
      */
     @Override
     protected void loadDataSeries(List<HistoricalRecord> list) {
+        /*
         super.loadDataSeries(list);
         speedSeries.clear();
         gustSeries.clear();
@@ -198,6 +199,7 @@ public class DayWindPanel extends DayXYPlotPanel {
 
         if (!gustSeries.isEmpty())
             dataset.addSeries(gustSeries);
+*/
     }
 
     @Override

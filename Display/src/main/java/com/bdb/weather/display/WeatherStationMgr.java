@@ -85,7 +85,7 @@ public class WeatherStationMgr {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/WeatherStationMgr.fxml"));
         loader.load();
         BorderPane root = loader.getRoot();
-        Scene scene = new Scene(root, 900, 600);
+        Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/weathersense.css");
         stage.setTitle("Weather Station Editor");
         //stage.setResizable(false);
