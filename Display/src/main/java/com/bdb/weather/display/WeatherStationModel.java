@@ -16,11 +16,11 @@
  */
 package com.bdb.weather.display;
 
-import java.time.Month;
-
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -28,6 +28,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import com.bdb.weather.common.SpeedBin;
+import com.bdb.weather.common.WeatherStation;
 
 /**
  *
@@ -42,10 +43,13 @@ public class WeatherStationModel {
     private final StringProperty  firmwareVersion = new SimpleStringProperty();
     private final DoubleProperty  latitude = new SimpleDoubleProperty();
     private final DoubleProperty  longitude = new SimpleDoubleProperty();
-    private Month           weatherYearStartMonth;
+    private final DoubleProperty  altitude = new SimpleDoubleProperty();
+    private final IntegerProperty weatherYearStartMonth = new SimpleIntegerProperty();
     private final DoubleProperty  windSpeedBinInterval = new SimpleDoubleProperty();
     private final IntegerProperty numWindSpeedBins = new SimpleIntegerProperty();
-    private final IntegerProperty numWindDirectionSlices = new SimpleIntegerProperty();
+    private final BooleanProperty windDirSlices8 = new SimpleBooleanProperty();
+    private final BooleanProperty windDirSlices16 = new SimpleBooleanProperty();
+    private final BooleanProperty windDirSlices360 = new SimpleBooleanProperty();
     private final ListProperty<SpeedBin> speedBins = new SimpleListProperty<>();
     private final DoubleProperty  thermometerMin = new SimpleDoubleProperty();
     private final DoubleProperty  thermometerMax = new SimpleDoubleProperty();
@@ -57,258 +61,198 @@ public class WeatherStationModel {
     private final StringProperty  weatherUndergroundStationId = new SimpleStringProperty();
     private final StringProperty  weatherUndergroundPassword = new SimpleStringProperty();
     private final StringProperty  dopplerRadarUrl = new SimpleStringProperty();
+    private final BooleanProperty windSpeedBins3 = new SimpleBooleanProperty();
+    private final BooleanProperty windSpeedBins4 = new SimpleBooleanProperty();
+    private final BooleanProperty windSpeedBins5 = new SimpleBooleanProperty();
+    private final BooleanProperty windSpeedBins6 = new SimpleBooleanProperty();
 
-    public void setManufacturer(String value) {
-        manufacturer.set(value);
+    public void importWeatherStation(WeatherStation ws) {
+        manufacturer.setValue(ws.getManufacturer());
+        model.setValue(ws.getModel());
+        firmwareDate.setValue(ws.getFirmwareDate());
+        firmwareVersion.setValue(ws.getFirmwareVersion());
+        locationCode.setValue(ws.getLocationCode());
+        locationDescription.setValue(ws.getLocationDescription());
+        latitude.setValue(ws.getGeographicLocation().getLatitude().get());
+        longitude.setValue(ws.getGeographicLocation().getLongitude().get());
+        altitude.setValue(ws.getGeographicLocation().getAltitude().get());
+        switch (ws.getWindParameters().getNumWindDirectionSlices()) {
+            case 8:
+                windDirSlices8.setValue(true);
+                windDirSlices16.setValue(false);
+                windDirSlices360.setValue(false);
+                break;
+
+            case 16:
+                windDirSlices8.setValue(false);
+                windDirSlices16.setValue(true);
+                windDirSlices360.setValue(false);
+                break;
+
+            case 360:
+                windDirSlices8.setValue(false);
+                windDirSlices16.setValue(false);
+                windDirSlices360.setValue(true);
+                break;
+        }
+
+        switch (ws.getWindParameters().getNumWindSpeedBins()) {
+            case 3:
+                windSpeedBins3.setValue(true);
+                windSpeedBins4.setValue(false);
+                windSpeedBins5.setValue(false);
+                windSpeedBins6.setValue(false);
+                break;
+            case 4:
+                windSpeedBins3.setValue(false);
+                windSpeedBins4.setValue(true);
+                windSpeedBins5.setValue(false);
+                windSpeedBins6.setValue(false);
+                break;
+            case 5:
+                windSpeedBins3.setValue(false);
+                windSpeedBins4.setValue(false);
+                windSpeedBins5.setValue(true);
+                windSpeedBins6.setValue(false);
+                break;
+            case 6:
+                windSpeedBins3.setValue(false);
+                windSpeedBins4.setValue(false);
+                windSpeedBins5.setValue(false);
+                windSpeedBins6.setValue(true);
+                break;
+        }
+
+        thermometerMin.setValue(ws.getThermometerMin().get());
+        thermometerMax.setValue(ws.getThermometerMax().get());
+        barometerMin.setValue(ws.getBarometerMin().get());
+        barometerMax.setValue(ws.getBarometerMax().get());
+        dopplerRadarUrl.setValue(ws.getDopplerRadarUrl());
+        weatherUndergroundStationId.setValue(ws.getWeatherUndergroundStationId());
+        weatherUndergroundPassword.setValue(ws.getWeatherUndergroundPassword());
+        dailyRainMax.setValue(ws.getDailyRainMax().get());
+        monthlyRainMax.setValue(ws.getMonthlyRainMax().get());
+        yearlyRainMax.setValue(ws.getYearlyRainMax().get());
+        windSpeedBinInterval.setValue(ws.getWindParameters().getWindSpeedBinInterval().get());
     }
 
-    public String getManufacturer() {
-        return manufacturer.get();
+    public void exportWeatherStation(WeatherStation ws) {
+        ws.setManufacturer(manufacturer.getValue());
+        ws.setModel(model.getValue());
+        ws.setFirmwareDate(firmwareDate.getValue());
+        ws.setFirmwareVersion(firmwareVersion.getValue());
     }
 
     public StringProperty manufacturerProperty() {
         return manufacturer;
     }
 
-    public void setModel(String value) {
-        model.set(value);
-    }
-
-    public String getModel() {
-        return model.get();
-    }
-
     public StringProperty modelProperty() {
         return model;
-    }
-
-    public void setLocationCode(String value) {
-        locationCode.set(value);
-    }
-
-    public String getLocationCode() {
-        return locationCode.get();
     }
 
     public StringProperty locationCodeProperty() {
         return locationCode;
     }
 
-    public void setLocationDescription(String value) {
-        locationDescription.set(value);
-    }
-
-    public String getLocationDescription() {
-        return locationDescription.get();
-    }
-
     public StringProperty locationDescriptionProperty() {
         return locationDescription;
-    }
-
-    public void setFirmwareDate(String value) {
-        firmwareDate.set(value);
-    }
-
-    public String getFirmwareDate() {
-        return firmwareDate.get();
     }
 
     public StringProperty firmwareDateProperty() {
         return firmwareDate;
     }
 
-    public void setFirmwareVersion(String value) {
-        firmwareVersion.set(value);
-    }
-
-    public String getFirmwareVersion() {
-        return firmwareVersion.get();
-    }
-
     public StringProperty firmwareVersionProperty() {
         return firmwareVersion;
-    }
-
-    public void setLatitude(Double value) {
-        latitude.set(value);
-    }
-
-    public Double getLatitude() {
-        return latitude.get();
     }
 
     public DoubleProperty latitudeProperty() {
         return latitude;
     }
 
-    public void setLongitude(Double value) {
-        longitude.set(value);
-    }
-
-    public Double getLongitude() {
-        return longitude.get();
-    }
-
     public DoubleProperty longitudeProperty() {
         return longitude;
     }
 
-    public void setWindSpeedBinInterval(Double value) {
-        windSpeedBinInterval.set(value);
-    }
-
-    public Double getWindSpeedBinInterval() {
-        return windSpeedBinInterval.get();
+    public DoubleProperty altitudeProperty() {
+        return altitude;
     }
 
     public DoubleProperty windSpeedBinIntervalProperty() {
         return windSpeedBinInterval;
     }
 
-    public void setNumWindSpeedBins(Integer value) {
-        numWindSpeedBins.set(value);
-    }
-
-    public Integer getNumWindSpeedBins() {
-        return numWindSpeedBins.get();
-    }
-
     public IntegerProperty numWindSpeedBinsProperty() {
         return numWindSpeedBins;
     }
 
-    public void setNumWindDirectionSlices(Integer value) {
-        numWindDirectionSlices.set(value);
+    public BooleanProperty windDirectionSlices8Property() {
+        return windDirSlices8;
     }
 
-    public Integer getNumWindDirectionSlices() {
-        return numWindDirectionSlices.get();
+    public BooleanProperty windDirectionSlices16Property() {
+        return windDirSlices16;
     }
 
-    public IntegerProperty numWindDirectionSlicesProperty() {
-        return numWindDirectionSlices;
-    }
-
-    public void setThermometerMin(Double value) {
-        thermometerMin.set(value);
-    }
-
-    public Double getThermometerMin() {
-        return thermometerMin.get();
+    public BooleanProperty windDirectionSlices360Property() {
+        return windDirSlices360;
     }
 
     public DoubleProperty thermometerMinProperty() {
         return thermometerMin;
     }
 
-    public void setThermometerMax(Double value) {
-        thermometerMax.set(value);
-    }
-
-    public Double getThermometerMax() {
-        return thermometerMax.get();
-    }
-
     public DoubleProperty thermometerMaxProperty() {
         return thermometerMax;
-    }
-
-    public void setBarometerMin(Double value) {
-        barometerMin.set(value);
-    }
-
-    public Double getBarometerMin() {
-        return barometerMin.get();
     }
 
     public DoubleProperty barometerMinProperty() {
         return barometerMin;
     }
 
-    public void setBarometerMax(Double value) {
-        barometerMax.set(value);
-    }
-
-    public Double getBarometerMax() {
-        return barometerMax.get();
-    }
-
     public DoubleProperty barometerMaxProperty() {
         return barometerMax;
-    }
-
-    public void setDailyRainMax(Double value) {
-        dailyRainMax.set(value);
-    }
-
-    public Double getDailyRainMax() {
-        return dailyRainMax.get();
     }
 
     public DoubleProperty dailyRainMaxProperty() {
         return dailyRainMax;
     }
 
-    public void setMonthlyRainMax(Double value) {
-        monthlyRainMax.set(value);
-    }
-
-    public Double getMonthlyRainMax() {
-        return monthlyRainMax.get();
-    }
-
     public DoubleProperty monthlyRainMaxProperty() {
         return monthlyRainMax;
-    }
-
-    public void setYearlyRainMax(Double value) {
-        yearlyRainMax.set(value);
-    }
-
-    public Double getYearlyRainMax() {
-        return yearlyRainMax.get();
     }
 
     public DoubleProperty yearlyRainMaxProperty() {
         return yearlyRainMax;
     }
 
-    public void setWeatherUndergroundStationId(String value) {
-        weatherUndergroundStationId.set(value);
-    }
-
-    public String getWeatherUndergroundStationId() {
-        return weatherUndergroundStationId.get();
-    }
-
     public StringProperty weatherUndergroundStationIdProperty() {
         return weatherUndergroundStationId;
-    }
-
-    public void setWeatherUndergroundPassword(String value) {
-        weatherUndergroundPassword.set(value);
-    }
-
-    public String getWeatherUndergroundPassword() {
-        return weatherUndergroundPassword.get();
     }
 
     public StringProperty weatherUndergroundPasswordProperty() {
         return weatherUndergroundPassword;
     }
 
-    public void setDopplerRadarUrl(String value) {
-        dopplerRadarUrl.set(value);
-    }
-
-    public String getDopplerRadarUrl() {
-        return dopplerRadarUrl.get();
-    }
-
     public StringProperty dopplerRadarUrlProperty() {
         return dopplerRadarUrl;
     }
-  
-   
+
+    public BooleanProperty windSpeedBins3() {
+        return windSpeedBins3;
+    }
+
+    public BooleanProperty windSpeedBins4() {
+        return windSpeedBins4;
+    }
+
+    public BooleanProperty windSpeedBins5() {
+        return windSpeedBins5;
+    }
+
+    public BooleanProperty windSpeedBins6() {
+        return windSpeedBins6;
+    }
+
 }

@@ -15,29 +15,29 @@
                         <Label text="Manufacturer:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                         <TextField fx:id="manufacturer" prefColumnCount="20"  GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2" />
                         <Label text="Model:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                        <TextField fx:id="Model" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2" />
+                        <TextField fx:id="model" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2" />
                         <Label text="Firmware Date:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                        <TextField fx:id="FirmwareDate" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="2" />
+                        <TextField fx:id="firmwareDate" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="2" />
                         <Label text="Firmware Version:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                        <TextField fx:id="FirmwareVerion" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="2" />
+                        <TextField fx:id="firmwareVersion" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="2" />
                     </GridPane>
                 </TitledPane>
                 <TitledPane text="Location Information" collapsible="false">
                     <GridPane hgap="5" vgap="5">
                         <Label text="Location Code:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                        <TextField fx:id="LocationCode" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2">
+                        <TextField fx:id="locationCode" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2">
                             <tooltip>
                                 <Tooltip text="The location code (zip code) is used to load the seasonal averages and extremes."/>
                             </tooltip>
                         </TextField>
                         <Label text="Location Description:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                        <TextField fx:id="LocationDescription" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="3" />
+                        <TextField fx:id="locationDescription" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="3" />
                         <Label text="Latitude:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                        <TextField fx:id="Latitude" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="1" />
+                        <TextField fx:id="latitude" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="1" />
                         <Label text="Longitude:" GridPane.halignment="RIGHT" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                        <TextField fx:id="Longitude" GridPane.columnIndex="3" GridPane.rowIndex="2" GridPane.columnSpan="1" />
+                        <TextField fx:id="longitude" GridPane.columnIndex="3" GridPane.rowIndex="2" GridPane.columnSpan="1" />
                         <Label text="Altitude:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                        <TextField fx:id="Altitude" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="1" >
+                        <TextField fx:id="altitude" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="1" >
                             <tooltip>
                                 <Tooltip text="Altitude is used to calculate barometric pressure offset"/>
                             </tooltip>
@@ -53,19 +53,19 @@
                             </fx:define>
                             <Label text="Number Of Wind Direction Slices:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                             <HBox spacing="5"  GridPane.columnIndex="1" GridPane.rowIndex="0"> 
-                                <RadioButton text="8" selected="true" toggleGroup="$WindDirToggleGroup"/>
-                                <RadioButton text="16" toggleGroup="$WindDirToggleGroup"/>
-                                <RadioButton text="360" toggleGroup="$WindDirToggleGroup"/>
+                                <RadioButton fx:id="windDirSlices8" text="8" selected="true" toggleGroup="$WindDirToggleGroup"/>
+                                <RadioButton fx:id="windDirSlices16" text="16" toggleGroup="$WindDirToggleGroup"/>
+                                <RadioButton fx:id="windDirSlices360" text="360" toggleGroup="$WindDirToggleGroup"/>
                             </HBox>
                             <Label text="Number Of Wind Speed Bins:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                             <HBox spacing="5"  GridPane.columnIndex="1" GridPane.rowIndex="1"> 
-                                <RadioButton text="3" selected="true" toggleGroup="$WindSpeedBinsToggleGroup"/>
-                                <RadioButton text="4" toggleGroup="$WindSpeedBinsToggleGroup"/>
-                                <RadioButton text="5" toggleGroup="$WindSpeedBinsToggleGroup"/>
-                                <RadioButton text="6" toggleGroup="$WindSpeedBinsToggleGroup"/>
+                                <RadioButton fx:id="windSpeedBins3" text="3" selected="true" toggleGroup="$WindSpeedBinsToggleGroup"/>
+                                <RadioButton fx:id="windSpeedBins4" text="4" toggleGroup="$WindSpeedBinsToggleGroup"/>
+                                <RadioButton fx:id="windSpeedBins5" text="5" toggleGroup="$WindSpeedBinsToggleGroup"/>
+                                <RadioButton fx:id="windSpeedBins6" text="6" toggleGroup="$WindSpeedBinsToggleGroup"/>
                             </HBox>
                             <Label text="Wind Speed Bin Interval:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                            <TextField fx:id="WindSpeedBinInterval" prefColumnCount="4"  GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                            <TextField fx:id="windSpeedBinInterval" prefColumnCount="4"  GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         </GridPane>
                     </TitledPane>
                     <TitledPane text="Temperature Bins" collapsible="false" alignment="TOP_LEFT" TilePane.alignment="TOP_LEFT" >
@@ -87,27 +87,27 @@
                         <TitledPane text="Thermometer" TilePane.alignment="TOP_LEFT" >
                             <GridPane hgap="5" vgap="5">
                                 <Label text="Minimum:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                                <TextField fx:id="ThermometerMin" prefColumnCount="5"  GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="1" />
+                                <TextField fx:id="thermometerMin" prefColumnCount="5"  GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="1" />
                                 <Label text="Maximum:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                                <TextField fx:id="ThermometerMax" prefColumnCount="5"  GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="1" />
+                                <TextField fx:id="thermometerMax" prefColumnCount="5"  GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="1" />
                             </GridPane>
                         </TitledPane>
                         <TitledPane text="Barometer" TilePane.alignment="TOP_LEFT" >
                             <GridPane hgap="5" vgap="5">
                                 <Label text="Minimum:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                                <TextField fx:id="BorometerMin" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="1" />
+                                <TextField fx:id="barometerMin" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="1" />
                                 <Label text="Maximum:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                                <TextField fx:id="BorometerMax" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="1" />
+                                <TextField fx:id="barometerMax" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="1" />
                             </GridPane>
                         </TitledPane>
                         <TitledPane text="Max Rain" TilePane.alignment="TOP_LEFT" >
                             <GridPane hgap="5" vgap="5">
                                 <Label text="Daily:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                                <TextField fx:id="DailyRain" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="1" />
+                                <TextField fx:id="dailyRain" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="1" />
                                 <Label text="Monthly:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                                <TextField fx:id="MonthlyRain" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="1" />
+                                <TextField fx:id="monthlyRain" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="1" />
                                 <Label text="Yearly:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                                <TextField fx:id="YearlyRain" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="1" />
+                                <TextField fx:id="yearlyRain" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="1" />
                             </GridPane>
                         </TitledPane>
                     </TilePane>
@@ -115,16 +115,16 @@
                 <TitledPane text="Weather Underground">
                     <GridPane hgap="5" vgap="5">
                         <Label text="Station ID:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                        <TextField fx:id="WuStationId" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="1" />
+                        <TextField fx:id="weatherUndergroundStationId" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="1" />
                         <Label text="Password:" GridPane.halignment="RIGHT" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                        <TextField fx:id="WuStationPassword" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="1" />
+                        <TextField fx:id="weatherUndergroundPassword" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="1" />
                     </GridPane>
                 </TitledPane>
                 <TitledPane text="Doppler Radar">
                     <FlowPane hgap="5" vgap="5">
                         <Label text="Doppler Radar URL:"/>
-                        <TextField fx:id="DopplerRadarURL"/>
-                        <Button text="Test URL"/>
+                        <TextField fx:id="dopplerRadarURL" prefColumnCount="80" />
+                        <Button text="Test URL" onAction="#testURL" />
                     </FlowPane>
                 </TitledPane>
             </VBox>

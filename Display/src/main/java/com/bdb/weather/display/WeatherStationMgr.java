@@ -17,21 +17,15 @@
 package com.bdb.weather.display;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import com.bdb.util.jdbc.DBConnection;
-import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.db.CollectorCommandsTable;
 import com.bdb.weather.common.db.TemperatureBinTable;
 import com.bdb.weather.common.db.WeatherStationTable;
@@ -41,39 +35,13 @@ import com.bdb.weather.common.db.WeatherStationTable;
  * @author Bruce
  */
 @SuppressWarnings("serial")
-public class WeatherStationMgr implements Initializable {
+public class WeatherStationMgr {
     private static DBConnection connection;
     
     private WeatherStationTable wsTable;
     private TemperatureBinTable binTable;
     private CollectorCommandsTable commandTable;
-    private WeatherStation ws;
-    //@FXML
-    private TextField manufacturer;
     /*
-    private final TextField manufacturerTF = new TextField();
-    private final TextField modelTF = new TextField(50);
-    private final TextField firmwareDateTF = new TextField(50);
-    private final TextField firmwareVersionTF = new TextField(50);
-    private final TextField locationCodeTF = new TextField(20);
-    private final TextField locationDescriptionTF = new TextField(50);
-    private final TextField latitudeTF = new FormattedTextField(new DecimalFormat("##.######"));
-    private final TextField longitudeTF = new FormattedTextField(new DecimalFormat("###.######"));
-    private final TextField altitudeTF = new FormattedTextField(Distance.getDefaultFormatter());
-    private final TextField minThermometerValueTF = new FormattedTextField(Temperature.getDefaultFormatter());
-    private final TextField maxThermometerValueTF = new FormattedTextField(Temperature.getDefaultFormatter());
-    private final TextField minBarometerValueTF = new FormattedTextField(Pressure.getDefaultFormatter());
-    private final TextField maxBarometerValueTF = new FormattedTextField(Pressure.getDefaultFormatter());
-    private final TextField maxDailyRainTF = new FormattedTextField(Depth.getDefaultFormatter());
-    private final TextField maxMonthlyRainTF = new FormattedTextField(Depth.getDefaultFormatter());
-    private final TextField maxYearlyRainTF = new FormattedTextField(Depth.getDefaultFormatter());
-    private final RadioButtonPanel windSliceCountRB = new RadioButtonPanel(WIND_SLICE_OPTIONS);
-    private final RadioButtonPanel windSpeedBinCountRB = new RadioButtonPanel(WIND_SPEED_BIN_COUNT_OPTIONS);
-    private final TextField windSpeedBinIntervalTF = new FormattedTextField(Speed.getDefaultFormatter());
-    private final TextField dopplerRadarUrlTF = new TextField(50);
-    private final TextField weatherUndergroundIdTF = new TextField(20);
-    private final TextField weatherUndergroundPasswordTF = new TextField(20);
-    private final TemperatureBinEditor temperatureBinEditor = new TemperatureBinEditor();
     private String origWindSpeedInterval;
     private int origSpeedBins;
     private int origWindSlices;
@@ -82,7 +50,6 @@ public class WeatherStationMgr implements Initializable {
 
     private WeatherStationMgr() {
         wsTable = new WeatherStationTable(connection);
-        ws = wsTable.getWeatherStation();
         commandTable = new CollectorCommandsTable(connection);
         binTable = new TemperatureBinTable(connection);
     }
@@ -103,6 +70,8 @@ public class WeatherStationMgr implements Initializable {
         Stage stage = new Stage();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/WeatherStationMgr.fxml"));
         loader.load();
+        WeatherStationMgrController controller = loader.getController();
+        controller.loadWsData(wsTable);
         BorderPane root = loader.getRoot();
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/weathersense.css");
@@ -111,234 +80,6 @@ public class WeatherStationMgr implements Initializable {
         stage.setScene(scene);
         stage.sizeToScene();
         stage.show();
-
-        /*
-        JPanel paramPanel = new JPanel();
-        BoxLayout boxLayout = new BoxLayout(paramPanel, BoxLayout.Y_AXIS);
-        paramPanel.setLayout(boxLayout);
-
-        JPanel wsInfoPanel = new JPanel();
-        setDefaultBorder(wsInfoPanel, "Weather Station Information");
-        GridBagLayout layout = new GridBagLayout();
-        wsInfoPanel.setLayout(layout);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
-        JLabel l = new JLabel("Manufacturer:");
-        wsInfoPanel.add(l, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridwidth = 2;
-        wsInfoPanel.add(manufacturerTF, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        wsInfoPanel.add(new JLabel("Model:"), gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridwidth = 2;
-        wsInfoPanel.add(modelTF, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        wsInfoPanel.add(new JLabel("Firmware Date:"), gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridwidth = 2;
-        wsInfoPanel.add(firmwareDateTF, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        wsInfoPanel.add(new JLabel("Firmware Version:"), gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridwidth = 2;
-        wsInfoPanel.add(firmwareVersionTF, gbc);
-
-        JPanel locationPanel = new JPanel();
-        setDefaultBorder(locationPanel, "Location Information");
-        layout = new GridBagLayout();
-        locationPanel.setLayout(layout);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
-        l = new JLabel("Location Code:");
-        locationPanel.add(l, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridwidth = 2;
-        locationPanel.add(locationCodeTF, gbc);
-        locationCodeTF.setToolTipText("The location code (zip code) is used to load the seasonal averages and extremes.");
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        locationPanel.add(new JLabel("Location Description:"), gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridwidth = 3;
-        locationPanel.add(locationDescriptionTF, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        locationPanel.add(new JLabel("Latitude:"), gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.WEST;
-        locationPanel.add(latitudeTF, gbc);
-        latitudeTF.setToolTipText("The latitude and longitude are used to calculate the sunrise and sunset");
-
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.EAST;
-        locationPanel.add(new JLabel("Longitude:"), gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.WEST;
-        locationPanel.add(longitudeTF, gbc);
-        longitudeTF.setToolTipText("The latitude and longitude are used to calculate the sunrise and sunset");
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        locationPanel.add(new JLabel("Altitude:"), gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.WEST;
-        locationPanel.add(altitudeTF, gbc);
-        altitudeTF.setToolTipText("Altitude is used to calculate barometric pressure offset");
-        
-        TilePane innerPanel = new TilePane(1, 0);
-        JPanel windPanel = new JPanel(new GridBagLayout());
-        setDefaultBorder(windPanel, "Wind Parameters");
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
-        windPanel.add(new JLabel("Number of Wind Direction Slices:"), gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.WEST;
-        windPanel.add(windSliceCountRB, gbc);
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        windPanel.add(new JLabel("Number of Wind Speed Bins:"), gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.WEST;
-        windPanel.add(windSpeedBinCountRB, gbc);
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        windPanel.add(new JLabel("Wind Speed Bin Interval:"), gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.WEST;
-        windSpeedBinIntervalTF.setColumns(5);
-        windPanel.add(windSpeedBinIntervalTF, gbc);
-        innerPanel.add(windPanel);
-        setDefaultBorder(temperatureBinEditor, "Temperature Bins");
-        innerPanel.add(temperatureBinEditor);
-
-        JPanel minMaxPanel = new JPanel(new GridLayout(1,0));
-        
-        setDefaultBorder(minMaxPanel, "Ranges");
-        JPanel p1 = new JPanel();
-        setDefaultBorder(p1, "Thermometer (" + Temperature.getDefaultUnit() + ")");
-        p1.add(new LabeledFieldPanel("Minimum:", minThermometerValueTF));
-        p1.add(new LabeledFieldPanel("Maximum:", maxThermometerValueTF));
-        minMaxPanel.add(p1);
-
-        p1 = new JPanel();
-        setDefaultBorder(p1, "Barometer (" + Pressure.getDefaultUnit() + ")");
-        p1.add(new LabeledFieldPanel("Minimum:", minBarometerValueTF));
-        p1.add(new LabeledFieldPanel("Maximum:", maxBarometerValueTF));
-        minMaxPanel.add(p1);
-
-        p1 = new JPanel();
-        setDefaultBorder(p1, "Maximum Rain (" + Depth.getDefaultUnit() + ")");
-        p1.add(new LabeledFieldPanel("Daily:", maxDailyRainTF));
-        p1.add(new LabeledFieldPanel("Monthly:", maxMonthlyRainTF));
-        p1.add(new LabeledFieldPanel("Yearly:", maxYearlyRainTF));
-        minMaxPanel.add(p1);
-        
-        JPanel weatherUndergroundPanel = new JPanel();
-        weatherUndergroundPanel.setLayout(new BoxLayout(weatherUndergroundPanel, BoxLayout.X_AXIS));
-        setDefaultBorder(weatherUndergroundPanel, "Weather Underground Settings");
-        weatherUndergroundPanel.add(new JLabel("Station ID:"));
-        weatherUndergroundPanel.add(weatherUndergroundIdTF);
-        weatherUndergroundPanel.add(Box.createHorizontalStrut(10));
-        weatherUndergroundPanel.add(new JLabel("Password:"));
-        weatherUndergroundPanel.add(weatherUndergroundPasswordTF);
-        
-        JPanel dopplerUrlPanel = new JPanel();
-        setDefaultBorder(dopplerUrlPanel, "Doppler Radar");
-        dopplerUrlPanel.add(new JLabel("Doppler Radar Image URL:"));
-        dopplerUrlPanel.add(dopplerRadarUrlTF);
-        urlTest = new JButton("Test URL");
-        dopplerUrlPanel.add(urlTest);
-        urlTest.addActionListener((ActionEvent e) -> {
-            try {
-                URL url = new URL(dopplerRadarUrlTF.getText());
-                BufferedImage bi = ImageIO.read(url);
-                if (bi == null)
-                    JOptionPane.showMessageDialog(null, "URL does not refer to an image", "", JOptionPane.WARNING_MESSAGE);
-                else {
-                    ImageIcon image = new ImageIcon(bi);
-                    JOptionPane.showMessageDialog(null, null, "URL is good", JOptionPane.INFORMATION_MESSAGE, image);
-                }
-            }
-            catch (IOException ex) {
-                Logger.getLogger(WeatherStationMgr.class.getName()).log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog(null, "Invalid URL", "Invalid URL", JOptionPane.WARNING_MESSAGE);
-            }
-        });
-
-        paramPanel.add(wsInfoPanel);
-        paramPanel.add(Box.createVerticalStrut(10));
-        paramPanel.add(locationPanel);
-        paramPanel.add(Box.createVerticalStrut(10));
-        paramPanel.add(innerPanel);
-        paramPanel.add(Box.createVerticalStrut(10));
-        paramPanel.add(minMaxPanel);
-        paramPanel.add(Box.createVerticalStrut(10));
-        paramPanel.add(weatherUndergroundPanel);
-        paramPanel.add(Box.createVerticalStrut(10));
-        paramPanel.add(dopplerUrlPanel);
-
-        getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(paramPanel, BorderLayout.CENTER);
-
-        BorderPane buttonPanel = new JPanel();
-        buttonPanel.setBorder(new LineBorder(Color.black));
-        Button b = new Button("OK");
-        b.addActionListener(this);
-        b.setActionCommand("OK");
-        buttonPanel.add(b);
-
-        b = new Button("Cancel");
-        b.addActionListener(this);
-        b.setActionCommand("Cancel");
-        buttonPanel.add(b);
-
-        b = new Button("Help");
-        b.addActionListener(this);
-        b.setActionCommand("Help");
-        buttonPanel.add(b);
-
-        getContentPane().add(buttonPanel, BorderLayout.SOUTH);
-
-        pack();
-
-        setLocationRelativeTo(frame);
-
-        loadWsData();
-*/
     }
 
     /*
@@ -393,12 +134,6 @@ public class WeatherStationMgr implements Initializable {
         temperatureBinEditor.loadValues(mgr.getAllBins());
 
     }
-*/
-    @FXML
-    public void saveWsData() {
-        System.out.println("Manufacturer: " + manufacturer.getText());
-    }
-        /*
         if (ws == null)
             ws = new WeatherStation();
 
@@ -553,29 +288,6 @@ public class WeatherStationMgr implements Initializable {
             }
         }
     }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        String command = e.getActionCommand();
-
-        switch (command) {
-            case "Cancel":
-                this.hide();
-                break;
-
-            case "OK":
-            default:
-                //saveWsData();
-                this.hide();
-                break;
-
-        }
-    }
-
-    private void setDefaultBorder(Region r) {
-        //r.setBorder(new Border(BorderStroke.THICK));
-
-    }
 */
     public static void initialize(DBConnection connection) {
         WeatherStationMgr.connection = connection;
@@ -588,9 +300,5 @@ public class WeatherStationMgr implements Initializable {
         } catch (IOException ex) {
             Logger.getLogger(WeatherStationMgr.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
     }
 }
