@@ -19,10 +19,8 @@ package com.bdb.weather.display.current;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -31,8 +29,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -44,7 +40,6 @@ import com.bdb.weather.common.CurrentWeather;
 import com.bdb.weather.common.Sensor;
 import com.bdb.weather.common.SensorManager;
 import com.bdb.weather.common.SensorType;
-import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.measurement.Humidity;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.ComponentContainer;
@@ -55,6 +50,7 @@ import com.bdb.weather.display.WeatherSense;
 import java.io.IOException;
 
 import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 /**
@@ -107,26 +103,28 @@ public class CurrentWeatherForm extends BorderPane implements ComponentContainer
     private final JTextField rainCalendarYear = new JTextField(DisplayConstants.UNKNOWN_VALUE_STRING);
     private final JTextField stormStart = new JTextField(DisplayConstants.UNKNOWN_VALUE_STRING);
     private final JTextField stormRain = new JTextField(DisplayConstants.UNKNOWN_VALUE_STRING);
-    private final SensorManager sensorManager;
+    private SensorManager sensorManager;
 
-    public CurrentWeatherForm(WeatherStation ws) {
+    public CurrentWeatherForm() {
         try {
-            sensorManager = ws.getSensorManager();
+            //sensorManager = ws.getSensorManager();
             Stage stage = new Stage();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("CurrentWeatherForm.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/CurrentWeatherForm.fxml"));
             loader.load();
-            BorderPane root = loader.getRoot();
-            Scene scene = new Scene(root, 900, 600);
+            GridPane root = loader.getRoot();
+            Scene scene = new Scene(root);
             scene.getStylesheets().add("/styles/weathersense.css");
             stage.setTitle("Current Weather Form");
             //stage.setResizable(false);
             stage.setScene(scene);
             stage.sizeToScene();
             stage.show();
-        } catch (IOException exception) {
+        }
+	catch (IOException exception) {
             throw new RuntimeException(exception);
         }
         
+	/*
         List<Pair<String,? extends JComponent>> rainComponents = new ArrayList<>();
         rainComponents.add(new Pair<>("Rain Rate: ", rainRate));
         rainComponents.add(new Pair<>("15 Minute Rain: ", rain15Minute));
@@ -239,6 +237,7 @@ public class CurrentWeatherForm extends BorderPane implements ComponentContainer
 
         forecastRule.setColumns(60);
         forecast.setColumns(30);
+*/
     }
 
     @Override

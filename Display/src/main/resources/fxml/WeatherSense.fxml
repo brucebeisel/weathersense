@@ -18,7 +18,7 @@
 	    </Menu>
 	    <Menu text="Views">
 		<MenuItem text="Current Weather" onAction="#launchCurrentWeatherView" />
-		<MenuItem text="Current Weather (Table)" onAction="#launchCurrentWeatherTextView"/>
+		<MenuItem text="Current Weather (Table)" onAction="#launchCurrentWeatherFormView"/>
 		<MenuItem text="Archive Table" onAction="#launchArchiveTableView"/> 
 		<SeparatorMenuItem />
 		<MenuItem text="Today" onAction="#launchTodayView" />

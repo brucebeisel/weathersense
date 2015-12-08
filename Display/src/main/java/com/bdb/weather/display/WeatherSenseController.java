@@ -25,6 +25,8 @@ import java.util.ResourceBundle;
 import javafx.fxml.Initializable;
 import javafx.application.Platform;
 
+import com.bdb.weather.display.current.CurrentWeatherForm;
+
 /**
  * FXML Controller class
  *
@@ -41,7 +43,8 @@ public class WeatherSenseController implements Initializable {
     }
 
     @FXML
-    public void launchCurrentWeatherTextView() {
+    public void launchCurrentWeatherFormView() {
+	CurrentWeatherForm form = new CurrentWeatherForm();
     }
 
     @FXML
