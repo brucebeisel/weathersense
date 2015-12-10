@@ -39,22 +39,20 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import com.bdb.util.jdbc.DBConnection;
-import com.bdb.weather.common.CurrentWeather;
-import com.bdb.weather.common.CurrentWeatherSubscriber;
 import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.db.DatabaseConstants;
 import com.bdb.weather.common.db.WeatherStationTable;
 import com.bdb.weather.display.day.HistoricalSeriesInfo;
 
-public class WeatherSense extends Application implements CurrentWeatherSubscriber.CurrentWeatherHandler {
+public class WeatherSense extends Application {
     private static final int REFRESH_INTERVAL = 30;
     private DBConnection connection;
     private WeatherStationTable stationTable;
     private WeatherStation ws;
     private final List<Refreshable> refreshList = new ArrayList<>();
     private ScheduledThreadPoolExecutor timer;
-    private final List<CurrentWeatherProcessor> cwpList = new ArrayList<>();
-    private CurrentWeatherSubscriber subscriber;
+    //private final List<CurrentWeatherProcessor> cwpList = new ArrayList<>();
+    //private CurrentWeatherSubscriber subscriber;
     private static final Logger logger = Logger.getLogger(WeatherSense.class.getName());
 
     private void openDatabase(List<String> args) {
@@ -92,7 +90,7 @@ public class WeatherSense extends Application implements CurrentWeatherSubscribe
 	openDatabase(args);
         WeatherStationMgr.initialize(connection);
 
-        subscriber = CurrentWeatherSubscriber.createSubscriber(this);
+        //subscriber = CurrentWeatherSubscriber.createSubscriber(this);
 
 	timer = new ScheduledThreadPoolExecutor(1);
 	timer.scheduleAtFixedRate(() -> {
@@ -132,6 +130,7 @@ public class WeatherSense extends Application implements CurrentWeatherSubscribe
 	stage.getIcons().add(icon);
         stage.setScene(scene);
         WeatherSenseController controller = loader.getController();
+	controller.setData(ws, connection);
         stage.sizeToScene();
         stage.show();
     }
@@ -139,16 +138,16 @@ public class WeatherSense extends Application implements CurrentWeatherSubscribe
     @Override
     public void stop() {
 	timer.shutdownNow();
-	subscriber.requestExit();
+	//subscriber.requestExit();
     }
 
-    @Override
-    public void handleCurrentWeather(CurrentWeather currentWeather) {
-        final CurrentWeather curWeather = currentWeather;
-        logger.fine(String.format("Updating %s current weather processors", cwpList.size()));
-        
-        Platform.runLater(() -> { cwpList.stream().forEach((cwp) -> { cwp.updateCurrentWeather(curWeather); }); });
-    }
+    //@Override
+    //public void handleCurrentWeather(CurrentWeather currentWeather) {
+    //    final CurrentWeather curWeather = currentWeather;
+    //    logger.fine(String.format("Updating %s current weather processors", cwpList.size()));
+    //    
+    //    Platform.runLater(() -> { cwpList.stream().forEach((cwp) -> { cwp.updateCurrentWeather(curWeather); }); });
+    //}
 
     public static void setStageTitle(Node node, String title) {
         Window window = node.getScene().getWindow();

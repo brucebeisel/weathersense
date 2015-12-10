@@ -17,14 +17,21 @@
 package com.bdb.weather.display;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
 import javafx.fxml.FXML;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
-import javafx.fxml.Initializable;
 import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
+import com.bdb.util.jdbc.DBConnection;
+import com.bdb.weather.common.CurrentWeather;
+import com.bdb.weather.common.CurrentWeatherSubscriber;
+import com.bdb.weather.common.WeatherStation;
+import com.bdb.weather.display.current.CurrentWeatherCharts;
 import com.bdb.weather.display.current.CurrentWeatherForm;
 
 /**
@@ -32,15 +39,30 @@ import com.bdb.weather.display.current.CurrentWeatherForm;
  *
  * @author bruce
  */
-public class WeatherSenseController implements Initializable {
+public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentWeatherHandler {
+    private WeatherStation ws;
+    private DBConnection connection;
+    private CurrentWeatherSubscriber subscriber;
+    private final List<CurrentWeatherProcessor> cwpList = new ArrayList<>();
+    private static final Logger logger = Logger.getLogger(WeatherSenseController.class.getName());
 
-    /**
-     * Initializes the controller class.
-     */
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-	// TODO
+    public WeatherSenseController() {
+        subscriber = CurrentWeatherSubscriber.createSubscriber(this);
     }
+
+    public void setData(WeatherStation ws, DBConnection connection) {
+	this.ws = ws;
+	this.connection = connection;
+    }
+
+    @Override
+    public void handleCurrentWeather(CurrentWeather currentWeather) {
+        final CurrentWeather curWeather = currentWeather;
+        logger.fine(String.format("Updating %s current weather processors", cwpList.size()));
+        
+        Platform.runLater(() -> { cwpList.stream().forEach((cwp) -> { cwp.updateCurrentWeather(curWeather); }); });
+    }
+
 
     @FXML
     public void launchCurrentWeatherFormView() {
@@ -49,6 +71,14 @@ public class WeatherSenseController implements Initializable {
 
     @FXML
     public void launchCurrentWeatherView() {
+	CurrentWeatherCharts cwCharts = new CurrentWeatherCharts(ws, connection);
+	cwpList.add(cwCharts);
+	Stage stage = new Stage();
+        Scene scene = new Scene(cwCharts);
+        stage.setTitle("Current Weather");
+        stage.setScene(scene);
+        stage.sizeToScene();
+        stage.show();
     }
 
     @FXML

@@ -22,8 +22,12 @@ import java.text.DecimalFormat;
 
 import javax.swing.border.BevelBorder;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.embed.swing.SwingNode;
-import javafx.scene.Node;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -47,19 +51,26 @@ import com.bdb.weather.common.WeatherTrend;
  * @author Bruce
  *
  */
-public class Hygrometer extends SwingNode {
+public class Hygrometer extends BorderPane {
     private final DefaultValueDataset humidityDataset = new DefaultValueDataset(50.0);
     private final DialPlot            humidityPlot = new DialPlot(humidityDataset);
     private final StandardDialRange   range;
     private final ChartPanel          chartPanel;
     private final DialTextAnnotation  trendAnnotation = new DialTextAnnotation("Trend");
+    private final Label               title = new Label();
+    private final StringProperty      titleProperty = new SimpleStringProperty();
+
+    public Hygrometer() {
+	this("");
+    }
 
     /**
      * Constructor.
      * 
-     * @param title The title to add to the panel that contains the gauge
+     * @param titleString The title to add to the panel that contains the gauge
      */
-    public Hygrometer(String title) {
+    public Hygrometer(String titleString) {
+	this.setPrefSize(250.0, 250.0);
         humidityPlot.addLayer(new DialBackground(new GradientPaint(0.0f, 0.0f, Color.LIGHT_GRAY, 100.0f, 0.0f, Color.blue)));
         StandardDialScale scale = new StandardDialScale(Humidity.MIN_HUMIDITY.get(), Humidity.MAX_HUMIDITY.get(), 240.0, -300.0, 10.0, 9);
         scale.setTickRadius(.9);
@@ -99,27 +110,35 @@ public class Hygrometer extends SwingNode {
         humidityPlot.addLayer(range);
 
         JFreeChart chart = new JFreeChart(humidityPlot);
-        chart.setTitle(title + " Humidity");
         chart.setBackgroundPaint(Color.GRAY);
         
         chartPanel = new ChartPanel(chart);
-        chartPanel.setMinimumDrawHeight(200);
-        chartPanel.setMinimumDrawWidth(200);
+        chartPanel.setMinimumDrawHeight(250);
+        chartPanel.setMinimumDrawWidth(250);
         chartPanel.setBackground(Color.GRAY);
         chartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
 
-	this.setContent(chartPanel);
+	SwingNode node = new SwingNode();
+	node.setContent(chartPanel);
+	this.setTop(title);
+	this.setCenter(node);
+	BorderPane.setAlignment(title, Pos.CENTER);
+	title.textProperty().bind(titleProperty);
+	setTitle(titleString);
     }
     
-    /**
-     * Get the Swing component that contains the gauge
-     * 
-     * @return The swing container
-     */
-    public Node getComponent() {
-        return this;
+    public String getTitle() {
+	return titleProperty.getValue();
     }
-    
+
+    public final void setTitle(String title) {
+	titleProperty.setValue(title);
+    }
+
+    public StringProperty titleProperty() {
+	return titleProperty;
+    }
+
     /**
      * Load the current value and the min and max values of the day.
      * 

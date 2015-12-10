@@ -22,8 +22,11 @@ import java.awt.GradientPaint;
 
 import javax.swing.border.BevelBorder;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.embed.swing.SwingNode;
-import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -38,11 +41,18 @@ import com.bdb.weather.common.measurement.Temperature;
  * @author Bruce
  *
  */
-public class Thermometer extends SwingNode {
+public class Thermometer extends BorderPane {
     private final DefaultValueDataset temperatureDataset = new DefaultValueDataset(0.0);
     private final ThermometerPlot     thermometerPlot = new ThermometerPlot(temperatureDataset);
     private final ChartPanel          chartPanel;
+    private final Label               highLabel = new Label();
+    private final Label               lowLabel = new Label();
+    private final StringProperty      titleProperty = new SimpleStringProperty();
+    private JFreeChart                chart;
  
+    public Thermometer() {
+	this("", new Temperature(-50, Temperature.Unit.CELSIUS), new Temperature(50, Temperature.Unit.CELSIUS));
+    }
     /**
      * Constructor.
      * 
@@ -75,7 +85,7 @@ public class Thermometer extends SwingNode {
         thermometerPlot.setBackgroundPaint(Color.GRAY);
         thermometerPlot.setOutlineVisible(false);
 
-        JFreeChart chart = new JFreeChart(thermometerPlot);
+        chart = new JFreeChart(thermometerPlot);
         chart.setTitle(title);
         chart.setBackgroundPaint(Color.GRAY);
 
@@ -86,18 +96,27 @@ public class Thermometer extends SwingNode {
         chartPanel.setBackground(Color.GRAY);
         chartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
 
-	this.setContent(chartPanel);
-    }
-    
-    /**
-     * Get the swing component that contains the thermometer
-     * 
-     * @return The swing container
-     */
-    public Node getComponent() {
-        return this;
+	SwingNode node = new SwingNode();
+	node.setContent(chartPanel);
+	this.setCenter(node);
+	this.setTop(highLabel);
+	this.setBottom(lowLabel);
     }
 
+    public String getTitle() {
+	return titleProperty.getValue();
+    }
+
+    public final void setTitle(String title) {
+	titleProperty.setValue(title);
+	chart.setTitle(title);
+    }
+
+    public StringProperty titleProperty() {
+	return titleProperty;
+    }
+
+    
     /**
      * Set the current value, the low and high for the day.
      * 
@@ -115,5 +134,7 @@ public class Thermometer extends SwingNode {
         temperatureDataset.setValue(current.get());
         thermometerPlot.setSubrange(0,low.get(), low.get());
         thermometerPlot.setSubrange(1, high.get(), high.get());
+	lowLabel.setText(low.toString());
+	highLabel.setText(high.toString());
     }
 }

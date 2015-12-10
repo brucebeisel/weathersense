@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import com.bdb.weather.display.current.*?>
+
+<fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml">
+    <HBox>
+	<TilePane prefColumns="2" prefRows="1">
+	    <Thermometer fx:id="indoorTemperature" title="Indoor"/>
+	    <Thermometer fx:id="outdoorTemperature" title="Outdoor"/>
+	</TilePane>
+	<TilePane prefRows="2"  prefColumns="2" >
+	    <Barometer fx:id="barometer" title="Barometer" />
+	    <Hygrometer fx:id="indoorHumidity" title="Indoor Humidity" />
+	    <Hygrometer fx:id="outdoorHumidity" title="Outdoor Humidity" />
+	    <WindGauge fx:id="windGauge" title="Windy" />
+	</TilePane>
+    </HBox>
+</fx:root>

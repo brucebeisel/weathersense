@@ -25,8 +25,12 @@ import java.util.List;
 import javax.swing.Timer;
 import javax.swing.border.BevelBorder;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.embed.swing.SwingNode;
-import javafx.scene.Node;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -52,7 +56,7 @@ import com.bdb.weather.display.DisplayConstants;
  * @author Bruce
  * 
  */
-public class WindGauge extends SwingNode {
+public class WindGauge extends BorderPane {
     private static final int WIND_SPEED_DATASET_INDEX = 0;
     private static final int WIND_GUST_DATASET_INDEX = 1;
     private static final int MAX_WIND_SPEED_DATASET_INDEX = 2;
@@ -86,11 +90,14 @@ public class WindGauge extends SwingNode {
     private double speedInterval;
     private int timerCount;
     private Timer timer;
+    private final Label title = new Label();
+    private StringProperty titleProperty = new SimpleStringProperty();
 
     /**
      * Constructor.
      */
     public WindGauge() {
+	this.setPrefSize(250.0, 250.0);
         lastHeading = 0.0;
         lastSpeed = 0.0;
         plot = new DialPlot();
@@ -192,7 +199,6 @@ public class WindGauge extends SwingNode {
         plot.addLayer(range);
 
         JFreeChart chart = new JFreeChart(plot);
-        chart.setTitle("Wind");
         chart.setBackgroundPaint(Color.GRAY);
 
         chartPanel = new ChartPanel(chart);
@@ -202,16 +208,26 @@ public class WindGauge extends SwingNode {
         chartPanel.setMaximumDrawWidth(300);
         chartPanel.setBackground(Color.GRAY);
         chartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
-	this.setContent(chartPanel);
+
+	SwingNode node = new SwingNode();
+	node.setContent(chartPanel);
+	this.setCenter(node);
+	this.setTop(title);
+	BorderPane.setAlignment(title, Pos.CENTER);
+	title.textProperty().bind(titleProperty);
+	setTitle("Wind");
     }
 
-    /**
-     * Get the swing component that contains the gauge
-     * 
-     * @return The swing container
-     */
-    public Node getComponent() {
-        return this;
+    public void setTitle(String title) {
+	titleProperty.setValue(title);
+    }
+
+    public String getTitle() {
+	return titleProperty.getValue();
+    }
+
+    public StringProperty titleProperty() {
+	return titleProperty;
     }
 
     /**
