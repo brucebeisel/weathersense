@@ -17,7 +17,6 @@
 package com.bdb.weather.display.current;
 
 
-import javafx.scene.Node;
 
 import javafx.scene.layout.TilePane;
 
@@ -58,22 +57,13 @@ public class CurrentWeatherRainBucketsPanel extends TilePane {
         currentYear = new RainBucketNode("YTD", ws.getYearlyRainMax(), yearlyAverage, calendarYearAverageToDate);
         weatherYear = new RainBucketNode("Weather Year", ws.getYearlyRainMax(), yearlyAverage, weatherYearAverageToDate);
         
-        this.getChildren().add(lastHour.getComponent());
-        this.getChildren().add(today.getComponent());
-        this.getChildren().add(last24Hours.getComponent());
-        this.getChildren().add(currentMonth.getComponent());
-        this.getChildren().add(lastMonth.getComponent());
-        this.getChildren().add(currentYear.getComponent());
-        this.getChildren().add(weatherYear.getComponent());
-    }
-    
-    /**
-     * Get the swing component that contains the rain buckets.
-     * 
-     * @return The swing container
-     */
-    public Node getComponent() {
-        return this;
+        this.getChildren().add(lastHour);
+        this.getChildren().add(today);
+        this.getChildren().add(last24Hours);
+        this.getChildren().add(currentMonth);
+        this.getChildren().add(lastMonth);
+        this.getChildren().add(currentYear);
+        this.getChildren().add(weatherYear);
     }
     
     /**

@@ -58,10 +58,9 @@ public class CurrentWeatherRainPanel extends BorderPane {
     @SuppressWarnings("serial")
     public CurrentWeatherRainPanel(WeatherStation ws, Depth thisMonthAverage, Depth lastMonthAverage, Depth yearlyAverage, Depth calendarYearAverageToDate, Depth weatherYearAverageToDate) {
         rainPlot = new RainPlot();
-        Node panel = rainPlot.getComponent();
-        this.setCenter(panel);
+        this.setCenter(rainPlot);
         bucketsPanel = new CurrentWeatherRainBucketsPanel(ws, thisMonthAverage, lastMonthAverage, yearlyAverage, weatherYearAverageToDate, calendarYearAverageToDate);
-        this.setBottom(bucketsPanel.getComponent());
+        this.setBottom(bucketsPanel);
     }
     
     /**

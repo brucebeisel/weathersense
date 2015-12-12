@@ -6,18 +6,47 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import com.bdb.weather.display.current.*?>
+<?import com.bdb.weather.display.*?>
 
 <fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml">
-    <HBox>
-	<TilePane prefColumns="2" prefRows="1">
-	    <Thermometer fx:id="indoorTemperature" title="Indoor"/>
-	    <Thermometer fx:id="outdoorTemperature" title="Outdoor"/>
-	</TilePane>
-	<TilePane prefRows="2"  prefColumns="2" >
-	    <Barometer fx:id="barometer" title="Barometer" />
-	    <Hygrometer fx:id="indoorHumidity" title="Indoor Humidity" />
-	    <Hygrometer fx:id="outdoorHumidity" title="Outdoor Humidity" />
-	    <WindGauge fx:id="windGauge" title="Windy" />
-	</TilePane>
-    </HBox>
+    <BorderPane>
+	<center>
+	    <HBox>
+		<VBox>
+		    <DopplerRadar fx:id="dopplerRadar"/>
+		    <TilePane prefColumns="2" prefRows="1">
+			<Thermometer fx:id="indoorTemperature" title="Indoor"/>
+			<Thermometer fx:id="outdoorTemperature" title="Outdoor"/>
+		    </TilePane>
+		</VBox>
+		<TilePane prefRows="2"  prefColumns="2" >
+		    <Hygrometer fx:id="outdoorHumidity" title="Outdoor Humidity" />
+		    <Barometer fx:id="barometer" title="Barometer" />
+		    <Hygrometer fx:id="indoorHumidity" title="Indoor Humidity" />
+		    <WindGauge fx:id="windGauge" title="Windy" />
+		</TilePane>
+	    </HBox>
+	</center>
+	<bottom>
+	    <TextField fx:id="forecastRule" editable="false"/> 
+	</bottom>
+    </BorderPane>
+    <TitledPane text="Rain">
+	<BorderPane>
+	    <top>
+		<RainPlot fx:id="rainPlot" />
+	    </top>
+	    <center>
+		<TilePane>
+		    <RainBucketNode/>
+		    <RainBucketNode/>
+		    <RainBucketNode/>
+		    <RainBucketNode/>
+		    <RainBucketNode/>
+		    <RainBucketNode/>
+		    <RainBucketNode/>
+		</TilePane>
+	    </center>
+	</BorderPane>
+    </TitledPane>
 </fx:root>

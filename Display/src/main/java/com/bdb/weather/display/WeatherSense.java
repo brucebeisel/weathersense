@@ -26,8 +26,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
+
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -51,8 +55,6 @@ public class WeatherSense extends Application {
     private WeatherStation ws;
     private final List<Refreshable> refreshList = new ArrayList<>();
     private ScheduledThreadPoolExecutor timer;
-    //private final List<CurrentWeatherProcessor> cwpList = new ArrayList<>();
-    //private CurrentWeatherSubscriber subscriber;
     private static final Logger logger = Logger.getLogger(WeatherSense.class.getName());
 
     private void openDatabase(List<String> args) {
@@ -140,14 +142,6 @@ public class WeatherSense extends Application {
 	timer.shutdownNow();
 	//subscriber.requestExit();
     }
-
-    //@Override
-    //public void handleCurrentWeather(CurrentWeather currentWeather) {
-    //    final CurrentWeather curWeather = currentWeather;
-    //    logger.fine(String.format("Updating %s current weather processors", cwpList.size()));
-    //    
-    //    Platform.runLater(() -> { cwpList.stream().forEach((cwp) -> { cwp.updateCurrentWeather(curWeather); }); });
-    //}
 
     public static void setStageTitle(Node node, String title) {
         Window window = node.getScene().getWindow();

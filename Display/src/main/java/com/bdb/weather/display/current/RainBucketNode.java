@@ -31,11 +31,13 @@ import com.bdb.weather.display.RainBucket;
  * @author Bruce
  *
  */
-public class RainBucketNode {
+public class RainBucketNode extends BorderPane {
     private RainBucket       rainBucket;
     private Label            label;
-    private final BorderPane panel = new BorderPane();
     
+    public RainBucketNode() {
+	this("", new Depth(1.0), new Depth(.5), new Depth(0.0));
+    }
     /**
      * Constructor.
      * 
@@ -51,8 +53,8 @@ public class RainBucketNode {
         label = new Label(labelString);
         label.setTextAlignment(TextAlignment.CENTER);
         //label.setBorder(new EtchedBorder(EtchedBorder.RAISED));
-        panel.setCenter(rainBucket);
-        panel.setBottom(label);
+        setCenter(rainBucket);
+        setBottom(label);
     }
     
     /**
@@ -74,15 +76,6 @@ public class RainBucketNode {
      */
     public RainBucketNode(String labelString, Depth maxValue) {
     	this(labelString, maxValue, new Depth(0.0));
-    }
-    
-    /**
-     * Get the swing component that contains the Rain Bucket.
-     * 
-     * @return The swing container
-     */
-    public Node getComponent() {
-        return panel;
     }
     
     /**

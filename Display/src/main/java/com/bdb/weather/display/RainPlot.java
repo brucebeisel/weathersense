@@ -26,8 +26,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
 
+import javax.swing.SwingUtilities;
+
 import javafx.embed.swing.SwingNode;
-import javafx.scene.Node;
+import javafx.scene.layout.BorderPane;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -58,7 +60,7 @@ import com.bdb.weather.display.axis.RainRangeAxis;
  * @author Bruce
  *
  */
-public class RainPlot extends SwingNode {
+public class RainPlot extends BorderPane {
 public static class RainEntry {
     public LocalDateTime time;
     public Depth    rainfall;
@@ -71,16 +73,16 @@ public static class RainEntry {
 };
 private static final String RAIN_DOMAIN = "Rainfall";
 private static final String RAIN_RATE_DOMAIN_PREFIX = "Rate (%s/hr)";
-private final JFreeChart           chart;
-private final ChartPanel           chartPanel;
-private final CombinedDomainXYPlot plot;
-private final XYPlot               rainPlot;
-private final XYPlot               rainRatePlot;
-private final TimeSeriesCollection rainDataset;
-private final TimeSeriesCollection rainRateDataset;
-private final TimeSeries           rainSeries;
-private final TimeSeries           rainRateSeries;
-private final String               rateDomain;
+private JFreeChart           chart;
+private ChartPanel           chartPanel;
+private CombinedDomainXYPlot plot;
+private XYPlot               rainPlot;
+private XYPlot               rainRatePlot;
+private TimeSeriesCollection rainDataset;
+private TimeSeriesCollection rainRateDataset;
+private TimeSeries           rainSeries;
+private TimeSeries           rainRateSeries;
+private String               rateDomain;
 private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:mm"); // TODO use preferences
     
     /**
@@ -152,6 +154,13 @@ private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:m
      */
     @SuppressWarnings("serial")
     public RainPlot() {
+	setPrefSize(400, 200);
+	SwingNode swingNode = new SwingNode();
+	SwingUtilities.invokeLater(() -> createChartElements(swingNode));
+	this.setCenter(swingNode);
+    }
+
+    private void createChartElements(SwingNode swingNode) {
         String unitString = Depth.getDefaultUnit().toString();
         rateDomain = String.format(RAIN_RATE_DOMAIN_PREFIX, unitString);
         rainPlot = new XYPlot();
@@ -171,8 +180,8 @@ private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:m
         chartPanel = new ChartPanel(chart);
         chartPanel.setMaximumDrawHeight(10000);
         chartPanel.setMaximumDrawWidth(10000);
-        chartPanel.setMinimumDrawHeight(0);
-        chartPanel.setMinimumDrawWidth(0);
+        chartPanel.setMinimumDrawHeight(200);
+        chartPanel.setMinimumDrawWidth(400);
 
         rainDataset = new TimeSeriesCollection();
         rainSeries = new TimeSeries(RAIN_DOMAIN);
@@ -200,16 +209,7 @@ private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:m
         rateRenderer.setBaseToolTipGenerator(ttg);
         rainRatePlot.setRenderer(rateRenderer);
 
-        setContent(chartPanel);
-    }
-    
-    /**
-     * Return the swing component that contains the graph.
-     * 
-     * @return The swing container
-     */
-    public Node getComponent() {
-        return this;
+        swingNode.setContent(chartPanel);
     }
     
     /**

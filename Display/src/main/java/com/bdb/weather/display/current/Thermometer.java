@@ -17,11 +17,13 @@
 package com.bdb.weather.display.current;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GradientPaint;
 
+import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.embed.swing.SwingNode;
@@ -44,11 +46,12 @@ import com.bdb.weather.common.measurement.Temperature;
 public class Thermometer extends BorderPane {
     private final DefaultValueDataset temperatureDataset = new DefaultValueDataset(0.0);
     private final ThermometerPlot     thermometerPlot = new ThermometerPlot(temperatureDataset);
-    private final ChartPanel          chartPanel;
     private final Label               highLabel = new Label();
     private final Label               lowLabel = new Label();
     private final StringProperty      titleProperty = new SimpleStringProperty();
     private JFreeChart                chart;
+    private final DoubleProperty      minValue = new SimpleDoubleProperty();
+    private final DoubleProperty      maxValue = new SimpleDoubleProperty();
  
     public Thermometer() {
 	this("", new Temperature(-50, Temperature.Unit.CELSIUS), new Temperature(50, Temperature.Unit.CELSIUS));
@@ -61,13 +64,30 @@ public class Thermometer extends BorderPane {
      * @param max The maximum value for the thermometer scale
      */
     public Thermometer(String title, Temperature min, Temperature max) {
+	this.setPrefSize(150.0, 250.0);
+	SwingNode node = new SwingNode();
+	SwingUtilities.invokeLater(() -> createChartElements(node, min, max));
+	this.setCenter(node);
+	this.setTop(highLabel);
+	this.setBottom(lowLabel);
+    }
         
-        if (Temperature.getDefaultUnit() == Temperature.Unit.FAHRENHEIT)
-            thermometerPlot.setUnits(ThermometerPlot.UNITS_FAHRENHEIT);
-        else if (Temperature.getDefaultUnit() == Temperature.Unit.CELSIUS)
-            thermometerPlot.setUnits(ThermometerPlot.UNITS_CELCIUS);
-        else
-            thermometerPlot.setUnits(ThermometerPlot.UNITS_KELVIN);
+    private void createChartElements(SwingNode swingNode, Temperature min, Temperature max) {
+        if (null != Temperature.getDefaultUnit()) {
+            switch (Temperature.getDefaultUnit()) {
+		case FAHRENHEIT:
+		    thermometerPlot.setUnits(ThermometerPlot.UNITS_FAHRENHEIT);
+		    break;
+
+		case CELSIUS:
+		    thermometerPlot.setUnits(ThermometerPlot.UNITS_CELCIUS);
+		    break;
+
+		case KELVIN:
+		    thermometerPlot.setUnits(ThermometerPlot.UNITS_KELVIN);
+		    break;
+	    }
+	}
 
         thermometerPlot.setRange(min.get(), max.get());
         thermometerPlot.setMercuryPaint(new GradientPaint(0.0f, 0.0f, Color.RED.darker(), 5.0f, 5.0f, Color.RED, true));
@@ -86,21 +106,16 @@ public class Thermometer extends BorderPane {
         thermometerPlot.setOutlineVisible(false);
 
         chart = new JFreeChart(thermometerPlot);
-        chart.setTitle(title);
+        chart.setTitle(titleProperty.getValue());
         chart.setBackgroundPaint(Color.GRAY);
 
-        chartPanel = new ChartPanel(chart);
-        chartPanel.setMinimumDrawHeight(200);
-        chartPanel.setMinimumDrawWidth(200);
-        chartPanel.setPreferredSize(new Dimension(100, 200));
+        ChartPanel chartPanel = new ChartPanel(chart);
+        //chartPanel.setMinimumDrawHeight(200);
+        //chartPanel.setMinimumDrawWidth(200);
+        //chartPanel.setPreferredSize(new Dimension(100, 200));
         chartPanel.setBackground(Color.GRAY);
         chartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
-
-	SwingNode node = new SwingNode();
-	node.setContent(chartPanel);
-	this.setCenter(node);
-	this.setTop(highLabel);
-	this.setBottom(lowLabel);
+	swingNode.setContent(chartPanel);
     }
 
     public String getTitle() {
@@ -109,13 +124,39 @@ public class Thermometer extends BorderPane {
 
     public final void setTitle(String title) {
 	titleProperty.setValue(title);
-	chart.setTitle(title);
+	if (chart != null)
+	    SwingUtilities.invokeLater(() -> chart.setTitle(title));
     }
 
     public StringProperty titleProperty() {
 	return titleProperty;
     }
 
+    public Temperature getMinValue() {
+	return new Temperature(minValue.getValue(), Temperature.Unit.CELSIUS);
+    }
+
+    public void setMinValue(Temperature value) {
+	minValue.setValue(value.get(Temperature.Unit.CELSIUS));
+	SwingUtilities.invokeLater(()->thermometerPlot.setLowerBound(value.get()));
+    }
+
+    public DoubleProperty minValueProperty() {
+	return minValue;
+    }
+    
+    public Temperature getMaxValue() {
+	return new Temperature(maxValue.getValue(), Temperature.Unit.CELSIUS);
+    }
+
+    public void setMaxValue(Temperature value) {
+	maxValue.setValue(value.get(Temperature.Unit.CELSIUS));
+	SwingUtilities.invokeLater(()->thermometerPlot.setUpperBound(value.get()));
+    }
+
+    public DoubleProperty maxValueProperty() {
+	return maxValue;
+    }
     
     /**
      * Set the current value, the low and high for the day.
@@ -131,9 +172,12 @@ public class Thermometer extends BorderPane {
         if (current == null || low == null || high == null)
             return;
 
-        temperatureDataset.setValue(current.get());
-        thermometerPlot.setSubrange(0,low.get(), low.get());
-        thermometerPlot.setSubrange(1, high.get(), high.get());
+	SwingUtilities.invokeLater(() -> {
+	    temperatureDataset.setValue(current.get());
+	    thermometerPlot.setSubrange(0,low.get(), low.get());
+	    thermometerPlot.setSubrange(1, high.get(), high.get());
+	});
+
 	lowLabel.setText(low.toString());
 	highLabel.setText(high.toString());
     }
