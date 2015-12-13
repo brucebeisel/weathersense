@@ -38,13 +38,14 @@
 	    </top>
 	    <center>
 		<TilePane>
-		    <RainBucketNode/>
-		    <RainBucketNode/>
-		    <RainBucketNode/>
-		    <RainBucketNode/>
-		    <RainBucketNode/>
-		    <RainBucketNode/>
-		    <RainBucketNode/>
+		    <RainBucketNode fx:id="hourRain" title="Hour"/>
+		    <RainBucketNode fx:id="todayRain" title="Today"/>
+		    <RainBucketNode fx:id="rain24Hour" title="24 Hour"/>
+		    <RainBucketNode fx:id="stormRain" title="Storm"/>
+		    <RainBucketNode fx:id="monthRain" title="Month"/>
+		    <RainBucketNode fx:id="lastMonthRain" title="Last Month"/>
+		    <RainBucketNode fx:id="calendarYearRain" title="Cal Year"/>
+		    <RainBucketNode fx:id="weatherYearRain" title="Wthr Year"/>
 		</TilePane>
 	    </center>
 	</BorderPane>

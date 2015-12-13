@@ -61,7 +61,15 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
         logger.fine(String.format("Updating %s current weather processors", cwpList.size()));
         
         //Platform.runLater(() -> { cwpList.forEach((cwp) -> { cwp.updateCurrentWeather(curWeather); }); });
-        cwpList.forEach((cwp) -> Platform.runLater(() -> cwp.updateCurrentWeather(curWeather)));
+        //cwpList.forEach((cwp) -> Platform.runLater(() -> cwp.updateCurrentWeather(curWeather)));
+        for (CurrentWeatherProcessor cwp : cwpList) {
+            Platform.runLater(new Runnable() {
+                @Override public void run() {
+                    cwp.updateCurrentWeather(curWeather);
+                }
+            });
+        }
+
     }
 
 

@@ -27,17 +27,14 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 
 public final class RainBucket extends Canvas {
-    private static final long serialVersionUID = -4981948661829987749L;
-
     private GraphicsContext         gc;
     private double                  value = 0.0;
-    private final double            maxValue; 
-    private final double            tickIncrement;
+    private double                  maxValue; 
+    private double                  tickIncrement;
     private String                  unitLabel;
     private double                  valueTop = GUAGE_BOTTOM;
     private Font                    origFont = null;
@@ -125,6 +122,34 @@ public final class RainBucket extends Canvas {
         this(maxValue, formatter, unitLabel, 0.0);
     }
 
+    public double getAverage() {
+        return average;
+    }
+
+    public void setAverage(double average) {
+        this.average = average;
+        paint();
+    }
+
+    public double getToDateAverage() {
+        return toDateAverage;
+    }
+
+    public void setToDateAverage(double toDateAverage) {
+        this.toDateAverage = toDateAverage;
+        paint();
+    }
+
+    public double getMaxValue() {
+        return maxValue;
+    }
+
+    public void setMaxValue(double maxValue) {
+        this.maxValue = maxValue;
+        this.tickIncrement = maxValue / 2.0;
+        paint();
+    }
+
     /**
      * Set the current rainfall amount.
      * 
@@ -169,12 +194,7 @@ public final class RainBucket extends Canvas {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see javax.swing.JComponent#paint(java.awt.Graphics)
-     */
-    public void paint() {
-        System.out.println("Painting");
+    private void paint() {
 	gc = this.getGraphicsContext2D();
         gc.clearRect(0, 0, getWidth(), getHeight());
 

@@ -123,6 +123,7 @@ public class CurrentWeatherSubscriber implements Runnable {
     private void init() {
         exit = false;
         thread = new Thread(this);
+	thread.setName("current-weather-thread");
         thread.start();
     }
     

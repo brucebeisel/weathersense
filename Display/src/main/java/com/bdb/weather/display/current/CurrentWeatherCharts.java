@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TextField;
@@ -41,7 +40,6 @@ import com.bdb.util.measurement.Measurement;
 import com.bdb.weather.common.CurrentWeather;
 import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.MonthWeatherAverages;
-import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.TemperatureBinMgr;
 import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.WeatherTrend;
@@ -73,6 +71,14 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
     @FXML private TextField               forecastRule;
     @FXML private DopplerRadar            dopplerRadar;
     @FXML private RainPlot                rainPlot;
+    @FXML private RainBucketNode          hourRain;
+    @FXML private RainBucketNode          todayRain;
+    @FXML private RainBucketNode          rain24Hour;
+    @FXML private RainBucketNode          stormRain;
+    @FXML private RainBucketNode          monthRain;
+    @FXML private RainBucketNode          lastMonthRain;
+    @FXML private RainBucketNode          calendarYearRain;
+    @FXML private RainBucketNode          weatherYearRain;
     private final HistoryTable            historyTable;
     private final DailySummaryTable       summaryTable;
     private final Month                   weatherYearStartMonth;
@@ -116,30 +122,46 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         indoorTemperature.setMinValue(ws.getThermometerMin());
         indoorTemperature.setMaxValue(ws.getThermometerMax());
 
-	dopplerRadar.setConnection(connection);
+        hourRain.setMaxValue(ws.getDailyRainMax());
+        todayRain.setMaxValue(ws.getDailyRainMax());
+        rain24Hour.setMaxValue(ws.getDailyRainMax());
+        stormRain.setMaxValue(ws.getDailyRainMax().add(ws.getDailyRainMax()));
+        monthRain.setMaxValue(ws.getMonthlyRainMax());
+        lastMonthRain.setMaxValue(ws.getMonthlyRainMax());
+        weatherYearRain.setMaxValue(ws.getYearlyRainMax());
+        calendarYearRain.setMaxValue(ws.getYearlyRainMax());
+
+	dopplerRadar.configure(connection, ws.getDopplerRadarUrl());
 
         MonthWeatherAverages averages = (MonthWeatherAverages)monthlyAverageTable.retrieveMonthlyAveragesForLocation(ws.getLocationCode());
 
 	Depth yearlyAverage;
 	Depth thisMonthAverage;
 	Depth lastMonthAverage;
+	Depth calendarYearAverageToDate;
+	Depth weatherYearAverageToDate;
 	LocalDate thisMonth = LocalDate.now();
         LocalDate lastMonth = thisMonth.minusMonths(1);
         if (averages != null) {
             yearlyAverage = averages.calculateYearlyAverageRainfall();
-            //calendarYearAverageToDate = averages.calculateCalendarYearAverageRainfallToDate(thisMonth);
-            //weatherYearAverageToDate = averages.calculateWeatherYearAverageRainfallToDate(thisMonth, ws.getWeatherYearStartMonth());
+            calendarYearAverageToDate = averages.calculateCalendarYearAverageRainfallToDate(thisMonth);
+            weatherYearAverageToDate = averages.calculateWeatherYearAverageRainfallToDate(thisMonth, ws.getWeatherYearStartMonth());
             thisMonthAverage = averages.getAverage(thisMonth).getRainfall();
             lastMonthAverage = averages.getAverage(lastMonth).getRainfall();
             
         }
         else {
             yearlyAverage = new Depth(0.0);
-            //calendarYearAverageToDate = yearlyAverage;
-            //weatherYearAverageToDate = yearlyAverage;
+            calendarYearAverageToDate = yearlyAverage;
+            weatherYearAverageToDate = yearlyAverage;
             thisMonthAverage = yearlyAverage;
             lastMonthAverage = yearlyAverage;
         }
+
+        calendarYearRain.setAverages(yearlyAverage, calendarYearAverageToDate);
+        weatherYearRain.setAverages(yearlyAverage, weatherYearAverageToDate);
+        monthRain.setAverages(thisMonthAverage, null);
+        lastMonthRain.setAverages(lastMonthAverage, null);
     }
     
     @SuppressWarnings("unchecked")
@@ -184,67 +206,22 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         // TODO: All this logic should be in the collector so that there are no null values
         // when we get here.
         //
-        LocalDateTime hourBegin = now.minusHours(1);
-        Depth hourRain;
-        if ((hourRain = cw.getRainHour()) == null) {
-            hourRain = historyTable.rainTotal(hourBegin, now);
-        }
-        
-        Depth last24HourRain;
-        if ((last24HourRain = cw.getRain24Hour()) == null) {
-            LocalDateTime start = now.minusHours(24);
-            last24HourRain = historyTable.rainTotal(start, now);
-        }
-        
-        Depth todayRain;
-        if ((todayRain = cw.getRainToday()) == null) {
-            LocalDateTime start = now.toLocalDate().atStartOfDay();
-            todayRain = historyTable.rainTotal(start, now);
-        }
-        
-        LocalDateTime yearBegin = LocalDate.now().withDayOfYear(1).atStartOfDay();
-        Depth ytdRain;
-        if ((ytdRain = cw.getRainCalendarYear()) == null) {
-            ytdRain = historyTable.rainTotal(yearBegin, now);
-        }
-
-        Depth weatherYearRain;
-        if ((weatherYearRain = cw.getRainWeatherYear()) == null) {
-            yearBegin = yearBegin.withMonth(weatherYearStartMonth.getValue());
-
-            if (now.getMonth().getValue() < weatherYearStartMonth.getValue())
-                yearBegin = yearBegin.minusYears(1);
-
-            weatherYearRain = historyTable.rainTotal(yearBegin, now);
-        }
-        
-        Depth thisMonthRain;
-        LocalDate nowDate = LocalDate.now();
-        LocalDate monthBegin = nowDate.withDayOfMonth(1);
-        if ((thisMonthRain = cw.getRainMonth()) == null) {
-            thisMonthRain = historyTable.rainTotal(monthBegin.atStartOfDay(), now);
-        }
-        
-        monthBegin = monthBegin.minusMonths(1);
-        LocalDate monthEnd = monthBegin.plusDays(monthBegin.lengthOfMonth());
-        Depth lastMonthRain = historyTable.rainTotal(monthBegin.atStartOfDay(), monthEnd.atTime(23, 59, 59));
-        
         LocalDateTime start = now.minusHours(25);
+        List<HistoricalRecord> list = historyTable.queryRecordsForTimePeriod(start, now);
         
         //
         // The pair is the current rain amount, the hourly rain rate
         //
+	/*
         List<RainPlot.RainEntry> rainList = new ArrayList<>();
-        List<HistoricalRecord> list = historyTable.queryRecordsForTimePeriod(start, now);
         
         list.stream().forEach((rec) -> {
             rainList.add(new RainPlot.RainEntry(rec.getTime(), rec.getRainfall(), rec.getHighRainfallRate()));
         });
+*/
         
         //rainPanel.setRainData(ytdRain, weatherYearRain, thisMonthRain, lastMonthRain, last24HourRain, todayRain, hourRain, rainList);
         
-        temperatureBinMgr.refresh();
-        final SummaryRecord summary = summaryTable.retrieveTodaysSummary(ws.getWindParameters(), temperatureBinMgr);
           
         //
         // Find the indoor and outdoor humidity for up to an hour ago
@@ -256,6 +233,7 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         Pressure pd = null;
         final WeatherTrend pressureTrend = cw.getBaroTrend();
 
+	/*
         for (HistoricalRecord record : list) {
             if (record.getTime().isAfter(hourBegin)) {
                 Pair<WeatherTrend, Humidity> hpair = processTrend(cw.getOutdoorHumidity(), record.getOutdoorHumidity(), ohd);
@@ -282,6 +260,7 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         final Humidity outdoorHumidityDelta = ohd;
         final WeatherTrend outdoorHumidityTrend = oht;
         final Pressure pressureDelta = pd;
+*/
 
         List<Heading> headings = new ArrayList<>();
         if (cw.getWindDir2() != null) {
@@ -300,29 +279,37 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         //
         // If there is no summary record then just use the current temperature for both high and low
         //
-	Platform.runLater(() -> {
-	    if (summary != null) {
-		outdoorTemperature.loadData(cw.getOutdoorTemperature(), summary.getMinOutdoorTemp(), summary.getMaxOutdoorTemp());
-		indoorTemperature.loadData(cw.getIndoorTemperature(), summary.getMinIndoorTemp(), summary.getMaxIndoorTemp());
-		windGauge.loadData(cw.getWind(), cw.getWindGust(), summary.getMaxWindSpeed(), summary.getMaxWindGust(), summary.getAvgWindSpeed(), headings);
-		barometer.loadData(cw.getBaroPressure(), summary.getMinBaroPressure(), summary.getMaxBaroPressure(), pressureDelta, pressureTrend);
-		outdoorHumidity.loadData(cw.getOutdoorHumidity(), summary.getMinOutdoorHumidity(), summary.getMaxOutdoorHumidity(), outdoorHumidityDelta, outdoorHumidityTrend);
-		indoorHumidity.loadData(cw.getIndoorHumidity(), summary.getMinIndoorHumidity(), summary.getMaxIndoorHumidity(), indoorHumidityDelta, indoorHumidityTrend);
-	    }
-	    else {
-		outdoorTemperature.loadData(cw.getOutdoorTemperature(), cw.getOutdoorTemperature(), cw.getOutdoorTemperature());
-		indoorTemperature.loadData(cw.getIndoorTemperature(), cw.getIndoorTemperature(), cw.getIndoorTemperature());
-		windGauge.loadData(cw.getWind(), cw.getWindGust(), null, null, null, headings);
-		barometer.loadData(cw.getBaroPressure(), cw.getBaroPressure(), cw.getBaroPressure(), new Pressure(0.0), WeatherTrend.STEADY);
-		outdoorHumidity.loadData(cw.getOutdoorHumidity(), cw.getOutdoorHumidity(), cw.getOutdoorHumidity(), new Humidity(0.0), WeatherTrend.STEADY);
-		indoorHumidity.loadData(cw.getIndoorHumidity(), cw.getIndoorHumidity(), cw.getIndoorHumidity(), new Humidity(0.), WeatherTrend.STEADY);
-	    }
+	    /*
+	if (summary != null) {
+	    outdoorTemperature.loadData(cw.getOutdoorTemperature(), summary.getMinOutdoorTemp(), summary.getMaxOutdoorTemp());
+	    indoorTemperature.loadData(cw.getIndoorTemperature(), summary.getMinIndoorTemp(), summary.getMaxIndoorTemp());
+	    windGauge.loadData(cw.getWind(), cw.getWindGust(), summary.getMaxWindSpeed(), summary.getMaxWindGust(), summary.getAvgWindSpeed(), headings);
+	    barometer.loadData(cw.getBaroPressure(), summary.getMinBaroPressure(), summary.getMaxBaroPressure(), pressureDelta, pressureTrend);
+	    outdoorHumidity.loadData(cw.getOutdoorHumidity(), summary.getMinOutdoorHumidity(), summary.getMaxOutdoorHumidity(), outdoorHumidityDelta, outdoorHumidityTrend);
+	    indoorHumidity.loadData(cw.getIndoorHumidity(), summary.getMinIndoorHumidity(), summary.getMaxIndoorHumidity(), indoorHumidityDelta, indoorHumidityTrend);
+	}
+	else {
+*/
+	    outdoorTemperature.loadData(cw.getOutdoorTemperature(), cw.getOutdoorTemperature(), cw.getOutdoorTemperature());
+	    indoorTemperature.loadData(cw.getIndoorTemperature(), cw.getIndoorTemperature(), cw.getIndoorTemperature());
+	    windGauge.loadData(cw.getWind(), cw.getWindGust(), null, null, null, headings);
+	    barometer.loadData(cw.getBaroPressure(), cw.getBaroPressure(), cw.getBaroPressure(), new Pressure(0.0), WeatherTrend.STEADY);
+	    outdoorHumidity.loadData(cw.getOutdoorHumidity(), cw.getOutdoorHumidity(), cw.getOutdoorHumidity(), new Humidity(0.0), WeatherTrend.STEADY);
+	    indoorHumidity.loadData(cw.getIndoorHumidity(), cw.getIndoorHumidity(), cw.getIndoorHumidity(), new Humidity(0.), WeatherTrend.STEADY);
+	//}
 
-	    rainPlot.setRainData(rainList);
-	    String date = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.MEDIUM).format(cw.getTime());
-	    String ammendedFrameTitle = frameTitle + " " + date;
-	    WeatherSense.setStageTitle(this, ammendedFrameTitle);
-	});
+	//rainPlot.setRainData(rainList);
+        rain24Hour.setValue(cw.getRain24Hour().get());
+        monthRain.setValue(cw.getRainMonth().get());
+        if (cw.getStormRain() != null)
+            stormRain.setValue(cw.getStormRain().get());
+        else
+            stormRain.setValue(0.0);
+
+        weatherYearRain.setValue(cw.getRainWeatherYear().get());
+	String date = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.MEDIUM).format(cw.getTime());
+	String ammendedFrameTitle = frameTitle + " " + date;
+	WeatherSense.setStageTitle(this, ammendedFrameTitle);
     }
 
     @Override

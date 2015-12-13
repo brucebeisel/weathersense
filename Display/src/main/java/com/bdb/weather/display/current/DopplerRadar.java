@@ -28,12 +28,16 @@ import java.util.logging.Logger;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Pos;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.util.Duration;
 
 import com.bdb.util.jdbc.DBConnection;
@@ -55,7 +59,6 @@ public class DopplerRadar extends BorderPane {
     private final List<ImageView>         thumbnails = new ArrayList<>();
     private List<DopplerRadarImage>       dopplerRadarImages;
     private boolean                       animate = true;
-//    private final Timer                   animationTimer = new Timer(ANIMATION_INTERVAL, this);
 //    private final Timer                   loadImageTimer = new Timer(DOPPLER_IMAGE_REFRESH_INTERVAL, this);
     private int                           animationFrame = 0;
     private final Label                   radarImage = new Label();
@@ -77,15 +80,15 @@ public class DopplerRadar extends BorderPane {
      */
     public DopplerRadar(DBConnection connection, URL url) {
         frameInfo.setTextAlignment(TextAlignment.CENTER);
-        //animationTimer.start();
         //loadImageTimer.start();
         //radarImage.setBackground(Color.gray);
         //radarImage.setBorder(new BevelBorder(BevelBorder.RAISED));
         radarImage.setGraphicTextGap(0);
         this.setCenter(radarImage);
+        BorderPane.setAlignment(frameInfo, Pos.CENTER);
         this.setTop(frameInfo);
         if (url != null)
-            radarImage.setTooltip(new Tooltip("<html><img src=" + url + "></html>"));
+            setTooltip(url.toString());
 
         loadImage();
 
@@ -98,7 +101,20 @@ public class DopplerRadar extends BorderPane {
 	timeline.play();
     }
 
-    public void setConnection(DBConnection connection) {
+    private void setTooltip(String url) {
+        if (url != null) {
+            WebView  web = new WebView();
+            WebEngine webEngine = web.getEngine();
+            webEngine.loadContent("<html><img src=" + url + "></html>");
+            Tooltip  tip = new Tooltip();
+            tip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+            tip.setGraphic(web);
+            radarImage.setTooltip(tip);
+        }
+    }
+
+    public void configure(DBConnection connection, String url) {
+        setTooltip(url);
         dopplerRadarTable = new DopplerRadarTable(connection);    
 	loadImage();
     }
@@ -156,7 +172,6 @@ public class DopplerRadar extends BorderPane {
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     private void nextFrame() {
-	System.out.println("Next frame: " + animationFrame);
 	if (!animate)
 	    return;
 

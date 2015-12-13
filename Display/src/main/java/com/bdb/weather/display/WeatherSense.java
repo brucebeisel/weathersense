@@ -26,12 +26,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
-
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -66,6 +62,7 @@ public class WeatherSense extends Application {
 	    //databaseHost = DatabaseConstants.DATABASE_HOST;
             databaseHost = "192.168.1.100";
 
+	databaseHost = "192.168.1.100";
         String databaseUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, databaseHost, DatabaseConstants.DATABASE_PORT, DatabaseConstants.DATABASE_NAME);
 
         connection = new DBConnection(databaseUrl,
@@ -92,8 +89,6 @@ public class WeatherSense extends Application {
 	openDatabase(args);
         WeatherStationMgr.initialize(connection);
 
-        //subscriber = CurrentWeatherSubscriber.createSubscriber(this);
-
 	timer = new ScheduledThreadPoolExecutor(1);
 	timer.scheduleAtFixedRate(() -> {
 	    logger.info("Refreshing screens");
@@ -105,7 +100,7 @@ public class WeatherSense extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 	if (connection.getConnection() == null) {
-	    Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to connect to the data. Please contact your administrator", ButtonType.OK);
+	    Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to connect to the database. Please contact your administrator", ButtonType.OK);
 	    alert.showAndWait();
 	    Platform.exit();
         }

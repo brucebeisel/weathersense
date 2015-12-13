@@ -64,7 +64,7 @@ public class Thermometer extends BorderPane {
      * @param max The maximum value for the thermometer scale
      */
     public Thermometer(String title, Temperature min, Temperature max) {
-	this.setPrefSize(150.0, 250.0);
+	this.setPrefSize(150.0, 270.0);
 	SwingNode node = new SwingNode();
 	SwingUtilities.invokeLater(() -> createChartElements(node, min, max));
 	this.setCenter(node);
@@ -110,8 +110,8 @@ public class Thermometer extends BorderPane {
         chart.setBackgroundPaint(Color.GRAY);
 
         ChartPanel chartPanel = new ChartPanel(chart);
-        //chartPanel.setMinimumDrawHeight(200);
-        //chartPanel.setMinimumDrawWidth(200);
+        chartPanel.setMinimumDrawHeight(200);
+        chartPanel.setMinimumDrawWidth(200);
         //chartPanel.setPreferredSize(new Dimension(100, 200));
         chartPanel.setBackground(Color.GRAY);
         chartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
