@@ -28,10 +28,15 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import com.bdb.util.Pair;
 import com.bdb.util.jdbc.DBConnection;
@@ -60,8 +65,9 @@ import com.bdb.weather.display.WeatherSense;
  * @author Bruce
  *
  */
-public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcessor {
+public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcessor, ChangeListener<Boolean> {
     private final WeatherStation          ws;
+    private final Stage                   stage;
     @FXML private Barometer               barometer;
     @FXML private WindGauge               windGauge;
     @FXML private Hygrometer              indoorHumidity;
@@ -79,6 +85,7 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
     @FXML private RainBucketNode          lastMonthRain;
     @FXML private RainBucketNode          calendarYearRain;
     @FXML private RainBucketNode          weatherYearRain;
+    @FXML private TitledPane              rainPane;
     private final HistoryTable            historyTable;
     private final DailySummaryTable       summaryTable;
     private final Month                   weatherYearStartMonth;
@@ -93,8 +100,9 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
      * @param ws The weather station
      * @param connection The database connection
      */
-    public CurrentWeatherCharts(WeatherStation ws, DBConnection connection) {
+    public CurrentWeatherCharts(WeatherStation ws, DBConnection connection, Stage stage) {
         this.ws = ws;
+        this.stage = stage;
         weatherYearStartMonth = ws.getWeatherYearStartMonth();
         temperatureBinMgr = new TemperatureBinMgr(connection);
 
@@ -112,6 +120,9 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
 	catch (IOException exception) {
             throw new RuntimeException(exception);
         }
+
+        //rainPane.expandedProperty().addListener((listener) -> stage.sizeToScene());
+        rainPane.expandedProperty().addListener(this);
         
 	barometer.setMinValue(ws.getBarometerMin());
 	barometer.setMaxValue(ws.getBarometerMax());
@@ -212,17 +223,14 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         //
         // The pair is the current rain amount, the hourly rain rate
         //
-	/*
         List<RainPlot.RainEntry> rainList = new ArrayList<>();
         
         list.stream().forEach((rec) -> {
             rainList.add(new RainPlot.RainEntry(rec.getTime(), rec.getRainfall(), rec.getHighRainfallRate()));
         });
-*/
         
-        //rainPanel.setRainData(ytdRain, weatherYearRain, thisMonthRain, lastMonthRain, last24HourRain, todayRain, hourRain, rainList);
-        
-          
+        rainPlot.setRainData(rainList);
+
         //
         // Find the indoor and outdoor humidity for up to an hour ago
         //
@@ -263,18 +271,17 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
 */
 
         List<Heading> headings = new ArrayList<>();
-        if (cw.getWindDir2() != null) {
+        if (cw.getWindDir2() != null)
             headings.add(cw.getWindDir2());
-        }
-        if (cw.getWindDir3() != null) {
+
+        if (cw.getWindDir3() != null)
             headings.add(cw.getWindDir3());
-        }
-        if (cw.getWindDir4() != null) {
+
+        if (cw.getWindDir4() != null)
             headings.add(cw.getWindDir4());
-        }
-        if (cw.getWindDir5() != null) {
+
+        if (cw.getWindDir5() != null)
             headings.add(cw.getWindDir5());
-        }
 
         //
         // If there is no summary record then just use the current temperature for both high and low
@@ -299,6 +306,8 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
 	//}
 
 	//rainPlot.setRainData(rainList);
+        hourRain.setValue(cw.getRainHour().get());
+        todayRain.setValue(cw.getRainToday().get());
         rain24Hour.setValue(cw.getRain24Hour().get());
         monthRain.setValue(cw.getRainMonth().get());
         if (cw.getStormRain() != null)
@@ -320,5 +329,11 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         catch (SQLException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Override
+    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+        System.out.println("Rain panel expanded state changed to " + newValue);
+        Platform.runLater(()->stage.sizeToScene());
     }
 }

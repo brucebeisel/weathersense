@@ -44,6 +44,8 @@ public class RainTickUnitSource extends TickUnits {
         add(new NumberTickUnit(10000000000.0, format, 2));
         add(new NumberTickUnit(100000000000.0, format, 2));
 
+        add(new NumberTickUnit(0.02, format, 5));
+        add(new NumberTickUnit(0.05, format, 5));
         add(new NumberTickUnit(0.25, format, 5));
         add(new NumberTickUnit(2.5, format, 5));
         add(new NumberTickUnit(25, format, 5));

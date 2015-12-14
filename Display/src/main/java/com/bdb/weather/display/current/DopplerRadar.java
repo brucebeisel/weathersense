@@ -22,11 +22,15 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.control.ContentDisplay;
@@ -52,21 +56,21 @@ import com.bdb.weather.common.db.DopplerRadarTable;
  *
  */
 public class DopplerRadar extends BorderPane {
-    private static final int DOPPLER_IMAGE_REFRESH_INTERVAL = 120000;
+    private static final int DOPPLER_IMAGE_REFRESH_INTERVAL = 2;
     private static final int ANIMATION_INTERVAL = 500;
     private static final int NUM_ANIMATION_IMAGES = 20;
     private static final int DELAY_FRAMES = 2;
-    private final List<ImageView>         thumbnails = new ArrayList<>();
-    private List<DopplerRadarImage>       dopplerRadarImages;
-    private boolean                       animate = true;
-//    private final Timer                   loadImageTimer = new Timer(DOPPLER_IMAGE_REFRESH_INTERVAL, this);
-    private int                           animationFrame = 0;
-    private final Label                   radarImage = new Label();
-    private final Label                   frameInfo = new Label();
-    private final DateTimeFormatter       sdf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.SHORT);    
-    private DopplerRadarTable             dopplerRadarTable = null;
-    
-    private static final Logger           logger = Logger.getLogger(DopplerRadar.class.getName());
+    private final List<ImageView>           thumbnails = new ArrayList<>();
+    private List<DopplerRadarImage>         dopplerRadarImages;
+    private boolean                         animate = true;
+    private int                             animationFrame = 0;
+    private final Label                     radarImage = new Label();
+    private final Label                     frameInfo = new Label();
+    private final DateTimeFormatter         sdf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.SHORT);    
+    private DopplerRadarTable               dopplerRadarTable = null;
+    private final ScheduledExecutorService  executor = Executors.newSingleThreadScheduledExecutor();
+    private WebEngine                       webEngine;
+    private static final Logger             logger = Logger.getLogger(DopplerRadar.class.getName());
     
     public DopplerRadar() {
 	this(null, null);
@@ -80,9 +84,6 @@ public class DopplerRadar extends BorderPane {
      */
     public DopplerRadar(DBConnection connection, URL url) {
         frameInfo.setTextAlignment(TextAlignment.CENTER);
-        //loadImageTimer.start();
-        //radarImage.setBackground(Color.gray);
-        //radarImage.setBorder(new BevelBorder(BevelBorder.RAISED));
         radarImage.setGraphicTextGap(0);
         this.setCenter(radarImage);
         BorderPane.setAlignment(frameInfo, Pos.CENTER);
@@ -90,7 +91,9 @@ public class DopplerRadar extends BorderPane {
         if (url != null)
             setTooltip(url.toString());
 
-        loadImage();
+        loadImages();
+
+        executor.scheduleAtFixedRate(() -> loadImages(), DOPPLER_IMAGE_REFRESH_INTERVAL, DOPPLER_IMAGE_REFRESH_INTERVAL, TimeUnit.MINUTES);
 
 	Timeline timeline = new Timeline(
 	    new KeyFrame(Duration.ZERO, (actionEvent) -> nextFrame()),
@@ -104,7 +107,7 @@ public class DopplerRadar extends BorderPane {
     private void setTooltip(String url) {
         if (url != null) {
             WebView  web = new WebView();
-            WebEngine webEngine = web.getEngine();
+            webEngine = web.getEngine();
             webEngine.loadContent("<html><img src=" + url + "></html>");
             Tooltip  tip = new Tooltip();
             tip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -116,7 +119,7 @@ public class DopplerRadar extends BorderPane {
     public void configure(DBConnection connection, String url) {
         setTooltip(url);
         dopplerRadarTable = new DopplerRadarTable(connection);    
-	loadImage();
+	loadImages();
     }
     
     /**
@@ -140,12 +143,14 @@ public class DopplerRadar extends BorderPane {
     /**
      * Load the Doppler radar images from the database.
      */
-    private void loadImage() {
-        logger.fine("Loading doppler radar images");
-	if (dopplerRadarTable == null)
-	    return;
-
+    private synchronized void loadImages() {
         try {
+            logger.fine("Loading doppler radar images");
+            if (dopplerRadarTable == null)
+                return;
+
+            Platform.runLater(() -> webEngine.reload());
+
             dopplerRadarImages = dopplerRadarTable.getNewerRadarImages(NUM_ANIMATION_IMAGES);
 
             thumbnails.clear();
@@ -171,7 +176,7 @@ public class DopplerRadar extends BorderPane {
      * (non-Javadoc)
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
-    private void nextFrame() {
+    private synchronized void nextFrame() {
 	if (!animate)
 	    return;
 
@@ -190,7 +195,5 @@ public class DopplerRadar extends BorderPane {
 	    radarImage.setGraphic(thumbnails.get(animationFrame++));
 	    frameInfo.setText("" + animationFrame + " of " + thumbnails.size() + " (" + sdf.format(time) + ")");
 	}
-        //else if (event.getSource() == loadImageTimer)
-        //    loadImage();
     }
 }

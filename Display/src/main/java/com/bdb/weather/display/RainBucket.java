@@ -57,9 +57,11 @@ public final class RainBucket extends Canvas {
     private static final double      TICK_LINE_LENGTH    = 5;
     private static final Dimension2D PREFERRED_SIZE      = new Dimension2D(PREFERRED_WIDTH, PREFERRED_HEIGHT);
     private static final Color       BEAKER_COLOR        = new Color(.4, .4, 1.0, 1.0);
-    private static final Stop[]      WATER_STOPS         = {new Stop(0, new Color(0, 0, 1.0, .5)), new Stop(1, Color.WHITE)};
+    //private static final Stop[]      WATER_STOPS         = {new Stop(0, new Color(0, 0, 1.0, 1)), new Stop(1, Color.WHITE)};
+    private static final Stop[]      WATER_STOPS         = {new Stop(0, Color.LIGHTSKYBLUE), new Stop(1, Color.WHITE)};
     private static final Paint       WATER_PAINT         = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, WATER_STOPS);
-    private static final Stop[]      SURFACE_STOPS       = {new Stop(0, new Color(.6, .5, 1.0, 1)), new Stop(1, Color.WHITE)};
+    //private static final Stop[]      SURFACE_STOPS       = {new Stop(0, new Color(.6, .5, 1.0, 1)), new Stop(1, Color.WHITE)};
+    private static final Stop[]      SURFACE_STOPS       = {new Stop(0, Color.LIGHTSKYBLUE.darker()), new Stop(1, Color.WHITE)};
     private static final Paint       SURFACE_PAINT       = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, SURFACE_STOPS);
     private static final Stop[]      BELOW_AVG_STOPS     = {new Stop(0, new Color(1.0, .6, .6, 1)), new Stop(1, Color.WHITE)};
     private static final Paint       BELOW_AVERAGE_PAINT = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, BELOW_AVG_STOPS);

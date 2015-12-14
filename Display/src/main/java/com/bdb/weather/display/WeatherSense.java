@@ -136,6 +136,7 @@ public class WeatherSense extends Application {
     public void stop() {
 	timer.shutdownNow();
 	//subscriber.requestExit();
+
     }
 
     public static void setStageTitle(Node node, String title) {

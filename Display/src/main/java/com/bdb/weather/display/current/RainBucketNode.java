@@ -51,7 +51,7 @@ public class RainBucketNode extends BorderPane {
      */
     public RainBucketNode(String labelString, Depth maxValue, Depth average, Depth averageToDate) {
         Depth.Unit unit = Depth.getDefaultUnit();
-        rainBucket = new com.bdb.weather.display.RainBucket(maxValue.get(), unit.getFormatter(), unit.toString(), average.get(), averageToDate.get());
+        rainBucket = new RainBucket(maxValue.get(), unit.getFormatter(), unit.toString(), average.get(), averageToDate.get());
         //rainBucket.setBorder(new EtchedBorder(EtchedBorder.RAISED));
         title = new Label(labelString);
         title.setTextAlignment(TextAlignment.CENTER);

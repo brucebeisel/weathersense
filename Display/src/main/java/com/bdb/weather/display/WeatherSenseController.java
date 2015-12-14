@@ -60,8 +60,6 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
         final CurrentWeather curWeather = currentWeather;
         logger.fine(String.format("Updating %s current weather processors", cwpList.size()));
         
-        //Platform.runLater(() -> { cwpList.forEach((cwp) -> { cwp.updateCurrentWeather(curWeather); }); });
-        //cwpList.forEach((cwp) -> Platform.runLater(() -> cwp.updateCurrentWeather(curWeather)));
         for (CurrentWeatherProcessor cwp : cwpList) {
             Platform.runLater(new Runnable() {
                 @Override public void run() {
@@ -69,9 +67,7 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
                 }
             });
         }
-
     }
-
 
     @FXML
     public void launchCurrentWeatherFormView() {
@@ -80,9 +76,9 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchCurrentWeatherView() {
-	CurrentWeatherCharts cwCharts = new CurrentWeatherCharts(ws, connection);
-	cwpList.add(cwCharts);
 	Stage stage = new Stage();
+	CurrentWeatherCharts cwCharts = new CurrentWeatherCharts(ws, connection, stage);
+	cwpList.add(cwCharts);
         Scene scene = new Scene(cwCharts);
         stage.setTitle("Current Weather");
         stage.setScene(scene);

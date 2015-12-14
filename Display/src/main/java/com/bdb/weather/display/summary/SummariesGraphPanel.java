@@ -43,7 +43,7 @@ public class SummariesGraphPanel {
     public SummariesGraphPanel(SummaryInterval interval, DBConnection connection, ViewLauncher launcher, SummarySupporter supporter) {
         temperaturePanel = new HighLowMedianTempPanel(interval, launcher, supporter);
         deltaPanel = new TemperatureDeviationPlotPanel(interval, launcher, supporter);
-        rainPanel = new RainSummary(interval, launcher, supporter);
+        rainPanel = new RainSummary(interval, supporter);
         windPanel = new WindSummary(interval, launcher, supporter);
         windRosePanel = new WindRosePane();
         highLowHumidityPanel = new HighLowHumidityPanel(interval, launcher, supporter);

@@ -31,7 +31,7 @@
 	    <TextField fx:id="forecastRule" editable="false"/> 
 	</bottom>
     </BorderPane>
-    <TitledPane text="Rain">
+    <TitledPane fx:id="rainPane" text="Rain" >
 	<BorderPane>
 	    <top>
 		<RainPlot fx:id="rainPlot" />
