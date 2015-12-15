@@ -218,32 +218,34 @@ private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:m
      * @param list The list of historical records for the rainfall graph.
      */
     public void setRainData(List<RainEntry> list) {
-        rainSeries.clear();
-        rainRateSeries.clear();
-        
-        if (list.size() > 0) {
-            rainPlot.clearDomainMarkers();
-            //
-            // Load the graph
-            //
-            for (RainEntry r : list) {
-                RegularTimePeriod p = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(r.time), TimeZone.getDefault());
+        SwingUtilities.invokeLater(() -> {
+            rainSeries.clear();
+            rainRateSeries.clear();
+            
+            if (list.size() > 0) {
+                rainPlot.clearDomainMarkers();
+                //
+                // Load the graph
+                //
+                for (RainEntry r : list) {
+                    RegularTimePeriod p = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(r.time), TimeZone.getDefault());
 
-                if (r.rainfall != null) {
-                    TimeSeriesDataItem item = new TimeSeriesDataItem(p, r.rainfall.get());
-                    rainSeries.add(item);
+                    if (r.rainfall != null) {
+                        TimeSeriesDataItem item = new TimeSeriesDataItem(p, r.rainfall.get());
+                        rainSeries.add(item);
+                    }
+
+                    if (r.rainfallRate != null) {
+                        TimeSeriesDataItem item = new TimeSeriesDataItem(p, r.rainfallRate.get());
+                        rainRateSeries.add(item);
+                    }
                 }
 
-                if (r.rainfallRate != null) {
-                    TimeSeriesDataItem item = new TimeSeriesDataItem(p, r.rainfallRate.get());
-                    rainRateSeries.add(item);
-                }
+                rainPlot.getRangeAxis().setAutoRange(true);
+
+                addMarker(list.get(list.size() - 1).time);
             }
-
-            rainPlot.getRangeAxis().setAutoRange(true);
-
-            addMarker(list.get(list.size() - 1).time);
-        }
+        });
     }
 
     public void addMarker(LocalDateTime markerTime) {

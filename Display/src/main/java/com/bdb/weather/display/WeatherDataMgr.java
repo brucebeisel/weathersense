@@ -81,7 +81,7 @@ public final class WeatherDataMgr {
     private WeatherDataMgr() {
     }
 
-    public void initialize(DBConnection connection, Month weatherStartMonth) {
+    public void initialize(String databaseURL, Month weatherStartMonth) {
         this.connection = connection;
         this.weatherYearStartMonth = weatherStartMonth;
         historyTable = new HistoryTable(connection);
@@ -147,9 +147,6 @@ public final class WeatherDataMgr {
         LocalDate monthBegin = LocalDate.now().withDayOfMonth(1).minusMonths(1);
         LocalDate monthEnd = monthBegin.plusDays(monthBegin.lengthOfMonth());
         lastMonthRain = historyTable.rainTotal(monthBegin.atStartOfDay(), monthEnd.atTime(23, 59, 59));
-
-
-        //recentData.stream().filter(
 
         todaysSummary = summaryTable.retrieveTodaysSummary(ws.getWindParameters(), temperatureBinMgr);
     }

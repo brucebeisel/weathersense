@@ -38,14 +38,70 @@
 	    </top>
 	    <center>
 		<TilePane>
-		    <RainBucketNode fx:id="hourRain" title="Hour"/>
-		    <RainBucketNode fx:id="todayRain" title="Today"/>
-		    <RainBucketNode fx:id="rain24Hour" title="24 Hour"/>
-		    <RainBucketNode fx:id="stormRain" title="Storm"/>
-		    <RainBucketNode fx:id="monthRain" title="Month"/>
-		    <RainBucketNode fx:id="lastMonthRain" title="Last Month"/>
-		    <RainBucketNode fx:id="calendarYearRain" title="Cal Year"/>
-		    <RainBucketNode fx:id="weatherYearRain" title="Wthr Year"/>
+                    <BorderPane styleClass="border">
+                        <center>
+                            <RainBucket fx:id="hourRain" />
+                        </center>
+                        <bottom>
+                            <Label text="Hour" BorderPane.alignment="CENTER" />
+                        </bottom>
+                    </BorderPane>
+                    <BorderPane>
+                        <center>
+                            <RainBucket fx:id="todayRain" />
+                        </center>
+                        <bottom>
+                            <Label text="Today" BorderPane.alignment="CENTER" />
+                        </bottom>
+                    </BorderPane>
+                    <BorderPane>
+                        <center>
+                            <RainBucket fx:id="rain24Hour" />
+                        </center>
+                        <bottom>
+                            <Label text="24 Hour" BorderPane.alignment="CENTER" />
+                        </bottom>
+                    </BorderPane>
+                    <BorderPane>
+                        <center>
+                            <RainBucket fx:id="stormRain" />
+                        </center>
+                        <bottom>
+                            <Label text="Storm" BorderPane.alignment="CENTER" />
+                        </bottom>
+                    </BorderPane>
+                    <BorderPane>
+                        <center>
+                            <RainBucket fx:id="monthRain" />
+                        </center>
+                        <bottom>
+                            <Label text="This Month" BorderPane.alignment="CENTER" />
+                        </bottom>
+                    </BorderPane>
+                    <BorderPane>
+                        <center>
+                            <RainBucket fx:id="lastMonthRain" />
+                        </center>
+                        <bottom>
+                            <Label text="Last Month" BorderPane.alignment="CENTER" />
+                        </bottom>
+                    </BorderPane>
+                    <BorderPane>
+                        <center>
+                            <RainBucket fx:id="calendarYearRain" />
+                        </center>
+                        <bottom>
+                            <Label text="Calendar Year" BorderPane.alignment="CENTER" />
+                        </bottom>
+                    </BorderPane>
+                    <BorderPane>
+                        <center>
+                            <RainBucket fx:id="weatherYearRain" waterColor="purple"/>
+                        </center>
+                        <bottom>
+                            <Label text="Weather Year" BorderPane.alignment="CENTER" />
+                        </bottom>
+                    </BorderPane>
 		</TilePane>
 	    </center>
 	</BorderPane>

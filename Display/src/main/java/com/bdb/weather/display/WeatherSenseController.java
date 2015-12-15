@@ -55,6 +55,10 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 	this.connection = connection;
     }
 
+    public void stop() {
+	subscriber.requestExit();
+    }
+
     @Override
     public void handleCurrentWeather(CurrentWeather currentWeather) {
         final CurrentWeather curWeather = currentWeather;
@@ -84,6 +88,7 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
         stage.setScene(scene);
         stage.sizeToScene();
         stage.show();
+        stage.setOnCloseRequest((handler) -> cwpList.remove(cwCharts));
     }
 
     @FXML

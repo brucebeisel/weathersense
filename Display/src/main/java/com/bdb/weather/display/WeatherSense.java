@@ -51,6 +51,7 @@ public class WeatherSense extends Application {
     private WeatherStation ws;
     private final List<Refreshable> refreshList = new ArrayList<>();
     private ScheduledThreadPoolExecutor timer;
+    private WeatherSenseController controller;
     private static final Logger logger = Logger.getLogger(WeatherSense.class.getName());
 
     private void openDatabase(List<String> args) {
@@ -91,6 +92,7 @@ public class WeatherSense extends Application {
 
 	timer = new ScheduledThreadPoolExecutor(1);
 	timer.scheduleAtFixedRate(() -> {
+            WeatherDataMgr.getInstance().refreshData();
 	    logger.info("Refreshing screens");
 	    refreshList.stream().forEach((refresh) -> refresh.refresh());
 	}, REFRESH_INTERVAL, REFRESH_INTERVAL, TimeUnit.SECONDS);
@@ -126,7 +128,7 @@ public class WeatherSense extends Application {
         stage.setTitle("WeatherSense 3.0");
 	stage.getIcons().add(icon);
         stage.setScene(scene);
-        WeatherSenseController controller = loader.getController();
+        controller = loader.getController();
 	controller.setData(ws, connection);
         stage.sizeToScene();
         stage.show();
@@ -135,7 +137,7 @@ public class WeatherSense extends Application {
     @Override
     public void stop() {
 	timer.shutdownNow();
-	//subscriber.requestExit();
+        controller.stop();
 
     }
 

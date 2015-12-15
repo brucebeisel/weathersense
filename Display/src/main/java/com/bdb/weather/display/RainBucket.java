@@ -18,6 +18,8 @@ package com.bdb.weather.display;
 
 import java.text.NumberFormat;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Dimension2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -39,9 +41,17 @@ public final class RainBucket extends Canvas {
     private double                  valueTop = GUAGE_BOTTOM;
     private Font                    origFont = null;
     private Font                    defaultFont = null;
-    private final NumberFormat      formatter;
+    private NumberFormat            formatter;
     private double                  average;
     private double                  toDateAverage;
+    private final ObjectProperty<Color>   beakerColorProperty = new SimpleObjectProperty<>(new Color(.4, .4, 1.0, 1.0));
+    private final ObjectProperty<Color>   waterColorProperty = new SimpleObjectProperty<>(Color.LIGHTSKYBLUE);
+    private final ObjectProperty<Color>   surfaceColorProperty = new SimpleObjectProperty<>(Color.LIGHTSKYBLUE.darker());
+    private static final Stop       WHITE_STOP = new Stop(1, Color.WHITE);
+    private Stop[]                  waterStops  = {new Stop(0, waterColorProperty.getValue()), WHITE_STOP};
+    private Paint                   waterPaint  = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, waterStops);
+    private Stop[]                  surfaceStops = {new Stop(0, surfaceColorProperty.getValue()), WHITE_STOP};
+    private Paint                   surfacePaint = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, surfaceStops);
 
     private static final double      INSET               = 5;
     private static final double      GUAGE_HEIGHT        = 100;
@@ -56,17 +66,14 @@ public final class RainBucket extends Canvas {
     private static final double      PREFERRED_WIDTH     = INSET + GUAGE_WIDTH + 5 + 10 + 5 + 20;
     private static final double      TICK_LINE_LENGTH    = 5;
     private static final Dimension2D PREFERRED_SIZE      = new Dimension2D(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-    private static final Color       BEAKER_COLOR        = new Color(.4, .4, 1.0, 1.0);
-    //private static final Stop[]      WATER_STOPS         = {new Stop(0, new Color(0, 0, 1.0, 1)), new Stop(1, Color.WHITE)};
-    private static final Stop[]      WATER_STOPS         = {new Stop(0, Color.LIGHTSKYBLUE), new Stop(1, Color.WHITE)};
-    private static final Paint       WATER_PAINT         = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, WATER_STOPS);
-    //private static final Stop[]      SURFACE_STOPS       = {new Stop(0, new Color(.6, .5, 1.0, 1)), new Stop(1, Color.WHITE)};
-    private static final Stop[]      SURFACE_STOPS       = {new Stop(0, Color.LIGHTSKYBLUE.darker()), new Stop(1, Color.WHITE)};
-    private static final Paint       SURFACE_PAINT       = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, SURFACE_STOPS);
     private static final Stop[]      BELOW_AVG_STOPS     = {new Stop(0, new Color(1.0, .6, .6, 1)), new Stop(1, Color.WHITE)};
     private static final Paint       BELOW_AVERAGE_PAINT = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, BELOW_AVG_STOPS);
     private static final Stop[]      ABOVE_AVG_STOPS     = {new Stop(0, new Color(.6, 1, .6, 1)), new Stop(1, Color.WHITE)};
     private static final Paint       ABOVE_AVERAGE_PAINT = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, ABOVE_AVG_STOPS);
+
+    public RainBucket() {
+        this(10.0, NumberFormat.getNumberInstance(), "UNK", 0.0, 0.0);
+    }
 
     /**
      * Constructor.
@@ -98,7 +105,7 @@ public final class RainBucket extends Canvas {
         //setPreferredSize(PREFERRED_SIZE);
         //setMaximumSize(PREFERRED_SIZE);
     }
-    
+
     /**
      * Constructor.
      * 
@@ -142,6 +149,12 @@ public final class RainBucket extends Canvas {
         paint();
     }
 
+    public void setAverages(double average, double toDateAverage) {
+        this.average = average;
+        this.toDateAverage = toDateAverage;
+        paint();
+    }
+
     public double getMaxValue() {
         return maxValue;
     }
@@ -172,6 +185,50 @@ public final class RainBucket extends Canvas {
         return value;
     }
 
+    public void setFormatter(NumberFormat formatter) {
+        this.formatter = formatter;
+        paint();
+    }
+
+    public Color getWaterColor() {
+        return waterColorProperty.getValue();
+    }
+
+    public void setWaterColor(Color color) {
+        waterColorProperty.setValue(color);
+        waterStops[0] = new Stop(0, color);
+        waterPaint = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, waterStops);
+        paint();
+    }
+
+    public ObjectProperty<Color> waterColorProperty() {
+        return waterColorProperty;
+    }
+    
+    public Color getSurfaceColor() {
+        return surfaceColorProperty.getValue();
+    }
+
+    public void setSurfaceColor(Color color) {
+        surfaceColorProperty.setValue(color);
+        surfaceStops[0] = new Stop(0, color);
+        surfacePaint = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, surfaceStops);
+        paint();
+    }
+
+    public ObjectProperty<Color> surfaceColorProperty() {
+        return surfaceColorProperty;
+    }
+
+    public String getUnitLabel() {
+        return unitLabel;
+    }
+    
+    public void setUnitLabel(String label) {
+        unitLabel = label;
+        paint();
+    }
+    
     /**
      * Calculate the pixel location of the top of the water line.
      * 
@@ -234,7 +291,7 @@ public final class RainBucket extends Canvas {
         // Draw the container by drawing an entire rectangle then overwriting the
         // upper portion using the background color
         //
-        gc.setStroke(BEAKER_COLOR);
+        gc.setStroke(beakerColorProperty.getValue());
         //
         // Line on left of bucket
         //
@@ -245,7 +302,7 @@ public final class RainBucket extends Canvas {
         //
         // Draw an oval on the top to give the appearance of a beaker
         //
-        gc.setStroke(BEAKER_COLOR);
+        gc.setStroke(beakerColorProperty.getValue());
         gc.strokeOval(INSET, TOP_Y - (OVAL_HEIGHT / 2), GUAGE_WIDTH, OVAL_HEIGHT);
 
         //
@@ -264,13 +321,13 @@ public final class RainBucket extends Canvas {
         //
         // Draw the water that fills the beaker based on the current value
         //
-        gc.setFill(WATER_PAINT);
+        gc.setFill(waterPaint);
         gc.fillRect(INSET, valueTop, GUAGE_WIDTH, GUAGE_BOTTOM - valueTop);
 
         //
         // Draw the surface of the water
         //
-        gc.setFill(SURFACE_PAINT);
+        gc.setFill(surfacePaint);
         gc.fillOval(INSET, valueTop - (OVAL_HEIGHT / 2), GUAGE_WIDTH, OVAL_HEIGHT);
 
         paintAverage(average, value);
@@ -303,4 +360,5 @@ public final class RainBucket extends Canvas {
         gc.setFont(origFont);
 
     }
+
 }

@@ -5,3 +5,7 @@
 .label {
     -fx-underline: true;
 }
+
+.border {
+    -fx-border-color: black; -fx-border-width: 1; -fx-border-style: solid;
+}
