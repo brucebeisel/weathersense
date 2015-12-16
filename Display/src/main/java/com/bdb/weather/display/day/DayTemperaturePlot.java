@@ -16,15 +16,15 @@
  */
 package com.bdb.weather.display.day;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.Menu;
 
 import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.axis.ValueAxis;
@@ -53,10 +53,10 @@ import com.bdb.weather.display.preferences.UserPreferences;
  * @author Bruce
  *
  */
-public class DayTemperaturePlot extends DayXYPlotPanel implements ActionListener {
+public class DayTemperaturePlot extends DayXYPlotPanel implements EventHandler<ActionEvent> {
     private Temperature             recordLow;
     private Temperature             recordHigh;
-    private final JCheckBoxMenuItem minMaxLabelsItem = new JCheckBoxMenuItem("Min/Max Labels", true);
+    private final CheckMenuItem     minMaxLabelsItem = new CheckMenuItem("Min/Max Labels");
     private SummaryRecord           summary;
     
     /**
@@ -65,12 +65,13 @@ public class DayTemperaturePlot extends DayXYPlotPanel implements ActionListener
     public DayTemperaturePlot() {
 	super(new TemperatureRangeAxis(), null);
         createElements();
+        minMaxLabelsItem.setSelected(true);
     }
     
     @Override
-    public List<SeriesControl> configure(JMenu menu) {
-	menu.add(minMaxLabelsItem);
-	minMaxLabelsItem.addActionListener(this);
+    public List<SeriesControl> configure(Menu menu) {
+	menu.getItems().add(minMaxLabelsItem);
+	minMaxLabelsItem.setOnAction(this);
         List<SeriesControl> controls = new ArrayList<>();
         controls.add(new SeriesControl(HistoricalSeriesInfo.INDOOR_TEMPERATURE_SERIES, true));
         controls.add(new SeriesControl(HistoricalSeriesInfo.LOW_OUTDOOR_TEMPERATURE_SERIES, false));
@@ -205,8 +206,8 @@ public class DayTemperaturePlot extends DayXYPlotPanel implements ActionListener
      * @see com.bdb.weather.display.day.DayXYPlotPanel#actionPerformed(java.awt.event.ActionEvent)
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-	super.actionPerformed(event);
+    public void handle(ActionEvent event) {
+	super.handle(event);
         Object source = event.getSource();
         if (source == minMaxLabelsItem) {
             addAnnotations(getPlot(), summary);

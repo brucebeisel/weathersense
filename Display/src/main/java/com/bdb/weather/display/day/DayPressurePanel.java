@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JMenu;
+import javafx.scene.control.Menu;
 
 import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
@@ -32,7 +32,6 @@ import org.jfree.ui.TextAnchor;
 
 import com.bdb.util.TimeUtils;
 import com.bdb.weather.common.SummaryRecord;
-import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.common.measurement.SolarRadiation;
 import com.bdb.weather.display.DisplayConstants;
@@ -44,9 +43,7 @@ import com.bdb.weather.display.axis.SolarRadiationAxis;
  * 
  * @author Bruce
  */
-public class DayPressurePanel extends DayXYPlotPanel implements ActionListener {
-    private static final long serialVersionUID = 4553915836873397344L;
-
+public class DayPressurePanel extends DayXYPlotPanel {
     /**
      * Constructor.
      */
@@ -56,7 +53,7 @@ public class DayPressurePanel extends DayXYPlotPanel implements ActionListener {
     }
     
     @Override
-    public List<SeriesControl> configure(JMenu menu) {
+    public List<SeriesControl> configure(Menu menu) {
         List<SeriesControl> controls = new ArrayList<>();
         controls.add(new SeriesControl(HistoricalSeriesInfo.BAROMETER_SERIES, true));
         controls.add(new SeriesControl(HistoricalSeriesInfo.HIGH_SOLAR_RADIATION_SERIES, true, false));

@@ -121,6 +121,8 @@ public class Hygrometer extends BorderPane {
         ChartViewer chartViewer = new ChartViewer(chart);
         chartViewer.setMinHeight(250);
         chartViewer.setMinWidth(250);
+        chartViewer.setMaxHeight(250);
+        chartViewer.setMaxWidth(250);
         //chartViewer.setBackground(Color.GRAY);
         return chartViewer;
     }

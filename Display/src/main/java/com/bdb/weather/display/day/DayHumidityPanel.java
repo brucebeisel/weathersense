@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JMenu;
+import javafx.scene.control.Menu;
 
 import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.plot.XYPlot;
@@ -39,7 +39,6 @@ import com.bdb.weather.display.axis.HumidityRangeAxis;
  *
  */
 public class DayHumidityPanel extends DayXYPlotPanel {
-    private static final long serialVersionUID = -8608928921655446678L;
     
     /**
      * Constructor.
@@ -55,7 +54,7 @@ public class DayHumidityPanel extends DayXYPlotPanel {
      * @return
      */
     @Override
-    public List<SeriesControl> configure(JMenu menu) {
+    public List<SeriesControl> configure(Menu menu) {
         List<SeriesControl> controls = new ArrayList<>();
         controls.add(new SeriesControl(HistoricalSeriesInfo.OUTDOOR_HUMIDITY_SERIES, true));
         controls.add(new SeriesControl(HistoricalSeriesInfo.INDOOR_HUMIDITY_SERIES, true));

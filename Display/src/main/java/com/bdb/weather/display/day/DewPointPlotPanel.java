@@ -19,7 +19,7 @@ package com.bdb.weather.display.day;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JMenu;
+import javafx.scene.control.Menu;
 
 import com.bdb.weather.display.axis.HumidityRangeAxis;
 import com.bdb.weather.display.axis.TemperatureRangeAxis;
@@ -38,7 +38,7 @@ public class DewPointPlotPanel extends DayXYPlotPanel {
     }
 
     @Override
-    public List<SeriesControl> configure(JMenu menu) {
+    public List<SeriesControl> configure(Menu menu) {
         List<SeriesControl> controls = new ArrayList<>();
         controls.add(new SeriesControl(HistoricalSeriesInfo.AVG_OUTDOOR_TEMPERATURE_SERIES, true));
         controls.add(new SeriesControl(HistoricalSeriesInfo.DEW_POINT_SERIES, true));

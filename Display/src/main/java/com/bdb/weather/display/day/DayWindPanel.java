@@ -18,17 +18,14 @@ package com.bdb.weather.display.day;
 
 import java.text.DateFormat;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import javax.swing.JMenu;
+import javafx.scene.control.Menu;
 
 import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.ui.TextAnchor;
@@ -38,14 +35,12 @@ import com.bdb.util.TimeUtils;
 import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherStation;
-import com.bdb.weather.common.Wind;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.WeatherSenseConstants;
 import com.bdb.weather.display.axis.WindSpeedRangeAxis;
 import com.bdb.weather.display.windplot.WindItemRenderer;
 import com.bdb.weather.display.windplot.WindSeries;
-import com.bdb.weather.display.windplot.WindSeriesDataItem;
 
 /**
  * Display the wind data for a day.
@@ -78,7 +73,7 @@ public class DayWindPanel extends DayXYPlotPanel {
     }
 
     @Override
-    public List<SeriesControl> configure(JMenu menu) {
+    public List<SeriesControl> configure(Menu menu) {
         List<SeriesControl> controls = new ArrayList<>();
         controls.add(new SeriesControl(HistoricalSeriesInfo.AVG_WIND_SPEED_SERIES, false));
         controls.add(new SeriesControl(HistoricalSeriesInfo.AVG_WIND_DIRECTION_SERIES, false));

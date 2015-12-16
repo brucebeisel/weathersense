@@ -23,15 +23,16 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import javax.swing.Timer;
-import javax.swing.border.BevelBorder;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.util.Duration;
 
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.plot.dial.DialBackground;
@@ -202,10 +203,10 @@ public class WindGauge extends BorderPane {
         chart.setBackgroundPaint(Color.GRAY);
 
         chartViewer = new ChartViewer(chart);
-        chartViewer.setMinHeight(300);
-        chartViewer.setMinWidth(300);
-        chartViewer.setMaxHeight(300);
-        chartViewer.setMaxWidth(300);
+        chartViewer.setMinHeight(250);
+        chartViewer.setMinWidth(250);
+        chartViewer.setMaxHeight(250);
+        chartViewer.setMaxWidth(250);
         //chartViewer.setBackground(Color.GRAY);
         //chartViewer.setBorder(new BevelBorder(BevelBorder.RAISED));
 
@@ -300,22 +301,28 @@ public class WindGauge extends BorderPane {
         else
             avgAnnotation.setLabel("");
 
-        timerCount = 0;
-        timer = new Timer(100, evt -> {
-            lastHeading += headingInterval;
-            datasets[0].setValue(lastHeading);
-            lastSpeed += speedInterval;
-            speedDataset.setValue(lastSpeed);
-            timerCount++;
-            if (timerCount > 9) {
-                timer.stop();
-                datasets[0].setValue(currentHeading);
-                lastHeading = currentHeading;
-                speedDataset.setValue(currentSpeed);
-                lastSpeed = currentSpeed;
-            }
-        });
-        timer.start();
+	Timeline timeline = new Timeline(
+	    new KeyFrame(Duration.ZERO, (actionEvent) -> nextFrame()),
+	    new KeyFrame(Duration.millis(100))
+	);
 
+	timeline.setCycleCount(10);
+        timerCount = 0;
+	timeline.play();
+
+    }
+
+    private void nextFrame() {
+        lastHeading += headingInterval;
+        datasets[0].setValue(lastHeading);
+        lastSpeed += speedInterval;
+        speedDataset.setValue(lastSpeed);
+        timerCount++;
+        if (timerCount > 9) {
+            datasets[0].setValue(currentHeading);
+            lastHeading = currentHeading;
+            speedDataset.setValue(currentSpeed);
+            lastSpeed = currentSpeed;
+        }
     }
 }
