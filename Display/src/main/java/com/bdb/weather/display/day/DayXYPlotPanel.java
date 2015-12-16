@@ -17,8 +17,6 @@
 package com.bdb.weather.display.day;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,40 +26,15 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JPopupMenu;
-
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.DateTickUnit;
-import org.jfree.chart.axis.DateTickUnitType;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.labels.StandardXYToolTipGenerator;
-import org.jfree.chart.plot.IntervalMarker;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.time.Minute;
-import org.jfree.data.time.RegularTimePeriod;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
-
-import com.bdb.util.TimeUtils;
-import com.bdb.util.measurement.Measurement;
-
-import com.bdb.weather.common.DailyRecords;
-import com.bdb.weather.common.HistoricalRecord;
-import com.bdb.weather.common.SummaryRecord;
-import com.bdb.weather.common.WeatherAverage;
-
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingNode;
-import javafx.scene.Node;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -69,12 +42,34 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.DateTickUnit;
+import org.jfree.chart.axis.DateTickUnitType;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.fx.ChartViewer;
+import org.jfree.chart.labels.StandardXYToolTipGenerator;
+import org.jfree.chart.plot.IntervalMarker;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLine3DRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.time.Minute;
+import org.jfree.data.time.RegularTimePeriod;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
 
+import com.bdb.util.TimeUtils;
+import com.bdb.util.measurement.Measurement;
+import com.bdb.weather.common.DailyRecords;
 import com.bdb.weather.common.GeographicLocation;
+import com.bdb.weather.common.HistoricalRecord;
+import com.bdb.weather.common.SummaryRecord;
+import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.astronomical.SolarEventCalculator;
 import com.bdb.weather.display.DisplayConstants;
+
 
 /**
  * An XY Plot for a single day of data. This class provides a tabbed pane, one pane for the plot
@@ -83,19 +78,19 @@ import com.bdb.weather.display.DisplayConstants;
  * 
  * @author Bruce
  */
-abstract public class DayXYPlotPanel extends TabPane implements ActionListener {
+abstract public class DayXYPlotPanel extends TabPane implements EventHandler<ActionEvent> {
     protected static final String TIME_HEADING = "Time";
     protected static final int TIME_COLUMN = 0;
 
     private XYPlot               plot;
     private JFreeChart           chart;
-    private ChartPanel           chartPanel;
+    private ChartViewer          chartViewer;
     private DateAxis             dateAxis;
     private final ValueAxis      leftAxis;
     private final ValueAxis      rightAxis;
-    private JMenu                displayMenu;
+    private Menu                 displayMenu;
     private boolean              displayDayNightIndicators = true;
-    private JCheckBoxMenuItem    dayNightItem;
+    private CheckMenuItem        dayNightItem;
     private LocalDate            currentDate;
     private LocalDateTime        sunrise;
     private LocalDateTime        sunset;
@@ -113,11 +108,35 @@ abstract public class DayXYPlotPanel extends TabPane implements ActionListener {
     }
         
     protected final void createElements() {
+        createChartElements();
+
+	this.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+
+	Tab tab = new Tab(DisplayConstants.GRAPH_TAB_NAME);
+	tab.setContent(chartViewer);
+        this.getTabs().add(tab);
+
+        //
+        // Build the table for the data tab
+        //
+        dataTable = new TableView<>();
+	tab = new Tab(DisplayConstants.DATA_TAB_NAME);
+	tab.setContent(dataTable);
+        this.getTabs().add(tab);
+
+        TableColumn<HistoricalRecord,String> col = new TableColumn<>(TIME_HEADING);
+        col.setCellValueFactory((rec)->new ReadOnlyStringWrapper(DisplayConstants.formatTime(rec.getValue().getTime().toLocalTime())));
+
+	dataTable.getColumns().add(col);
+        doConfigure(displayMenu);
+	this.layout();
+    }
+
+    private void createChartElements(){
         //
         // Set up the Domain Axis (X)
         //
         plot = new XYPlot();
-	this.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         dateAxis = new DateAxis("Time");
         dateAxis.setAutoRange(false);
         dateAxis.setTickUnit(new DateTickUnit(DateTickUnitType.HOUR, 1, new SimpleDateFormat("h a")));
@@ -160,57 +179,34 @@ abstract public class DayXYPlotPanel extends TabPane implements ActionListener {
         //
         chart = new JFreeChart(plot);
         ChartFactory.getChartTheme().apply(chart);
-        chartPanel = new ChartPanel(chart);
+        chartViewer = new ChartViewer(chart);
 
         //chartPanel.setMaximumDrawHeight(10000);
         //chartPanel.setMaximumDrawWidth(10000);
 
         //
-        // Create a panel to hold the chart panel
-        //
-        SwingNode p = new SwingNode();
-	p.setContent(chartPanel);
-
-	Tab tab = new Tab(DisplayConstants.GRAPH_TAB_NAME);
-	tab.setContent(p);
-        this.getTabs().add(tab);
-
-        //
-        // Build the table for the data tab
-        //
-        dataTable = new TableView<>();
-	tab = new Tab(DisplayConstants.DATA_TAB_NAME);
-	tab.setContent(dataTable);
-        this.getTabs().add(tab);
-
-        //
         // Add the Day/Night indicator option to the chart panels context menu
         //
-        JPopupMenu menu = chartPanel.getPopupMenu();
+        ContextMenu menu = chartViewer.getContextMenu();
 
-        displayMenu = new JMenu("Display");
-        menu.add(displayMenu);
+        displayMenu = new Menu("Display");
 
-        dayNightItem = new JCheckBoxMenuItem("Day/Night Indicators", true);
-        displayMenu.add(dayNightItem);
-        dayNightItem.addActionListener(this);
+        dayNightItem = new CheckMenuItem("Day/Night Indicators");
+        dayNightItem.setSelected(true);
+        displayMenu.getItems().add(dayNightItem);
+        dayNightItem.setOnAction(this);
+        menu.getItems().add(displayMenu);
 
-        TableColumn<HistoricalRecord,String> col = new TableColumn<>(TIME_HEADING);
-        col.setCellValueFactory((rec)->new ReadOnlyStringWrapper(DisplayConstants.formatTime(rec.getValue().getTime().toLocalTime())));
-
-	dataTable.getColumns().add(col);
-        doConfigure(displayMenu);
-	this.layout();
     }
     
-    private void doConfigure(JMenu menu) {
+    private void doConfigure(Menu menu) {
         List<SeriesControl> controls = configure(displayMenu);
         int tableColumn = 1;
         for (SeriesControl control : controls) {
             HistoricalSeriesInfo info = HistoricalSeriesInfo.find(control.name);
             if (info != null) {
                 TimeSeries timeSeries = new TimeSeries(info.getSeriesName());
-                JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(info.getSeriesName());
+                CheckMenuItem menuItem = new CheckMenuItem(info.getSeriesName());
                 menuItem.setSelected(control.displayInitially);
                 SeriesEntry entry = new SeriesEntry(info, timeSeries, tableColumn, menuItem, control.leftAxis);
                 entries.add(entry);
@@ -219,24 +215,14 @@ abstract public class DayXYPlotPanel extends TabPane implements ActionListener {
 		col.setCellValueFactory(entry);
                 dataTable.getColumns().add(col);
 
-                menu.add(menuItem);
-                menuItem.addActionListener(this);
+                menu.getItems().add(menuItem);
+                menuItem.setOnAction(this);
                 tableColumn++;
             }
         }
     }
 
-    protected abstract List<SeriesControl> configure(JMenu menu);
-
-
-    /**
-     * Return the Swing component that contains the Day XY Plot.
-     * 
-     * @return The component
-     */
-    public Node getNode() {
-        return this;
-    }
+    protected abstract List<SeriesControl> configure(Menu menu);
 
     /**
      * Get the plot used by this panel
@@ -252,16 +238,16 @@ abstract public class DayXYPlotPanel extends TabPane implements ActionListener {
      * 
      * @return The chart panel
      */
-    protected ChartPanel getChartPanel() {
-        return chartPanel;
+    protected ChartViewer getChartViewer() {
+        return chartViewer;
     }
 
     /**
      * Get the menu that pops up when the user right-clicks on the plot.
      * 
-     * @return The Swing menu
+     * @return The menu
      */
-    protected JMenu getDisplayMenu() {
+    protected Menu getDisplayMenu() {
         return displayMenu;
     }
 
@@ -416,7 +402,7 @@ abstract public class DayXYPlotPanel extends TabPane implements ActionListener {
      * @param event
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
+    public void handle(ActionEvent event) {
         if (event.getSource() == dayNightItem) {
             displayDayNightIndicators = dayNightItem.isSelected();
             addSunriseSunsetMarkers();
@@ -451,10 +437,10 @@ abstract public class DayXYPlotPanel extends TabPane implements ActionListener {
         public HistoricalSeriesInfo seriesInfo;
         public TimeSeries           timeSeries;
         public int                  tableColumn;
-        public JCheckBoxMenuItem    checkbox;
+        public CheckMenuItem        checkbox;
         public boolean              datasetLeft;
         
-        public SeriesEntry(HistoricalSeriesInfo info, TimeSeries ts, int tc, JCheckBoxMenuItem cb, boolean left) {
+        public SeriesEntry(HistoricalSeriesInfo info, TimeSeries ts, int tc, CheckMenuItem cb, boolean left) {
             seriesInfo = info;
             timeSeries = ts;
             tableColumn = tc;

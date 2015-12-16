@@ -20,18 +20,14 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 import java.text.DecimalFormat;
 
-import javax.swing.SwingUtilities;
-import javax.swing.border.BevelBorder;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.embed.swing.SwingNode;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.plot.dial.DialBackground;
 import org.jfree.chart.plot.dial.DialCap;
 import org.jfree.chart.plot.dial.DialPlot;
@@ -72,16 +68,15 @@ public class Hygrometer extends BorderPane {
     public Hygrometer(String titleString) {
 	this.setPrefSize(250.0, 250.0);
 
-	SwingNode swingNode = new SwingNode();
-	SwingUtilities.invokeLater(()-> createChartElements(swingNode));
+	ChartViewer chartViewer = createChartElements();
 	this.setTop(title);
-	this.setCenter(swingNode);
+	this.setCenter(chartViewer);
 	BorderPane.setAlignment(title, Pos.CENTER);
 	title.textProperty().bind(titleProperty);
 	setTitle(titleString);
     }
 
-    private void createChartElements(SwingNode swingNode) {
+    private ChartViewer createChartElements() {
         humidityPlot.addLayer(new DialBackground(new GradientPaint(0.0f, 0.0f, Color.LIGHT_GRAY, 100.0f, 0.0f, Color.blue)));
         StandardDialScale scale = new StandardDialScale(Humidity.MIN_HUMIDITY.get(), Humidity.MAX_HUMIDITY.get(), 240.0, -300.0, 10.0, 9);
         scale.setTickRadius(.9);
@@ -123,13 +118,11 @@ public class Hygrometer extends BorderPane {
         JFreeChart chart = new JFreeChart(humidityPlot);
         chart.setBackgroundPaint(Color.GRAY);
         
-        ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setMinimumDrawHeight(250);
-        chartPanel.setMinimumDrawWidth(250);
-        chartPanel.setBackground(Color.GRAY);
-        chartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
-
-	swingNode.setContent(chartPanel);
+        ChartViewer chartViewer = new ChartViewer(chart);
+        chartViewer.setMinHeight(250);
+        chartViewer.setMinWidth(250);
+        //chartViewer.setBackground(Color.GRAY);
+        return chartViewer;
     }
     
     public String getTitle() {
@@ -154,25 +147,23 @@ public class Hygrometer extends BorderPane {
      * @param trend The current trend of the barometer
      */
     public void loadData(Humidity current, Humidity min, Humidity max, Humidity delta, WeatherTrend trend) {
-	SwingUtilities.invokeLater(() -> {
-	    humidityDataset.setValue(current.get());
-	    
-	    if (min != null && max != null) {
-		if (!min.equals(max)) {
-		    humidityPlot.addLayer(range);
-		    range.setLowerBound(min.get());
-		    range.setUpperBound(max.get());
-		}
-		else if (humidityPlot.getLayerIndex(range) >= 0)
-		    humidityPlot.removeLayer(range);
-	    }
-	    
-	    if (trend == WeatherTrend.STEADY)
-		trendAnnotation.setLabel(WeatherTrend.STEADY.toString());
-	    else {
-		String trendText = trend.getSymbol() + delta + "/hr";
-		trendAnnotation.setLabel(trendText);
-	    }
-	});
+        humidityDataset.setValue(current.get());
+        
+        if (min != null && max != null) {
+            if (!min.equals(max)) {
+                humidityPlot.addLayer(range);
+                range.setLowerBound(min.get());
+                range.setUpperBound(max.get());
+            }
+            else if (humidityPlot.getLayerIndex(range) >= 0)
+                humidityPlot.removeLayer(range);
+        }
+        
+        if (trend == WeatherTrend.STEADY)
+            trendAnnotation.setLabel(WeatherTrend.STEADY.toString());
+        else {
+            String trendText = trend.getSymbol() + delta + "/hr";
+            trendAnnotation.setLabel(trendText);
+        }
     }
 }

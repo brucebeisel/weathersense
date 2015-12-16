@@ -27,13 +27,13 @@ import javax.swing.border.BevelBorder;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.embed.swing.SwingNode;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.plot.dial.DialBackground;
 import org.jfree.chart.plot.dial.DialCap;
 import org.jfree.chart.plot.dial.DialPlot;
@@ -81,7 +81,7 @@ public class WindGauge extends BorderPane {
     private final DefaultValueDataset maxGustDataset = new DefaultValueDataset(0.0);
     private final DialTextAnnotation speedAnnotation = new DialTextAnnotation("");
     private final DialTextAnnotation avgAnnotation = new DialTextAnnotation("");
-    private final ChartPanel chartPanel;
+    private final ChartViewer chartViewer;
     private double lastHeading;
     private double currentHeading;
     private double headingInterval;
@@ -201,17 +201,15 @@ public class WindGauge extends BorderPane {
         JFreeChart chart = new JFreeChart(plot);
         chart.setBackgroundPaint(Color.GRAY);
 
-        chartPanel = new ChartPanel(chart);
-        chartPanel.setMinimumDrawHeight(300);
-        chartPanel.setMinimumDrawWidth(300);
-        chartPanel.setMaximumDrawHeight(300);
-        chartPanel.setMaximumDrawWidth(300);
-        chartPanel.setBackground(Color.GRAY);
-        chartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        chartViewer = new ChartViewer(chart);
+        chartViewer.setMinHeight(300);
+        chartViewer.setMinWidth(300);
+        chartViewer.setMaxHeight(300);
+        chartViewer.setMaxWidth(300);
+        //chartViewer.setBackground(Color.GRAY);
+        //chartViewer.setBorder(new BevelBorder(BevelBorder.RAISED));
 
-	SwingNode node = new SwingNode();
-	node.setContent(chartPanel);
-	this.setCenter(node);
+	this.setCenter(chartViewer);
 	this.setTop(title);
 	BorderPane.setAlignment(title, Pos.CENTER);
 	title.textProperty().bind(titleProperty);

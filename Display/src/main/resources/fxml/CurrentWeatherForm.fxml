@@ -6,12 +6,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane  id="CurrentWeather" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="javafx.scene.layout.GridPane" xmlns:fx="http://javafx.com/fxml">
     <fx:define>
         <Double fx:id="FORM_SPACING" fx:value="5"/>
     </fx:define>
     <TitledPane text="Temperatures" collapsible="false"  GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.rowSpan="2" GridPane.valignment="TOP" >
-        <GridPane hgap="5" vgap="$FORM_SPACING">
+        <GridPane fx:id="temperaturePane" hgap="5" vgap="$FORM_SPACING">
             <Label text="Outdoor:" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
             <TextField fx:id="outdoorTemperature" prefColumnCount="5" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
             <Label text="Dew Point:" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
@@ -27,7 +27,7 @@
 	</GridPane>
     </TitledPane>
     <TitledPane text="Humidities" collapsible="false"  GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.rowSpan="1">
-        <GridPane hgap="5" vgap="$FORM_SPACING">
+        <GridPane fx:id="humidityPane" hgap="5" vgap="$FORM_SPACING">
             <Label text="Outdoor:" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
             <TextField fx:id="outdoorHumidity" prefColumnCount="5" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
             <Label text="Indoor:" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
@@ -78,8 +78,8 @@
             <TextField fx:id="rainRate" prefColumnCount="5" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
             <Label text="15 Minute Rain:" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
             <TextField fx:id="rain15Minute" prefColumnCount="5" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-            <Label text="1 Hour Rain:" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
-            <TextField fx:id="rain1Hour" prefColumnCount="5" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <Label text="Hour Rain:" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="rainHour" prefColumnCount="5" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
             <Label text="24 Hour Rain:" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
             <TextField fx:id="rain24Hour" prefColumnCount="5" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
             <Label text="Today Rain:" GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
@@ -108,4 +108,4 @@
             <TextField fx:id="forecastRule" prefColumnCount="40" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="3" />
 	</GridPane>
     </TitledPane>
-</GridPane>
+</fx:root>

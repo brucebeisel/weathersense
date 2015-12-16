@@ -29,6 +29,7 @@ import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.TemperatureBinMgr;
 import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.db.DailySummaryTable;
+import com.bdb.weather.common.db.DatabaseConstants;
 import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.common.db.WeatherStationTable;
 import com.bdb.weather.common.measurement.Depth;
@@ -41,12 +42,12 @@ import com.bdb.weather.common.measurement.Depth;
  * @author Bruce
  */
 public final class WeatherDataMgr {
-    private boolean needHourRain = false;
-    private boolean needTodayRain = false;
-    private boolean need24HourRain = false;
-    private boolean needThisMonthRain = false;
-    private boolean needWeatherYearRain = false;
-    private boolean needCalendarYearRain = true;
+    private final boolean needHourRain = false;
+    private final boolean needTodayRain = false;
+    private final boolean need24HourRain = false;
+    private final boolean needThisMonthRain = false;
+    private final boolean needWeatherYearRain = false;
+    private final boolean needCalendarYearRain = true;
     private DBConnection connection;
     private HistoryTable historyTable;
     private DailySummaryTable summaryTable;
@@ -67,8 +68,8 @@ public final class WeatherDataMgr {
     private List<HistoricalRecord> recentData;
     private SummaryRecord todaysSummary;
     private Thread thread = null;
-    private static WeatherDataMgr instance;
-    private static Logger logger = Logger.getLogger(WeatherDataMgr.class.getName());
+    private static final WeatherDataMgr instance;
+    private static final Logger logger = Logger.getLogger(WeatherDataMgr.class.getName());
 
     static {
         instance = new WeatherDataMgr();
@@ -81,8 +82,11 @@ public final class WeatherDataMgr {
     private WeatherDataMgr() {
     }
 
-    public void initialize(String databaseURL, Month weatherStartMonth) {
-        this.connection = connection;
+    public void initialize(String databaseUrl, Month weatherStartMonth) {
+        connection = new DBConnection(databaseUrl, DatabaseConstants.DATABASE_USER, DatabaseConstants.DATABASE_PASSWORD);
+
+        connection.connect();
+
         this.weatherYearStartMonth = weatherStartMonth;
         historyTable = new HistoryTable(connection);
         summaryTable = new DailySummaryTable(connection);
@@ -143,7 +147,7 @@ public final class WeatherDataMgr {
             LocalDate monthBegin = nowDate.withDayOfMonth(1);
             thisMonthRain = historyTable.rainTotal(monthBegin.atStartOfDay(), now);
         }
-        
+
         LocalDate monthBegin = LocalDate.now().withDayOfMonth(1).minusMonths(1);
         LocalDate monthEnd = monthBegin.plusDays(monthBegin.lengthOfMonth());
         lastMonthRain = historyTable.rainTotal(monthBegin.atStartOfDay(), monthEnd.atTime(23, 59, 59));
@@ -151,7 +155,16 @@ public final class WeatherDataMgr {
         todaysSummary = summaryTable.retrieveTodaysSummary(ws.getWindParameters(), temperatureBinMgr);
     }
 
-    public void fillInCurrentWeather(CurrentWeather cw) {
+    public SummaryRecord getTodaysSummary() {
+        return todaysSummary;
+    }
 
+    public Depth getLastMonthRain() {
+        return lastMonthRain;
+    }
+
+    public void fillInCurrentWeather(CurrentWeather cw) {
+        // TODO: Fill in other possible missing data
+        cw.setRainCalendarYear(ytdRain);
     }
 }

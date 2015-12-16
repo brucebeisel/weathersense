@@ -58,6 +58,7 @@ import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.display.CurrentWeatherProcessor;
 import com.bdb.weather.display.RainBucket;
 import com.bdb.weather.display.RainPlot;
+import com.bdb.weather.display.WeatherDataMgr;
 import com.bdb.weather.display.WeatherSense;
 
 /**
@@ -302,7 +303,7 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         //
         // If there is no summary record then just use the current temperature for both high and low
         //
-        SummaryRecord summary = null;
+        SummaryRecord summary = WeatherDataMgr.getInstance().getTodaysSummary();
 	if (summary != null) {
 	    outdoorTemperature.loadData(cw.getOutdoorTemperature(), summary.getMinOutdoorTemp(), summary.getMaxOutdoorTemp());
 	    indoorTemperature.loadData(cw.getIndoorTemperature(), summary.getMinIndoorTemp(), summary.getMaxIndoorTemp());
@@ -320,17 +321,18 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
 	    indoorHumidity.loadData(cw.getIndoorHumidity(), cw.getIndoorHumidity(), cw.getIndoorHumidity(), new Humidity(0.), WeatherTrend.STEADY);
 	}
 
-	//rainPlot.setRainData(rainList);
         hourRain.setRainfallAmount(cw.getRainHour().get());
         todayRain.setRainfallAmount(cw.getRainToday().get());
         rain24Hour.setRainfallAmount(cw.getRain24Hour().get());
         monthRain.setRainfallAmount(cw.getRainMonth().get());
+        lastMonthRain.setRainfallAmount(WeatherDataMgr.getInstance().getLastMonthRain().get());
         if (cw.getStormRain() != null)
             stormRain.setRainfallAmount(cw.getStormRain().get());
         else
             stormRain.setRainfallAmount(0.0);
 
         weatherYearRain.setRainfallAmount(cw.getRainWeatherYear().get());
+        calendarYearRain.setRainfallAmount(cw.getRainCalendarYear().get());
 	String date = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.MEDIUM).format(cw.getTime());
 	String ammendedFrameTitle = frameTitle + " " + date;
 	WeatherSense.setStageTitle(this, ammendedFrameTitle);

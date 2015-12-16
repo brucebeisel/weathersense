@@ -21,7 +21,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -50,8 +51,9 @@ public class WeatherSense extends Application {
     private WeatherStationTable stationTable;
     private WeatherStation ws;
     private final List<Refreshable> refreshList = new ArrayList<>();
-    private ScheduledThreadPoolExecutor timer;
+    private ScheduledExecutorService timer;
     private WeatherSenseController controller;
+    private String databaseUrl;
     private static final Logger logger = Logger.getLogger(WeatherSense.class.getName());
 
     private void openDatabase(List<String> args) {
@@ -64,11 +66,9 @@ public class WeatherSense extends Application {
             databaseHost = "192.168.1.100";
 
 	databaseHost = "192.168.1.100";
-        String databaseUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, databaseHost, DatabaseConstants.DATABASE_PORT, DatabaseConstants.DATABASE_NAME);
+        databaseUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, databaseHost, DatabaseConstants.DATABASE_PORT, DatabaseConstants.DATABASE_NAME);
 
-        connection = new DBConnection(databaseUrl,
-                                      DatabaseConstants.DATABASE_USER,
-                                      DatabaseConstants.DATABASE_PASSWORD);
+        connection = new DBConnection(databaseUrl, DatabaseConstants.DATABASE_USER, DatabaseConstants.DATABASE_PASSWORD);
 
         connection.connect();
     }
@@ -90,7 +90,7 @@ public class WeatherSense extends Application {
 	openDatabase(args);
         WeatherStationMgr.initialize(connection);
 
-	timer = new ScheduledThreadPoolExecutor(1);
+        timer = Executors.newSingleThreadScheduledExecutor();
 	timer.scheduleAtFixedRate(() -> {
             WeatherDataMgr.getInstance().refreshData();
 	    logger.info("Refreshing screens");
@@ -117,6 +117,8 @@ public class WeatherSense extends Application {
         }
         else
 	    HistoricalSeriesInfo.addExtraSensors(ws.getSensorManager().getAllSensors());
+
+        WeatherDataMgr.getInstance().initialize(databaseUrl, ws.getWeatherYearStartMonth());
 
 	Image icon = new Image("com/bdb/weathersense/WeatherSense.jpg");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/WeatherSense.fxml"), ResourceBundle.getBundle("com.bdb.weathersense.Localization"));

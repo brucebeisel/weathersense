@@ -20,18 +20,16 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 
 import javax.swing.SwingUtilities;
-import javax.swing.border.BevelBorder;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.embed.swing.SwingNode;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.plot.ThermometerPlot;
 import org.jfree.data.general.DefaultValueDataset;
 
@@ -65,14 +63,13 @@ public class Thermometer extends BorderPane {
      */
     public Thermometer(String title, Temperature min, Temperature max) {
 	this.setPrefSize(150.0, 270.0);
-	SwingNode node = new SwingNode();
-	SwingUtilities.invokeLater(() -> createChartElements(node, min, max));
-	this.setCenter(node);
+	ChartViewer chartViewer = createChartElements(min, max);
+	this.setCenter(chartViewer);
 	this.setTop(highLabel);
 	this.setBottom(lowLabel);
     }
         
-    private void createChartElements(SwingNode swingNode, Temperature min, Temperature max) {
+    private ChartViewer createChartElements(Temperature min, Temperature max) {
         if (null != Temperature.getDefaultUnit()) {
             switch (Temperature.getDefaultUnit()) {
 		case FAHRENHEIT:
@@ -109,13 +106,12 @@ public class Thermometer extends BorderPane {
         chart.setTitle(titleProperty.getValue());
         chart.setBackgroundPaint(Color.GRAY);
 
-        ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setMinimumDrawHeight(200);
-        chartPanel.setMinimumDrawWidth(200);
-        //chartPanel.setPreferredSize(new Dimension(100, 200));
-        chartPanel.setBackground(Color.GRAY);
-        chartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
-	swingNode.setContent(chartPanel);
+        ChartViewer chartViewer = new ChartViewer(chart);
+        chartViewer.setMinHeight(200);
+        chartViewer.setMinWidth(200);
+        //chartViewer.setBackground(Color.GRAY);
+        //chartViewer.setBorder(new BevelBorder(BevelBorder.RAISED));
+        return chartViewer;
     }
 
     public String getTitle() {

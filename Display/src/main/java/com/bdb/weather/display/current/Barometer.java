@@ -19,20 +19,16 @@ package com.bdb.weather.display.current;
 import java.awt.Color;
 import java.awt.GradientPaint;
 
-import javax.swing.SwingUtilities;
-import javax.swing.border.BevelBorder;
-
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.embed.swing.SwingNode;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.plot.dial.DialBackground;
 import org.jfree.chart.plot.dial.DialCap;
 import org.jfree.chart.plot.dial.DialPlot;
@@ -78,14 +74,13 @@ public class Barometer extends BorderPane {
 	this.setPrefSize(250.0, 250.0);
 	title.setText(titleString);
 
-	SwingNode node = new SwingNode();
-	SwingUtilities.invokeLater(()->createChartElements(node, min, max));
+	ChartViewer chartViewer = createChartElements(min, max);
 	this.setTop(title);
-        this.setCenter(node);
+        this.setCenter(chartViewer);
 	BorderPane.setAlignment(title, Pos.CENTER);
     }
 
-    private void createChartElements(SwingNode swingNode, Pressure min, Pressure max) {
+    private ChartViewer createChartElements(Pressure min, Pressure max) {
         plot.addLayer(new DialBackground(new GradientPaint(0.0f, 0.0f, Color.LIGHT_GRAY, 100.0f, 0.0f, Color.blue)));
         scale = new StandardDialScale(min.get(), max.get(), 240.0, -300.0, 0.2, 10);
         scale.setTickRadius(.9);
@@ -125,16 +120,16 @@ public class Barometer extends BorderPane {
         JFreeChart chart = new JFreeChart(plot);
         chart.setBackgroundPaint(Color.GRAY);
 
-        ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setMinimumDrawHeight(250);
-        chartPanel.setMinimumDrawWidth(250);
-        chartPanel.setMaximumDrawHeight(250);
-        chartPanel.setMaximumDrawWidth(250);
+        ChartViewer chartViewer = new ChartViewer(chart);
+        chartViewer.setMinHeight(250);
+        chartViewer.setMinWidth(250);
+        chartViewer.setMaxHeight(250);
+        chartViewer.setMaxWidth(250);
 
-        chartPanel.setBackground(Color.GRAY);
-        chartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        //chartViewer.setBackground(Color.GRAY);
+        //chartViewer.setBorder(new BevelBorder(BevelBorder.RAISED));
 
-	swingNode.setContent(chartPanel);
+        return chartViewer;
     }
 
     public Pressure getMinValue() {
@@ -143,7 +138,7 @@ public class Barometer extends BorderPane {
 
     public void setMinValue(Pressure value) {
 	minValue.setValue(value.get(Pressure.Unit.MILLIBAR));
-	SwingUtilities.invokeLater(()->scale.setLowerBound(value.get()));
+	scale.setLowerBound(value.get());
     }
 
     public DoubleProperty minValueProperty() {
@@ -156,7 +151,7 @@ public class Barometer extends BorderPane {
 
     public void setMaxValue(Pressure value) {
 	maxValue.setValue(value.get(Pressure.Unit.MILLIBAR));
-	SwingUtilities.invokeLater(()->scale.setUpperBound(value.get()));
+	scale.setUpperBound(value.get());
     }
 
     public DoubleProperty maxValueProperty() {
@@ -186,19 +181,17 @@ public class Barometer extends BorderPane {
      * @param trend The direction the value is trending
      */
     public void loadData(Pressure current, Pressure min, Pressure max, Pressure delta, WeatherTrend trend) {
-	SwingUtilities.invokeLater(() -> {
-	    dataset.setValue(current.get());
-	    if (!min.equals(max)) {
-		range.setLowerBound(min.get());
-		range.setUpperBound(max.get());
-	    }
-	    
-	    if (trend == WeatherTrend.STEADY)
-		trendAnnotation.setLabel(WeatherTrend.STEADY.toString());
-	    else {
-		String trendText = trend.getSymbol() + delta + "/hr";
-		trendAnnotation.setLabel(trendText);
-	    }
-	});
+        dataset.setValue(current.get());
+        if (!min.equals(max)) {
+            range.setLowerBound(min.get());
+            range.setUpperBound(max.get());
+        }
+        
+        if (trend == WeatherTrend.STEADY)
+            trendAnnotation.setLabel(WeatherTrend.STEADY.toString());
+        else {
+            String trendText = trend.getSymbol() + delta + "/hr";
+            trendAnnotation.setLabel(trendText);
+        }
     }
 }
