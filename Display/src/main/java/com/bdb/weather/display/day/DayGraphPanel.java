@@ -16,24 +16,21 @@
  */
 package com.bdb.weather.display.day;
 
-import java.awt.Color;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
-import javafx.scene.Node;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.GridPane;
 
 import com.bdb.weather.common.DailyRecords;
+import com.bdb.weather.common.GeographicLocation;
 import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.WeatherStation;
-import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.windrose.WindRosePane;
 
 /**
@@ -42,72 +39,29 @@ import com.bdb.weather.display.windrose.WindRosePane;
  * @author Bruce
  *
  */
-public class DayGraphPanel extends GridPane implements ComponentContainer {
-    private final JComponent       component;
-    private final DayHumidityPanel humidityPanel;
-    private final DayRainPanel     rainPanel;
-    private final DayXYPlotPanel   temperaturePanel;
-    private final DayXYPlotPanel   pressurePanel;
-    private DayWindPanel     windPanel;
-    private final WindDirPlot      windDirPanel;
-    private final WindRosePane    windRose;
+public class DayGraphPanel extends GridPane {
+    @FXML private DayHumidityPanel humidityPlot;
+    @FXML private DayRainPanel     rainPlot;
+    @FXML private DayXYPlotPanel   temperaturePlot;
+    @FXML private DayXYPlotPanel   pressurePlot;
+    @FXML private DayWindPanel     windPlot;
+    @FXML private WindDirPlot      windDirectionPlot;
+    @FXML private WindRosePane     windRose;
 
     /**
      * Constructor.
-     * 
-     * @param ws The weather station for which this graph displays data
      */
-    public DayGraphPanel(WeatherStation ws) {
-        component = new JPanel();
-        windRose = new WindRosePane();
-        temperaturePanel = new DayTemperaturePlot();
-        humidityPanel = new DayHumidityPanel();
-        pressurePanel = new DayPressurePanel();
-        rainPanel = new DayRainPanel();
-        //windPanel = DayWindPanel.createDayWindPanel();
-        windDirPanel = new WindDirPlot();
-
-        component.setBackground(Color.BLACK);
-        component.setLayout(new GridBagLayout());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = .5;
-        gbc.weighty = 1.0;
-        //component.add(temperaturePanel gbc);
-        gbc.gridx = 1;
-        gbc.gridwidth = 2;
-        //component.add(humidityPanel, gbc);
-        gbc.gridwidth = 1;
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        //component.add(rainPanel.getComponent(), gbc);
-        gbc.gridx = 1;
-        gbc.gridwidth = 2;
-        //component.add(pressurePanel, gbc);
-
-        gbc.gridwidth = 1;
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        //component.add(windPanel.getComponent(), gbc);
-
-        gbc.gridwidth = 1;
-        gbc.gridx = 1;
-        gbc.weightx = .25;
-        //component.add(windDirPanel, gbc);
-        gbc.gridx = 2;
-        //component.add(windRose.getComponent(), gbc);
-    }
-
-    /**
-     * Get the Swing container component for this set of plots.
-     * 
-     * @return The Swing container
-     */
-    @Override
-    public Node getComponent() {
-        return this;
+    @SuppressWarnings("LeakingThisInConstructor")
+    public DayGraphPanel() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/TodayPlots.fxml"));
+            fxmlLoader.setRoot(this);
+            fxmlLoader.setController(this);
+            fxmlLoader.load();
+        }
+	catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 
     /**
@@ -118,8 +72,9 @@ public class DayGraphPanel extends GridPane implements ComponentContainer {
      * @param summaryRecord The summary record for the day (may be null)
      * @param records The weather records for this day
      * @param averages The averages for this day
+     * @param location The location of this weather station
      */
-    public void loadData(LocalDate date, List<HistoricalRecord> list, SummaryRecord summaryRecord, DailyRecords records, WeatherAverage averages) {
+    public void loadData(LocalDate date, List<HistoricalRecord> list, SummaryRecord summaryRecord, DailyRecords records, WeatherAverage averages, GeographicLocation location) {
         //
         // Right after midnight the summary record might be null
         //
@@ -128,11 +83,11 @@ public class DayGraphPanel extends GridPane implements ComponentContainer {
         else
             windRose.loadData(null);
         
-//        temperaturePanel.loadData(date, list, summaryRecord, records, averages);
-//        pressurePanel.loadData(date, list, summaryRecord, records, averages);
-//        windPanel.loadData(date, list, summaryRecord, records, averages);
-//        humidityPanel.loadData(date, list, summaryRecord, records, averages);
-        rainPanel.loadData(summaryRecord, list);
-        windDirPanel.loadData(list);
+        temperaturePlot.loadData(date, list, summaryRecord, records, averages, location);
+        pressurePlot.loadData(date, list, summaryRecord, records, averages, location);
+        windPlot.loadData(date, list, summaryRecord, records, averages, location);
+        humidityPlot.loadData(date, list, summaryRecord, records, averages, location);
+        rainPlot.loadData(summaryRecord, list);
+        windDirectionPlot.loadData(list);
     }
 }

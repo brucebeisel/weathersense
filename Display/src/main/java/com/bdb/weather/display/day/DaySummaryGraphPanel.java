@@ -16,22 +16,16 @@
  */
 package com.bdb.weather.display.day;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JPanel;
-
-import javafx.scene.Node;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Dialog;
+import javafx.scene.layout.BorderPane;
 
 import com.bdb.util.DateButton;
 import com.bdb.util.jdbc.DBConnection;
@@ -46,8 +40,8 @@ import com.bdb.weather.common.db.DailyAveragesTable;
 import com.bdb.weather.common.db.DailyRecordsTable;
 import com.bdb.weather.common.db.DailySummaryTable;
 import com.bdb.weather.common.db.HistoryTable;
-import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.DisplayConstants;
+import com.bdb.weather.display.WeatherSense;
 
 /**
  * Panel that displays a day's worth of data and handles the panel for advancing through the days or
@@ -56,18 +50,15 @@ import com.bdb.weather.display.DisplayConstants;
  * @author Bruce
  * TODO This name is confusing with the other summary graphs. Should change the name.
  */
-public class DaySummaryGraphPanel implements ComponentContainer, ActionListener, PropertyChangeListener {
-    private static final String NEXT_CMD = "Next";
-    private static final String PREV_CMD = "Prev";
-    private final JComponent          component = new JPanel(new BorderLayout());
-    private final DayGraphPanel       graphPanel;
+public class DaySummaryGraphPanel extends BorderPane {
+    @FXML private DayGraphPanel       graphPanel;
+    @FXML private DatePicker          datePicker;
     private final DailySummaryTable   dailySummaryTable;
     private final DailyAveragesTable  dailyAveragesTable;
     private final DailyRecordsTable   dailyRecordsTable;
     private final HistoryTable        historyTable;
     private final WeatherStation      ws;
     private LocalDate                 date;
-    private final DateButton          dateButton = new DateButton();
     private final TemperatureBinMgr   temperatureBinMgr;
 
     /**
@@ -79,124 +70,63 @@ public class DaySummaryGraphPanel implements ComponentContainer, ActionListener,
      */
     @SuppressWarnings("LeakingThisInConstructor")
     public DaySummaryGraphPanel(WeatherStation ws, DBConnection connection, LocalDate day) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/DayPlots.fxml"));
+            fxmlLoader.setRoot(this);
+            fxmlLoader.setController(this);
+            fxmlLoader.load();
+        }
+	catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+
         this.ws = ws;
         this.date = day;
+        datePicker.setValue(date);
         dailySummaryTable = new DailySummaryTable(connection);
         historyTable = new HistoryTable(connection);
         dailyAveragesTable = new DailyAveragesTable(connection);
         dailyRecordsTable = new DailyRecordsTable(connection);
         temperatureBinMgr = new TemperatureBinMgr(connection);
 
-        graphPanel = new DayGraphPanel(ws);
-        
-//        component.add(graphPanel.getComponent(), BorderLayout.CENTER);
-
-        JPanel cmdPanel = new JPanel();
-
-        JButton downButton = new JButton(PREV_CMD);
-        downButton.addActionListener(this);
-        downButton.setActionCommand(PREV_CMD);
-
-        JButton upButton = new JButton(NEXT_CMD);
-        upButton.addActionListener(this);
-        upButton.setActionCommand(NEXT_CMD);
-
-        cmdPanel.add(downButton);
-        cmdPanel.add(dateButton);
-        cmdPanel.add(upButton);
-
-        dateButton.addPropertyChangeListener(this);
-
-        component.add(cmdPanel, BorderLayout.NORTH);
-
-        dateButton.setDate(day);
-
-        loadData(day);
-
-    }
-    
-    /**
-     * Get the Swing c that is the container for these graphs.
-     * 
-     * @return The swing c
-     */
-    @Override
-    public Node getComponent() {
-        return null;
+        datePicker.setOnAction((event) -> {
+            this.date = datePicker.getValue();
+            loadData();
+        });
     }
     
     /**
      * Set the title of the Frame.
-     * TODO This should probably be some kind of utility function
      */
-    @SuppressWarnings("empty-statement")
     public void setTitle() {
-        Component c;
-
-        for (c = this.component.getParent();
-             c != null && !(c instanceof JFrame) && !(c instanceof JInternalFrame);
-             c = c.getParent());
-
-        if (c != null) {
-            String dateString = DisplayConstants.formatDate(date);
-
-            if (c instanceof JFrame)
-                ((JFrame)c).setTitle(dateString);
-            else 
-                ((JInternalFrame)c).setTitle(dateString);
-        }
+        String dateString = DisplayConstants.formatDate(date);
+        WeatherSense.setStageTitle(this, dateString);
     }
 
     /**
      * Load the data into the plots.
-     * 
-     * @param c The day of the data to load
      */
-    private void loadData(LocalDate date)
-    {
+    public void loadData() {
+        setTitle();
         List<HistoricalRecord> list = historyTable.queryRecordsForDay(date);
 
         temperatureBinMgr.refresh();
         SummaryRecord summaryRecord = dailySummaryTable.retrieveSummaryForDate(date, ws.getWindParameters(), temperatureBinMgr);
         DailyRecords records = dailyRecordsTable.retrieveRecordForDay(date);
         WeatherAverage averages = dailyAveragesTable.retrieveAveragesForDay(ws.getLocationCode(), date);
-        graphPanel.loadData(date, list, summaryRecord, records, averages);
-        setTitle();
+        graphPanel.loadData(date, list, summaryRecord, records, averages, ws.getGeographicLocation());
     }
 
-    /*
-     * (non-Javadoc)
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-     */
-    @Override
-    public void actionPerformed(ActionEvent evt)
-    {
-        String cmd = evt.getActionCommand();
-        switch (cmd) {
-            case NEXT_CMD:
-                date = date.plusDays(1);
-                break;
-            case PREV_CMD:
-                date = date.minusDays(1);
-                break;
-        }
+    @FXML
+    public void previousDay(ActionEvent event) {
+        date = date.minusDays(1);
+        datePicker.setValue(date);
 
-        dateButton.setDate(date);
-
-        loadData(date);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-     */
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        String prop = evt.getPropertyName();
-
-        if (prop.equals(DateButton.DATE_PROPERTY)) {
-            date = (LocalDate)evt.getNewValue();
-            loadData(date);
-        }
+    @FXML
+    public void nextDay(ActionEvent event) {
+        date = date.plusDays(1);
+        datePicker.setValue(date);
     }
 }

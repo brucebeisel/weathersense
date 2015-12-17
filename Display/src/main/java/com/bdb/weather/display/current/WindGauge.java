@@ -25,7 +25,9 @@ import java.util.List;
 import javax.swing.Timer;
 
 import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
@@ -89,6 +91,7 @@ public class WindGauge extends BorderPane {
     private double lastSpeed;
     private double currentSpeed;
     private double speedInterval;
+    private KeyValue headingKeyValue;
     private int timerCount;
     private Timer timer;
     private final Label title = new Label();
@@ -301,28 +304,38 @@ public class WindGauge extends BorderPane {
         else
             avgAnnotation.setLabel("");
 
+        System.out.println("Last Heading: " + lastHeading + " Current Heading: " + currentHeading);
+        headingKeyValue = new KeyValue(new SimpleDoubleProperty(lastHeading), currentHeading);
 	Timeline timeline = new Timeline(
-	    new KeyFrame(Duration.ZERO, (actionEvent) -> nextFrame()),
+	    new KeyFrame(Duration.ZERO, (actionEvent) -> nextFrame(), headingKeyValue),
 	    new KeyFrame(Duration.millis(100))
 	);
 
-	timeline.setCycleCount(10);
+	timeline.setCycleCount(9);
+        timeline.setOnFinished((event) -> {
+            datasets[0].setValue(currentHeading);
+            speedDataset.setValue(currentSpeed);
+            lastHeading = currentHeading;
+            lastSpeed = currentSpeed;
+        });
         timerCount = 0;
 	timeline.play();
-
     }
 
     private void nextFrame() {
         lastHeading += headingInterval;
+        System.out.println("Heading Value: " + lastHeading);
+        //System.out.println("Heading Value: " + (Double)headingKeyValue.getTarget().getValue());
+        // datasets[0].setValue((Double)headingKeyValue.getTarget().getValue());
         datasets[0].setValue(lastHeading);
         lastSpeed += speedInterval;
         speedDataset.setValue(lastSpeed);
-        timerCount++;
-        if (timerCount > 9) {
-            datasets[0].setValue(currentHeading);
-            lastHeading = currentHeading;
-            speedDataset.setValue(currentSpeed);
-            lastSpeed = currentSpeed;
-        }
+        //timerCount++;
+        //if (timerCount > 9) {
+        //    datasets[0].setValue(currentHeading);
+        //    lastHeading = currentHeading;
+        //    speedDataset.setValue(currentSpeed);
+        //    lastSpeed = currentSpeed;
+        //}
     }
 }

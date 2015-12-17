@@ -16,7 +16,6 @@
  */
 package com.bdb.weather.display.day;
 
-import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

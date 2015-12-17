@@ -16,9 +16,12 @@
  */
 package com.bdb.weather.display.day;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.logging.Logger;
+
+import javafx.fxml.FXMLLoader;
 
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.weather.common.DailyRecords;
@@ -52,28 +55,17 @@ public class TodayGraphPanel extends DayGraphPanel implements Refreshable {
     /**
      * Constructor.
      * 
-     * @param ws The weather station for which this is a display
      * @param connection The database connection
      */
-    public TodayGraphPanel(WeatherStation ws, DBConnection connection) {
-	super(ws);
-
+    public TodayGraphPanel( DBConnection connection) {
 	dailySummaryTable = new DailySummaryTable(connection);
 	historyTable = new HistoryTable(connection);
 	dailyRecordsTable = new DailyRecordsTable(connection);
 	dailyAveragesTable = new DailyAveragesTable(connection);
 	temperatureBinMgr = new TemperatureBinMgr(connection);
         wsTable = new WeatherStationTable(connection);
-    }
 
-//    /**
-//     * Make this component visible or not.
-//     * 
-//     * @param flag The visible flag
-//     */
-//    public void setVisible(boolean flag) {
-//        getComponent().setVisible(flag);
-//    }
+    }
 
     /*
      * (non-Javadoc)
@@ -95,6 +87,6 @@ public class TodayGraphPanel extends DayGraphPanel implements Refreshable {
         temperatureBinMgr.refresh();
         SummaryRecord summaryRecord = dailySummaryTable.retrieveTodaysSummary(ws.getWindParameters(), temperatureBinMgr);
 
-        super.loadData(date, list, summaryRecord, records, averages);
+        super.loadData(date, list, summaryRecord, records, averages, ws.getGeographicLocation());
     }
 }

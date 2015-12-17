@@ -110,11 +110,10 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         historyTable = new HistoryTable(connection);
 	monthlyAverageTable = new MonthlyAveragesTable(connection);
 
-	FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/CurrentWeatherCharts.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
-
         try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/CurrentWeatherCharts.fxml"));
+            fxmlLoader.setRoot(this);
+            fxmlLoader.setController(this);
             fxmlLoader.load();
         }
 	catch (IOException exception) {

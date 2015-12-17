@@ -39,7 +39,6 @@ import com.bdb.weather.display.axis.HumidityRangeAxis;
  *
  */
 public class DayHumidityPanel extends DayXYPlotPanel {
-    
     /**
      * Constructor.
      */

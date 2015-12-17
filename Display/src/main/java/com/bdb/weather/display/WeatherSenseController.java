@@ -17,6 +17,7 @@
 package com.bdb.weather.display;
 
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -33,6 +34,8 @@ import com.bdb.weather.common.CurrentWeatherSubscriber;
 import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.display.current.CurrentWeatherCharts;
 import com.bdb.weather.display.current.CurrentWeatherForm;
+import com.bdb.weather.display.day.DaySummaryGraphPanel;
+import com.bdb.weather.display.day.TodayGraphPanel;
 
 /**
  * FXML Controller class
@@ -42,10 +45,11 @@ import com.bdb.weather.display.current.CurrentWeatherForm;
 public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentWeatherHandler {
     private WeatherStation ws;
     private DBConnection connection;
-    private CurrentWeatherSubscriber subscriber;
+    private final CurrentWeatherSubscriber subscriber;
     private final List<CurrentWeatherProcessor> cwpList = new ArrayList<>();
     private static final Logger logger = Logger.getLogger(WeatherSenseController.class.getName());
 
+    @SuppressWarnings("LeakingThisInConstructor")
     public WeatherSenseController() {
         subscriber = CurrentWeatherSubscriber.createSubscriber(this);
     }
@@ -102,6 +106,15 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchTodayView() {
+	Stage stage = new Stage();
+        TodayGraphPanel todayGraphPanel = new TodayGraphPanel(connection);
+        Scene scene = new Scene(todayGraphPanel);
+        stage.setTitle("Today Weather");
+        stage.setScene(scene);
+        stage.sizeToScene();
+        stage.show();
+        //refreshList.add(todayGraphPanel);
+        todayGraphPanel.refresh();
     }
 
     @FXML
@@ -118,6 +131,14 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchDaySummaryView() {
+	Stage stage = new Stage();
+        DaySummaryGraphPanel graphPanel = new DaySummaryGraphPanel(ws, connection, LocalDate.now());
+        Scene scene = new Scene(graphPanel);
+        stage.setTitle("Weather");
+        stage.setScene(scene);
+        graphPanel.loadData();
+        stage.sizeToScene();
+        stage.show();
     }
 
     @FXML
@@ -185,26 +206,6 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
     /*
     private JInternalFrame launchView(String title, ComponentContainer container, Dimension geometry, boolean maximize) {
         return null;
-    }
-
-    @Override
-    public void launchCurrentWeatherView() {
-        if (currentWeatherFrame == null) {
-            ws = stationTable.getWeatherStation();
-            currentWeatherPanel = new CurrentWeatherPanel(ws, connection);
-            cwpList.add(currentWeatherPanel);
-            currentWeatherFrame = launchView("Current Weather", currentWeatherPanel, new Dimension(850, 850), false);
-            currentWeatherFrame.setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
-        }
-        else
-            currentWeatherFrame.setVisible(true);
-    }
-
-    public void launchCurrentWeatherTable() {
-        ws = stationTable.getWeatherStation();
-        CurrentWeatherText cwt = new CurrentWeatherText(ws);
-        cwpList.add(cwt);
-        launchView("Current Weather", cwt, null, false);
     }
 
     public void launchHistoricalTableView() {
@@ -279,11 +280,6 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
     @Override
     public void launchTodayView() {
         if (todayGraphPanel == null) {
-            todayGraphPanel = new TodayGraphPanel(ws, connection);
-            refreshList.add(todayGraphPanel);
-            todayFrame = launchView("Today", todayGraphPanel, new Dimension(800, 600), true);
-            todayFrame.setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
-            todayGraphPanel.refresh();
         }
         else
             todayFrame.setVisible(true);

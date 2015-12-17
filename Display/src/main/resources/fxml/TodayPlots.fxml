@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import com.bdb.weather.display.day.*?>
+<?import com.bdb.weather.display.windrose.*?>
+
+<fx:root type="javafx.scene.layout.GridPane" xmlns:fx="http://javafx.com/fxml/1">
+    <DayTemperaturePlot fx:id="temperaturePlot" GridPane.columnIndex="0" GridPane.rowIndex="0"/> 
+    <DayHumidityPanel fx:id="humidityPlot" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2" /> 
+    <DayRainPanel fx:id="rainPlot" GridPane.columnIndex="0" GridPane.rowIndex="1"/> 
+    <DayPressurePanel fx:id="pressurePlot" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2" /> 
+    <DayWindPanel fx:id="windPlot" GridPane.columnIndex="0" GridPane.rowIndex="2"/> 
+    <WindDirPlot fx:id="windDirectionPlot" GridPane.columnIndex="1" GridPane.rowIndex="2"/> 
+    <WindRosePane fx:id="windRose" GridPane.columnIndex="2" GridPane.rowIndex="2"/> 
+</fx:root>

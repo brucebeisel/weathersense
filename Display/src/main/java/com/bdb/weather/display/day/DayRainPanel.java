@@ -31,7 +31,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingNode;
-import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -43,6 +42,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
@@ -72,13 +72,13 @@ public class DayRainPanel extends TabPane {
 
     private final CategoryPlot        rainPlot;
     private final JFreeChart          chart;
-    private final ChartPanel          chartPanel;
+    private final ChartViewer         chartViewer;
     private final TableView           dataTable;
     private final NumberAxis          valueAxis = new RainRangeAxis();
     private final DateTimeFormatter   hourFormatter = DateTimeFormatter.ofPattern("h a");
     private LocalDateTime             timeCache = LocalDate.now().atStartOfDay();
 
-    private final class RainItem {
+    public final class RainItem {
         private IntegerProperty hour;
         private DoubleProperty rainfall;
         private DoubleProperty et;
@@ -141,7 +141,7 @@ public class DayRainPanel extends TabPane {
         this.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         chart = ChartFactory.createBarChart("Water Cycle", "Hour", "", null, PlotOrientation.VERTICAL, true, true, false);
 
-        chartPanel = new ChartPanel(chart);
+        chartViewer = new ChartViewer(chart);
 
         rainPlot = (CategoryPlot)chart.getPlot();
         rainPlot.setNoDataMessage("There is no data for the specified day");
@@ -166,9 +166,8 @@ public class DayRainPanel extends TabPane {
         rainPlot.getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
 
         Tab tab = new Tab(DisplayConstants.GRAPH_TAB_NAME);
-        SwingNode node = new SwingNode();
-        node.setContent(chartPanel);
-        tab.setContent(node);
+        tab.setContent(chartViewer);
+        this.getTabs().add(tab);
         
         dataTable = new TableView();
        
@@ -186,15 +185,8 @@ public class DayRainPanel extends TabPane {
         
         tab = new Tab(DisplayConstants.DATA_TAB_NAME);
         tab.setContent(dataTable);
-    }
-    
-    /**
-     * Get the swing component that contains this plot.
-     * 
-     * @return The swing component
-     */
-    public Node getComponent() {
-        return this;
+        this.getTabs().add(tab);
+
     }
     
     /**
