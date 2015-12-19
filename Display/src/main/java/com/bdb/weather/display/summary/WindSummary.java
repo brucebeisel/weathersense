@@ -21,23 +21,26 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
+
+import javafx.scene.Node;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartMouseEvent;
-import org.jfree.chart.ChartMouseListener;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.XYItemEntity;
+import org.jfree.chart.fx.ChartViewer;
+import org.jfree.chart.fx.interaction.ChartMouseEventFX;
+import org.jfree.chart.fx.interaction.ChartMouseListenerFX;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -62,12 +65,11 @@ import com.bdb.weather.display.axis.WindSpeedRangeAxis;
  * @author Bruce
  *
  */
-public class WindSummary implements ChartMouseListener {
-    private final JTabbedPane         component = new JTabbedPane();
-    private XYPlot              plot;
-    private DateAxis            dateAxis;
-    private NumberAxis          valueAxis;
-    private JTable              dataTable;
+public class WindSummary extends TabPane implements ChartMouseListenerFX {
+    private XYPlot                    plot;
+    private DateAxis                  dateAxis;
+    private NumberAxis                valueAxis;
+    private TableView                 dataTable;
     private final DefaultTableModel   tableModel = new DefaultTableModel();
     private final SummaryInterval     interval;
     private final ViewLauncher        launcher;
@@ -87,20 +89,16 @@ public class WindSummary implements ChartMouseListener {
         this.interval = interval;
         this.launcher = launcher;
         this.supporter = supporter;
-        ChartPanel panel = createPlot();
-        JComponent table = createTable();
+        ChartViewer panel = createPlot();
+        Node node = createTable();
         
-        component.add(DisplayConstants.GRAPH_TAB_NAME, panel);
-        component.add(DisplayConstants.DATA_TAB_NAME, table);
-    }
-    
-    /**
-     * Get the swing component that contains the plot.
-     * 
-     * @return The swing container
-     */
-    public JComponent getComponent() {
-        return component;
+        Tab tab = new Tab(DisplayConstants.GRAPH_TAB_NAME);
+        tab.setContent(panel);
+        this.getTabs().add(tab);
+
+        tab = new Tab(DisplayConstants.DATA_TAB_NAME);
+        tab.setContent(node);
+        this.getTabs().add(tab);
     }
     
     /**
@@ -108,10 +106,10 @@ public class WindSummary implements ChartMouseListener {
      * 
      * @return The panel that contains the plot
      */
-    private ChartPanel createPlot() {
+    private ChartViewer createPlot() {
         JFreeChart chart = ChartFactory.createXYLineChart("", "", "", null, PlotOrientation.VERTICAL, true, true, true);
         plot = (XYPlot)chart.getPlot();
-        ChartPanel panel = new ChartPanel(chart);
+        ChartViewer panel = new ChartViewer(chart);
         panel.addChartMouseListener(this);
         
         //
@@ -148,13 +146,13 @@ public class WindSummary implements ChartMouseListener {
      * 
      * @return The swing component
      */
-    private JComponent createTable() {
+    private Node createTable() {
         //
         // Build the table for the data tab
         //
         DefaultTableColumnModel colModel = new DefaultTableColumnModel();
         
-        dataTable = new JTable();
+        dataTable = new TableView();
         dataTable.setModel(tableModel);
         dataTable.setColumnModel(colModel);
 
@@ -175,7 +173,7 @@ public class WindSummary implements ChartMouseListener {
         //
         // Insert the JTable component into a scroll pane so that we have scroll bars
         //
-        JScrollPane sp = new JScrollPane(dataTable);
+        ScrollPane sp = new ScrollPane(dataTable);
         
         return sp;
     }
@@ -221,7 +219,7 @@ public class WindSummary implements ChartMouseListener {
     }
 
     @Override
-    public void chartMouseClicked(ChartMouseEvent event) {
+    public void chartMouseClicked(ChartMouseEventFX event) {
         ChartEntity entity = event.getEntity();
         //
         // Was a point on the plot selected?
@@ -238,7 +236,7 @@ public class WindSummary implements ChartMouseListener {
     }
 
     @Override
-    public void chartMouseMoved(ChartMouseEvent event) {
+    public void chartMouseMoved(ChartMouseEventFX event) {
         // Do nothing
     }
 }

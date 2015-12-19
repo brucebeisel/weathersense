@@ -32,14 +32,15 @@ import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.ErrorDisplayer;
 import com.bdb.weather.display.WeatherSense;
 
-public class UserPreferences
-{
+public class UserPreferences {
+    private static final String DISPLAY_NODE = "Display";
     private static final String UNITS_NODE = "Units";
     private static final String TEMP_UNITS_PREF = "Temperature Units";
     private static final String PRESSURE_UNITS_PREF = "Pressure Units";
     private static final String SPEED_UNITS_PREF = "Speed Units";
     private static final String DEPTH_UNITS_PREF = "Depth Units";
     private static final String DISTANCE_UNITS_PREF = "Distance Units";
+
     private static final String PLOT_COLOR_NODE = "Plot Color";
     
     public static final String OUTDOOR_TEMP_COLOR_PREF = "Outdoor Temp Color";

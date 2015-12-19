@@ -16,20 +16,19 @@
  */
 package com.bdb.weather.display.stripchart;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.BevelBorder;
 
-import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 
 import com.bdb.util.LabeledFieldPanel;
 import com.bdb.util.jdbc.DBConnection;
@@ -37,20 +36,19 @@ import com.bdb.util.jdbc.DBConnection;
 import com.bdb.weather.common.CurrentWeather;
 import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.db.HistoryTable;
-import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.CurrentWeatherProcessor;
 
 /**
  *
  * @author Bruce
  */
-public class StripChartPanel extends JPanel implements ComponentContainer, CurrentWeatherProcessor {
+public class StripChartPanel extends BorderPane implements CurrentWeatherProcessor {
     private static final int MAX_HOURS = 72;
     private static final String HOUR_CHOICES[] = {"1", "3", "6", "12", "24", "48", Integer.toString(MAX_HOURS)};
-    private final JPanel optionsPanel = new JPanel();
+    private final FlowPane optionsPanel = new FlowPane();
     private final StripChartContainer stripChartContainer = new StripChartContainer();
-    private final JPanel newStripChartPanel = new JPanel();
-    private JComboBox<String> hoursCB = new JComboBox<>(HOUR_CHOICES);
+    private final FlowPane newStripChartPanel = new FlowPane();
+    private ComboBox<String> hoursCB = new ComboBox<String>(Arrays.asList(HOUR_CHOICES));
     private final JComboBox<MeasurementType> leftAxisCB = new JComboBox<>(MeasurementType.values());
     private final JComboBox<MeasurementType> rightAxisCB = new JComboBox<>(MeasurementType.values());
     private final HistoryTable historyTable;
@@ -59,49 +57,43 @@ public class StripChartPanel extends JPanel implements ComponentContainer, Curre
     private final List<HistoricalRecord> initialData = new ArrayList<>();
 
     public StripChartPanel(DBConnection con, String namedLayout) {
-        super(new BorderLayout());
-        setBackground(Color.BLUE);
+        //setBackground(Color.BLUE);
         historyTable = new HistoryTable(con);
  
         createOptionPanelComponents();
         createNewStripChartPanelComponents();
-        add(optionsPanel, BorderLayout.NORTH);
-        add(stripChartContainer, BorderLayout.CENTER);
-        add(newStripChartPanel, BorderLayout.SOUTH);
+        setTop(optionsPanel);
+        setCenter(stripChartContainer);
+        setBottom(newStripChartPanel);
         rightAxisCB.setSelectedIndex(1);
-        hoursCB.addActionListener((ActionEvent e) -> {
-            int localSpan = Integer.parseInt(HOUR_CHOICES[hoursCB.getSelectedIndex()]);
+        hoursCB.setOnAction((actionEvent) -> {
+            int localSpan = Integer.parseInt(HOUR_CHOICES[hoursCB.getSelectionModel().getSelectedIndex()]);
             changeStripChartSpan(span);
             span = localSpan;
         });
     }
 
-    @Override
-    public Node getComponent() {
-        return null;
-    }
-
     private void createOptionPanelComponents() {
-        optionsPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
-        optionsPanel.add(new JLabel("Hours to Display:"));
-        optionsPanel.add(hoursCB);
-        optionsPanel.add(new JLabel("Saved Layouts:"));
-        JComboBox savedLayoutsCB = new JComboBox(layoutManager.getSavedLayoutNames());
-        optionsPanel.add(savedLayoutsCB);
-        JButton b = new JButton("Load Layout");
-        optionsPanel.add(b);
-        b = new JButton("Save Layout");
-        optionsPanel.add(b);
+        //optionsPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        optionsPanel.getChildren().add(new Label("Hours to Display:"));
+        optionsPanel.getChildren().add(hoursCB);
+        optionsPanel.getChildren().add(new Label("Saved Layouts:"));
+        ComboBox<String> savedLayoutsCB = new ComboBox<String>(layoutManager.getSavedLayoutNames());
+        optionsPanel.getChildren().add(savedLayoutsCB);
+        Button b = new Button("Load Layout");
+        optionsPanel.getChildren().add(b);
+        b = new Button("Save Layout");
+        optionsPanel.getChildren().add(b);
     }
 
     private void createNewStripChartPanelComponents() {
-        newStripChartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
-        newStripChartPanel.add(new JLabel("Select Axis Types"));
-        newStripChartPanel.add(new LabeledFieldPanel<>("Left Axis:", leftAxisCB));
-        newStripChartPanel.add(new LabeledFieldPanel<>("Right Axis:", rightAxisCB));
-        JButton addButton = new JButton("Add Chart");
-        newStripChartPanel.add(addButton);
-        addButton.addActionListener((ActionEvent e) -> {
+        //newStripChartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        newStripChartPanel.getChildren().add(new Label("Select Axis Types"));
+        newStripChartPanel.getChildren().add(new LabeledFieldPanel<>("Left Axis:", leftAxisCB));
+        newStripChartPanel.getChildren().add(new LabeledFieldPanel<>("Right Axis:", rightAxisCB));
+        Button addButton = new Button("Add Chart");
+        newStripChartPanel.getChildren().add(addButton);
+        addButton.setOnAction((e) -> {
             stripChartContainer.addStripChart((MeasurementType) leftAxisCB.getSelectedItem(),
                                               (MeasurementType) rightAxisCB.getSelectedItem(),
                                               retrieveInitialData(),

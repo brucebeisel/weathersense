@@ -17,8 +17,6 @@
 package com.bdb.weather.display.stripchart;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -30,15 +28,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DefaultXYItemRenderer;
@@ -52,7 +46,7 @@ import org.jfree.ui.RectangleEdge;
  * 
  * @author Bruce
  */
-class StripChart extends ChartPanel {
+class StripChart extends ChartViewer {
     public static final boolean MAP_TO_LEFT_AXIS = true;
     public static final boolean MAP_TO_RIGHT_AXIS = false;
     private final JFreeChart chart;
@@ -244,6 +238,7 @@ class StripChart extends ChartPanel {
         adjustDateAxis(Calendar.getInstance());
     }
 
+    /*
     public static void main(String args[]) {
         final StripChart chart = new StripChart(MeasurementType.TEMPERATURE, MeasurementType.HUMIDITY, 1, 10);
         chart.addSeries("Outdoor", MAP_TO_LEFT_AXIS, Color.BLUE);
@@ -279,4 +274,5 @@ class StripChart extends ChartPanel {
         };
         new Timer(delay, taskPerformer).start();
     }
+*/
 }

@@ -27,13 +27,14 @@ import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.BorderPane;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartMouseEvent;
@@ -60,10 +61,10 @@ import org.jfree.ui.RectangleEdge;
 import com.bdb.util.measurement.Measurement;
 
 import com.bdb.weather.common.SummaryRecord;
-import com.bdb.weather.display.DisplayConstants;
+import com.bdb.weather.display.ChartDataPane;
 import com.bdb.weather.display.ViewLauncher;
 
-public abstract class HighLowPanel<T extends Measurement> implements ChartMouseListener {
+public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane implements ChartMouseListener {
 
     public static class SeriesInfo<T extends Measurement> {
         private final String seriesName;
@@ -94,7 +95,7 @@ public abstract class HighLowPanel<T extends Measurement> implements ChartMouseL
             return avgMethod.apply(record);
         }
     }
-    private final JTabbedPane          component = new JTabbedPane();
+
     private final OHLCSeriesCollection seriesCollection = new OHLCSeriesCollection();
     private final XYPlot               plot;
     private final JFreeChart           chart;
@@ -115,8 +116,7 @@ public abstract class HighLowPanel<T extends Measurement> implements ChartMouseL
         this.interval = interval;
         this.launcher = launcher;
         this.supporter = supporter;
-        JPanel graphPanel = new JPanel(new BorderLayout());
-        component.addTab(DisplayConstants.GRAPH_TAB_NAME, graphPanel);
+        BorderPane graphPanel = new BorderPane();
         
         chart = ChartFactory.createHighLowChart(title, domainAxisLabel, "", seriesCollection, true);
         chart.getLegend().setPosition(RectangleEdge.RIGHT);
@@ -137,7 +137,7 @@ public abstract class HighLowPanel<T extends Measurement> implements ChartMouseL
  
         ChartPanel panel = new ChartPanel(chart);
         panel.addChartMouseListener(this);
-        graphPanel.add(panel, BorderLayout.CENTER);
+        graphPanel.setCenter(panel);
         
         series = new OHLCSeries[seriesList.length];
         
@@ -168,13 +168,13 @@ public abstract class HighLowPanel<T extends Measurement> implements ChartMouseL
         //
         // Insert the JTable component into a scroll pane so that we have scroll bars
         //
-        JScrollPane sp = new JScrollPane(dataTable);
+        ScrollPane sp = new ScrollPane(dataTable);
 
-        JPanel p = new JPanel(new BorderLayout());
+        BorderPane p = new BorderPane();
 
-        p.add(sp, BorderLayout.CENTER);
+        p.setCenter(sp);
 
-        component.addTab(DisplayConstants.DATA_TAB_NAME, p);
+        this.setTabContents(graphPanel, p);
 
         HighLowItemLabelGenerator ttg = new HiLoItemLabelGenerator(interval.getLegacyFormat(), format);
         plot.getRenderer().setBaseToolTipGenerator(ttg);

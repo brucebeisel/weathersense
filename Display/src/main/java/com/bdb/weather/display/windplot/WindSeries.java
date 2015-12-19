@@ -22,7 +22,6 @@ import org.jfree.data.time.TimeSeriesDataItem;
 /**
  *
  * @author Bruce
- * @param <E> The time period for each of the wind samples
  */
 @SuppressWarnings("serial")
 public class WindSeries extends TimeSeries {
