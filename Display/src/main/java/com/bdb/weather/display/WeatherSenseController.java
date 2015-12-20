@@ -36,6 +36,8 @@ import com.bdb.weather.display.current.CurrentWeatherCharts;
 import com.bdb.weather.display.current.CurrentWeatherForm;
 import com.bdb.weather.display.day.DaySummaryGraphPanel;
 import com.bdb.weather.display.day.TodayGraphPanel;
+import com.bdb.weather.display.stripchart.MeasurementType;
+import com.bdb.weather.display.stripchart.StripChartPane;
 
 /**
  * FXML Controller class
@@ -167,6 +169,16 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchStripChart() {
+	Stage stage = new Stage();
+        StripChartPane stripChartPane = new StripChartPane(connection, MeasurementType.WIND, MeasurementType.RAINFALL);
+        Scene scene = new Scene(stripChartPane);
+        stage.setTitle("Strip Chart");
+        stage.setScene(scene);
+	cwpList.add(stripChartPane);
+        //graphPanel.loadData();
+        stage.sizeToScene();
+        stage.show();
+        stage.setOnCloseRequest((handler) -> cwpList.remove(stripChartPane));
     }
 
     @FXML

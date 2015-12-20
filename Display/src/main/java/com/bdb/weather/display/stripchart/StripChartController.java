@@ -86,7 +86,7 @@ public class StripChartController extends BorderPane {
         this.manager = theManager;
         chart = new StripChart(leftAxisType, rightAxisType, spanHours, maxHours);
 
-        ContextMenu plotMenu = chart.getContextMenu();
+        ContextMenu plotMenu = chart.getChartViewer().getContextMenu();
         plotMenu.getItems().add(new SeparatorMenuItem());
         
         MenuItem item = new MenuItem("Remove This Chart");

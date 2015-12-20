@@ -18,6 +18,7 @@ package com.bdb.weather.display.stripchart;
 
 import java.awt.Color;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -27,6 +28,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import javafx.scene.layout.BorderPane;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -46,17 +49,28 @@ import org.jfree.ui.RectangleEdge;
  * 
  * @author Bruce
  */
-class StripChart extends ChartViewer {
+public class StripChart extends BorderPane {
+    public static final int MAX_HOURS = 72;
     public static final boolean MAP_TO_LEFT_AXIS = true;
     public static final boolean MAP_TO_RIGHT_AXIS = false;
     private final JFreeChart chart;
     private final XYPlot plot = new XYPlot();
+    private final ChartViewer chartViewer;
+    private NumberAxis leftAxis;
+    private NumberAxis rightAxis;
     private final DateAxis dateAxis;
     private final TimeSeriesCollection leftAxisCollection = new TimeSeriesCollection();
     private final TimeSeriesCollection rightAxisCollection = new TimeSeriesCollection();
     private final Map<String, TimeSeries> series = new TreeMap<>();
     private int span;
     private final int maxSpanHours;
+
+    /**
+     * Constructor.
+     */
+    public StripChart() {
+        this(MeasurementType.NONE, MeasurementType.NONE, 1, MAX_HOURS);
+    }
 
     /**
      * Constructor.
@@ -67,23 +81,14 @@ class StripChart extends ChartViewer {
      * @param maxSpanHours The maximum amount of data to keep in the plots dataset
      */
     public StripChart(MeasurementType leftAxisType, MeasurementType rightAxisType, int categorySpanHours, int maxSpanHours) {
-        super(null, true);
         span = categorySpanHours;
         this.maxSpanHours = maxSpanHours;
 
         //
         // Set up the Y axes
         //
-        NumberAxis axis = null;
-        if (leftAxisType != MeasurementType.NONE) {
-            axis = leftAxisType.createRangeAxis();
-            plot.setRangeAxis(0, axis);
-        }
-
-        if (rightAxisType != MeasurementType.NONE) {
-            axis = rightAxisType.createRangeAxis();
-            plot.setRangeAxis(1, axis);
-        }
+        setLeftAxis(leftAxisType);
+        setRightAxis(leftAxisType);
 
         //
         // Set up the X axis
@@ -95,37 +100,49 @@ class StripChart extends ChartViewer {
         dateAxis.setUpperMargin(.10);
 
         plot.setDomainAxis(dateAxis);
+        plot.mapDatasetToRangeAxis(0, 0);
+        plot.mapDatasetToRangeAxis(1, 1);
         adjustDateAxis(Calendar.getInstance());
-        chart = new JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 
-        //
-        // TODO figure out how to manage the renderers
-        //
+        chart = new JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
+        ChartFactory.getChartTheme().apply(chart);
+        chartViewer = new ChartViewer(chart);
+        this.setCenter(chartViewer);
+
+        chart.getLegend().setPosition(RectangleEdge.RIGHT);
+    }
+
+    public final ChartViewer getChartViewer() {
+        return chartViewer;
+    }
+
+    public final void setLeftAxis(MeasurementType axisType) {
+        if (axisType != MeasurementType.NONE) {
+            leftAxis = axisType.createRangeAxis();
+            plot.setRangeAxis(0, leftAxis);
+            createRenderer(0, leftAxisCollection, leftAxis.getNumberFormatOverride());
+        }
+    }
+
+    public final void setRightAxis(MeasurementType axisType) {
+        if (axisType != MeasurementType.NONE) {
+            rightAxis = axisType.createRangeAxis();
+            plot.setRangeAxis(1, rightAxis);
+            createRenderer(1, rightAxisCollection, rightAxis.getNumberFormatOverride());
+        }
+    }
+
+    private void createRenderer(int dataset, TimeSeriesCollection collection, NumberFormat format) {
         DefaultXYItemRenderer renderer = new DefaultXYItemRenderer();
         renderer.setBaseShapesVisible(false);
         
         renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator(StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                                                                         DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG),
-                                                                        axis.getNumberFormatOverride()));
+                                                                        format));
+                                                                        
         renderer.setDefaultEntityRadius(1);
-        plot.setRenderer(0, renderer);
-        plot.setDataset(0, leftAxisCollection);
-
-        renderer = new DefaultXYItemRenderer();
-        renderer.setBaseShapesVisible(false);
-        renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator(StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
-                                                                        DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG),
-                                                                        axis.getNumberFormatOverride()));
-        renderer.setDefaultEntityRadius(1);
-        renderer.setBasePaint(Color.BLUE);
-        plot.setRenderer(1, renderer);
-        plot.setDataset(1, rightAxisCollection);
-
-        ChartFactory.getChartTheme().apply(chart);
-        setChart(chart);
-        chart.getLegend().setPosition(RectangleEdge.RIGHT);
-        plot.mapDatasetToRangeAxis(0, 0);
-        plot.mapDatasetToRangeAxis(1, 1);
+        plot.setRenderer(dataset, renderer);
+        plot.setDataset(dataset, collection);
     }
 
     /**
@@ -243,6 +260,7 @@ class StripChart extends ChartViewer {
         final StripChart chart = new StripChart(MeasurementType.TEMPERATURE, MeasurementType.HUMIDITY, 1, 10);
         chart.addSeries("Outdoor", MAP_TO_LEFT_AXIS, Color.BLUE);
         chart.addSeries("Humidity", MAP_TO_RIGHT_AXIS, Color.CYAN);
+
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame();
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

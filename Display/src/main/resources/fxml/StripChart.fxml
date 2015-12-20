@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.*?>
+<?import com.bdb.weather.display.stripchart.*?>
+
+<fx:root type="BorderPane" xmlns:fx="http://javafx.com/fxml/1">
+    <top>
+        <FlowPane hgap="10">
+            <Label text="Hours to Display:">
+                <FlowPane.margin>
+                    <Insets top="5" right="5" bottom="5" left="25"/>
+                </FlowPane.margin>
+            </Label>
+            <ComboBox>
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="1" />
+                        <String fx:value="2" />
+                        <String fx:value="3" />
+                        <String fx:value="6" />
+                        <String fx:value="12" />
+                        <String fx:value="24" />
+                        <String fx:value="48" />
+                    </FXCollections>
+                </items>
+                <value>
+                    <String fx:value="1"/>
+                </value>
+            </ComboBox>
+            <FlowPane>
+                <Label text="Series: "/>
+                <FlowPane fx:id="seriesControlPane" hgap="5"/>
+            </FlowPane>
+        </FlowPane>
+    </top>
+    <center>
+        <StripChart fx:id="stripChart"/>
+    </center>
+</fx:root>
