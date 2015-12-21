@@ -42,7 +42,7 @@ public class StripChartController extends BorderPane {
     private final MeasurementType rightAxisType;
     private Menu rightAxisMenu;
     private Menu leftAxisMenu;
-    private final StripChartManager manager;
+    private final StripChartManagerOld manager;
     private static final String[] TEMPERATURE_DATASETS = {
         "Outdoor Temperature", "Indoor Temperature", "Heat Index", "Wind Chill", "Dew Point" // Dependent on sensors available
     };
@@ -79,7 +79,7 @@ public class StripChartController extends BorderPane {
      * @param maxHours The maximum number of hours that will ever be displayed. This is used to trim the dataset as more data is added.
      * @param theManager
      */
-    public StripChartController(String theName, MeasurementType leftAxisType, MeasurementType rightAxisType, List<HistoricalRecord> initialData, int spanHours, int maxHours, StripChartManager theManager) {
+    public StripChartController(String theName, MeasurementType leftAxisType, MeasurementType rightAxisType, List<HistoricalRecord> initialData, int spanHours, int maxHours, StripChartManagerOld theManager) {
         this.name = theName;
         this.leftAxisType = leftAxisType;
         this.rightAxisType = rightAxisType;

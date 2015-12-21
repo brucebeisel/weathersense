@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.*?>
+
+<fx:root type="FlowPane" hgap="5" vgap="10" xmlns:fx="http://javafx.com/fxml/1">
+    <Label text="Left Axis:"/>
+    <ComboBox fx:id="leftAxisComboBox" />
+    <Label text="Right Axis:"/>
+    <ComboBox fx:id="rightAxisComboBox" />
+    <Label text="Name"/>
+    <TextField fx:id="stripChartName" prefColumnCount="15"/> 
+    <Button text="Save" onAction="#saveStripChart" />
+    <Button text="Launch" onAction="#launchStripChart" />
+    <TableView fx:id="savedStripChartTable">
+        <columns>
+            <TableColumn text="Name"/>
+            <TableColumn text="Left Axis"/>
+            <TableColumn text="Right Axis"/>
+        </columns>
+    </TableView>
+    <Button text="Delete"/>
+</fx:root>

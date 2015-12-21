@@ -30,7 +30,7 @@ import com.bdb.weather.common.HistoricalRecord;
  * 
  * @author Bruce
  */
-public class StripChartContainer extends TilePane implements StripChartManager {
+public class StripChartContainer extends TilePane implements StripChartManagerOld {
     private final Map<String,StripChartController> controllers = new TreeMap<>();
     private int nextControllerId = 0;
     

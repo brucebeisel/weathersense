@@ -37,6 +37,7 @@ import com.bdb.weather.display.current.CurrentWeatherForm;
 import com.bdb.weather.display.day.DaySummaryGraphPanel;
 import com.bdb.weather.display.day.TodayGraphPanel;
 import com.bdb.weather.display.stripchart.MeasurementType;
+import com.bdb.weather.display.stripchart.StripChartManager;
 import com.bdb.weather.display.stripchart.StripChartPane;
 
 /**
@@ -72,11 +73,7 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
         
         WeatherDataMgr.getInstance().fillInCurrentWeather(curWeather);
         for (CurrentWeatherProcessor cwp : cwpList) {
-            Platform.runLater(new Runnable() {
-                @Override public void run() {
-                    cwp.updateCurrentWeather(curWeather);
-                }
-            });
+            Platform.runLater(() -> cwp.updateCurrentWeather(curWeather));
         }
     }
 
@@ -165,6 +162,13 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchMonthlyFreePlotView() {
+	Stage stage = new Stage();
+        StripChartManager stripChartManager = new StripChartManager();
+        Scene scene = new Scene(stripChartManager);
+        stage.setTitle("Strip Chart Manager");
+        stage.setScene(scene);
+        stage.sizeToScene();
+        stage.show();
     }
 
     @FXML
@@ -175,7 +179,6 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
         stage.setTitle("Strip Chart");
         stage.setScene(scene);
 	cwpList.add(stripChartPane);
-        //graphPanel.loadData();
         stage.sizeToScene();
         stage.show();
         stage.setOnCloseRequest((handler) -> cwpList.remove(stripChartPane));
