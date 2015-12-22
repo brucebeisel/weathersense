@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import javafx.fxml.FXML;
 
 import javafx.application.Platform;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -36,6 +37,7 @@ import com.bdb.weather.display.current.CurrentWeatherCharts;
 import com.bdb.weather.display.current.CurrentWeatherForm;
 import com.bdb.weather.display.day.DaySummaryGraphPanel;
 import com.bdb.weather.display.day.TodayGraphPanel;
+import com.bdb.weather.display.preferences.UnitsPreferenceDialog;
 import com.bdb.weather.display.stripchart.MeasurementType;
 import com.bdb.weather.display.stripchart.StripChartManager;
 import com.bdb.weather.display.stripchart.StripChartPane;
@@ -72,47 +74,39 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
         logger.fine(String.format("Updating %s current weather processors", cwpList.size()));
         
         WeatherDataMgr.getInstance().fillInCurrentWeather(curWeather);
-        for (CurrentWeatherProcessor cwp : cwpList) {
-            Platform.runLater(() -> cwp.updateCurrentWeather(curWeather));
-        }
+        cwpList.forEach((cwp) -> Platform.runLater(() -> cwp.updateCurrentWeather(curWeather)));
+    }
+
+    private Stage launchStage(Parent root, String title) {
+	Stage stage = new Stage();
+        Scene scene = new Scene(root);
+        stage.setTitle(title);
+        stage.setScene(scene);
+        stage.sizeToScene();
+        stage.show();
+        return stage;
     }
 
     @FXML
     public void launchCurrentWeatherFormView() {
-	Stage stage = new Stage();
 	CurrentWeatherForm form = new CurrentWeatherForm(ws);
+        Stage stage = launchStage(form, "Current Weather");
 	cwpList.add(form);
-        Scene scene = new Scene(form);
-        stage.setTitle("Current Weather");
-        stage.setScene(scene);
-        stage.sizeToScene();
-        stage.show();
         stage.setOnCloseRequest((handler) -> cwpList.remove(form));
     }
 
     @FXML
     public void launchCurrentWeatherView() {
-	Stage stage = new Stage();
-	CurrentWeatherCharts cwCharts = new CurrentWeatherCharts(ws, connection, stage);
+	CurrentWeatherCharts cwCharts = new CurrentWeatherCharts(ws, connection);
+	Stage stage = launchStage(cwCharts, "Current Weather");
 	cwpList.add(cwCharts);
-        Scene scene = new Scene(cwCharts);
-        stage.setTitle("Current Weather");
-        stage.setScene(scene);
-        stage.sizeToScene();
-        stage.show();
         stage.setOnCloseRequest((handler) -> cwpList.remove(cwCharts));
     }
 
     @FXML
     public void launchTodayView() {
-	Stage stage = new Stage();
         TodayGraphPanel todayGraphPanel = new TodayGraphPanel(connection);
-        Scene scene = new Scene(todayGraphPanel);
-        stage.setTitle("Today Weather");
-        stage.setScene(scene);
-        stage.sizeToScene();
-        stage.show();
-        //refreshList.add(todayGraphPanel);
+	launchStage(todayGraphPanel, "Today Weather");
         todayGraphPanel.refresh();
     }
 
@@ -130,14 +124,9 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchDaySummaryView() {
-	Stage stage = new Stage();
         DaySummaryGraphPanel graphPanel = new DaySummaryGraphPanel(ws, connection, LocalDate.now());
-        Scene scene = new Scene(graphPanel);
-        stage.setTitle("Weather");
-        stage.setScene(scene);
+	launchStage(graphPanel, "Weather");
         graphPanel.loadData();
-        stage.sizeToScene();
-        stage.show();
     }
 
     @FXML
@@ -162,25 +151,35 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchMonthlyFreePlotView() {
-	Stage stage = new Stage();
-        StripChartManager stripChartManager = new StripChartManager();
-        Scene scene = new Scene(stripChartManager);
-        stage.setTitle("Strip Chart Manager");
-        stage.setScene(scene);
-        stage.sizeToScene();
-        stage.show();
     }
 
     @FXML
     public void launchStripChart() {
-	Stage stage = new Stage();
-        StripChartPane stripChartPane = new StripChartPane(connection, MeasurementType.WIND, MeasurementType.RAINFALL);
-        Scene scene = new Scene(stripChartPane);
-        stage.setTitle("Strip Chart");
-        stage.setScene(scene);
+        StripChartManager stripChartManager = new StripChartManager();
+	launchStage(stripChartManager, "Strip Chart Manager");
+    }
+
+    @FXML
+    public void launchRainStripChart() {
+        StripChartPane stripChartPane = new StripChartPane(connection, MeasurementType.NONE, MeasurementType.RAINFALL);
+	Stage stage = launchStage(stripChartPane, "Strip Chart - Rain");
 	cwpList.add(stripChartPane);
-        stage.sizeToScene();
-        stage.show();
+        stage.setOnCloseRequest((handler) -> cwpList.remove(stripChartPane));
+    }
+
+    @FXML
+    public void launchRainAndWindStripChart() {
+        StripChartPane stripChartPane = new StripChartPane(connection, MeasurementType.WIND, MeasurementType.RAINFALL);
+	Stage stage = launchStage(stripChartPane, "Strip Chart - Wind and Rain");
+	cwpList.add(stripChartPane);
+        stage.setOnCloseRequest((handler) -> cwpList.remove(stripChartPane));
+    }
+
+    @FXML
+    public void launchTemperatureStripChart() {
+        StripChartPane stripChartPane = new StripChartPane(connection, MeasurementType.NONE, MeasurementType.TEMPERATURE);
+	Stage stage = launchStage(stripChartPane, "Strip Chart - Temperature");
+	cwpList.add(stripChartPane);
         stage.setOnCloseRequest((handler) -> cwpList.remove(stripChartPane));
     }
 
@@ -190,6 +189,9 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchUnitsPreference() {
+        UnitsPreferenceDialog dialog = new UnitsPreferenceDialog();
+        launchStage(dialog, "Units Preferences");
+
     }
 
     @FXML

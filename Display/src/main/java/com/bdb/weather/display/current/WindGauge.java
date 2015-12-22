@@ -92,10 +92,9 @@ public class WindGauge extends BorderPane {
     private double currentSpeed;
     private double speedInterval;
     private KeyValue headingKeyValue;
-    private int timerCount;
     private Timer timer;
     private final Label title = new Label();
-    private StringProperty titleProperty = new SimpleStringProperty();
+    private final StringProperty titleProperty = new SimpleStringProperty();
 
     /**
      * Constructor.
@@ -220,7 +219,7 @@ public class WindGauge extends BorderPane {
 	setTitle("Wind");
     }
 
-    public void setTitle(String title) {
+    public final void setTitle(final String title) {
 	titleProperty.setValue(title);
     }
 
@@ -304,7 +303,6 @@ public class WindGauge extends BorderPane {
         else
             avgAnnotation.setLabel("");
 
-        System.out.println("Last Heading: " + lastHeading + " Current Heading: " + currentHeading);
         headingKeyValue = new KeyValue(new SimpleDoubleProperty(lastHeading), currentHeading);
 	Timeline timeline = new Timeline(
 	    new KeyFrame(Duration.ZERO, (actionEvent) -> nextFrame(), headingKeyValue),
@@ -318,24 +316,13 @@ public class WindGauge extends BorderPane {
             lastHeading = currentHeading;
             lastSpeed = currentSpeed;
         });
-        timerCount = 0;
 	timeline.play();
     }
 
     private void nextFrame() {
         lastHeading += headingInterval;
-        System.out.println("Heading Value: " + lastHeading);
-        //System.out.println("Heading Value: " + (Double)headingKeyValue.getTarget().getValue());
-        // datasets[0].setValue((Double)headingKeyValue.getTarget().getValue());
         datasets[0].setValue(lastHeading);
         lastSpeed += speedInterval;
         speedDataset.setValue(lastSpeed);
-        //timerCount++;
-        //if (timerCount > 9) {
-        //    datasets[0].setValue(currentHeading);
-        //    lastHeading = currentHeading;
-        //    speedDataset.setValue(currentSpeed);
-        //    lastSpeed = currentSpeed;
-        //}
     }
 }

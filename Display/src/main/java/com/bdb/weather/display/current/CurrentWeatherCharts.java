@@ -28,15 +28,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 import com.bdb.util.Pair;
 import com.bdb.util.jdbc.DBConnection;
@@ -67,9 +63,8 @@ import com.bdb.weather.display.WeatherSense;
  * @author Bruce
  *
  */
-public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcessor, ChangeListener<Boolean> {
+public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcessor  {
     private final WeatherStation          ws;
-    private final Stage                   stage;
     @FXML private Barometer               barometer;
     @FXML private WindGauge               windGauge;
     @FXML private Hygrometer              indoorHumidity;
@@ -101,9 +96,9 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
      * @param ws The weather station
      * @param connection The database connection
      */
-    public CurrentWeatherCharts(WeatherStation ws, DBConnection connection, Stage stage) {
+    @SuppressWarnings("LeakingThisInConstructor")
+    public CurrentWeatherCharts(WeatherStation ws, DBConnection connection) {
         this.ws = ws;
-        this.stage = stage;
         weatherYearStartMonth = ws.getWeatherYearStartMonth();
         temperatureBinMgr = new TemperatureBinMgr(connection);
 
@@ -120,9 +115,6 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
             throw new RuntimeException(exception);
         }
 
-        //rainPane.expandedProperty().addListener((listener) -> stage.sizeToScene());
-        rainPane.expandedProperty().addListener(this);
-        
 	barometer.setMinValue(ws.getBarometerMin());
 	barometer.setMaxValue(ws.getBarometerMax());
 
@@ -345,11 +337,5 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         catch (SQLException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-    }
-
-    @Override
-    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-        System.out.println("Rain panel expanded state changed to " + newValue);
-        Platform.runLater(()->stage.sizeToScene());
     }
 }

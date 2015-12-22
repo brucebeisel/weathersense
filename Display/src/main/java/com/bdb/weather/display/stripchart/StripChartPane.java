@@ -46,6 +46,12 @@ public class StripChartPane extends BorderPane implements CurrentWeatherProcesso
     private static final String[] TEMPERATURE_DATASETS = {
         "Outdoor Temperature", "Indoor Temperature", "Heat Index", "Wind Chill", "Dew Point" // Dependent on sensors available
     };
+    private static final String[] WIND_CHILL_DATASETS = {"Wind Chill"};
+
+    private static final String[] DEW_POINT_DATASETS = {"Dew Point"};
+
+    private static final String[] HEAT_INDEX_DATASETS = {"Heat Index"};
+
     private static final String[] HUMIDITY_DATASETS = {
         "Outdoor Humidity", "Indoor Humidity"
     };
@@ -171,10 +177,19 @@ public class StripChartPane extends BorderPane implements CurrentWeatherProcesso
      * @return The menu
      */
     private void createDatasetCheckBoxes(MeasurementType axisType, boolean leftAxis) {
-        String[] datasetNames = null;
+        String[] datasetNames = NONE_DATASETS;
         switch (axisType) {
             case TEMPERATURE:
                 datasetNames = TEMPERATURE_DATASETS;
+                break;
+            case DEW_POINT:
+                datasetNames = DEW_POINT_DATASETS;
+                break;
+            case WIND_CHILL:
+                datasetNames = WIND_CHILL_DATASETS;
+                break;
+            case HEAT_INDEX:
+                datasetNames = HEAT_INDEX_DATASETS;
                 break;
             case HUMIDITY:
                 datasetNames = HUMIDITY_DATASETS;
@@ -241,6 +256,18 @@ public class StripChartPane extends BorderPane implements CurrentWeatherProcesso
                 values[2] = cw.getHeatIndex().get();
                 values[3] = cw.getWindChill().get();
                 values[4] = cw.getDewPoint().get();
+                break;
+            case WIND_CHILL:
+                datasetNames = WIND_CHILL_DATASETS;
+                values[0] = cw.getWindChill().get();
+                break;
+            case HEAT_INDEX:
+                datasetNames = HEAT_INDEX_DATASETS;
+                values[0] = cw.getHeatIndex().get();
+                break;
+            case DEW_POINT:
+                datasetNames = DEW_POINT_DATASETS;
+                values[0] = cw.getDewPoint().get();
                 break;
             case HUMIDITY:
                 datasetNames = HUMIDITY_DATASETS;

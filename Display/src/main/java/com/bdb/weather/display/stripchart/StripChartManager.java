@@ -30,6 +30,7 @@ import javafx.scene.layout.FlowPane;
 public class StripChartManager extends FlowPane {
     @FXML private TableView<StripChartPreferences.StripChartEntry> savedStripChartTable;
 
+    @SuppressWarnings("LeakingThisInConstructor")
     public StripChartManager() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/StripChartManager.fxml"));
@@ -53,5 +54,4 @@ public class StripChartManager extends FlowPane {
     public void launchStripChart() {
 
     }
-    
 }

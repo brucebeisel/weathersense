@@ -32,7 +32,12 @@
 		<MenuItem text="Day Summary Free Plot" onAction="#launchDailyFreePlotView"/>
 		<MenuItem text="Month Summary Free Plot" onAction="#launchMonthlyFreePlotView"/>
 		<SeparatorMenuItem />
-		<MenuItem text="Strip Chart" onAction="#launchStripChart"/> 
+                <Menu text="Strip Charts">
+                    <MenuItem text="Strip Chart" onAction="#launchStripChart"/> 
+                    <MenuItem text="Rain" onAction="#launchRainStripChart"/> 
+                    <MenuItem text="Rain and Wind" onAction="#launchRainAndWindStripChart"/> 
+                    <MenuItem text="Temperature" onAction="#launchTemperatureStripChart"/> 
+                </Menu>
 	    </Menu>
 	    <Menu text="Preferences">
 		<MenuItem text="Color..." onAction="#launchColorPreference"/>

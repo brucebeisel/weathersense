@@ -16,44 +16,37 @@
  */
 package com.bdb.weather.display.preferences;
 
-import com.bdb.util.RadioButtonPanel;
-import com.bdb.weather.common.measurement.Depth;
-import com.bdb.weather.common.measurement.Pressure;
-import com.bdb.weather.common.measurement.Speed;
-import com.bdb.weather.common.measurement.Temperature;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
+import java.io.IOException;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.RadioButton;
+import javafx.scene.layout.BorderPane;
 
-import com.bdb.weather.common.measurement.Distance;
 
 /**
  *
  * @author Bruce
  */
 @SuppressWarnings("serial")
-public class UnitsPreferenceDialog extends JDialog {
-    private RadioButtonPanel temperatureRBP;
-    private RadioButtonPanel depthRBP;
-    private RadioButtonPanel elevationRBP;
-    private RadioButtonPanel speedRBP;
-    private RadioButtonPanel pressureRBP;
+public class UnitsPreferenceDialog extends BorderPane {
+    @FXML private RadioButton celcius;
+    @FXML private RadioButton fahrenheit;
+    @FXML private RadioButton kelvin;
     private UserPreferences  prefs = UserPreferences.getInstance();
     
     public UnitsPreferenceDialog() {
-        super();
-        setModal(true);
-        setTitle("User Units Preferences");
-        setLayout(new BorderLayout());
-              
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/MeasurementUnits.fxml"));
+            fxmlLoader.setRoot(this);
+            fxmlLoader.setController(this);
+            fxmlLoader.load();
+        }
+	catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+        /*
         JPanel p = new JPanel();
         JButton b = new JButton("OK");
         b.addActionListener((ActionEvent e) -> {
@@ -78,8 +71,10 @@ public class UnitsPreferenceDialog extends JDialog {
         
         this.pack(); 
         this.setLocationRelativeTo(null);
+*/
     }
     
+    /*
     private JPanel createUnitsPanel() {
         JPanel p = new JPanel(new GridBagLayout());
         temperatureRBP = new RadioButtonPanel();
@@ -163,4 +158,5 @@ public class UnitsPreferenceDialog extends JDialog {
 
         return p;
     }
+*/
 }

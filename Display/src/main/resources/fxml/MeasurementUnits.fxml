@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root type="BorderPane" xmlns:fx="http://javafx.com/fxml/1">
+    <top>
+        <HBox spacing="10" BorderPane.alignment="CENTER"> 
+            <Button text="English"/>
+            <Button text="Metric"/>
+        </HBox>
+    </top>
+    <center>
+        <GridPane hgap="5" vgap="10" >
+            <fx:define>
+                <ToggleGroup fx:id="TemperatureToggleGroup"/>
+                <ToggleGroup fx:id="RainfallToggleGroup"/>
+                <ToggleGroup fx:id="ElevationToggleGroup"/>
+                <ToggleGroup fx:id="WindSpeedToggleGroup"/>
+                <ToggleGroup fx:id="BarometricPressureToggleGroup"/>
+            </fx:define>
+            <Label text="Temperature:" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="RIGHT"/>   
+            <Label text="Rainfall:" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="RIGHT"/>   
+            <Label text="Elevation:" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>   
+            <Label text="Wind Speed:" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>   
+            <Label text="Barometric Pressure:" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.halignment="RIGHT"/>   
+            <HBox spacing="5"  GridPane.columnIndex="1" GridPane.rowIndex="0"> 
+                <RadioButton fx:id="celcius" text="Celcius" selected="true" toggleGroup="$TemperatureToggleGroup"/>
+                <RadioButton fx:id="fahrenheit" text="Fahrenheit" toggleGroup="$TemperatureToggleGroup"/>
+                <RadioButton fx:id="kelvin" text="Kelvin" toggleGroup="$TemperatureToggleGroup"/>
+            </HBox>
+        </GridPane>
+    </center>
+</fx:root>
