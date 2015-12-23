@@ -131,7 +131,7 @@ public class WeatherSense extends Application {
 	stage.getIcons().add(icon);
         stage.setScene(scene);
         controller = loader.getController();
-	controller.setData(ws, connection);
+	controller.setData(ws, connection, stage);
         stage.sizeToScene();
         stage.show();
     }

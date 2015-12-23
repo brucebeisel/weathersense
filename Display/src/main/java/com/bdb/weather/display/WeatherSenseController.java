@@ -27,6 +27,7 @@ import javafx.fxml.FXML;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import com.bdb.util.jdbc.DBConnection;
@@ -50,6 +51,7 @@ import com.bdb.weather.display.stripchart.StripChartPane;
 public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentWeatherHandler {
     private WeatherStation ws;
     private DBConnection connection;
+    private Stage topLevelStage;
     private final CurrentWeatherSubscriber subscriber;
     private final List<CurrentWeatherProcessor> cwpList = new ArrayList<>();
     private static final Logger logger = Logger.getLogger(WeatherSenseController.class.getName());
@@ -59,9 +61,10 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
         subscriber = CurrentWeatherSubscriber.createSubscriber(this);
     }
 
-    public void setData(WeatherStation ws, DBConnection connection) {
+    public void setData(WeatherStation ws, DBConnection connection, Stage stage) {
 	this.ws = ws;
 	this.connection = connection;
+        topLevelStage = stage;
     }
 
     public void stop() {
@@ -84,6 +87,18 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
         stage.setScene(scene);
         stage.sizeToScene();
         stage.show();
+        return stage;
+    }
+
+    private Stage launchModalStage(Parent root, String title) {
+	Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initOwner(topLevelStage);
+        Scene scene = new Scene(root);
+        stage.setTitle(title);
+        stage.setScene(scene);
+        stage.sizeToScene();
+        stage.showAndWait();
         return stage;
     }
 
@@ -190,8 +205,7 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
     @FXML
     public void launchUnitsPreference() {
         UnitsPreferenceDialog dialog = new UnitsPreferenceDialog();
-        launchStage(dialog, "Units Preferences");
-
+        launchModalStage(dialog, "Units Preferences");
     }
 
     @FXML

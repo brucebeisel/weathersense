@@ -91,9 +91,9 @@ public class WindGauge extends BorderPane {
     private double lastSpeed;
     private double currentSpeed;
     private double speedInterval;
-    private KeyValue headingKeyValue;
     private Timer timer;
     private final Label title = new Label();
+    private final Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), (actionEvent) -> nextFrame()));
     private final StringProperty titleProperty = new SimpleStringProperty();
 
     /**
@@ -217,6 +217,14 @@ public class WindGauge extends BorderPane {
 	BorderPane.setAlignment(title, Pos.CENTER);
 	title.textProperty().bind(titleProperty);
 	setTitle("Wind");
+
+	timeline.setCycleCount(9);
+        timeline.setOnFinished((event) -> {
+            datasets[0].setValue(currentHeading);
+            speedDataset.setValue(currentSpeed);
+            lastHeading = currentHeading;
+            lastSpeed = currentSpeed;
+        });
     }
 
     public final void setTitle(final String title) {
@@ -303,19 +311,7 @@ public class WindGauge extends BorderPane {
         else
             avgAnnotation.setLabel("");
 
-        headingKeyValue = new KeyValue(new SimpleDoubleProperty(lastHeading), currentHeading);
-	Timeline timeline = new Timeline(
-	    new KeyFrame(Duration.ZERO, (actionEvent) -> nextFrame(), headingKeyValue),
-	    new KeyFrame(Duration.millis(100))
-	);
-
-	timeline.setCycleCount(9);
-        timeline.setOnFinished((event) -> {
-            datasets[0].setValue(currentHeading);
-            speedDataset.setValue(currentSpeed);
-            lastHeading = currentHeading;
-            lastSpeed = currentSpeed;
-        });
+	timeline.jumpTo(Duration.ZERO);
 	timeline.play();
     }
 

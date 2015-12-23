@@ -16,13 +16,14 @@
  */
 package com.bdb.weather.display.preferences;
 
-
 import java.io.IOException;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.RadioButton;
 import javafx.scene.layout.BorderPane;
+
+import com.bdb.weather.common.measurement.Temperature;
 
 
 /**
@@ -31,7 +32,7 @@ import javafx.scene.layout.BorderPane;
  */
 @SuppressWarnings("serial")
 public class UnitsPreferenceDialog extends BorderPane {
-    @FXML private RadioButton celcius;
+    @FXML private RadioButton celsius;
     @FXML private RadioButton fahrenheit;
     @FXML private RadioButton kelvin;
     private UserPreferences  prefs = UserPreferences.getInstance();
@@ -46,6 +47,13 @@ public class UnitsPreferenceDialog extends BorderPane {
 	catch (IOException exception) {
             throw new RuntimeException(exception);
         }
+
+        if (Temperature.getDefaultUnit() == Temperature.Unit.CELSIUS)
+            celsius.setSelected(true);
+        else if (Temperature.getDefaultUnit() == Temperature.Unit.FAHRENHEIT)
+            fahrenheit.setSelected(true);
+        else
+            kelvin.setSelected(true);
         /*
         JPanel p = new JPanel();
         JButton b = new JButton("OK");

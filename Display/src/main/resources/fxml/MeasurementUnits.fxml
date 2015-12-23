@@ -3,18 +3,25 @@
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <fx:root type="BorderPane" xmlns:fx="http://javafx.com/fxml/1">
     <top>
-        <HBox spacing="10" BorderPane.alignment="CENTER"> 
+        <HBox spacing="10" alignment="CENTER"   BorderPane.alignment="CENTER"> 
+            <BorderPane.margin>
+                <javafx.geometry.Insets bottom="10" top="10" left="10" right="10"/>
+            </BorderPane.margin>
             <Button text="English"/>
             <Button text="Metric"/>
         </HBox>
     </top>
     <center>
         <GridPane hgap="5" vgap="10" >
+            <BorderPane.margin>
+                <javafx.geometry.Insets bottom="10" top="10" left="10" right="10"/>
+            </BorderPane.margin>
             <fx:define>
                 <ToggleGroup fx:id="TemperatureToggleGroup"/>
                 <ToggleGroup fx:id="RainfallToggleGroup"/>
@@ -27,11 +34,32 @@
             <Label text="Elevation:" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>   
             <Label text="Wind Speed:" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>   
             <Label text="Barometric Pressure:" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.halignment="RIGHT"/>   
-            <HBox spacing="5"  GridPane.columnIndex="1" GridPane.rowIndex="0"> 
-                <RadioButton fx:id="celcius" text="Celcius" selected="true" toggleGroup="$TemperatureToggleGroup"/>
-                <RadioButton fx:id="fahrenheit" text="Fahrenheit" toggleGroup="$TemperatureToggleGroup"/>
-                <RadioButton fx:id="kelvin" text="Kelvin" toggleGroup="$TemperatureToggleGroup"/>
+            <HBox spacing="5"  GridPane.fillHeight="true" GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-border-color: black; -fx-border-width: 1; -fx-border-style: groove;" > 
+                <RadioButton fx:id="celsius" text="Celsius" selected="true" toggleGroup="$TemperatureToggleGroup" alignment="CENTER" >
+                    <HBox.margin>
+                        <Insets bottom="5" top="5" left="5" right="5"/>
+                    </HBox.margin>
+                </RadioButton>
+                <RadioButton fx:id="fahrenheit" text="Fahrenheit" toggleGroup="$TemperatureToggleGroup" alignment="CENTER" >
+                    <HBox.margin>
+                        <Insets bottom="5" top="5" left="5" right="5"/>
+                    </HBox.margin>
+                </RadioButton>
+                <RadioButton fx:id="kelvin" text="Kelvin" toggleGroup="$TemperatureToggleGroup" alignment="CENTER" >
+                    <HBox.margin>
+                        <Insets bottom="5" top="5" left="5" right="5"/>
+                    </HBox.margin>
+                </RadioButton>
             </HBox>
         </GridPane>
     </center>
+    <bottom>
+        <HBox spacing="10" alignment="CENTER"  BorderPane.alignment="CENTER" >
+            <BorderPane.margin>
+                <javafx.geometry.Insets bottom="10" top="10" left="10" right="10"/>
+            </BorderPane.margin>
+            <Button text="OK" /> 
+            <Button text="Cancel" />
+        </HBox>
+    </bottom>
 </fx:root>
