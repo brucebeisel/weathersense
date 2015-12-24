@@ -96,7 +96,7 @@
                     </BorderPane>
                     <BorderPane>
                         <center>
-                            <RainBucket fx:id="weatherYearRain" waterColor="purple"/>
+                            <RainBucket fx:id="weatherYearRain" />
                         </center>
                         <bottom>
                             <Label text="Weather Year" BorderPane.alignment="CENTER" />

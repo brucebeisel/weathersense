@@ -51,6 +51,7 @@ import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Heading;
 import com.bdb.weather.common.measurement.Humidity;
 import com.bdb.weather.common.measurement.Pressure;
+import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.CurrentWeatherProcessor;
 import com.bdb.weather.display.RainBucket;
 import com.bdb.weather.display.RainPlot;
@@ -290,6 +291,20 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
 
         if (cw.getWindDir5() != null)
             headings.add(cw.getWindDir5());
+
+        //
+        // Have some fun with units
+        //
+        /*
+        if (Temperature.getDefaultUnit() == Temperature.Unit.CELSIUS) {
+            Temperature.setDefaultUnit(Temperature.Unit.FAHRENHEIT);
+            outdoorTemperature.setUnit(Temperature.Unit.FAHRENHEIT);
+        }
+        else {
+            Temperature.setDefaultUnit(Temperature.Unit.CELSIUS);
+            outdoorTemperature.setUnit(Temperature.Unit.CELSIUS);
+        }
+*/
 
         //
         // If there is no summary record then just use the current temperature for both high and low

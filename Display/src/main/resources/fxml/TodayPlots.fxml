@@ -8,7 +8,12 @@
 <?import com.bdb.weather.display.day.*?>
 <?import com.bdb.weather.display.windrose.*?>
 
-<fx:root type="javafx.scene.layout.GridPane" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="javafx.scene.layout.GridPane"   xmlns:fx="http://javafx.com/fxml/1">
+    <columnConstraints>
+        <ColumnConstraints percentWidth="50"/> 
+        <ColumnConstraints percentWidth="25"/> 
+        <ColumnConstraints percentWidth="25"/> 
+    </columnConstraints>
     <DayTemperaturePlot fx:id="temperaturePlot" GridPane.columnIndex="0" GridPane.rowIndex="0"/> 
     <DayHumidityPanel fx:id="humidityPlot" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2" /> 
     <DayRainPanel fx:id="rainPlot" GridPane.columnIndex="0" GridPane.rowIndex="1"/> 

@@ -83,6 +83,7 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
     private Stage launchStage(Parent root, String title) {
 	Stage stage = new Stage();
         Scene scene = new Scene(root);
+        scene.getStylesheets().add("/styles/weathersense.css");
         stage.setTitle(title);
         stage.setScene(scene);
         stage.sizeToScene();

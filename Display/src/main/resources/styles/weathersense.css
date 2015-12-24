@@ -2,8 +2,9 @@
  * Empty Stylesheet file.
  */
 
-.label {
-    -fx-underline: true;
+.value-label {
+    -fx-text-fill: blue;
+    -fx-font-weight: bold;
 }
 
 .border {
