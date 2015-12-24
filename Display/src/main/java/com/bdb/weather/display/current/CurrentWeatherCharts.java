@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
@@ -31,7 +30,6 @@ import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
 
 import com.bdb.util.Pair;
@@ -42,7 +40,6 @@ import com.bdb.weather.common.CurrentWeather;
 import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.MonthWeatherAverages;
 import com.bdb.weather.common.SummaryRecord;
-import com.bdb.weather.common.TemperatureBinMgr;
 import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.WeatherTrend;
 import com.bdb.weather.common.db.HistoryTable;
@@ -51,12 +48,12 @@ import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Heading;
 import com.bdb.weather.common.measurement.Humidity;
 import com.bdb.weather.common.measurement.Pressure;
-import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.CurrentWeatherProcessor;
 import com.bdb.weather.display.RainBucket;
 import com.bdb.weather.display.RainPlot;
 import com.bdb.weather.display.WeatherDataMgr;
 import com.bdb.weather.display.WeatherSense;
+import com.bdb.weather.display.preferences.UserPreferences;
 
 /**
  * The top-level component for displaying the current weather.
@@ -83,12 +80,10 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
     @FXML private RainBucket              lastMonthRain;
     @FXML private RainBucket              calendarYearRain;
     @FXML private RainBucket              weatherYearRain;
-    @FXML private TitledPane              rainPane;
     private final HistoryTable            historyTable;
-    private final Month                   weatherYearStartMonth;
-    private final TemperatureBinMgr       temperatureBinMgr;
     private final MonthlyAveragesTable    monthlyAverageTable;
     private String                        frameTitle = null;
+    private final UserPreferences         prefs = UserPreferences.getInstance();
     private static final Logger           logger = Logger.getLogger(CurrentWeatherCharts.class.getName());
     
     /**
@@ -100,8 +95,6 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
     @SuppressWarnings("LeakingThisInConstructor")
     public CurrentWeatherCharts(WeatherStation ws, DBConnection connection) {
         this.ws = ws;
-        weatherYearStartMonth = ws.getWeatherYearStartMonth();
-        temperatureBinMgr = new TemperatureBinMgr(connection);
 
         historyTable = new HistoryTable(connection);
 	monthlyAverageTable = new MonthlyAveragesTable(connection);
@@ -124,6 +117,9 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
 
         indoorTemperature.setMinValue(ws.getThermometerMin());
         indoorTemperature.setMaxValue(ws.getThermometerMax());
+
+        outdoorTemperature.unitProperty().bind(prefs.temperatureUnitProperty());
+        indoorTemperature.unitProperty().bind(prefs.temperatureUnitProperty());
 
         String unitLabel = Depth.getDefaultUnit().toString();
 
@@ -293,20 +289,6 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
             headings.add(cw.getWindDir5());
 
         //
-        // Have some fun with units
-        //
-        /*
-        if (Temperature.getDefaultUnit() == Temperature.Unit.CELSIUS) {
-            Temperature.setDefaultUnit(Temperature.Unit.FAHRENHEIT);
-            outdoorTemperature.setUnit(Temperature.Unit.FAHRENHEIT);
-        }
-        else {
-            Temperature.setDefaultUnit(Temperature.Unit.CELSIUS);
-            outdoorTemperature.setUnit(Temperature.Unit.CELSIUS);
-        }
-*/
-
-        //
         // If there is no summary record then just use the current temperature for both high and low
         //
         SummaryRecord summary = WeatherDataMgr.getInstance().getTodaysSummary();
@@ -344,6 +326,15 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
 	WeatherSense.setStageTitle(this, ammendedFrameTitle);
     }
 
+    public void closing() {
+        outdoorTemperature.unitProperty().unbind();
+        indoorTemperature.unitProperty().unbind();
+    }
+    /**
+     * Update the display with the current weather data.
+     * 
+     * @param cw The current weather
+     */
     @Override
     public void updateCurrentWeather(CurrentWeather cw) {
         try {

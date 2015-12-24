@@ -23,6 +23,9 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+
 import com.bdb.weather.common.db.DatabaseConstants;
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Distance;
@@ -99,7 +102,14 @@ public class UserPreferences {
     private final Preferences plotColorNode = rootPref.node(PLOT_COLOR_NODE);
     private final Preferences dbNode = rootPref.node(DATABASE_NODE);
     private static UserPreferences instance = null;
+
+    private final ObjectProperty<Temperature.Unit> temperatureUnitProperty = new SimpleObjectProperty<>(Temperature.getDefaultUnit());
+
     private static final Logger logger = Logger.getLogger(UserPreferences.class.getName());
+
+    static {
+        instance = new UserPreferences();
+    }
 
     /**
      * Constructor
@@ -114,9 +124,6 @@ public class UserPreferences {
     }
 
     public static synchronized UserPreferences getInstance() {
-        if (instance == null)
-            instance = new UserPreferences();
-
         return instance;
     }
 
@@ -130,6 +137,21 @@ public class UserPreferences {
         }
     }
 
+    public void setTemperatureUnit(Temperature.Unit unit) {
+        temperatureUnitProperty.set(unit);
+        Temperature.setDefaultUnit(unit);
+        logger.log(Level.FINER,"Setting preference " + TEMP_UNITS_PREF + " to {0}", unit.name());
+        unitNode.put(TEMP_UNITS_PREF, unit.name());
+    }
+
+    public Temperature.Unit getTemperatureUnit() {
+        return temperatureUnitProperty.get();
+    }
+
+    public ObjectProperty<Temperature.Unit> temperatureUnitProperty() {
+        return temperatureUnitProperty;
+    }
+
     private void loadTemperatureUnitsPref() {
         //
         // If the preference is not legal then set the preference to the default
@@ -138,17 +160,11 @@ public class UserPreferences {
         try {
             String pref = unitNode.get(TEMP_UNITS_PREF, Temperature.getDefaultUnit().name());
             logger.log(Level.FINER, "Temperature unit prefereuce = {0}", pref);
-            Temperature.setDefaultUnit(Temperature.Unit.valueOf(Temperature.Unit.class, pref));
+            setTemperatureUnit(Temperature.Unit.valueOf(Temperature.Unit.class, pref));
         }
         catch (IllegalArgumentException e) {
             unitNode.put(TEMP_UNITS_PREF, Temperature.getDefaultUnit().name());
         }
-    }
-
-    public void putTemperatureUnitsPref(Temperature.Unit pref) {
-        logger.log(Level.FINER,"Setting preference " + TEMP_UNITS_PREF + " to {0}", pref.name());
-        unitNode.put(TEMP_UNITS_PREF, pref.name());
-        Temperature.setDefaultUnit(pref);
     }
 
     public void addUnitListener(PreferenceChangeListener listener) {

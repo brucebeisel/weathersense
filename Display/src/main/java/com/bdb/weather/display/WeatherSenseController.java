@@ -39,6 +39,7 @@ import com.bdb.weather.display.current.CurrentWeatherForm;
 import com.bdb.weather.display.day.DaySummaryGraphPanel;
 import com.bdb.weather.display.day.TodayGraphPanel;
 import com.bdb.weather.display.preferences.UnitsPreferenceDialog;
+import com.bdb.weather.display.preferences.UserPreferences;
 import com.bdb.weather.display.stripchart.MeasurementType;
 import com.bdb.weather.display.stripchart.StripChartManager;
 import com.bdb.weather.display.stripchart.StripChartPane;
@@ -54,6 +55,7 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
     private Stage topLevelStage;
     private final CurrentWeatherSubscriber subscriber;
     private final List<CurrentWeatherProcessor> cwpList = new ArrayList<>();
+    private final UserPreferences prefs = UserPreferences.getInstance();
     private static final Logger logger = Logger.getLogger(WeatherSenseController.class.getName());
 
     @SuppressWarnings("LeakingThisInConstructor")
@@ -96,6 +98,7 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initOwner(topLevelStage);
         Scene scene = new Scene(root);
+        scene.getStylesheets().add("/styles/weathersense.css");
         stage.setTitle(title);
         stage.setScene(scene);
         stage.sizeToScene();
@@ -117,6 +120,7 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 	Stage stage = launchStage(cwCharts, "Current Weather");
 	cwpList.add(cwCharts);
         stage.setOnCloseRequest((handler) -> cwpList.remove(cwCharts));
+
     }
 
     @FXML
