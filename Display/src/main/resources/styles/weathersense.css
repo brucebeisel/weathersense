@@ -9,4 +9,6 @@
 
 .toggle-group-border {
     -fx-border-color: black; -fx-border-width: 1; -fx-border-style: solid;
+    -fx-padding: 5;
+    -fx-spacing: 5;
 }

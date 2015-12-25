@@ -21,18 +21,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
-
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartMouseEvent;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
@@ -70,7 +65,6 @@ public class WindSummary extends TabPane implements ChartMouseListenerFX {
     private DateAxis                  dateAxis;
     private NumberAxis                valueAxis;
     private TableView                 dataTable;
-    private final DefaultTableModel   tableModel = new DefaultTableModel();
     private final SummaryInterval     interval;
     private final ViewLauncher        launcher;
     private final SummarySupporter    supporter;
@@ -147,12 +141,8 @@ public class WindSummary extends TabPane implements ChartMouseListenerFX {
      * @return The swing component
      */
     private Node createTable() {
-        //
-        // Build the table for the data tab
-        //
-        DefaultTableColumnModel colModel = new DefaultTableColumnModel();
-        
         dataTable = new TableView();
+        /*
         dataTable.setModel(tableModel);
         dataTable.setColumnModel(colModel);
 
@@ -169,6 +159,7 @@ public class WindSummary extends TabPane implements ChartMouseListenerFX {
         }
 
         tableModel.setColumnCount(COLUMN_HEADINGS.length);
+        */
 
         //
         // Insert the JTable component into a scroll pane so that we have scroll bars
@@ -190,7 +181,7 @@ public class WindSummary extends TabPane implements ChartMouseListenerFX {
         TimeSeriesCollection gustDataset = new TimeSeriesCollection();
         TimeSeries windGustSeries = new TimeSeries("Maximum Gust");
         
-        tableModel.setRowCount(records.size());
+        //tableModel.setRowCount(records.size());
      
         for (int i = 0; i < records.size(); i++) {
             RegularTimePeriod p = RegularTimePeriod.createInstance(interval.getFreeChartClass(), TimeUtils.localDateTimeToDate(records.get(i).getDate().atStartOfDay()), TimeZone.getDefault());
@@ -200,14 +191,14 @@ public class WindSummary extends TabPane implements ChartMouseListenerFX {
             
             if (gust != null) {
                 windGustSeries.add(p, gust.get());
-                tableModel.setValueAt(gust, i, MAX_GUST_COLUMN);
+                //tableModel.setValueAt(gust, i, MAX_GUST_COLUMN);
             }
-            else
-                tableModel.setValueAt(DisplayConstants.UNKNOWN_VALUE_STRING, i, MAX_GUST_COLUMN);
+            //else
+                //tableModel.setValueAt(DisplayConstants.UNKNOWN_VALUE_STRING, i, MAX_GUST_COLUMN);
                 
-            tableModel.setValueAt(interval.getFormat().format(records.get(i).getDate()), i, DATE_COLUMN);
-            tableModel.setValueAt(records.get(i).getMaxWindSpeed(), i, MAX_WIND_COLUMN);
-            tableModel.setValueAt(records.get(i).getAvgWindSpeed(), i, AVG_WIND_COLUMN);
+            //tableModel.setValueAt(interval.getFormat().format(records.get(i).getDate()), i, DATE_COLUMN);
+            //tableModel.setValueAt(records.get(i).getMaxWindSpeed(), i, MAX_WIND_COLUMN);
+            //tableModel.setValueAt(records.get(i).getAvgWindSpeed(), i, AVG_WIND_COLUMN);
                      
         }
         sustainedDataset.addSeries(avgSpeedSeries);

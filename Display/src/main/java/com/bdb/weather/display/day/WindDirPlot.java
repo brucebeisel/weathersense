@@ -101,8 +101,6 @@ class ItemRenderer extends CompassPolarItemRenderer {
 }
 
 public class WindDirPlot extends TabPane {
-    private static final long serialVersionUID = -3945455610185595801L;
-    
     private PolarPlot   plot;
     private JFreeChart  chart;
     private TableView   table;
@@ -110,6 +108,7 @@ public class WindDirPlot extends TabPane {
     
     
     public WindDirPlot() {
+        setPrefSize(300, 300);
         this.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         chart = ChartFactory.createPolarChart(null, null, false, true, false);
         

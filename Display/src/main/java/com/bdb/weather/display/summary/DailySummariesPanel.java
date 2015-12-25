@@ -16,8 +16,6 @@
  */
 package com.bdb.weather.display.summary;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
@@ -26,20 +24,18 @@ import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 
 import com.bdb.util.jdbc.DBConnection;
 
@@ -59,10 +55,10 @@ import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.DateInterval;
 import com.bdb.weather.display.ViewLauncher;
+import com.bdb.weather.display.WeatherSense;
 
-public final class DailySummariesPanel implements ComponentContainer, ActionListener, SummarySupporter
+public final class DailySummariesPanel extends BorderPane implements ComponentContainer, ActionListener, SummarySupporter
 {
-    private final JComponent                  component = new JPanel(new BorderLayout());
     private final SummariesGraphPanel         graphPanel;
     private final DailySummariesTextPanel     textPanel;
     private final DailySummaryTable           dailySummaryTable;
@@ -73,10 +69,10 @@ public final class DailySummariesPanel implements ComponentContainer, ActionList
     private LocalDate                         startDate;
     private LocalDate                         endDate;
     private final DateTimeFormatter           dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-    private final JFormattedTextField         startDateTF = new JFormattedTextField(dateFormat);
-    private final JFormattedTextField         endDateTF = new JFormattedTextField(dateFormat);
-    private final JComboBox                   intervalsCB = new JComboBox(DateInterval.availableIntervals());
-    private final JButton                     goButton = new JButton("Go");
+    private final TextField                   startDateTF = new TextField();
+    private final TextField                   endDateTF = new TextField();
+    private final ComboBox                    intervalsCB = new ComboBox(DateInterval.availableIntervals());
+    private final Button                      goButton = new Button("Go");
 
     @SuppressWarnings("LeakingThisInConstructor")
     public DailySummariesPanel(WeatherStation ws, DBConnection connection, ViewLauncher launcher, LocalDate start, LocalDate end, DateInterval interval) {
@@ -88,23 +84,27 @@ public final class DailySummariesPanel implements ComponentContainer, ActionList
 
         graphPanel = new SummariesGraphPanel(SummaryInterval.DAY_INTERVAL, connection, launcher, this);
         textPanel = new DailySummariesTextPanel();
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Graphs", graphPanel.getComponent());
-        tabbedPane.addTab("Statistics", new JScrollPane(textPanel));
+        TabPane tabPane = new TabPane();
+        Tab tab = new Tab("Charts");
+        tab.setContent(graphPanel);
+        tabPane.getTabs().add(tab);
 
+        tab = new Tab("Statistics");
+        tab.setContent(new ScrollPane(textPanel));
+        tabPane.getTabs().add(sp);
 
-        component.add(tabbedPane, BorderLayout.CENTER);
+        setCenter(tabPane);
 
-        JPanel cmdPanel = new JPanel();
+        HBox cmdPanel = new HBox();
 
-        cmdPanel.add(intervalsCB);
-        cmdPanel.add(new JLabel("Start:"));
-        cmdPanel.add(startDateTF);
-        cmdPanel.add(new JLabel("End:"));
-        cmdPanel.add(endDateTF);
-        cmdPanel.add(goButton);
+        cmdPanel.getChildren().add(intervalsCB);
+        cmdPanel.getChildren().add(new Label("Start:"));
+        cmdPanel.getChildren().add(startDateTF);
+        cmdPanel.getChildren().add(new Label("End:"));
+        cmdPanel.getChildren().add(endDateTF);
+        cmdPanel.getChildren().add(goButton);
 
-        component.add(cmdPanel, BorderLayout.NORTH);
+        setTop(cmdPanel);
 
         startDate = start;
         endDate = end;
@@ -121,7 +121,7 @@ public final class DailySummariesPanel implements ComponentContainer, ActionList
         intervalsCB.setMaximumRowCount(intervalsCB.getItemCount());
         intervalsCB.addActionListener(this);
         
-        goButton.addActionListener((ae)-> {
+        goButton.setOnAction((ae)-> {
             try {
                 startDate = LocalDate.from(dateFormat.parse(startDateTF.getText()));
                 endDate = LocalDate.from(dateFormat.parse(endDateTF.getText()));
@@ -132,41 +132,11 @@ public final class DailySummariesPanel implements ComponentContainer, ActionList
             }
         });
 
-        goButton.setEnabled(false);
+        goButton.setDisable(true);
 
         loadData(startDate, endDate);
     }
     
-    @Override
-    public Node getComponent() {
-        return null;
-    }
-
-    @SuppressWarnings("empty-statement")
-    private Component getParentFrame() {
-        Component c;
-
-        for (c = component.getParent();
-             c != null && !(c instanceof JFrame) && !(c instanceof JInternalFrame);
-             c = c.getParent());
-        
-        return c;
-    }
-    
-    public void setWindowTitle() {
-        Component c = getParentFrame();
-
-        if (c != null) {
-            DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-            String dateString = df.format(startDate) + " - " + df.format(endDate);
-
-            if (c instanceof JFrame)
-                ((JFrame)c).setTitle(dateString);
-            else 
-                ((JInternalFrame)c).setTitle(dateString);
-        }
-    }
-
     private void loadData(LocalDate startDate, LocalDate endDate) {
         temperatureBinMgr.refresh();
         List<SummaryRecord> summaryRecords = dailySummaryTable.retrieveRange(startDate, endDate, ws.getWindParameters(), temperatureBinMgr);
@@ -175,17 +145,17 @@ public final class DailySummariesPanel implements ComponentContainer, ActionList
                                                                                     endDate.getMonth(), endDate.getDayOfMonth());
                                                 
         if (summaryRecords.isEmpty())
-            SwingUtilities.invokeLater(() -> {
-                JOptionPane.showMessageDialog(getParentFrame(), "No data available for date range", "No Data", JOptionPane.INFORMATION_MESSAGE);
-            });
+            //SwingUtilities.invokeLater(() -> {
+            //    JOptionPane.showMessageDialog(getParentFrame(), "No data available for date range", "No Data", JOptionPane.INFORMATION_MESSAGE);
+            //});
             // TODO put combobox back to original value, probably the same for the text fields when in custom mode.
         else {
             WeatherAverages dailyAverages = dailyAveragesTable.retrieveDailyAverages();
 
             if (dailyAverages == null) {
-                SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(getParentFrame(), "No weather average data", "No Averages", JOptionPane.INFORMATION_MESSAGE);
-                });
+                //SwingUtilities.invokeLater(() -> {
+                //    JOptionPane.showMessageDialog(getParentFrame(), "No weather average data", "No Averages", JOptionPane.INFORMATION_MESSAGE);
+                //});
                 return;
             }
 
@@ -199,7 +169,9 @@ public final class DailySummariesPanel implements ComponentContainer, ActionList
             List<Extreme<Temperature,TemperatureRecordType>> records = temperatureRecordTable.retrieveRecordsForDateRange(startDate, endDate);
             textPanel.loadData(totalSummary, seasonalAverages, records);
 
-            setWindowTitle();
+            DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+            String dateString = df.format(startDate) + " - " + df.format(endDate);
+            WeatherSense.setStageTitle(this, dateString);
         }
     }
 

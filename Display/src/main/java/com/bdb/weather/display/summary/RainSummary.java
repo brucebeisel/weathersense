@@ -21,23 +21,21 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.swing.JComponent;
-
-import javafx.embed.swing.SwingNode;
+import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartMouseEvent;
-import org.jfree.chart.ChartMouseListener;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.entity.CategoryItemEntity;
 import org.jfree.chart.entity.ChartEntity;
+import org.jfree.chart.fx.ChartViewer;
+import org.jfree.chart.fx.interaction.ChartMouseEventFX;
+import org.jfree.chart.fx.interaction.ChartMouseListenerFX;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -55,7 +53,7 @@ import com.bdb.weather.display.axis.RainRangeAxis;
 /**
  * Plot to summarize rain over a specified period of time
  */
-public class RainSummary extends TabPane implements ChartMouseListener {
+public class RainSummary extends TabPane implements ChartMouseListenerFX {
     private XYPlot            rainPlot;
     private JFreeChart        chart;
     private final TableView         dataTable;
@@ -85,14 +83,11 @@ public class RainSummary extends TabPane implements ChartMouseListener {
     public RainSummary(SummaryInterval interval, SummarySupporter supporter) {
         this.interval = interval;
         this.supporter = supporter;
-        JComponent component = createChartElements();
+        Node component = createChartElements();
         dataTable = new TableView();
 
-        SwingNode swingNode = new SwingNode();
-        swingNode.setContent(component);
-
         Tab tab = new Tab(DisplayConstants.GRAPH_TAB_NAME);
-        tab.setContent(swingNode);
+        tab.setContent(component);
         getTabs().add(tab);
 
         tab = new Tab(DisplayConstants.DATA_TAB_NAME);
@@ -100,10 +95,10 @@ public class RainSummary extends TabPane implements ChartMouseListener {
         getTabs().add(tab);
     }
 
-    private JComponent createChartElements() {
+    private Node createChartElements() {
         chart = ChartFactory.createXYBarChart("Water Cycle", "Date", true, "", null, PlotOrientation.VERTICAL, true, true, false);
-        ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.addChartMouseListener(this);
+        ChartViewer chartViewer = new ChartViewer(chart);
+        chartViewer.addChartMouseListener(this);
 
         rainPlot = (XYPlot)chart.getPlot();
         DateAxis dateAxis = (DateAxis)rainPlot.getDomainAxis();
@@ -143,7 +138,7 @@ public class RainSummary extends TabPane implements ChartMouseListener {
 
         //p.add(sp, BorderLayout.CENTER);
 
-        return chartPanel;
+        return chartViewer;
     }
     
     /**
@@ -201,7 +196,7 @@ public class RainSummary extends TabPane implements ChartMouseListener {
      * @see org.jfree.chart.ChartMouseListener#chartMouseClicked(org.jfree.chart.ChartMouseEvent)
      */
     @Override
-    public void chartMouseClicked(ChartMouseEvent event) {
+    public void chartMouseClicked(ChartMouseEventFX event) {
         ChartEntity entity = event.getEntity();
         //
         // Was a point on the plot selected?
@@ -226,7 +221,7 @@ public class RainSummary extends TabPane implements ChartMouseListener {
      * @see org.jfree.chart.ChartMouseListener#chartMouseMoved(org.jfree.chart.ChartMouseEvent)
      */
     @Override
-    public void chartMouseMoved(ChartMouseEvent event) {
+    public void chartMouseMoved(ChartMouseEventFX event) {
         // Do nothing with mouse movement
     }
 }

@@ -17,7 +17,6 @@
 package com.bdb.weather.display.summary;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -38,9 +37,15 @@ import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -54,7 +59,6 @@ import com.bdb.weather.common.TemperatureRecordType;
 import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Pressure;
-import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.axis.RainRangeAxis;
@@ -101,7 +105,7 @@ import com.bdb.weather.display.axis.RainRangeAxis;
  */
 
 @SuppressWarnings("serial")
-public class DailySummariesTextPanel extends JPanel {
+public class DailySummariesTextPanel extends VBox {
     private static final int DATE_FIELD_LENGTH = 10;
     private static final int DATETIME_FIELD_LENGTH = 15;
     private static final int TEMPERATURE_FIELD_LENGTH = 5;
@@ -176,7 +180,6 @@ public class DailySummariesTextPanel extends JPanel {
     
     public DailySummariesTextPanel() {
         super();
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
         minLowTempValue.setEditable(false);
         minLowTempTime.setEditable(false);
@@ -414,8 +417,8 @@ public class DailySummariesTextPanel extends JPanel {
         
         tempTextPanel.add(extremesPanel);
         
-        JPanel tempRangePanel = new JPanel(new GridBagLayout());
-        tempRangePanel.setBorder(new TitledBorder(innerBorder, "Temperature Range"));
+        GridPane tempRangePanel = new GridPane();
+        //tempRangePanel.setBorder(new TitledBorder(innerBorder, "Temperature Range"));
         
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -447,28 +450,27 @@ public class DailySummariesTextPanel extends JPanel {
         tempRangePanel.add(largestTempRangeDate, gbc);
         
         tempTextPanel.add(tempRangePanel);
-        temperaturePanel.add(tempTextPanel, BorderLayout.WEST);
+        temperaturePanel.setRight(tempTextPanel);
         
-        JPanel temperatureBinPanel = new JPanel(new BorderLayout());
-        temperatureBinPanel.setBorder(new TitledBorder(innerBorder, "Bins"));
-        temperatureBinPanel.add(temperatureBinSummaryPlot, BorderLayout.CENTER);
+        BorderPane temperatureBinPanel = new BorderPane();
+        //temperatureBinPanel.setBorder(new TitledBorder(innerBorder, "Bins"));
+        temperatureBinPanel.setCenter(temperatureBinSummaryPlot);
         
         temperaturePanel.add(temperatureBinPanel, BorderLayout.CENTER);
         
         add(temperaturePanel);
         
-        JPanel rainPanel = new JPanel();
-        rainPanel.setLayout(new BorderLayout());
-        rainPanel.setBorder(new TitledBorder(innerBorder, "Rain (" + Depth.getDefaultUnit() + ")"));
+        BorderPane rainPanel = new BorderPane();
+        //rainPanel.setBorder(new TitledBorder(innerBorder, "Rain (" + Depth.getDefaultUnit() + ")"));
         
-        JPanel rainTextOuterPanel = new JPanel(new BorderLayout());
-        JPanel rainTextPanel = new JPanel(new GridBagLayout());
+        BorderPane rainTextOuterPanel = new BorderPane();
+        BorderPane rainTextPanel = new BorderPane();
         
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        rainTextPanel.add(new JBoldLabel("Total"), gbc);
+        rainTextPanel.add(new Label("Total"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         rainTextPanel.add(totalRain, gbc);
@@ -476,13 +478,13 @@ public class DailySummariesTextPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        rainTextPanel.add(new JBoldLabel("Maximum Rainfall Rate:"), gbc);
+        rainTextPanel.add(new Label("Maximum Rainfall Rate:"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         rainTextPanel.add(maxRainRate, gbc);
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.CENTER;
-        rainTextPanel.add(new JLabel("at"), gbc);
+        rainTextPanel.add(new Label("at"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         rainTextPanel.add(maxRainRateTime, gbc);
@@ -490,7 +492,7 @@ public class DailySummariesTextPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        rainTextPanel.add(new JBoldLabel("Days of Rain:"), gbc);
+        rainTextPanel.add(new Label("Days of Rain:"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         rainTextPanel.add(rainDays, gbc);
@@ -498,13 +500,13 @@ public class DailySummariesTextPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        rainTextPanel.add(new JBoldLabel("Max Rain Day:"), gbc);
+        rainTextPanel.add(new Label("Max Rain Day:"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         rainTextPanel.add(maxRainDayDepth, gbc);
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.CENTER;
-        rainTextPanel.add(new JLabel("on"), gbc);
+        rainTextPanel.add(new Label("on"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         rainTextPanel.add(maxRainDayDate, gbc);
@@ -512,49 +514,49 @@ public class DailySummariesTextPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        rainTextPanel.add(new JBoldLabel("Avg Rain/Day:"), gbc);
+        rainTextPanel.add(new Label("Avg Rain/Day:"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         rainTextPanel.add(avgRainPerDay, gbc);
         
-        rainTextOuterPanel.add(rainTextPanel, BorderLayout.NORTH);
-        rainTextOuterPanel.add(new JPanel(), BorderLayout.CENTER);
+        rainTextOuterPanel.setTop(rainTextPanel);
+        rainTextOuterPanel.setCenter(new FlowPane());
         
-        rainPanel.add(rainTextOuterPanel, BorderLayout.WEST);
+        rainPanel.setRight(rainTextOuterPanel);
         
         for (int i = 0; i < 24; i++)
             hourRainDataset.addValue(0.0, "Rain", "" + i);
         
         JFreeChart rainChart = ChartFactory.createBarChart(null, "Hour", "", hourRainDataset, PlotOrientation.VERTICAL, false, true, false);
-        ChartPanel rainChartPanel = new ChartPanel(rainChart);
-        rainChartPanel.setMaximumDrawHeight(10000);
-        rainChartPanel.setMaximumDrawWidth(10000);
-        rainChartPanel.setPreferredSize(new Dimension(0, 200));
+        ChartViewer rainChartViewer = new ChartViewer(rainChart);
+        rainChartViewer.setMaxHeight(10000);
+        rainChartViewer.setMaxWidth(10000);
+        rainChartViewer.setPrefSize(0, 200);
         ((CategoryPlot)rainChart.getPlot()).setRangeAxis(new RainRangeAxis());
-        JPanel hourlyRainPanel = new JPanel(new BorderLayout());
-        hourlyRainPanel.setBorder(new TitledBorder(innerBorder, "Rain by Hour"));
-        hourlyRainPanel.add(rainChartPanel, BorderLayout.CENTER);
+        BorderPane hourlyRainPanel = new BorderPane();
+        //hourlyRainPanel.setBorder(new TitleBorder(innerBorder, "Rain by Hour"));
+        hourlyRainPanel.setCenter(rainChartViewer);
         
-        rainPanel.add(hourlyRainPanel, BorderLayout.CENTER);
+        rainPanel.setCenter(hourlyRainPanel);
         
         add(rainPanel);
         
         JPanel windPressureHumidityPanel = new JPanel(new GridLayout(1,0));
         
-        JPanel windPanel = new JPanel(new GridBagLayout());
-        windPanel.setBorder(new TitledBorder(innerBorder, "Wind (" + Speed.getDefaultUnit() + ")"));
+        GridPane windPanel = new GridPane();
+        //windPanel.setBorder(new TitleBorder(innerBorder, "Wind (" + Speed.getDefaultUnit() + ")"));
         
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        windPanel.add(new JBoldLabel("Maximum Speed:"), gbc);
+        windPanel.add(new Label("Maximum Speed:"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         windPanel.add(maxWindSpeed, gbc);
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.CENTER;
-        windPanel.add(new JLabel("at"), gbc);
+        windPanel.add(new Label("at"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         windPanel.add(maxWindSpeedTime, gbc);      
@@ -562,13 +564,13 @@ public class DailySummariesTextPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        windPanel.add(new JBoldLabel("Maximum Gust:"), gbc);
+        windPanel.add(new Label("Maximum Gust:"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         windPanel.add(maxWindGust, gbc);
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.CENTER;
-        windPanel.add(new JLabel("at"), gbc);
+        windPanel.add(new Label("at"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         windPanel.add(maxWindGustTime, gbc);      
@@ -576,13 +578,13 @@ public class DailySummariesTextPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        windPanel.add(new JBoldLabel("Windiest Day:"), gbc);
+        windPanel.add(new Label("Windiest Day:"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         windPanel.add(maxAvgWindSpeed, gbc);
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.CENTER;
-        windPanel.add(new JLabel("on"), gbc);
+        windPanel.add(new Label("on"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         windPanel.add(maxAvgWindSpeedDate, gbc);
@@ -590,7 +592,7 @@ public class DailySummariesTextPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        windPanel.add(new JBoldLabel("Average:"), gbc);
+        windPanel.add(new Label("Average:"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         windPanel.add(avgWindSpeed, gbc);
@@ -604,13 +606,13 @@ public class DailySummariesTextPanel extends JPanel {
         gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        pressurePanel.add(new JBoldLabel("Minimum:"), gbc);
+        pressurePanel.add(new Label("Minimum:"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         pressurePanel.add(minPressure, gbc);
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.CENTER;
-        pressurePanel.add(new JLabel("at"), gbc);
+        pressurePanel.add(new Label("at"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         pressurePanel.add(minPressureTime, gbc);
@@ -618,13 +620,13 @@ public class DailySummariesTextPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        pressurePanel.add(new JBoldLabel("Maximum:"), gbc);
+        pressurePanel.add(new Label("Maximum:"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         pressurePanel.add(maxPressure, gbc);
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.CENTER;
-        pressurePanel.add(new JLabel("at"), gbc);
+        pressurePanel.add(new Label("at"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         pressurePanel.add(maxPressureTime, gbc);
@@ -632,7 +634,7 @@ public class DailySummariesTextPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        pressurePanel.add(new JBoldLabel("Average:"), gbc);
+        pressurePanel.add(new Label("Average:"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         pressurePanel.add(avgPressure, gbc);
@@ -640,13 +642,13 @@ public class DailySummariesTextPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        pressurePanel.add(new JBoldLabel("Smallest Range:"), gbc);
+        pressurePanel.add(new Label("Smallest Range:"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         pressurePanel.add(smallestPressureRange, gbc);
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.CENTER;
-        pressurePanel.add(new JLabel("on"), gbc);
+        pressurePanel.add(new Label("on"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         pressurePanel.add(smallestPressureRangeDate, gbc);
@@ -654,21 +656,21 @@ public class DailySummariesTextPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        pressurePanel.add(new JBoldLabel("Largest Range:"), gbc);
+        pressurePanel.add(new Label("Largest Range:"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         pressurePanel.add(largestPressureRange, gbc);
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.CENTER;
-        pressurePanel.add(new JLabel("on"), gbc);
+        pressurePanel.add(new Label("on"), gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx++;
         pressurePanel.add(largestPressureRangeDate, gbc);
         
         windPressureHumidityPanel.add(pressurePanel);
         
-        JPanel humidityPanel = new JPanel(new GridBagLayout());
-        humidityPanel.setBorder(new TitledBorder(innerBorder, "Humidity (%)"));
+        GridPane humidityPanel = new GridPane();
+        //humidityPanel.setBorder(new TitledBorder(innerBorder, "Humidity (%)"));
         
         gbc.gridx = 0;
         gbc.gridy = 0;

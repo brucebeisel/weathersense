@@ -21,10 +21,10 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Map;
 
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.CombinedDomainCategoryPlot;
@@ -37,7 +37,7 @@ import com.bdb.weather.common.ThresholdType;
 import com.bdb.weather.common.measurement.Temperature;
 
 @SuppressWarnings("serial")
-public class TemperatureBinSummaryPlot extends ChartPanel {
+public class TemperatureBinSummaryPlot extends ChartViewer {
     private final CombinedDomainCategoryPlot plot;
     private final DefaultCategoryDataset     countDataset = new DefaultCategoryDataset();
     private final CategoryPlot               countPlot = new CategoryPlot();
@@ -49,8 +49,8 @@ public class TemperatureBinSummaryPlot extends ChartPanel {
         plot = new CombinedDomainCategoryPlot();
         JFreeChart chart = new JFreeChart(plot);
         setChart(chart);
-        setMaximumDrawHeight(10000);
-        setMaximumDrawWidth(10000);
+        setMaxHeight(10000);
+        setMaxWidth(10000);
         
         NumberAxis countAxis = new NumberAxis("Day Count");
         countAxis.setUpperMargin(.2);

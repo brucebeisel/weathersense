@@ -2,6 +2,7 @@
 
 <?import java.lang.*?>
 <?import java.util.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -9,11 +10,12 @@
 
 <fx:root type="BorderPane" xmlns:fx="http://javafx.com/fxml/1">
     <top>
-        <FlowPane>
+        <HBox spacing="10" alignment="CENTER" >
+            <padding> <Insets bottom="10" top="10" left="10" right="10"/> </padding>
             <Button text="Previous" onAction="#previousDay"/>
             <DatePicker fx:id="datePicker" />
             <Button text="Next" onAction="#nextDay"/>
-        </FlowPane>
+        </HBox>
     </top>
     <center>
         <DayGraphPanel fx:id="graphPanel"/>

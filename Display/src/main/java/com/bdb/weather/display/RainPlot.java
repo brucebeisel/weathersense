@@ -26,14 +26,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
 
-import javax.swing.SwingUtilities;
-
-import javafx.embed.swing.SwingNode;
 import javafx.scene.layout.BorderPane;
 
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
@@ -74,7 +71,7 @@ public static class RainEntry {
 private static final String RAIN_DOMAIN = "Rainfall";
 private static final String RAIN_RATE_DOMAIN_PREFIX = "Rate (%s/hr)";
 private JFreeChart           chart;
-private ChartPanel           chartPanel;
+private ChartViewer          chartViewer;
 private CombinedDomainXYPlot plot;
 private XYPlot               rainPlot;
 private XYPlot               rainRatePlot;
@@ -155,12 +152,11 @@ private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:m
     @SuppressWarnings("serial")
     public RainPlot() {
 	setPrefSize(400, 200);
-	SwingNode swingNode = new SwingNode();
-	SwingUtilities.invokeLater(() -> createChartElements(swingNode));
-	this.setCenter(swingNode);
+	createChartElements();
+	this.setCenter(chartViewer);
     }
 
-    private void createChartElements(SwingNode swingNode) {
+    private void createChartElements() {
         String unitString = Depth.getDefaultUnit().toString();
         rateDomain = String.format(RAIN_RATE_DOMAIN_PREFIX, unitString);
         rainPlot = new XYPlot();
@@ -177,11 +173,11 @@ private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:m
         chart = new JFreeChart(plot);
         chart.getLegend().setPosition(RectangleEdge.RIGHT);
         
-        chartPanel = new ChartPanel(chart);
-        chartPanel.setMaximumDrawHeight(10000);
-        chartPanel.setMaximumDrawWidth(10000);
-        chartPanel.setMinimumDrawHeight(200);
-        chartPanel.setMinimumDrawWidth(400);
+        chartViewer = new ChartViewer(chart);
+        chartViewer.setMaxHeight(10000);
+        chartViewer.setMaxWidth(10000);
+        chartViewer.setMinHeight(200);
+        chartViewer.setMinWidth(400);
 
         rainDataset = new TimeSeriesCollection();
         rainSeries = new TimeSeries(RAIN_DOMAIN);
@@ -208,8 +204,6 @@ private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:m
         rateRenderer.setSeriesPaint(0, Color.RED);
         rateRenderer.setBaseToolTipGenerator(ttg);
         rainRatePlot.setRenderer(rateRenderer);
-
-        swingNode.setContent(chartPanel);
     }
     
     /**
@@ -218,34 +212,32 @@ private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:m
      * @param list The list of historical records for the rainfall graph.
      */
     public void setRainData(List<RainEntry> list) {
-        SwingUtilities.invokeLater(() -> {
-            rainSeries.clear();
-            rainRateSeries.clear();
-            
-            if (list.size() > 0) {
-                rainPlot.clearDomainMarkers();
-                //
-                // Load the graph
-                //
-                for (RainEntry r : list) {
-                    RegularTimePeriod p = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(r.time), TimeZone.getDefault());
+        rainSeries.clear();
+        rainRateSeries.clear();
+        
+        if (list.size() > 0) {
+            rainPlot.clearDomainMarkers();
+            //
+            // Load the graph
+            //
+            for (RainEntry r : list) {
+                RegularTimePeriod p = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(r.time), TimeZone.getDefault());
 
-                    if (r.rainfall != null) {
-                        TimeSeriesDataItem item = new TimeSeriesDataItem(p, r.rainfall.get());
-                        rainSeries.add(item);
-                    }
-
-                    if (r.rainfallRate != null) {
-                        TimeSeriesDataItem item = new TimeSeriesDataItem(p, r.rainfallRate.get());
-                        rainRateSeries.add(item);
-                    }
+                if (r.rainfall != null) {
+                    TimeSeriesDataItem item = new TimeSeriesDataItem(p, r.rainfall.get());
+                    rainSeries.add(item);
                 }
 
-                rainPlot.getRangeAxis().setAutoRange(true);
-
-                addMarker(list.get(list.size() - 1).time);
+                if (r.rainfallRate != null) {
+                    TimeSeriesDataItem item = new TimeSeriesDataItem(p, r.rainfallRate.get());
+                    rainRateSeries.add(item);
+                }
             }
-        });
+
+            rainPlot.getRangeAxis().setAutoRange(true);
+
+            addMarker(list.get(list.size() - 1).time);
+        }
     }
 
     public void addMarker(LocalDateTime markerTime) {

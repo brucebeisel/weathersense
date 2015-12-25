@@ -16,7 +16,6 @@
  */
 package com.bdb.weather.display.summary;
 
-import java.awt.BorderLayout;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -25,27 +24,24 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartMouseEvent;
-import org.jfree.chart.ChartMouseListener;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.DateTickMarkPosition;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.XYItemEntity;
+import org.jfree.chart.fx.ChartViewer;
+import org.jfree.chart.fx.interaction.ChartMouseEventFX;
+import org.jfree.chart.fx.interaction.ChartMouseListenerFX;
 import org.jfree.chart.labels.HighLowItemLabelGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.HighLowRenderer;
@@ -64,7 +60,7 @@ import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.display.ChartDataPane;
 import com.bdb.weather.display.ViewLauncher;
 
-public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane implements ChartMouseListener {
+public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane implements ChartMouseListenerFX {
 
     public static class SeriesInfo<T extends Measurement> {
         private final String seriesName;
@@ -103,7 +99,7 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
     private final DateAxis             dateAxis;
     private final SeriesInfo<T>[]      seriesInfo;
     private final OHLCSeries[]         series;
-    private final JTable               dataTable = new JTable();
+    private final TableView            dataTable = new TableView();
     private final DefaultTableModel    tableModel = new DefaultTableModel();
     private final SummaryInterval      interval;
     private final ViewLauncher         launcher;
@@ -135,7 +131,7 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
         //dateAxis.setTickUnit(new DateTickUnit(DateTickUnitType.MONTH, 2));
         
  
-        ChartPanel panel = new ChartPanel(chart);
+        ChartViewer panel = new ChartViewer(chart);
         panel.addChartMouseListener(this);
         graphPanel.setCenter(panel);
         
@@ -148,8 +144,9 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
         
         seriesInfo = Arrays.copyOf(seriesList, seriesList.length);
         
-        dataTable.setModel(tableModel);
+        //dataTable.setModel(tableModel);
        
+        /*
         DefaultTableColumnModel colModel = new DefaultTableColumnModel();      
         dataTable.setColumnModel(colModel);
         dataTable.setAutoCreateColumnsFromModel(false);
@@ -164,6 +161,7 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
                 addColumn(colModel, prefix + " - " + seriesList1.getSeriesName(), columnCount++);
 
         tableModel.setColumnCount(columnCount);
+        */
         
         //
         // Insert the JTable component into a scroll pane so that we have scroll bars
@@ -178,10 +176,6 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
 
         HighLowItemLabelGenerator ttg = new HiLoItemLabelGenerator(interval.getLegacyFormat(), format);
         plot.getRenderer().setBaseToolTipGenerator(ttg);
-    }
-    
-    public JComponent getComponent() {
-        return component;
     }
     
     private void addColumn(TableColumnModel model, String heading, int index) {
@@ -246,7 +240,7 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
      * @see org.jfree.chart.ChartMouseListener#chartMouseClicked(org.jfree.chart.ChartMouseEvent)
      */
     @Override
-    public void chartMouseClicked(ChartMouseEvent event) {
+    public void chartMouseClicked(ChartMouseEventFX event) {
         ChartEntity entity = event.getEntity();
         //
         // Was a point on the plot selected?
@@ -267,7 +261,7 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
      * @see org.jfree.chart.ChartMouseListener#chartMouseMoved(org.jfree.chart.ChartMouseEvent)
      */
     @Override
-    public void chartMouseMoved(ChartMouseEvent event) {
+    public void chartMouseMoved(ChartMouseEventFX event) {
         // Ignore mouse movement
     }
 

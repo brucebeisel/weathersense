@@ -100,6 +100,7 @@ abstract public class DayXYPlotPanel extends TabPane implements EventHandler<Act
     private List<SeriesEntry>    entries;
 
     protected DayXYPlotPanel(ValueAxis leftAxis, ValueAxis rightAxis) {
+        this.setPrefSize(400, 300);
         this.leftAxis = leftAxis;
         this.rightAxis = rightAxis;
         datasetLeft = new TimeSeriesCollection();
@@ -181,8 +182,8 @@ abstract public class DayXYPlotPanel extends TabPane implements EventHandler<Act
         ChartFactory.getChartTheme().apply(chart);
         chartViewer = new ChartViewer(chart);
 
-        //chartPanel.setMaximumDrawHeight(10000);
-        //chartPanel.setMaximumDrawWidth(10000);
+        chartViewer.setMaxHeight(500);
+        chartViewer.setMaxWidth(800);
 
         //
         // Add the Day/Night indicator option to the chart panels context menu
@@ -196,7 +197,6 @@ abstract public class DayXYPlotPanel extends TabPane implements EventHandler<Act
         displayMenu.getItems().add(dayNightItem);
         dayNightItem.setOnAction(this);
         menu.getItems().add(displayMenu);
-
     }
     
     private void doConfigure(Menu menu) {
@@ -345,7 +345,6 @@ abstract public class DayXYPlotPanel extends TabPane implements EventHandler<Act
         LocalDateTime endOfDay = midnight.plusDays(1).minusSeconds(1);
 
         dateAxis.setRange(TimeUtils.localDateTimeToDate(midnight), TimeUtils.localDateTimeToDate(endOfDay));
-
     }
 
     /**
@@ -365,7 +364,6 @@ abstract public class DayXYPlotPanel extends TabPane implements EventHandler<Act
         marker.setPaint(color);
 
         plot.addDomainMarker(marker);
-        
     }
 
     /**
@@ -417,7 +415,6 @@ abstract public class DayXYPlotPanel extends TabPane implements EventHandler<Act
         }
     }
     
-
     protected static class SeriesControl {
         String name;
         boolean displayInitially;

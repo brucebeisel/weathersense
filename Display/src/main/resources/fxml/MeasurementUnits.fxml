@@ -7,12 +7,10 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root type="BorderPane" xmlns:fx="http://javafx.com/fxml/1" > <!--fx:controller="com.bdb.weather.display.preferences.UnitsPreferenceDialog"> -->
+<fx:root type="BorderPane" xmlns:fx="http://javafx.com/fxml/1" >
     <top>
         <HBox spacing="10" alignment="CENTER"   BorderPane.alignment="CENTER"> 
-            <BorderPane.margin>
-                <javafx.geometry.Insets bottom="10" top="10" left="10" right="10"/>
-            </BorderPane.margin>
+            <BorderPane.margin> <Insets bottom="10" top="10" left="10" right="10"/> </BorderPane.margin>
             <Button text="English" onAction="#handleEnglish"/>
             <Button text="Metric" onAction="#handleMetric"/>
         </HBox>
@@ -34,63 +32,31 @@
             <Label text="Elevation:" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="RIGHT"/>   
             <Label text="Wind Speed:" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="RIGHT"/>   
             <Label text="Barometric Pressure:" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.halignment="RIGHT"/>   
-            <HBox spacing="5"  GridPane.fillHeight="true" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="toggle-group-border">
-                <RadioButton fx:id="celsius" text="Celsius" selected="true" toggleGroup="$temperatureToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
-                <RadioButton fx:id="fahrenheit" text="Fahrenheit" toggleGroup="$temperatureToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
-                <RadioButton fx:id="kelvin" text="Kelvin" toggleGroup="$temperatureToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
+            <HBox GridPane.fillHeight="true" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="toggle-group-border">
+                <RadioButton fx:id="celsius" text="Celsius" selected="true" toggleGroup="$temperatureToggleGroup" />
+                <RadioButton fx:id="fahrenheit" text="Fahrenheit" toggleGroup="$temperatureToggleGroup" />
+                <RadioButton fx:id="kelvin" text="Kelvin" toggleGroup="$temperatureToggleGroup" />
             </HBox>
-            <HBox spacing="5"  GridPane.fillHeight="true" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="toggle-group-border">
-                <RadioButton fx:id="rainfallMillimeters" text="mm" selected="true" toggleGroup="$rainfallToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
-                <RadioButton fx:id="rainfallCentimeters" text="cm" toggleGroup="$rainfallToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
-                <RadioButton fx:id="rainfallInches" text="in" toggleGroup="$rainfallToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
+            <HBox GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="toggle-group-border">
+                <RadioButton fx:id="rainfallMillimeters" text="mm" selected="true" toggleGroup="$rainfallToggleGroup" />
+                <RadioButton fx:id="rainfallCentimeters" text="cm" toggleGroup="$rainfallToggleGroup" />
+                <RadioButton fx:id="rainfallInches" text="in" toggleGroup="$rainfallToggleGroup" />
             </HBox>
-            <HBox spacing="5"  GridPane.fillHeight="true" GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="toggle-group-border">
-                <RadioButton fx:id="elevationMeters" text="m" toggleGroup="$elevationToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
-                <RadioButton fx:id="elevationFeet" text="ft" selected="true" toggleGroup="$elevationToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
+            <HBox GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="toggle-group-border" >
+                <RadioButton fx:id="elevationMeters" text="m" toggleGroup="$elevationToggleGroup" />
+                <RadioButton fx:id="elevationFeet" text="ft" selected="true" toggleGroup="$elevationToggleGroup" />
             </HBox>
-            <HBox spacing="5"  GridPane.fillHeight="true" GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="toggle-group-border">
-                <RadioButton fx:id="speedKPH" text="KPH" selected="true" toggleGroup="$windSpeedToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
-                <RadioButton fx:id="speedMPS" text="MPS" selected="false" toggleGroup="$windSpeedToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
-                <RadioButton fx:id="speedMPH" text="MPH" selected="false" toggleGroup="$windSpeedToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
-                <RadioButton fx:id="speedKTS" text="KTS" selected="false" toggleGroup="$windSpeedToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
+            <HBox GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="toggle-group-border">
+                <RadioButton fx:id="speedKPH" text="KPH" selected="true" toggleGroup="$windSpeedToggleGroup" />
+                <RadioButton fx:id="speedMPS" text="MPS" selected="false" toggleGroup="$windSpeedToggleGroup" />
+                <RadioButton fx:id="speedMPH" text="MPH" selected="false" toggleGroup="$windSpeedToggleGroup" />
+                <RadioButton fx:id="speedKTS" text="KTS" selected="false" toggleGroup="$windSpeedToggleGroup" />
             </HBox>
-            <HBox spacing="5"  GridPane.fillHeight="true" GridPane.columnIndex="1" GridPane.rowIndex="4" styleClass="toggle-group-border">
-                <RadioButton fx:id="pressureKPA" text="kPa" selected="true" toggleGroup="$barometricPressureToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
-                <RadioButton fx:id="pressureHPA" text="hPa" selected="false" toggleGroup="$barometricPressureToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
-                <RadioButton fx:id="pressureMB" text="mb" selected="false" toggleGroup="$barometricPressureToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
-                <RadioButton fx:id="pressureINHG" text="InHg" selected="false" toggleGroup="$barometricPressureToggleGroup" alignment="CENTER" >
-                    <HBox.margin> <Insets bottom="5" top="5" left="5" right="5"/> </HBox.margin>
-                </RadioButton>
+            <HBox GridPane.columnIndex="1" GridPane.rowIndex="4" styleClass="toggle-group-border">
+                <RadioButton fx:id="pressureKPA" text="kPa" selected="true" toggleGroup="$barometricPressureToggleGroup" />
+                <RadioButton fx:id="pressureHPA" text="hPa" selected="false" toggleGroup="$barometricPressureToggleGroup" />
+                <RadioButton fx:id="pressureMB" text="mb" selected="false" toggleGroup="$barometricPressureToggleGroup" />
+                <RadioButton fx:id="pressureINHG" text="InHg" selected="false" toggleGroup="$barometricPressureToggleGroup" />
             </HBox>
         </GridPane>
     </center>

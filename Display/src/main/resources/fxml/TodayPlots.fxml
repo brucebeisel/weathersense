@@ -14,6 +14,11 @@
         <ColumnConstraints percentWidth="25"/> 
         <ColumnConstraints percentWidth="25"/> 
     </columnConstraints>
+    <rowConstraints>
+        <RowConstraints percentHeight="33" />
+        <RowConstraints percentHeight="34" />
+        <RowConstraints percentHeight="33" />
+    </rowConstraints>
     <DayTemperaturePlot fx:id="temperaturePlot" GridPane.columnIndex="0" GridPane.rowIndex="0"/> 
     <DayHumidityPanel fx:id="humidityPlot" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2" /> 
     <DayRainPanel fx:id="rainPlot" GridPane.columnIndex="0" GridPane.rowIndex="1"/> 

@@ -77,6 +77,7 @@ public class WindRosePane extends TabPane {
      * Constructor.
      */
     public WindRosePane() {
+        setPrefSize(300, 300);
         this.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         ChartFactory.getChartTheme().apply(chart);
         chartPanel.setMinimumDrawHeight(10);
