@@ -82,7 +82,18 @@ public class Barometer extends BorderPane {
 
     private ChartViewer createChartElements(Pressure min, Pressure max) {
         plot.addLayer(new DialBackground(new GradientPaint(0.0f, 0.0f, Color.LIGHT_GRAY, 100.0f, 0.0f, Color.blue)));
-        scale = new StandardDialScale(min.get(), max.get(), 240.0, -300.0, 0.2, 10);
+        double dialTickIncrements = .2;
+        switch (Pressure.getDefaultUnit()) {
+            case IN_HG:
+                dialTickIncrements = .2;
+                break;
+            case HECTO_PASCAL:
+            case MILLIBAR:
+                dialTickIncrements = 10.0;
+                break;
+        }
+
+        scale = new StandardDialScale(min.get(), max.get(), 240.0, -300.0, dialTickIncrements, 10);
         scale.setTickRadius(.9);
         scale.setTickLabelFormatter(Pressure.getDefaultFormatter());
         scale.setTickLabelOffset(.25);
@@ -183,8 +194,7 @@ public class Barometer extends BorderPane {
     public void loadData(Pressure current, Pressure min, Pressure max, Pressure delta, WeatherTrend trend) {
         dataset.setValue(current.get());
         if (!min.equals(max)) {
-            range.setLowerBound(min.get());
-            range.setUpperBound(max.get());
+            range.setBounds(min.get(), max.get());
         }
         
         if (trend == WeatherTrend.STEADY)

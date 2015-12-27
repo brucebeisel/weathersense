@@ -28,6 +28,8 @@ import javafx.stage.Stage;
 
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Distance;
+import com.bdb.weather.common.measurement.Pressure;
+import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
 
 /**
@@ -44,9 +46,19 @@ public class UnitsPreferenceDialog extends BorderPane {
     @FXML private RadioButton rainfallMillimeters;
     @FXML private RadioButton elevationFeet;
     @FXML private RadioButton elevationMeters;
+    @FXML private RadioButton speedKPH;
+    @FXML private RadioButton speedMPS;
+    @FXML private RadioButton speedMPH;
+    @FXML private RadioButton speedKTS;
+    @FXML private RadioButton pressureKPA;
+    @FXML private RadioButton pressureHPA;
+    @FXML private RadioButton pressureMB;
+    @FXML private RadioButton pressureINHG;
     @FXML private ToggleGroup temperatureToggleGroup;
     @FXML private ToggleGroup rainfallToggleGroup;
     @FXML private ToggleGroup elevationToggleGroup;
+    @FXML private ToggleGroup windSpeedToggleGroup;
+    @FXML private ToggleGroup barometricPressureToggleGroup;
     private final UserPreferences  prefs = UserPreferences.getInstance();
     
     @SuppressWarnings("LeakingThisInConstructor")
@@ -69,6 +81,14 @@ public class UnitsPreferenceDialog extends BorderPane {
         rainfallInches.setUserData(Depth.Unit.INCHES);
         elevationFeet.setUserData(Distance.Unit.FEET);
         elevationMeters.setUserData(Distance.Unit.METERS);
+        speedKPH.setUserData(Speed.Unit.KM_PER_HOUR);
+        speedMPS.setUserData(Speed.Unit.METERS_PER_SEC);
+        speedMPH.setUserData(Speed.Unit.MILES_PER_HOUR);
+        speedKTS.setUserData(Speed.Unit.KNOTS);
+        pressureKPA.setUserData(Pressure.Unit.KILO_PASCAL);
+        pressureHPA.setUserData(Pressure.Unit.HECTO_PASCAL);
+        pressureMB.setUserData(Pressure.Unit.MILLIBAR);
+        pressureINHG.setUserData(Pressure.Unit.IN_HG);
 
         switch (prefs.getTemperatureUnit()) {
             case CELSIUS:
@@ -83,12 +103,87 @@ public class UnitsPreferenceDialog extends BorderPane {
                 kelvin.setSelected(true);
                 break;
         }
+
+        switch (prefs.getRainfallUnit()) {
+            case CENTIMETERS:
+                rainfallCentimeters.setSelected(true);
+                break;
+
+            case INCHES:
+                rainfallInches.setSelected(true);
+                break;
+
+            default:
+            case MILLIMETERS:
+                rainfallMillimeters.setSelected(true);
+                break;
+        }
+
+        switch (prefs.getElevationUnit()) {
+            case FEET:
+                elevationFeet.setSelected(true);
+                break;
+
+            default:
+            case METERS:
+                elevationMeters.setSelected(true);
+                break;
+        }
+
+        switch (prefs.getSpeedUnit()) {
+            case KM_PER_HOUR:
+                speedKPH.setSelected(true);
+                break;
+
+            default:
+            case METERS_PER_SEC:
+                speedMPS.setSelected(true);
+                break;
+
+            case MILES_PER_HOUR:
+                speedMPH.setSelected(true);
+                break;
+
+            case KNOTS:
+                speedKTS.setSelected(true);
+                break;
+        }
+
+        switch (prefs.getPressureUnit()) {
+            case KILO_PASCAL:
+                pressureKPA.setSelected(true);
+                break;
+
+            case HECTO_PASCAL:
+                pressureHPA.setSelected(true);
+                break;
+
+            case MILLIBAR:
+                pressureMB.setSelected(true);
+                break;
+
+            case IN_HG:
+                pressureINHG.setSelected(true);
+                break;
+
+        }
     }
     
     public void handleOK() {
         Toggle selected = temperatureToggleGroup.getSelectedToggle();
-        Temperature.Unit temperatureUnit = (Temperature.Unit)selected.getUserData();
-        prefs.setTemperatureUnit(temperatureUnit);
+        prefs.setTemperatureUnit((Temperature.Unit)selected.getUserData());
+
+        selected = rainfallToggleGroup.getSelectedToggle();
+        prefs.setRainfallUnit((Depth.Unit)selected.getUserData());
+
+        selected = elevationToggleGroup.getSelectedToggle();
+        prefs.setElevationUnit((Distance.Unit)selected.getUserData());
+
+        selected = windSpeedToggleGroup.getSelectedToggle();
+        prefs.setSpeedUnit((Speed.Unit)selected.getUserData());
+
+        selected = barometricPressureToggleGroup.getSelectedToggle();
+        prefs.setPressureUnit((Pressure.Unit)selected.getUserData());
 
         prefs.sync();
         handleCancel();
@@ -102,11 +197,15 @@ public class UnitsPreferenceDialog extends BorderPane {
         celsius.setSelected(true);
         rainfallMillimeters.setSelected(true);
         elevationMeters.setSelected(true);
+        speedMPS.setSelected(true);
+        pressureHPA.setSelected(true);
     }
 
-    public void handleEnglish() {
+    public void handleImperial() {
         fahrenheit.setSelected(true);
         rainfallInches.setSelected(true);
         elevationFeet.setSelected(true);
+        speedMPH.setSelected(true);
+        pressureINHG.setSelected(true);
     }
 }

@@ -16,7 +16,6 @@
  */
 package com.bdb.weather.display.summary;
 
-import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
@@ -25,16 +24,14 @@ import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
-import javafx.scene.Node;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.weather.common.DateRange;
@@ -48,13 +45,11 @@ import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.db.MonthlyAveragesTable;
 import com.bdb.weather.common.db.MonthlySummaryTable;
 import com.bdb.weather.common.measurement.Temperature;
-import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.DateInterval;
 import com.bdb.weather.display.ViewLauncher;
 import com.bdb.weather.display.WeatherSense;
 
-public class MonthlySummariesPanel implements ComponentContainer, ActionListener, SummarySupporter {
-    private final JComponent             component = new JPanel(new BorderLayout());
+public class MonthlySummariesPanel extends BorderPane implements EventHandler, ActionListener, SummarySupporter {
     private final SummariesGraphPanel    graphPanel;
     private final MonthlySummaryTable    monthlySummaryTable;
     private final MonthlyAveragesTable   monthlyAveragesTable;
@@ -63,10 +58,10 @@ public class MonthlySummariesPanel implements ComponentContainer, ActionListener
     private LocalDate                    startDate;
     private LocalDate                    endDate;
     private final DateTimeFormatter      dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-    private final JFormattedTextField    startDateTF = new JFormattedTextField(dateFormat);
-    private final JFormattedTextField    endDateTF = new JFormattedTextField(dateFormat);
-    private final JComboBox<DateInterval> intervalsCB = new JComboBox<>(DateInterval.availableIntervals());
-    private final JButton                goButton = new JButton("Go");
+    private final TextField              startDateTF = new TextField();
+    private final TextField              endDateTF = new TextField();
+    private final ComboBox<DateInterval> intervalsCB = new ComboBox<>();
+    private final Button                 goButton = new Button("Go");
 
     @SuppressWarnings("LeakingThisInConstructor")
     public MonthlySummariesPanel(WeatherStation ws, DBConnection connection, ViewLauncher launcher, LocalDate start, LocalDate end, DateInterval interval) {
@@ -77,18 +72,18 @@ public class MonthlySummariesPanel implements ComponentContainer, ActionListener
 
         graphPanel = new SummariesGraphPanel(SummaryInterval.MONTH_INTERVAL, connection, launcher, this);
 
-        component.add(graphPanel.getComponent(), BorderLayout.CENTER);
+        setCenter(graphPanel);
 
-        JPanel cmdPanel = new JPanel();
+        HBox cmdPane = new HBox();
 
-        cmdPanel.add(intervalsCB);
-        cmdPanel.add(new JLabel("Start:"));
-        cmdPanel.add(startDateTF);
-        cmdPanel.add(new JLabel("End:"));
-        cmdPanel.add(endDateTF);
-        cmdPanel.add(goButton);
+        cmdPane.getChildren().add(intervalsCB);
+        cmdPane.getChildren().add(new Label("Start:"));
+        cmdPane.getChildren().add(startDateTF);
+        cmdPane.getChildren().add(new Label("End:"));
+        cmdPane.getChildren().add(endDateTF);
+        cmdPane.getChildren().add(goButton);
 
-        component.add(cmdPanel, BorderLayout.NORTH);
+        setTop(cmdPane);
 
         startDate = start;
         endDate = end;
@@ -101,25 +96,20 @@ public class MonthlySummariesPanel implements ComponentContainer, ActionListener
             endDateTF.setEditable(false);
         }
         
-        intervalsCB.setSelectedItem(interval);
-        intervalsCB.setMaximumRowCount(intervalsCB.getItemCount());
-        intervalsCB.addActionListener(this);
+        intervalsCB.getSelectionModel().select(interval);
+        //intervalsCB.getSelectionModel().setMaximumRowCount(intervalsCB.getItems().size());
+        intervalsCB.setOnAction(this);
         
-        goButton.addActionListener(this);
-        goButton.setEnabled(false);
+        goButton.setOnAction(this);
+        goButton.setDisable(true);
 
         loadData(startDate, endDate);
     }
     
-    @Override
-    public Node getComponent() {
-        return null;
-    }
-
     public void setWindowTitle() {
         DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
         String dateString = df.format(startDate) + " - " + df.format(endDate);
-        //WeatherSense.setFrameTitle(component, dateString);
+        WeatherSense.setStageTitle(this, dateString);
     }
 
     private void loadData(LocalDate startDate, LocalDate endDate) {
@@ -128,9 +118,8 @@ public class MonthlySummariesPanel implements ComponentContainer, ActionListener
         List<SummaryRecord> summaryRecords = monthlySummaryTable.retrieveRange(ws, startDate, endDate, temperatureBinMgr);
         
         if (summaryRecords.isEmpty())
-            SwingUtilities.invokeLater(() -> {
-                JOptionPane.showMessageDialog(null, "No data available for date range", "No Data", JOptionPane.INFORMATION_MESSAGE);
-        });
+            //JOptionPane.showMessageDialog(null, "No data available for date range", "No Data", JOptionPane.INFORMATION_MESSAGE);
+        ;
             // TODO put combobox back to original value, probably the same for the text fields when in custom mode.
         else {
             WeatherAverages dailyAverages = monthlyAveragesTable.retrieveMonthlyAveragesForLocation(ws.getLocationCode());
@@ -154,7 +143,7 @@ public class MonthlySummariesPanel implements ComponentContainer, ActionListener
         Object source = evt.getSource();
 
         if (source == intervalsCB) {
-            DateInterval interval = (DateInterval)intervalsCB.getSelectedItem();
+            DateInterval interval = (DateInterval)intervalsCB.getSelectionModel().getSelectedItem();
 
             DateRange range = interval.range();
 
@@ -162,8 +151,8 @@ public class MonthlySummariesPanel implements ComponentContainer, ActionListener
 
             startDateTF.setEditable(editable);
             endDateTF.setEditable(editable);
-            goButton.setEnabled(editable);
-            startDateTF.setValue(dateFormat.format(range.getStart()));
+            goButton.setDisable(!editable);
+            startDateTF.setText(dateFormat.format(range.getStart()));
             endDateTF.setText(dateFormat.format(range.getEnd()));
             
             if (!editable)
@@ -201,5 +190,10 @@ public class MonthlySummariesPanel implements ComponentContainer, ActionListener
         LocalDate start = date.withDayOfMonth(1);
         LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
         launcher.launchDailySummariesView(start, end);
+    }
+
+    @Override
+    public void handle(Event event) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

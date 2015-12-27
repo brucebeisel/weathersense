@@ -16,41 +16,19 @@
  */
 package com.bdb.weather.display.summary;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
 
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 
-import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.fx.ChartViewer;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
-
-import com.bdb.util.JBoldLabel;
 
 import com.bdb.weather.common.DayHourRain;
 import com.bdb.weather.common.Extreme;
@@ -58,10 +36,8 @@ import com.bdb.weather.common.Statistics;
 import com.bdb.weather.common.TemperatureRecordType;
 import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.measurement.Depth;
-import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.DisplayConstants;
-import com.bdb.weather.display.axis.RainRangeAxis;
 /**
  * Need fields for:
  * Temperatures:
@@ -239,6 +215,7 @@ public class DailySummariesTextPanel extends VBox {
         largestHumidityRange.setEditable(false);
         largestHumidityRangeDate.setEditable(false);
         
+        /*
         JPanel temperaturePanel = new JPanel(new BorderLayout());
         temperaturePanel.setBorder(new TitledBorder(innerBorder, "Temperature (" + Temperature.getDefaultUnit() + ")"));
         
@@ -761,6 +738,7 @@ public class DailySummariesTextPanel extends VBox {
         recordsPanel.add(new JScrollPane(recordTable), BorderLayout.CENTER);
         
         add(recordsPanel);
+*/
     }
     
     // TODO Get the simple date formatter from a global class, like one that contains some sort of preferences

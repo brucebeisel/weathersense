@@ -100,7 +100,7 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
     private final SeriesInfo<T>[]      seriesInfo;
     private final OHLCSeries[]         series;
     private final TableView            dataTable = new TableView();
-    private final DefaultTableModel    tableModel = new DefaultTableModel();
+    //private final DefaultTableModel    tableModel = new DefaultTableModel();
     private final SummaryInterval      interval;
     private final ViewLauncher         launcher;
     private final SummarySupporter     supporter;
@@ -112,7 +112,6 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
         this.interval = interval;
         this.launcher = launcher;
         this.supporter = supporter;
-        BorderPane graphPanel = new BorderPane();
         
         chart = ChartFactory.createHighLowChart(title, domainAxisLabel, "", seriesCollection, true);
         chart.getLegend().setPosition(RectangleEdge.RIGHT);
@@ -131,9 +130,8 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
         //dateAxis.setTickUnit(new DateTickUnit(DateTickUnitType.MONTH, 2));
         
  
-        ChartViewer panel = new ChartViewer(chart);
-        panel.addChartMouseListener(this);
-        graphPanel.setCenter(panel);
+        ChartViewer chartViewer = new ChartViewer(chart);
+        chartViewer.addChartMouseListener(this);
         
         series = new OHLCSeries[seriesList.length];
         
@@ -167,12 +165,7 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
         // Insert the JTable component into a scroll pane so that we have scroll bars
         //
         ScrollPane sp = new ScrollPane(dataTable);
-
-        BorderPane p = new BorderPane();
-
-        p.setCenter(sp);
-
-        this.setTabContents(graphPanel, p);
+        this.setTabContents(chartViewer, sp);
 
         HighLowItemLabelGenerator ttg = new HiLoItemLabelGenerator(interval.getLegacyFormat(), format);
         plot.getRenderer().setBaseToolTipGenerator(ttg);
@@ -190,10 +183,10 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
     }
 
     public void loadData(List<SummaryRecord> records) {   
-        tableModel.setRowCount(records.size());
+        //tableModel.setRowCount(records.size());
         
-        for (int i = 0; i < records.size(); i++)
-            tableModel.setValueAt(interval.getFormat().format(records.get(i).getDate()), i, 0);
+        //for (int i = 0; i < records.size(); i++)
+        //    tableModel.setValueAt(interval.getFormat().format(records.get(i).getDate()), i, 0);
 
         for (int i = 0; i < seriesInfo.length; i++) {
             series[i].clear();
@@ -211,27 +204,26 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
             LocalDate date = record.getDate();
             // TODO: Figure out how to create a time period based on the specified interval
             RegularTimePeriod period = null;
-            if (null != interval)
-                switch (interval) {
-                    case DAY_INTERVAL:
-                        period = new Hour(seriesIndex * 4, date.getDayOfMonth(), date.getMonth().getValue(), date.getYear());
-                        break;
-                    case MONTH_INTERVAL:
-                        period = new Day(seriesIndex * 4 + 1,  date.getMonth().getValue(), date.getYear());
-                        break;
-                    case YEAR_INTERVAL:
-                        period = new Year(date.getYear());
-                        break;
-                    default:
-                        period = null;
-                        break;
+            switch (interval) {
+                case DAY_INTERVAL:
+                    period = new Hour(seriesIndex * 4, date.getDayOfMonth(), date.getMonth().getValue(), date.getYear());
+                    break;
+                case MONTH_INTERVAL:
+                    period = new Day(seriesIndex * 4 + 1,  date.getMonth().getValue(), date.getYear());
+                    break;
+                case YEAR_INTERVAL:
+                    period = new Year(date.getYear());
+                    break;
+                default:
+                    period = null;
+                    break;
             }
 
             if (avg != null && min != null && max != null) {
                 series.add(period, avg.get(), max.get(), min.get(), min.get());
-                tableModel.setValueAt(max, row, seriesIndex * 3 + 1);
-                tableModel.setValueAt(min, row, seriesIndex * 3 + 2);
-                tableModel.setValueAt(avg, row++, seriesIndex * 3 + 3);
+                //tableModel.setValueAt(max, row, seriesIndex * 3 + 1);
+                //tableModel.setValueAt(min, row, seriesIndex * 3 + 2);
+                //tableModel.setValueAt(avg, row++, seriesIndex * 3 + 3);
             }
         }
     }

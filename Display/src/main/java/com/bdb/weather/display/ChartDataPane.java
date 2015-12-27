@@ -33,7 +33,7 @@ public abstract class ChartDataPane extends TabPane {
         this.getTabs().add(dataTab);
     }
 
-    protected void setTabContents(Node chartNode, Node dataNode) {
+    protected final void setTabContents(Node chartNode, Node dataNode) {
         chartTab.setContent(chartNode);
         dataTab.setContent(dataNode);
     }

@@ -16,17 +16,14 @@
  */
 package com.bdb.weather.display.summary;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -52,12 +49,11 @@ import com.bdb.weather.common.db.DailyAveragesTable;
 import com.bdb.weather.common.db.DailySummaryTable;
 import com.bdb.weather.common.db.TemperatureRecordTable;
 import com.bdb.weather.common.measurement.Temperature;
-import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.DateInterval;
 import com.bdb.weather.display.ViewLauncher;
 import com.bdb.weather.display.WeatherSense;
 
-public final class DailySummariesPanel extends BorderPane implements ComponentContainer, ActionListener, SummarySupporter
+public final class DailySummariesPanel extends BorderPane implements EventHandler, SummarySupporter
 {
     private final SummariesGraphPanel         graphPanel;
     private final DailySummariesTextPanel     textPanel;
@@ -71,7 +67,7 @@ public final class DailySummariesPanel extends BorderPane implements ComponentCo
     private final DateTimeFormatter           dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
     private final TextField                   startDateTF = new TextField();
     private final TextField                   endDateTF = new TextField();
-    private final ComboBox                    intervalsCB = new ComboBox(DateInterval.availableIntervals());
+    private final ComboBox                    intervalsCB = new ComboBox();
     private final Button                      goButton = new Button("Go");
 
     @SuppressWarnings("LeakingThisInConstructor")
@@ -91,7 +87,7 @@ public final class DailySummariesPanel extends BorderPane implements ComponentCo
 
         tab = new Tab("Statistics");
         tab.setContent(new ScrollPane(textPanel));
-        tabPane.getTabs().add(sp);
+        tabPane.getTabs().add(tab);
 
         setCenter(tabPane);
 
@@ -117,9 +113,9 @@ public final class DailySummariesPanel extends BorderPane implements ComponentCo
             endDateTF.setEditable(false);
         }
         
-        intervalsCB.setSelectedItem(interval);
-        intervalsCB.setMaximumRowCount(intervalsCB.getItemCount());
-        intervalsCB.addActionListener(this);
+        intervalsCB.getSelectionModel().select(interval);
+       // intervalsCB.setMaximumRowCount(intervalsCB.getItemCount());
+        intervalsCB.setOnAction(this);
         
         goButton.setOnAction((ae)-> {
             try {
@@ -147,7 +143,7 @@ public final class DailySummariesPanel extends BorderPane implements ComponentCo
         if (summaryRecords.isEmpty())
             //SwingUtilities.invokeLater(() -> {
             //    JOptionPane.showMessageDialog(getParentFrame(), "No data available for date range", "No Data", JOptionPane.INFORMATION_MESSAGE);
-            //});
+            ;
             // TODO put combobox back to original value, probably the same for the text fields when in custom mode.
         else {
             WeatherAverages dailyAverages = dailyAveragesTable.retrieveDailyAverages();
@@ -176,31 +172,6 @@ public final class DailySummariesPanel extends BorderPane implements ComponentCo
     }
 
     @Override
-    public void actionPerformed(ActionEvent evt) {
-        Object source = evt.getSource();
-
-        if (source == intervalsCB) {
-            DateInterval interval = (DateInterval)intervalsCB.getSelectedItem();
-
-            DateRange range = interval.range();
-
-            boolean editable = interval == DateInterval.CUSTOM;
-
-            startDateTF.setEditable(editable);
-            endDateTF.setEditable(editable);
-            goButton.setEnabled(editable);
-            startDateTF.setText(dateFormat.format(range.getStart()));
-            endDateTF.setText(dateFormat.format(range.getEnd()));
-            
-            if (!editable) {
-                startDate = range.getStart().toLocalDate();
-                endDate = range.getEnd().toLocalDate();
-                loadData(startDate, endDate);
-            }
-        }
-    }
-
-    @Override
     public Temperature retrieveAvgOutdoorTemperature(SummaryRecord rec) {
         return rec.getAvgOutdoorTemp();
     }
@@ -219,5 +190,31 @@ public final class DailySummariesPanel extends BorderPane implements ComponentCo
     public void launchView(ViewLauncher launcher, LocalDate date) {
         launcher.launchDaySummaryView(date);
         
+    }
+
+    @Override
+    public void handle(Event event) {
+        Object source = event.getSource();
+
+        if (source == intervalsCB) {
+            DateInterval interval = (DateInterval)intervalsCB.getSelectionModel().getSelectedItem();
+
+            DateRange range = interval.range();
+
+            boolean editable = interval == DateInterval.CUSTOM;
+
+            startDateTF.setEditable(editable);
+            endDateTF.setEditable(editable);
+            goButton.setDisable(!editable);
+            startDateTF.setText(dateFormat.format(range.getStart()));
+            endDateTF.setText(dateFormat.format(range.getEnd()));
+            
+            if (!editable) {
+                startDate = range.getStart().toLocalDate();
+                endDate = range.getEnd().toLocalDate();
+                loadData(startDate, endDate);
+            }
+        }
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

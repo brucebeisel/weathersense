@@ -11,7 +11,7 @@
     <top>
         <HBox spacing="10" alignment="CENTER"   BorderPane.alignment="CENTER"> 
             <BorderPane.margin> <Insets bottom="10" top="10" left="10" right="10"/> </BorderPane.margin>
-            <Button text="English" onAction="#handleEnglish"/>
+            <Button text="Imperial" onAction="#handleImperial"/>
             <Button text="Metric" onAction="#handleMetric"/>
         </HBox>
     </top>

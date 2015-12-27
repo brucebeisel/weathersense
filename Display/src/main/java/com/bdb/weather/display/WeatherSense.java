@@ -65,7 +65,7 @@ public class WeatherSense extends Application {
 	    //databaseHost = DatabaseConstants.DATABASE_HOST;
             databaseHost = "192.168.1.100";
 
-	databaseHost = "192.168.1.100";
+	databaseHost = "192.168.1.101";
         databaseUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, databaseHost, DatabaseConstants.DATABASE_PORT, DatabaseConstants.DATABASE_NAME);
 
         connection = new DBConnection(databaseUrl, DatabaseConstants.DATABASE_USER, DatabaseConstants.DATABASE_PASSWORD);

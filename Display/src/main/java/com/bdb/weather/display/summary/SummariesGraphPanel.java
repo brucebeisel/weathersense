@@ -16,12 +16,11 @@
  */
 package com.bdb.weather.display.summary;
 
-import java.awt.BorderLayout;
 import java.util.List;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
+import javafx.geometry.Orientation;
+import javafx.scene.control.SplitPane;
+import javafx.scene.layout.BorderPane;
 
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.weather.common.SummaryRecord;
@@ -30,13 +29,12 @@ import com.bdb.weather.common.WindRoseData;
 import com.bdb.weather.display.ViewLauncher;
 import com.bdb.weather.display.windrose.WindRosePane;
 
-public class SummariesGraphPanel {
-    private final JComponent                     component = new JPanel(new BorderLayout());
+public class SummariesGraphPanel extends BorderPane {
     private final HighLowMedianTempPanel         temperaturePanel;
     private final TemperatureDeviationPlotPanel  deltaPanel;
     private final RainSummary                    rainPanel;
     private final WindSummary                    windPanel;
-    private final WindRosePane                  windRosePanel;
+    private final WindRosePane                   windRosePanel;
     private final HighLowHumidityPanel           highLowHumidityPanel;
     private final HighLowPressurePanel           highLowPressurePanel;
 
@@ -49,7 +47,8 @@ public class SummariesGraphPanel {
         highLowHumidityPanel = new HighLowHumidityPanel(interval, launcher, supporter);
         highLowPressurePanel = new HighLowPressurePanel(interval, launcher, supporter);
 
-        JSplitPane sp1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, temperaturePanel.getComponent(), deltaPanel.getComponent());
+        SplitPane sp1 = new SplitPane(temperaturePanel, deltaPanel);
+        sp1.setOrientation(Orientation.VERTICAL);
         //JSplitPane sp2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, windPanel.getComponent(), windRosePanel.getComponent());       
 //        JSplitPane sp3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, rainPanel.getComponent(), sp2);
 //        JSplitPane sp4 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, sp1, sp3);
@@ -58,7 +57,7 @@ public class SummariesGraphPanel {
         
 //        component.add(sp6, BorderLayout.CENTER);
         
-        sp1.setResizeWeight(.5);
+        //sp1.setResizeWeight(.5);
         //sp2.setResizeWeight(.7);
 //        sp3.setResizeWeight(.5);
 //        sp4.setResizeWeight(.5);
@@ -66,10 +65,6 @@ public class SummariesGraphPanel {
 //        sp6.setResizeWeight(.7);
     }
     
-    public JComponent getComponent() {
-        return component;
-    }
-
     public void loadData(List<SummaryRecord> list, WeatherAverages averages) {        
         temperaturePanel.loadData(list, averages);
         deltaPanel.loadData(list, averages);

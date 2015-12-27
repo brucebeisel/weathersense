@@ -41,8 +41,8 @@ public class UserPreferences {
     private static final String TEMP_UNITS_PREF = "Temperature Units";
     private static final String PRESSURE_UNITS_PREF = "Pressure Units";
     private static final String SPEED_UNITS_PREF = "Speed Units";
-    private static final String DEPTH_UNITS_PREF = "Depth Units";
-    private static final String DISTANCE_UNITS_PREF = "Distance Units";
+    private static final String RAINFALL_UNITS_PREF = "Rainfall Units";
+    private static final String ELEVATION_UNITS_PREF = "Elevation Units";
 
     private static final String PLOT_COLOR_NODE = "Plot Color";
     
@@ -104,6 +104,10 @@ public class UserPreferences {
     private static UserPreferences instance = null;
 
     private final ObjectProperty<Temperature.Unit> temperatureUnitProperty = new SimpleObjectProperty<>(Temperature.getDefaultUnit());
+    private final ObjectProperty<Depth.Unit> rainfallUnitProperty = new SimpleObjectProperty<>(Depth.getDefaultUnit());
+    private final ObjectProperty<Distance.Unit> elevationUnitProperty = new SimpleObjectProperty<>(Distance.getDefaultUnit());
+    private final ObjectProperty<Pressure.Unit> pressureUnitProperty = new SimpleObjectProperty<>(Pressure.getDefaultUnit());
+    private final ObjectProperty<Speed.Unit> speedUnitProperty = new SimpleObjectProperty<>(Speed.getDefaultUnit());
 
     private static final Logger logger = Logger.getLogger(UserPreferences.class.getName());
 
@@ -118,7 +122,8 @@ public class UserPreferences {
      */
     private UserPreferences() {
         loadTemperatureUnitsPref();
-        loadDepthUnitsPref();
+        loadRainfallUnitsPref();
+        loadElevationUnitsPref();
         loadPressureUnitsPref();
         loadSpeedUnitsPref();
     }
@@ -167,39 +172,79 @@ public class UserPreferences {
         }
     }
 
-    public void addUnitListener(PreferenceChangeListener listener) {
-        try {
-            for (String child : unitNode.childrenNames()) {
-                unitNode.node(child).addPreferenceChangeListener(listener);
-            }
-        }
-        catch (BackingStoreException ex) {
-            ErrorDisplayer.getInstance().displayError("User preference storage error. Please contact support");
-        }
+    public void setRainfallUnit(Depth.Unit unit) {
+        rainfallUnitProperty.set(unit);
+        Depth.setDefaultUnit(unit);
+        logger.log(Level.FINER,"Setting preference " + RAINFALL_UNITS_PREF + " to {0}", unit.name());
+        unitNode.put(RAINFALL_UNITS_PREF, unit.name());
     }
 
-    private void loadDepthUnitsPref() {
+    public Depth.Unit getRainfallUnit() {
+        return rainfallUnitProperty.get();
+    }
+
+    public ObjectProperty<Depth.Unit> rainfallUnitProperty() {
+        return rainfallUnitProperty;
+    }
+
+    private void loadRainfallUnitsPref() {
         //
         // If the preference is not legal then set the preference to the default
         // value of the Unit
         //
         try {
-            String pref = unitNode.get(DEPTH_UNITS_PREF, Depth.getDefaultUnit().name());
-            Depth.setDefaultUnit(Depth.Unit.valueOf(Depth.Unit.class, pref));
+            String pref = unitNode.get(RAINFALL_UNITS_PREF, Depth.getDefaultUnit().name());
+            logger.log(Level.FINER, "Rainfall unit prefereuce = {0}", pref);
+            setRainfallUnit(Depth.Unit.valueOf(Depth.Unit.class, pref));
         }
         catch (IllegalArgumentException e) {
-            unitNode.put(DEPTH_UNITS_PREF, Depth.getDefaultUnit().toString());
+            unitNode.put(RAINFALL_UNITS_PREF, Depth.getDefaultUnit().name());
         }
     }
 
-    public void putDepthUnitsPref(Depth.Unit pref) {
-        unitNode.put(DEPTH_UNITS_PREF, pref.name());
-        Depth.setDefaultUnit(pref);
+    public void setElevationUnit(Distance.Unit unit) {
+        elevationUnitProperty.set(unit);
+        Distance.setDefaultUnit(unit);
+        logger.log(Level.FINER,"Setting preference " + ELEVATION_UNITS_PREF + " to {0}", unit.name());
+        unitNode.put(ELEVATION_UNITS_PREF, unit.name());
     }
 
-    public void putDistanceUnitsPref(Depth.Unit pref) {
-        unitNode.put(DISTANCE_UNITS_PREF, pref.name());
-        Distance.setDefaultUnit(pref);
+    public Distance.Unit getElevationUnit() {
+        return elevationUnitProperty.get();
+    }
+
+    public ObjectProperty<Distance.Unit> elevationUnitProperty() {
+        return elevationUnitProperty;
+    }
+
+    private void loadElevationUnitsPref() {
+        //
+        // If the preference is not legal then set the preference to the default
+        // value of the Unit
+        //
+        try {
+            String pref = unitNode.get(ELEVATION_UNITS_PREF, Distance.getDefaultUnit().name());
+            logger.log(Level.FINER, "Elevation unit prefereuce = {0}", pref);
+            setElevationUnit(Distance.Unit.valueOf(Distance.Unit.class, pref));
+        }
+        catch (IllegalArgumentException e) {
+            unitNode.put(ELEVATION_UNITS_PREF, Distance.getDefaultUnit().name());
+        }
+    }
+
+    public void setPressureUnit(Pressure.Unit unit) {
+        pressureUnitProperty.set(unit);
+        Pressure.setDefaultUnit(unit);
+        logger.log(Level.FINER,"Setting preference " + PRESSURE_UNITS_PREF + " to {0}", unit.name());
+        unitNode.put(PRESSURE_UNITS_PREF, unit.name());
+    }
+
+    public Pressure.Unit getPressureUnit() {
+        return pressureUnitProperty.get();
+    }
+
+    public ObjectProperty<Pressure.Unit> pressureUnitProperty() {
+        return pressureUnitProperty;
     }
 
     private void loadPressureUnitsPref() {
@@ -209,16 +254,27 @@ public class UserPreferences {
         //
         try {
             String pref = unitNode.get(PRESSURE_UNITS_PREF, Pressure.getDefaultUnit().name());
-            Pressure.setDefaultUnit(Pressure.Unit.valueOf(Pressure.Unit.class, pref));
+            logger.log(Level.FINER, "Pressure unit prefereuce = {0}", pref);
+            setPressureUnit(Pressure.Unit.valueOf(Pressure.Unit.class, pref));
         }
         catch (IllegalArgumentException e) {
-            unitNode.put(PRESSURE_UNITS_PREF, Pressure.getDefaultUnit().toString());
+            unitNode.put(PRESSURE_UNITS_PREF, Pressure.getDefaultUnit().name());
         }
     }
 
-    public void putPressureUnitsPref(Pressure.Unit pref) {
-        unitNode.put(PRESSURE_UNITS_PREF, pref.name());
-        Pressure.setDefaultUnit(pref);
+    public void setSpeedUnit(Speed.Unit unit) {
+        speedUnitProperty.set(unit);
+        Speed.setDefaultUnit(unit);
+        logger.log(Level.FINER,"Setting preference " + SPEED_UNITS_PREF + " to {0}", unit.name());
+        unitNode.put(SPEED_UNITS_PREF, unit.name());
+    }
+
+    public Speed.Unit getSpeedUnit() {
+        return speedUnitProperty.get();
+    }
+
+    public ObjectProperty<Speed.Unit> speedUnitProperty() {
+        return speedUnitProperty;
     }
 
     private void loadSpeedUnitsPref() {
@@ -228,16 +284,23 @@ public class UserPreferences {
         //
         try {
             String pref = unitNode.get(SPEED_UNITS_PREF, Speed.getDefaultUnit().name());
-            Speed.setDefaultUnit(Speed.Unit.valueOf(Speed.Unit.class, pref));
+            logger.log(Level.FINER, "Speed unit prefereuce = {0}", pref);
+            setSpeedUnit(Speed.Unit.valueOf(Speed.Unit.class, pref));
         }
         catch (IllegalArgumentException e) {
-            unitNode.put(SPEED_UNITS_PREF, Speed.getDefaultUnit().toString());
+            unitNode.put(SPEED_UNITS_PREF, Speed.getDefaultUnit().name());
         }
     }
 
-    public void putSpeedUnitsPref(Speed.Unit pref) {
-        unitNode.put(SPEED_UNITS_PREF, pref.name());
-        Speed.setDefaultUnit(pref);
+    public void addUnitListener(PreferenceChangeListener listener) {
+        try {
+            for (String child : unitNode.childrenNames()) {
+                unitNode.node(child).addPreferenceChangeListener(listener);
+            }
+        }
+        catch (BackingStoreException ex) {
+            ErrorDisplayer.getInstance().displayError("User preference storage error. Please contact support");
+        }
     }
 
     public void putColorPref(String preferenceName, Color color) {
