@@ -16,7 +16,6 @@
  */
 package com.bdb.weather.display;
 
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +42,7 @@ import com.bdb.weather.display.preferences.UserPreferences;
 import com.bdb.weather.display.stripchart.MeasurementType;
 import com.bdb.weather.display.stripchart.StripChartManager;
 import com.bdb.weather.display.stripchart.StripChartPane;
+import com.bdb.weather.display.summary.DailySummariesPanel;
 
 /**
  * FXML Controller class
@@ -151,6 +151,8 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchDailySummariesView() {
+        DailySummariesPanel panel = new DailySummariesPanel(ws, connection, null, LocalDate.now().minusDays(30), LocalDate.now(), DateInterval.LAST_30_DAYS);
+        launchStage(panel, "Summary by Day");
     }
 
     @FXML

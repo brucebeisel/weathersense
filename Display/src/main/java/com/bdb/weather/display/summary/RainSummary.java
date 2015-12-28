@@ -47,13 +47,14 @@ import org.jfree.data.time.TimeSeriesCollection;
 import com.bdb.util.TimeUtils;
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.measurement.Depth;
+import com.bdb.weather.display.ChartDataPane;
 import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.axis.RainRangeAxis;
 
 /**
  * Plot to summarize rain over a specified period of time
  */
-public class RainSummary extends TabPane implements ChartMouseListenerFX {
+public class RainSummary extends ChartDataPane implements ChartMouseListenerFX {
     private XYPlot            rainPlot;
     private JFreeChart        chart;
     private final TableView         dataTable;
@@ -76,7 +77,6 @@ public class RainSummary extends TabPane implements ChartMouseListenerFX {
  
     public RainSummary() {
         this(SummaryInterval.DAY_INTERVAL, null);
-
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
@@ -86,13 +86,7 @@ public class RainSummary extends TabPane implements ChartMouseListenerFX {
         Node component = createChartElements();
         dataTable = new TableView();
 
-        Tab tab = new Tab(DisplayConstants.GRAPH_TAB_NAME);
-        tab.setContent(component);
-        getTabs().add(tab);
-
-        tab = new Tab(DisplayConstants.DATA_TAB_NAME);
-        tab.setContent(dataTable);
-        getTabs().add(tab);
+        this.setTabContents(component, dataTable);
     }
 
     private Node createChartElements() {
@@ -123,11 +117,11 @@ public class RainSummary extends TabPane implements ChartMouseListenerFX {
         //dataTable.setColumnModel(colModel);
         //dataTable.setAutoCreateColumnsFromModel(false);
         for (String columnHeading : TABLE_HEADINGS) {
-            TableColumn col = new TableColumn(columnHeading);
+            //TableColumn col = new TableColumn(columnHeading);
             //col.setHeaderValue(TABLE_HEADINGS[i]);
             //col.setModelIndex(i);
             //colModel.addColumn(col);
-            dataTable.getColumns().add(col);
+            //dataTable.getColumns().add(col);
         }
 
         //tableModel.setColumnCount(TABLE_HEADINGS.length);

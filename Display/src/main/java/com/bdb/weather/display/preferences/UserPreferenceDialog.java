@@ -262,10 +262,6 @@ public class UserPreferenceDialog extends JDialog implements ActionListener
         
         switch (event.getActionCommand()) {
             case "OK":
-                prefs.setTemperatureUnit(Temperature.Unit.values()[temperatureRBP.getSelectedIndex()]);
-                prefs.putDepthUnitsPref(Depth.Unit.values()[depthRBP.getSelectedIndex()]);
-                prefs.putPressureUnitsPref(Pressure.Unit.values()[pressureRBP.getSelectedIndex()]);
-                prefs.putSpeedUnitsPref(Speed.Unit.values()[speedRBP.getSelectedIndex()]);
                 prefs.putDbHostPref(hostTF.getText());
                 prefs.putDbPortPref(portTF.getText());
                 prefs.putHighOutdoorTempColorPref(highTempColorButton.getBackground());

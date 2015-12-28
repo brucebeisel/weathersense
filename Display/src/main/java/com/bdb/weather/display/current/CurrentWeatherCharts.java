@@ -53,7 +53,7 @@ import com.bdb.weather.display.RainBucket;
 import com.bdb.weather.display.RainPlot;
 import com.bdb.weather.display.WeatherDataMgr;
 import com.bdb.weather.display.WeatherSense;
-import com.bdb.weather.display.preferences.UserPreferences;
+import com.bdb.weather.display.preferences.UnitsPreferences;
 
 /**
  * The top-level component for displaying the current weather.
@@ -83,7 +83,7 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
     private final HistoryTable            historyTable;
     private final MonthlyAveragesTable    monthlyAverageTable;
     private String                        frameTitle = null;
-    private final UserPreferences         prefs = UserPreferences.getInstance();
+    private final UnitsPreferences        prefs = UnitsPreferences.getInstance();
     private static final Logger           logger = Logger.getLogger(CurrentWeatherCharts.class.getName());
     
     /**

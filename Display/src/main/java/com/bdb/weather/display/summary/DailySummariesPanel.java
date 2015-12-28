@@ -167,7 +167,7 @@ public final class DailySummariesPanel extends BorderPane implements EventHandle
 
             DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
             String dateString = df.format(startDate) + " - " + df.format(endDate);
-            WeatherSense.setStageTitle(this, dateString);
+            //WeatherSense.setStageTitle(this, dateString);
         }
     }
 

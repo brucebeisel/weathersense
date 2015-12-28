@@ -26,6 +26,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
 
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -88,27 +89,6 @@ public class DailySummariesTextPanel extends VBox {
     private static final int PRESSURE_FIELD_LENGTH = 5;
     private static final int HUMIDITY_FIELD_LENGTH = 4;
     private static final int RAIN_FIELD_LENGTH = 6;
-    private final JTextField   minLowTempValue = new JTextField("0.0", TEMPERATURE_FIELD_LENGTH);
-    private final JTextField   minLowTempTime = new JTextField(DATETIME_FIELD_LENGTH);
-    private final JTextField   maxLowTempValue = new JTextField("0.0", TEMPERATURE_FIELD_LENGTH);
-    private final JTextField   maxLowTempTime = new JTextField(DATETIME_FIELD_LENGTH);
-    private final JTextField   avgLowTemp = new JTextField(TEMPERATURE_FIELD_LENGTH);
-    private final JTextField   seasonalAvgLowTemp = new JTextField(TEMPERATURE_FIELD_LENGTH);
-    private final JTextField   daysLowBelowNormal = new JTextField(7);
-    private final JTextField   minHighTempValue = new JTextField("0.0", TEMPERATURE_FIELD_LENGTH);
-    private final JTextField   minHighTempTime = new JTextField(DATETIME_FIELD_LENGTH);
-    private final JTextField   maxHighTempValue = new JTextField("0.0", TEMPERATURE_FIELD_LENGTH);
-    private final JTextField   maxHighTempTime = new JTextField(DATETIME_FIELD_LENGTH);
-    private final JTextField   avgHighTemp = new JTextField(TEMPERATURE_FIELD_LENGTH);
-    private final JTextField   seasonalAvgHighTemp = new JTextField(TEMPERATURE_FIELD_LENGTH);
-    private final JTextField   daysHighAboveNormal = new JTextField(7);
-    private final JTextField   minMeanTempValue = new JTextField("0.0", TEMPERATURE_FIELD_LENGTH);
-    private final JTextField   minMeanTempDate = new JTextField(DATETIME_FIELD_LENGTH);
-    private final JTextField   maxMeanTempValue = new JTextField("0.0", TEMPERATURE_FIELD_LENGTH);
-    private final JTextField   maxMeanTempDate = new JTextField(DATETIME_FIELD_LENGTH);
-    private final JTextField   avgMeanTemp = new JTextField(TEMPERATURE_FIELD_LENGTH);
-    private final JTextField   seasonalAvgMeanTemp = new JTextField(TEMPERATURE_FIELD_LENGTH);
-    private final JTextField   daysMeanAboveNormal = new JTextField(7);
     private final JTextField   largestTempRange = new JTextField("0.0", TEMPERATURE_FIELD_LENGTH * 3);
     private final JTextField   largestTempRangeDate = new JTextField(DATE_FIELD_LENGTH);
     private final JTextField   smallestTempRange = new JTextField("0.0", TEMPERATURE_FIELD_LENGTH * 3);
@@ -150,6 +130,7 @@ public class DailySummariesTextPanel extends VBox {
     private final JTextField   largestHumidityRangeDate = new JTextField(DATE_FIELD_LENGTH);
     private final DefaultTableModel   tableModel = new DefaultTableModel();
     private final JTable       recordTable = new JTable(tableModel);
+    private final TemperatureSummaryPane temperatureSummaryPane = new TemperatureSummaryPane();
     private static final String[] COLUMN_NAMES = {
         "Date", "Record", "Type", "Previous Record Date", "Previous Record"
     };
@@ -157,27 +138,6 @@ public class DailySummariesTextPanel extends VBox {
     public DailySummariesTextPanel() {
         super();
         
-        minLowTempValue.setEditable(false);
-        minLowTempTime.setEditable(false);
-        maxLowTempValue.setEditable(false);
-        maxLowTempTime.setEditable(false);
-        avgLowTemp.setEditable(false);
-        seasonalAvgLowTemp.setEditable(false);
-        daysLowBelowNormal.setEditable(false); 
-        minHighTempValue.setEditable(false);
-        minHighTempTime.setEditable(false);
-        maxHighTempValue.setEditable(false);
-        maxHighTempTime.setEditable(false);
-        avgHighTemp.setEditable(false);
-        seasonalAvgHighTemp.setEditable(false);
-        daysHighAboveNormal.setEditable(false);
-        minMeanTempValue.setEditable(false);
-        minMeanTempDate.setEditable(false);
-        maxMeanTempValue.setEditable(false);
-        maxMeanTempDate.setEditable(false);
-        avgMeanTemp.setEditable(false);
-        seasonalAvgMeanTemp.setEditable(false);
-        daysMeanAboveNormal.setEditable(false);
         largestTempRange.setEditable(false);
         largestTempRangeDate.setEditable(false);
         smallestTempRange.setEditable(false);
@@ -215,182 +175,11 @@ public class DailySummariesTextPanel extends VBox {
         largestHumidityRange.setEditable(false);
         largestHumidityRangeDate.setEditable(false);
         
+        TitledPane pane = new TitledPane();
+        pane.setText("Temperature");
+        pane.setContent(temperatureSummaryPane);
+        this.getChildren().add(pane);
         /*
-        JPanel temperaturePanel = new JPanel(new BorderLayout());
-        temperaturePanel.setBorder(new TitledBorder(innerBorder, "Temperature (" + Temperature.getDefaultUnit() + ")"));
-        
-        JPanel tempTextPanel = new JPanel();
-        tempTextPanel.setLayout(new BoxLayout(tempTextPanel, BoxLayout.Y_AXIS));
-        
-        JPanel extremesPanel = new JPanel();
-        extremesPanel.setLayout(new BoxLayout(extremesPanel, BoxLayout.Y_AXIS));
-        extremesPanel.setBorder(new TitledBorder(innerBorder, "Extremes"));
-        
-        JPanel lowTemperaturePanel = new JPanel(new GridBagLayout());
-        lowTemperaturePanel.setBorder(new TitledBorder(innerBorder, "Low"));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
-        lowTemperaturePanel.add(new JBoldLabel("Minimum:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        lowTemperaturePanel.add(minLowTempValue, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        lowTemperaturePanel.add(new JLabel("at"), gbc);
-        gbc.gridx++;
-        lowTemperaturePanel.add(minLowTempTime, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        lowTemperaturePanel.add(new JBoldLabel("Maximum:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        lowTemperaturePanel.add(maxLowTempValue, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        lowTemperaturePanel.add(new JLabel("at"), gbc);
-        gbc.gridx++;
-        lowTemperaturePanel.add(maxLowTempTime, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        lowTemperaturePanel.add(new JBoldLabel("Average:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        lowTemperaturePanel.add(avgLowTemp, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.EAST;
-        lowTemperaturePanel.add(new JBoldLabel("Seasonal:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        lowTemperaturePanel.add(seasonalAvgLowTemp, gbc);
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        lowTemperaturePanel.add(new JBoldLabel("Days Below Normal:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        gbc.gridwidth = 2;
-        lowTemperaturePanel.add(daysLowBelowNormal, gbc);
-        
-        extremesPanel.add(lowTemperaturePanel);
-        
-        JPanel meanTemperaturePanel = new JPanel(new GridBagLayout());
-        meanTemperaturePanel.setBorder(new TitledBorder(innerBorder, "Mean"));
-      
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        meanTemperaturePanel.add(new JBoldLabel("Minimum:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        meanTemperaturePanel.add(minMeanTempValue, gbc);
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridx++;
-        meanTemperaturePanel.add(new JLabel("on"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        meanTemperaturePanel.add(minMeanTempDate, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        meanTemperaturePanel.add(new JBoldLabel("Maximum:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        meanTemperaturePanel.add(maxMeanTempValue, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        meanTemperaturePanel.add(new JLabel("on"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        meanTemperaturePanel.add(maxMeanTempDate, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        meanTemperaturePanel.add(new JBoldLabel("Average:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        meanTemperaturePanel.add(avgMeanTemp, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.EAST;
-        meanTemperaturePanel.add(new JBoldLabel("Seasonal:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        meanTemperaturePanel.add(seasonalAvgMeanTemp, gbc);
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        meanTemperaturePanel.add(new JBoldLabel("Days Above Normal"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        gbc.gridwidth = 2;
-        meanTemperaturePanel.add(daysMeanAboveNormal, gbc);
-        
-        extremesPanel.add(meanTemperaturePanel);
-         
-        JPanel highTemperaturePanel = new JPanel(new GridBagLayout());
-        highTemperaturePanel.setBorder(new TitledBorder(innerBorder, "High"));
-      
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        highTemperaturePanel.add(new JBoldLabel("Minimum:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        highTemperaturePanel.add(minHighTempValue, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        highTemperaturePanel.add(new JLabel("at"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        highTemperaturePanel.add(minHighTempTime, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        highTemperaturePanel.add(new JBoldLabel("Maximum:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        highTemperaturePanel.add(maxHighTempValue, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        highTemperaturePanel.add(new JLabel("at"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        highTemperaturePanel.add(maxHighTempTime, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        highTemperaturePanel.add(new JBoldLabel("Average:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        highTemperaturePanel.add(avgHighTemp, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.EAST;
-        highTemperaturePanel.add(new JBoldLabel("Seasonal:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        highTemperaturePanel.add(seasonalAvgHighTemp, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        highTemperaturePanel.add(new JBoldLabel("Days Above Normal:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        gbc.gridwidth = 2;
-        highTemperaturePanel.add(daysHighAboveNormal, gbc);
-        
-        extremesPanel.add(highTemperaturePanel);
         
         tempTextPanel.add(extremesPanel);
         
@@ -745,26 +534,6 @@ public class DailySummariesTextPanel extends VBox {
     public void loadData(Statistics rec, WeatherAverage seasonalAverages, List<Extreme<Temperature,TemperatureRecordType>> records) {
         DateTimeFormatter dateTime = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
         DateTimeFormatter dateOnly = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-        minLowTempValue.setText(rec.getMinOutdoorTemp().toString());
-        minLowTempTime.setText(dateTime.format(rec.getMinOutdoorTempTime()));
-        maxLowTempValue.setText(rec.getMaxLowOutdoorTemperature().getValue().toString());
-        maxLowTempTime.setText(dateTime.format(rec.getMaxLowOutdoorTemperature().getTime()));
-        minHighTempValue.setText(rec.getMinHighOutdoorTemperature().getValue().toString());
-        minHighTempTime.setText(dateTime.format(rec.getMinHighOutdoorTemperature().getTime()));
-        maxHighTempValue.setText(rec.getMaxOutdoorTemp().toString());
-        maxHighTempTime.setText(dateTime.format(rec.getMaxOutdoorTempTime()));
-        minMeanTempValue.setText(rec.getMinMeanOutdoorTemperature().getValue().toString());
-        minMeanTempDate.setText(dateOnly.format(rec.getMinMeanOutdoorTemperature().getTime()));
-        maxMeanTempValue.setText(rec.getMaxMeanOutdoorTemperature().getValue().toString());
-        maxMeanTempDate.setText(dateOnly.format(rec.getMaxMeanOutdoorTemperature().getTime()));
-        
-        avgHighTemp.setText(rec.getAvgHighTemperature().toString());
-        avgLowTemp.setText(rec.getAvgLowTemperature().toString());
-        avgMeanTemp.setText(rec.getAvgMeanTemperature().toString());
-        
-        seasonalAvgLowTemp.setText(seasonalAverages.getLowTemperature().toString());
-        seasonalAvgMeanTemp.setText(seasonalAverages.getMeanTemperature().toString());
-        seasonalAvgHighTemp.setText(seasonalAverages.getHighTemperature().toString());
 
         smallestTempRange.setText("" + rec.getSmallestTemperatureRange().getRange() +
                                    " (" + rec.getSmallestTemperatureRange().getMin() +
@@ -775,9 +544,6 @@ public class DailySummariesTextPanel extends VBox {
                 ", " + rec.getLargestTemperatureRange().getMax() + ")");
         largestTempRangeDate.setText(dateOnly.format(rec.getLargestTemperatureRange().getDate()));
         
-        daysHighAboveNormal.setText("" + rec.getDaysHighAboveNormal() + " of " + rec.getNumberOfDays());
-        daysMeanAboveNormal.setText("" + rec.getDaysMeanAboveNormal() + " of " + rec.getNumberOfDays());
-        daysLowBelowNormal.setText("" + rec.getDaysLowBelowNormal() + " of " + rec.getNumberOfDays());
         
         temperatureBinSummaryPlot.loadData(rec.getTemperatureBinData());
 
@@ -843,6 +609,7 @@ public class DailySummariesTextPanel extends VBox {
         
         tableModel.setNumRows(records.size());
         
+        /*
         int n = 0;
         for (Extreme<Temperature,TemperatureRecordType> record : records) {
             tableModel.setValueAt(dateOnly.format(record.getDate()), n, 0);
@@ -853,5 +620,6 @@ public class DailySummariesTextPanel extends VBox {
             tableModel.setValueAt(dateOnly.format(record.getPreviousDate()), n, 3);
             tableModel.setValueAt(record.getPreviousValue(), n++, 4);
         }
+*/
     }
 }

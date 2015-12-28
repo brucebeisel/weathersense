@@ -59,7 +59,7 @@ public class UnitsPreferenceDialog extends BorderPane {
     @FXML private ToggleGroup elevationToggleGroup;
     @FXML private ToggleGroup windSpeedToggleGroup;
     @FXML private ToggleGroup barometricPressureToggleGroup;
-    private final UserPreferences  prefs = UserPreferences.getInstance();
+    private final UnitsPreferences  prefs = UnitsPreferences.getInstance();
     
     @SuppressWarnings("LeakingThisInConstructor")
     public UnitsPreferenceDialog() {
