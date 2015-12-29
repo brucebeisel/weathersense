@@ -44,6 +44,7 @@ import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.db.DatabaseConstants;
 import com.bdb.weather.common.db.WeatherStationTable;
 import com.bdb.weather.display.day.HistoricalSeriesInfo;
+import com.bdb.weather.display.preferences.UnitsPreferences;
 
 public class WeatherSense extends Application {
     private static final int REFRESH_INTERVAL = 30;
@@ -97,6 +98,7 @@ public class WeatherSense extends Application {
 	    refreshList.stream().forEach((refresh) -> refresh.refresh());
 	}, REFRESH_INTERVAL, REFRESH_INTERVAL, TimeUnit.SECONDS);
 
+        UnitsPreferences.getInstance();
     }
 
     @Override

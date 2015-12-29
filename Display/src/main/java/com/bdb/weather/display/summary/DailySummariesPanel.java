@@ -22,6 +22,7 @@ import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -51,7 +52,6 @@ import com.bdb.weather.common.db.TemperatureRecordTable;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.DateInterval;
 import com.bdb.weather.display.ViewLauncher;
-import com.bdb.weather.display.WeatherSense;
 
 public final class DailySummariesPanel extends BorderPane implements EventHandler, SummarySupporter
 {
@@ -82,10 +82,12 @@ public final class DailySummariesPanel extends BorderPane implements EventHandle
         textPanel = new DailySummariesTextPanel();
         TabPane tabPane = new TabPane();
         Tab tab = new Tab("Charts");
+        tab.setClosable(false);
         tab.setContent(graphPanel);
         tabPane.getTabs().add(tab);
 
         tab = new Tab("Statistics");
+        tab.setClosable(false);
         tab.setContent(new ScrollPane(textPanel));
         tabPane.getTabs().add(tab);
 
@@ -130,7 +132,7 @@ public final class DailySummariesPanel extends BorderPane implements EventHandle
 
         goButton.setDisable(true);
 
-        loadData(startDate, endDate);
+        Platform.runLater(() -> loadData(startDate, endDate));
     }
     
     private void loadData(LocalDate startDate, LocalDate endDate) {

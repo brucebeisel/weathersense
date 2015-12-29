@@ -22,8 +22,6 @@ import java.util.List;
 
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 
 import javafx.scene.control.TitledPane;
@@ -85,19 +83,12 @@ import com.bdb.weather.display.DisplayConstants;
 public class DailySummariesTextPanel extends VBox {
     private static final int DATE_FIELD_LENGTH = 10;
     private static final int DATETIME_FIELD_LENGTH = 15;
-    private static final int TEMPERATURE_FIELD_LENGTH = 5;
     private static final int PRESSURE_FIELD_LENGTH = 5;
     private static final int HUMIDITY_FIELD_LENGTH = 4;
     private static final int RAIN_FIELD_LENGTH = 6;
-    private final JTextField   largestTempRange = new JTextField("0.0", TEMPERATURE_FIELD_LENGTH * 3);
-    private final JTextField   largestTempRangeDate = new JTextField(DATE_FIELD_LENGTH);
-    private final JTextField   smallestTempRange = new JTextField("0.0", TEMPERATURE_FIELD_LENGTH * 3);
-    private final JTextField   smallestTempRangeDate = new JTextField(DATE_FIELD_LENGTH);
-    private final TemperatureBinSummaryPlot temperatureBinSummaryPlot = new TemperatureBinSummaryPlot();
     private final JTextField   totalRain = new JTextField("0.00", RAIN_FIELD_LENGTH);
     private final JTextField   maxRainRate = new JTextField("0.00/hr", RAIN_FIELD_LENGTH + "hour".length());
     private final JTextField   maxRainRateTime = new JTextField(DATETIME_FIELD_LENGTH);
-    private final Border       innerBorder = new BevelBorder(BevelBorder.LOWERED);
     private final JTextField   rainDays = new JTextField(3);
     private final JTextField   maxRainDayDepth = new JTextField(RAIN_FIELD_LENGTH);
     private final JTextField   maxRainDayDate = new JTextField(DATE_FIELD_LENGTH);
@@ -131,6 +122,7 @@ public class DailySummariesTextPanel extends VBox {
     private final DefaultTableModel   tableModel = new DefaultTableModel();
     private final JTable       recordTable = new JTable(tableModel);
     private final TemperatureSummaryPane temperatureSummaryPane = new TemperatureSummaryPane();
+    private final RainSummaryPane rainSummaryPane = new RainSummaryPane();
     private static final String[] COLUMN_NAMES = {
         "Date", "Record", "Type", "Previous Record Date", "Previous Record"
     };
@@ -138,10 +130,6 @@ public class DailySummariesTextPanel extends VBox {
     public DailySummariesTextPanel() {
         super();
         
-        largestTempRange.setEditable(false);
-        largestTempRangeDate.setEditable(false);
-        smallestTempRange.setEditable(false);
-        smallestTempRangeDate.setEditable(false);
         totalRain.setEditable(false);
         maxRainRate.setEditable(false);
         maxRainRateTime.setEditable(false);
@@ -176,136 +164,21 @@ public class DailySummariesTextPanel extends VBox {
         largestHumidityRangeDate.setEditable(false);
         
         TitledPane pane = new TitledPane();
-        pane.setText("Temperature");
+        pane.setText("Temperature (" + Temperature.getDefaultUnit() + ")");
+        pane.setCollapsible(false);
         pane.setContent(temperatureSummaryPane);
+        this.getChildren().add(pane);
+
+        pane = new TitledPane();
+        pane.setText("Rain (" + Depth.getDefaultUnit() + ")");
+        pane.setCollapsible(false);
+        pane.setContent(rainSummaryPane);
         this.getChildren().add(pane);
         /*
         
         tempTextPanel.add(extremesPanel);
         
-        GridPane tempRangePanel = new GridPane();
-        //tempRangePanel.setBorder(new TitledBorder(innerBorder, "Temperature Range"));
-        
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        tempRangePanel.add(new JBoldLabel("Smallest:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        tempRangePanel.add(smallestTempRange, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        tempRangePanel.add(new JLabel("on"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        tempRangePanel.add(smallestTempRangeDate, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        tempRangePanel.add(new JBoldLabel("Largest:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        tempRangePanel.add(largestTempRange, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        tempRangePanel.add(new JLabel("on"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        tempRangePanel.add(largestTempRangeDate, gbc);
-        
-        tempTextPanel.add(tempRangePanel);
-        temperaturePanel.setRight(tempTextPanel);
-        
-        BorderPane temperatureBinPanel = new BorderPane();
-        //temperatureBinPanel.setBorder(new TitledBorder(innerBorder, "Bins"));
-        temperatureBinPanel.setCenter(temperatureBinSummaryPlot);
-        
-        temperaturePanel.add(temperatureBinPanel, BorderLayout.CENTER);
-        
-        add(temperaturePanel);
-        
         BorderPane rainPanel = new BorderPane();
-        //rainPanel.setBorder(new TitledBorder(innerBorder, "Rain (" + Depth.getDefaultUnit() + ")"));
-        
-        BorderPane rainTextOuterPanel = new BorderPane();
-        BorderPane rainTextPanel = new BorderPane();
-        
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        rainTextPanel.add(new Label("Total"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        rainTextPanel.add(totalRain, gbc);
-               
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        rainTextPanel.add(new Label("Maximum Rainfall Rate:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        rainTextPanel.add(maxRainRate, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        rainTextPanel.add(new Label("at"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        rainTextPanel.add(maxRainRateTime, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        rainTextPanel.add(new Label("Days of Rain:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        rainTextPanel.add(rainDays, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        rainTextPanel.add(new Label("Max Rain Day:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        rainTextPanel.add(maxRainDayDepth, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        rainTextPanel.add(new Label("on"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        rainTextPanel.add(maxRainDayDate, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        rainTextPanel.add(new Label("Avg Rain/Day:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        rainTextPanel.add(avgRainPerDay, gbc);
-        
-        rainTextOuterPanel.setTop(rainTextPanel);
-        rainTextOuterPanel.setCenter(new FlowPane());
-        
-        rainPanel.setRight(rainTextOuterPanel);
-        
-        for (int i = 0; i < 24; i++)
-            hourRainDataset.addValue(0.0, "Rain", "" + i);
-        
-        JFreeChart rainChart = ChartFactory.createBarChart(null, "Hour", "", hourRainDataset, PlotOrientation.VERTICAL, false, true, false);
-        ChartViewer rainChartViewer = new ChartViewer(rainChart);
-        rainChartViewer.setMaxHeight(10000);
-        rainChartViewer.setMaxWidth(10000);
-        rainChartViewer.setPrefSize(0, 200);
-        ((CategoryPlot)rainChart.getPlot()).setRangeAxis(new RainRangeAxis());
-        BorderPane hourlyRainPanel = new BorderPane();
-        //hourlyRainPanel.setBorder(new TitleBorder(innerBorder, "Rain by Hour"));
-        hourlyRainPanel.setCenter(rainChartViewer);
-        
-        rainPanel.setCenter(hourlyRainPanel);
-        
-        add(rainPanel);
         
         JPanel windPressureHumidityPanel = new JPanel(new GridLayout(1,0));
         
@@ -532,42 +405,13 @@ public class DailySummariesTextPanel extends VBox {
     
     // TODO Get the simple date formatter from a global class, like one that contains some sort of preferences
     public void loadData(Statistics rec, WeatherAverage seasonalAverages, List<Extreme<Temperature,TemperatureRecordType>> records) {
+        temperatureSummaryPane.loadData(rec, seasonalAverages);
+        rainSummaryPane.loadData(rec);
+
         DateTimeFormatter dateTime = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
         DateTimeFormatter dateOnly = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
 
-        smallestTempRange.setText("" + rec.getSmallestTemperatureRange().getRange() +
-                                   " (" + rec.getSmallestTemperatureRange().getMin() +
-                                   ", " + rec.getSmallestTemperatureRange().getMax() + ")");
-        smallestTempRangeDate.setText(dateOnly.format(rec.getSmallestTemperatureRange().getDate()));
-        largestTempRange.setText("" + rec.getLargestTemperatureRange().getRange() +
-                " (" + rec.getLargestTemperatureRange().getMin() +
-                ", " + rec.getLargestTemperatureRange().getMax() + ")");
-        largestTempRangeDate.setText(dateOnly.format(rec.getLargestTemperatureRange().getDate()));
         
-        
-        temperatureBinSummaryPlot.loadData(rec.getTemperatureBinData());
-
-        totalRain.setText(rec.getTotalRainfall().toString());
-        //
-        // This can be null if the data was collected before 2.2 or there was no rain the entire time period
-        //
-        Depth maxRainfallRate = rec.getMaxRainfallRate();
-        if (maxRainfallRate != null && maxRainfallRate.get() != 0.0) {
-            maxRainRate.setText("" + rec.getMaxRainfallRate() + "/hour");
-            maxRainRateTime.setText(dateTime.format(rec.getMaxRainfallRateTime()));
-        }
-        else {
-            maxRainRate.setText(DisplayConstants.UNKNOWN_VALUE_STRING);
-            maxRainRateTime.setText(DisplayConstants.UNKNOWN_VALUE_STRING);
-        }
-        rainDays.setText("" + rec.getRainDays());
-        maxRainDayDepth.setText(rec.getMaxDayRainDepth().toString());
-        maxRainDayDate.setText(dateOnly.format(rec.getMaxDayRainDate()));
-        avgRainPerDay.setText(rec.getAvgRainPerDay().toString());
-        DayHourRain hourlyRain = rec.getHourlyRainfall();
-        hourlyRain.getHourValues().stream().forEach((hour) -> {
-            hourRainDataset.setValue(hourlyRain.getRain(hour).get(), "Rain", "" + hour);
-        });
         
         maxWindSpeed.setText("" + rec.getMaxWindSpeed());
         maxWindSpeedTime.setText(dateTime.format(rec.getMaxWindSpeedTime()));

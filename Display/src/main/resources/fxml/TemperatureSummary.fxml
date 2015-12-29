@@ -23,10 +23,10 @@
                         <TextField fx:id="daysLowBelowNormal" prefColumnCount="10" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="2" />
                         <Label text="at" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="CENTER" /> 
                         <Label text="at" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="CENTER" /> 
-                        <Label text="Seasonal" styleClass="value-label" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="CENTER" /> 
+                        <Label text="Seasonal:" styleClass="value-label" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="CENTER" /> 
                         <TextField fx:id="minimumLowTime" editable="false" prefColumnCount="15" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
                         <TextField fx:id="maximumLowTime" editable="false" prefColumnCount="15" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
-                        <TextField fx:id="sesonalLowAverage" editable="false" prefColumnCount="5" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+                        <TextField fx:id="seasonalLowAverage" editable="false" prefColumnCount="5" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
                     </GridPane>
                 </TitledPane>
                 <TitledPane text="Mean" collapsible="false" >
@@ -41,10 +41,10 @@
                         <TextField fx:id="daysMeanAboveNormal" prefColumnCount="10" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="2" />
                         <Label text="on" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="CENTER" /> 
                         <Label text="on" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="CENTER" /> 
-                        <Label text="Seasonal" styleClass="value-label" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="CENTER" /> 
-                        <TextField fx:id="minimumMeanTime" editable="false" prefColumnCount="15" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
-                        <TextField fx:id="maximumMeanTime" editable="false" prefColumnCount="15" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
-                        <TextField fx:id="sesonalMeanAverage" editable="false" prefColumnCount="5" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+                        <Label text="Seasonal:" styleClass="value-label" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="CENTER" /> 
+                        <TextField fx:id="minimumMeanDate" editable="false" prefColumnCount="15" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                        <TextField fx:id="maximumMeanDate" editable="false" prefColumnCount="15" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+                        <TextField fx:id="seasonalMeanAverage" editable="false" prefColumnCount="5" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
                     </GridPane>
                 </TitledPane>
                 <TitledPane text="High" collapsible="false" >
@@ -52,23 +52,37 @@
                         <Label text="Minimum:" styleClass="value-label" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="RIGHT" /> 
                         <Label text="Maximum:" styleClass="value-label" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="RIGHT" /> 
                         <Label text="Average:" styleClass="value-label" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="RIGHT" /> 
-                        <Label text="Days Below Normal:" styleClass="value-label" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="RIGHT" /> 
+                        <Label text="Days Above Normal:" styleClass="value-label" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="RIGHT" /> 
                         <TextField fx:id="minimumHigh" editable="false" prefColumnCount="5" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                         <TextField fx:id="maximumHigh" editable="false" prefColumnCount="5" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                         <TextField fx:id="averageHigh" editable="false" prefColumnCount="5" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                        <TextField fx:id="daysBelowNormal" prefColumnCount="10" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="2" />
+                        <TextField fx:id="daysHighAboveNormal" prefColumnCount="10" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="2" />
                         <Label text="at" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="CENTER" /> 
                         <Label text="at" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="CENTER" /> 
-                        <Label text="Seasonal" styleClass="value-label" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="CENTER" /> 
+                        <Label text="Seasonal:" styleClass="value-label" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="CENTER" /> 
                         <TextField fx:id="minimumHighTime" editable="false" prefColumnCount="15" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
                         <TextField fx:id="maximumHighTime" editable="false" prefColumnCount="15" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
-                        <TextField fx:id="sesonalHighAverage" editable="false" prefColumnCount="5" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+                        <TextField fx:id="seasonalHighAverage" editable="false" prefColumnCount="5" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+                    </GridPane>
+                </TitledPane>
+                <TitledPane text="Temperature Range" collapsible="false"> 
+                    <GridPane hgap="5" vgap="5">
+                        <Label text="Smallest:" styleClass="value-label" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="RIGHT" /> 
+                        <Label text="Largest:" styleClass="value-label" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="RIGHT" /> 
+                        <TextField fx:id="smallestTemperatureRange" editable="false" prefColumnCount="15" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        <TextField fx:id="largestTemperatureRange" editable="false" prefColumnCount="15" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        <Label text="on" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="CENTER" /> 
+                        <Label text="on" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="CENTER" /> 
+                        <TextField fx:id="smallestTemperatureRangeDate" editable="false" prefColumnCount="10" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                        <TextField fx:id="largestTemperatureRangeDate" editable="false" prefColumnCount="10" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
                     </GridPane>
                 </TitledPane>
             </VBox>
         </TitledPane>
     </left>
     <center>
-        <TemperatureBinSummaryPlot/>
+        <TitledPane text="Temperature Bins">
+            <TemperatureBinSummaryPlot fx:id="temperatureBinSummaryPlot"/>
+        </TitledPane>
     </center>
 </fx:root>
