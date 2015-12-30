@@ -81,7 +81,7 @@
         </TitledPane>
     </left>
     <center>
-        <TitledPane text="Temperature Bins">
+        <TitledPane text="Temperature Bins" collapsible="false" >
             <TemperatureBinSummaryPlot fx:id="temperatureBinSummaryPlot"/>
         </TitledPane>
     </center>

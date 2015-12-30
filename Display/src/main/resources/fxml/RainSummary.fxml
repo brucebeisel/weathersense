@@ -18,12 +18,12 @@
             <TextField fx:id="totalRainfall" editable="false" prefColumnCount="5" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
             <TextField fx:id="maxRainfallRate" editable="false" prefColumnCount="5" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
             <TextField fx:id="daysOfRainfall" editable="false" prefColumnCount="5" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-            <TextField fx:id="maxRainDay" editable="false" prefColumnCount="5" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-            <TextField fx:id="avgRainPerDay" editable="false" prefColumnCount="5" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+            <TextField fx:id="maxRainfallDay" editable="false" prefColumnCount="5" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+            <TextField fx:id="avgRainfallPerDay" editable="false" prefColumnCount="5" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
             <Label text="at" styleClass="value-label" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="CENTER" /> 
             <Label text="on" styleClass="value-label" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.halignment="CENTER" /> 
             <TextField fx:id="maxRainfallRateTime" editable="false" prefColumnCount="15" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
-            <TextField fx:id="maxRainDayDate" editable="false" prefColumnCount="10" GridPane.columnIndex="3" GridPane.rowIndex="3"/>
+            <TextField fx:id="maxRainfallDayDate" editable="false" prefColumnCount="10" GridPane.columnIndex="3" GridPane.rowIndex="3"/>
         </GridPane>
     </left>
     <center>

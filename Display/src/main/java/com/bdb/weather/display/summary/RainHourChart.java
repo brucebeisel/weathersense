@@ -52,8 +52,7 @@ public class RainHourChart extends HBox {
         this.getChildren().add(rainChartViewer);
     }
 
-    public void loadData(Statistics rec) {
-        DayHourRain hourlyRain = rec.getHourlyRainfall();
+    public void loadData(DayHourRain hourlyRain) {
         hourlyRain.getHourValues().forEach((hour) -> {
             hourRainDataset.setValue(hourlyRain.getRain(hour).get(), CATEGORY_NAME, hour.toString());
         });

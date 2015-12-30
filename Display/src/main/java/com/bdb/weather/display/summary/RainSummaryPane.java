@@ -38,6 +38,10 @@ public class RainSummaryPane extends BorderPane {
     @FXML private TextField     totalRainfall;
     @FXML private TextField     maxRainfallRate;
     @FXML private TextField     maxRainfallRateTime;
+    @FXML private TextField     daysOfRainfall;
+    @FXML private TextField     maxRainfallDay;
+    @FXML private TextField     avgRainfallPerDay;
+    @FXML private TextField     maxRainfallDayDate;
 
     @SuppressWarnings("LeakingThisInConstructor")
     public RainSummaryPane() {
@@ -56,7 +60,7 @@ public class RainSummaryPane extends BorderPane {
         DateTimeFormatter dateTime = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
         DateTimeFormatter dateOnly = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
 
-        rainHourChart.loadData(rec);
+        rainHourChart.loadData(rec.getHourlyRainfall());
 
         totalRainfall.setText(rec.getTotalRainfall().toString());
         Depth maxRainfallRateValue = rec.getMaxRainfallRate();
@@ -68,14 +72,12 @@ public class RainSummaryPane extends BorderPane {
             maxRainfallRate.setText(DisplayConstants.UNKNOWN_VALUE_STRING);
             maxRainfallRateTime.setText(DisplayConstants.UNKNOWN_VALUE_STRING);
         }
-        /*
         //
         // This can be null if the data was collected before 2.2 or there was no rain the entire time period
         //
-        rainDays.setText("" + rec.getRainDays());
-        maxRainDayDepth.setText(rec.getMaxDayRainDepth().toString());
-        maxRainDayDate.setText(dateOnly.format(rec.getMaxDayRainDate()));
-        avgRainPerDay.setText(rec.getAvgRainPerDay().toString());
-*/
+        daysOfRainfall.setText(Integer.toString(rec.getRainDays()));
+        maxRainfallDay.setText(rec.getMaxDayRainDepth().toString());
+        maxRainfallDayDate.setText(dateOnly.format(rec.getMaxDayRainDate()));
+        avgRainfallPerDay.setText(rec.getAvgRainPerDay().toString());
     }
 }

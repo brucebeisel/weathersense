@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import com.bdb.weather.display.summary.*?>
+
+<fx:root type="VBox" xmlns:fx="http://javafx.com/fxml/1">
+    <TitledPane fx:id="temperatureTitledPane" text="Temperature" collapsible="false">
+        <TemperatureSummaryPane fx:id="temperatureSummaryPane"/>
+    </TitledPane>
+    <TitledPane fx:id="rainTitledPane" text="Rain" collapsible="false">
+        <RainSummaryPane fx:id="rainSummaryPane"/>
+    </TitledPane>
+    <HBox spacing="5" >
+        <TitledPane fx:id="windTitledPane" text="Wind" collapsible="false">
+            <WindSummaryPane fx:id="windSummaryPane"/>
+        </TitledPane>
+        <TitledPane fx:id="pressureTitledPane" text="Wind" collapsible="false">
+            <PressureSummaryPane fx:id="pressureSummaryPane"/>
+        </TitledPane>
+    </HBox>
+</fx:root>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root type="GridPane" xmlns:fx="http://javafx.com/fxml/1">
+    <Label text="Mimimum:" styleClass="value-label" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="RIGHT" /> 
+    <Label text="Maximum:" styleClass="value-label" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.halignment="RIGHT" /> 
+    <Label text="Average:" styleClass="value-label" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.halignment="RIGHT" /> 
+    <Label text="Smallest Range:" styleClass="value-label" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.halignment="RIGHT" /> 
+    <Label text="Largest Range:" styleClass="value-label" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.halignment="RIGHT" /> 
+    <TextField fx:id="mimimumPressure" editable="false" prefColumnCount="5" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+    <TextField fx:id="maximumPressure" editable="false" prefColumnCount="5" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+    <TextField fx:id="averagePressure" editable="false" prefColumnCount="5" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+    <TextField fx:id="smallestRange" editable="false" prefColumnCount="15" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+    <TextField fx:id="largestRange" editable="false" prefColumnCount="15" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+    <Label text="at" styleClass="value-label" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.halignment="CENTER" /> 
+    <Label text="at" styleClass="value-label" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="CENTER" /> 
+    <Label text="on" styleClass="value-label" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.halignment="CENTER" /> 
+    <Label text="on" styleClass="value-label" GridPane.columnIndex="2" GridPane.rowIndex="4" GridPane.halignment="CENTER" /> 
+    <TextField fx:id="mimimumPressureTime" editable="false" prefColumnCount="15" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+    <TextField fx:id="maximumPressureTime" editable="false" prefColumnCount="15" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+    <TextField fx:id="smallestRangeDate" editable="false" prefColumnCount="10" GridPane.columnIndex="3" GridPane.rowIndex="3"/>
+    <TextField fx:id="largestRangeDate" editable="false" prefColumnCount="10" GridPane.columnIndex="3" GridPane.rowIndex="4"/>
+</fx:root>

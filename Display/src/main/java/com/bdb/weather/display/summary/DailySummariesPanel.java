@@ -56,7 +56,7 @@ import com.bdb.weather.display.ViewLauncher;
 public final class DailySummariesPanel extends BorderPane implements EventHandler, SummarySupporter
 {
     private final SummariesGraphPanel         graphPanel;
-    private final DailySummariesTextPanel     textPanel;
+    private final DailySummariesStatisticsPane     textPanel;
     private final DailySummaryTable           dailySummaryTable;
     private final DailyAveragesTable          dailyAveragesTable;
     private final TemperatureRecordTable      temperatureRecordTable;
@@ -79,7 +79,7 @@ public final class DailySummariesPanel extends BorderPane implements EventHandle
         temperatureBinMgr = new TemperatureBinMgr(connection);
 
         graphPanel = new SummariesGraphPanel(SummaryInterval.DAY_INTERVAL, connection, launcher, this);
-        textPanel = new DailySummariesTextPanel();
+        textPanel = new DailySummariesStatisticsPane();
         TabPane tabPane = new TabPane();
         Tab tab = new Tab("Charts");
         tab.setClosable(false);

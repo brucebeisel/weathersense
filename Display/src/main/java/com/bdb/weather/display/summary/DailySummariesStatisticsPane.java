@@ -16,6 +16,7 @@
  */
 package com.bdb.weather.display.summary;
 
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
@@ -24,19 +25,18 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
 
-import org.jfree.data.category.DefaultCategoryDataset;
-
-import com.bdb.weather.common.DayHourRain;
 import com.bdb.weather.common.Extreme;
 import com.bdb.weather.common.Statistics;
 import com.bdb.weather.common.TemperatureRecordType;
 import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.measurement.Depth;
+import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
-import com.bdb.weather.display.DisplayConstants;
 /**
  * Need fields for:
  * Temperatures:
@@ -80,27 +80,12 @@ import com.bdb.weather.display.DisplayConstants;
  */
 
 @SuppressWarnings("serial")
-public class DailySummariesTextPanel extends VBox {
+public class DailySummariesStatisticsPane extends VBox {
     private static final int DATE_FIELD_LENGTH = 10;
     private static final int DATETIME_FIELD_LENGTH = 15;
     private static final int PRESSURE_FIELD_LENGTH = 5;
     private static final int HUMIDITY_FIELD_LENGTH = 4;
     private static final int RAIN_FIELD_LENGTH = 6;
-    private final JTextField   totalRain = new JTextField("0.00", RAIN_FIELD_LENGTH);
-    private final JTextField   maxRainRate = new JTextField("0.00/hr", RAIN_FIELD_LENGTH + "hour".length());
-    private final JTextField   maxRainRateTime = new JTextField(DATETIME_FIELD_LENGTH);
-    private final JTextField   rainDays = new JTextField(3);
-    private final JTextField   maxRainDayDepth = new JTextField(RAIN_FIELD_LENGTH);
-    private final JTextField   maxRainDayDate = new JTextField(DATE_FIELD_LENGTH);
-    private final JTextField   avgRainPerDay = new JTextField(RAIN_FIELD_LENGTH);
-    private final JTextField   maxWindSpeed = new JTextField(5);
-    private final JTextField   maxWindSpeedTime = new JTextField(DATETIME_FIELD_LENGTH);
-    private final JTextField   maxWindGust = new JTextField(5);
-    private final JTextField   maxWindGustTime = new JTextField(DATETIME_FIELD_LENGTH);
-    private final JTextField   avgWindSpeed = new JTextField(5);
-    private final DefaultCategoryDataset hourRainDataset = new DefaultCategoryDataset();
-    private final JTextField   maxAvgWindSpeed = new JTextField(5);
-    private final JTextField   maxAvgWindSpeedDate = new JTextField(DATE_FIELD_LENGTH);
     private final JTextField   minPressure = new JTextField(PRESSURE_FIELD_LENGTH);
     private final JTextField   minPressureTime = new JTextField(DATETIME_FIELD_LENGTH);
     private final JTextField   maxPressure = new JTextField(PRESSURE_FIELD_LENGTH);
@@ -121,29 +106,30 @@ public class DailySummariesTextPanel extends VBox {
     private final JTextField   largestHumidityRangeDate = new JTextField(DATE_FIELD_LENGTH);
     private final DefaultTableModel   tableModel = new DefaultTableModel();
     private final JTable       recordTable = new JTable(tableModel);
-    private final TemperatureSummaryPane temperatureSummaryPane = new TemperatureSummaryPane();
-    private final RainSummaryPane rainSummaryPane = new RainSummaryPane();
+
+    @FXML private TitledPane             temperatureTitledPane;
+    @FXML private TemperatureSummaryPane temperatureSummaryPane;
+    @FXML private TitledPane             rainTitledPane;
+    @FXML private RainSummaryPane        rainSummaryPane;
+    @FXML private TitledPane             windTitledPane;
+    @FXML private WindSummaryPane        windSummaryPane;
+
     private static final String[] COLUMN_NAMES = {
         "Date", "Record", "Type", "Previous Record Date", "Previous Record"
     };
     
-    public DailySummariesTextPanel() {
-        super();
+    @SuppressWarnings("LeakingThisInConstructor")
+    public DailySummariesStatisticsPane() {
         
-        totalRain.setEditable(false);
-        maxRainRate.setEditable(false);
-        maxRainRateTime.setEditable(false);
-        rainDays.setEditable(false);
-        maxRainDayDepth.setEditable(false);
-        maxRainDayDate.setEditable(false);
-        avgRainPerDay.setEditable(false);
-        maxWindSpeed.setEditable(false);
-        maxWindSpeedTime.setEditable(false);
-        maxWindGust.setEditable(false);
-        maxWindGustTime.setEditable(false);
-        avgWindSpeed.setEditable(false);
-        maxAvgWindSpeed.setEditable(false);
-        maxAvgWindSpeedDate.setEditable(false);
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/DailySummariesStatistics.fxml"));
+            fxmlLoader.setRoot(this);
+            fxmlLoader.setController(this);
+            fxmlLoader.load();
+        }
+	catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
         minPressure.setEditable(false);
         minPressureTime.setEditable(false);
         maxPressure.setEditable(false);
@@ -163,80 +149,13 @@ public class DailySummariesTextPanel extends VBox {
         largestHumidityRange.setEditable(false);
         largestHumidityRangeDate.setEditable(false);
         
-        TitledPane pane = new TitledPane();
-        pane.setText("Temperature (" + Temperature.getDefaultUnit() + ")");
-        pane.setCollapsible(false);
-        pane.setContent(temperatureSummaryPane);
-        this.getChildren().add(pane);
+        temperatureTitledPane.setText(temperatureTitledPane.getText() + "(" + Temperature.getDefaultUnit() + ")");
+        rainTitledPane.setText(rainTitledPane.getText() + "(" + Depth.getDefaultUnit() + ")");
+        windTitledPane.setText(windTitledPane.getText() + "(" + Speed.getDefaultUnit() + ")");
 
-        pane = new TitledPane();
-        pane.setText("Rain (" + Depth.getDefaultUnit() + ")");
-        pane.setCollapsible(false);
-        pane.setContent(rainSummaryPane);
-        this.getChildren().add(pane);
         /*
         
         tempTextPanel.add(extremesPanel);
-        
-        BorderPane rainPanel = new BorderPane();
-        
-        JPanel windPressureHumidityPanel = new JPanel(new GridLayout(1,0));
-        
-        GridPane windPanel = new GridPane();
-        //windPanel.setBorder(new TitleBorder(innerBorder, "Wind (" + Speed.getDefaultUnit() + ")"));
-        
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        windPanel.add(new Label("Maximum Speed:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        windPanel.add(maxWindSpeed, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        windPanel.add(new Label("at"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        windPanel.add(maxWindSpeedTime, gbc);      
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        windPanel.add(new Label("Maximum Gust:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        windPanel.add(maxWindGust, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        windPanel.add(new Label("at"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        windPanel.add(maxWindGustTime, gbc);      
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        windPanel.add(new Label("Windiest Day:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        windPanel.add(maxAvgWindSpeed, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        windPanel.add(new Label("on"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        windPanel.add(maxAvgWindSpeedDate, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        windPanel.add(new Label("Average:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        windPanel.add(avgWindSpeed, gbc);
-        
-        windPressureHumidityPanel.add(windPanel);
         
         JPanel pressurePanel = new JPanel(new GridBagLayout());
         pressurePanel.setBorder(new TitledBorder(innerBorder, "Pressure (" + Pressure.getDefaultUnit() + ")"));
@@ -407,20 +326,11 @@ public class DailySummariesTextPanel extends VBox {
     public void loadData(Statistics rec, WeatherAverage seasonalAverages, List<Extreme<Temperature,TemperatureRecordType>> records) {
         temperatureSummaryPane.loadData(rec, seasonalAverages);
         rainSummaryPane.loadData(rec);
+        windSummaryPane.loadData(rec);
 
         DateTimeFormatter dateTime = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
         DateTimeFormatter dateOnly = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
 
-        
-        
-        maxWindSpeed.setText("" + rec.getMaxWindSpeed());
-        maxWindSpeedTime.setText(dateTime.format(rec.getMaxWindSpeedTime()));
-        maxWindGust.setText("" + rec.getMaxWindGust());
-        maxWindGustTime.setText(dateTime.format(rec.getMaxWindGustTime()));
-        avgWindSpeed.setText("" + rec.getAvgWindSpeed());
-        maxAvgWindSpeed.setText("" + rec.getMaxAvgWindSpeed().getValue());
-        maxAvgWindSpeedDate.setText(dateOnly.format(rec.getMaxAvgWindSpeed().getTime()));
-        
         minPressure.setText(rec.getMinBaroPressure().toString());
         minPressureTime.setText(dateTime.format(rec.getMinBaroPressureTime()));
         maxPressure.setText(rec.getMaxBaroPressure().toString());
