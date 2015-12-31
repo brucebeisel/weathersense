@@ -24,7 +24,6 @@ import java.util.TimeZone;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TableView;
 
 import org.jfree.chart.ChartFactory;
@@ -49,6 +48,7 @@ import com.bdb.util.TimeUtils;
 
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.measurement.Speed;
+import com.bdb.weather.display.ChartDataPane;
 import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.ViewLauncher;
 import com.bdb.weather.display.WeatherSenseConstants;
@@ -60,7 +60,7 @@ import com.bdb.weather.display.axis.WindSpeedRangeAxis;
  * @author Bruce
  *
  */
-public class WindSummary extends TabPane implements ChartMouseListenerFX {
+public class WindSummary extends ChartDataPane implements ChartMouseListenerFX {
     private XYPlot                    plot;
     private DateAxis                  dateAxis;
     private NumberAxis                valueAxis;
@@ -80,19 +80,13 @@ public class WindSummary extends TabPane implements ChartMouseListenerFX {
     private static final int GUST_SERIES = 1;
     
     public WindSummary(SummaryInterval interval, ViewLauncher launcher, SummarySupporter supporter) {
+        this.setPrefSize(500, 300);
         this.interval = interval;
         this.launcher = launcher;
         this.supporter = supporter;
         ChartViewer panel = createPlot();
         Node node = createTable();
-        
-        Tab tab = new Tab(DisplayConstants.GRAPH_TAB_NAME);
-        tab.setContent(panel);
-        this.getTabs().add(tab);
-
-        tab = new Tab(DisplayConstants.DATA_TAB_NAME);
-        tab.setContent(node);
-        this.getTabs().add(tab);
+        this.setTabContents(panel, node);
     }
     
     /**
@@ -104,6 +98,7 @@ public class WindSummary extends TabPane implements ChartMouseListenerFX {
         JFreeChart chart = ChartFactory.createXYLineChart("", "", "", null, PlotOrientation.VERTICAL, true, true, true);
         plot = (XYPlot)chart.getPlot();
         ChartViewer panel = new ChartViewer(chart);
+        panel.setPrefSize(500, 300);
         panel.addChartMouseListener(this);
         
         //

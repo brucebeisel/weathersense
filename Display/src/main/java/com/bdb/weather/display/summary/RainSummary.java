@@ -22,9 +22,6 @@ import java.util.List;
 import java.util.TimeZone;
 
 import javafx.scene.Node;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import org.jfree.chart.ChartFactory;
@@ -48,7 +45,6 @@ import com.bdb.util.TimeUtils;
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.display.ChartDataPane;
-import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.axis.RainRangeAxis;
 
 /**
@@ -81,6 +77,7 @@ public class RainSummary extends ChartDataPane implements ChartMouseListenerFX {
 
     @SuppressWarnings("LeakingThisInConstructor")
     public RainSummary(SummaryInterval interval, SummarySupporter supporter) {
+        this.setPrefSize(500, 300);
         this.interval = interval;
         this.supporter = supporter;
         Node component = createChartElements();
@@ -92,6 +89,7 @@ public class RainSummary extends ChartDataPane implements ChartMouseListenerFX {
     private Node createChartElements() {
         chart = ChartFactory.createXYBarChart("Water Cycle", "Date", true, "", null, PlotOrientation.VERTICAL, true, true, false);
         ChartViewer chartViewer = new ChartViewer(chart);
+        chartViewer.setPrefSize(500, 300);
         chartViewer.addChartMouseListener(this);
 
         rainPlot = (XYPlot)chart.getPlot();

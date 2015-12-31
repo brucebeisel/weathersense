@@ -89,10 +89,12 @@ public class TemperatureDeviationPlotPanel extends ChartDataPane {
     };
 
     public TemperatureDeviationPlotPanel(SummaryInterval interval, ViewLauncher theLauncher, SummarySupporter theSupporter) {
+        this.setPrefSize(500, 300);
         this.interval = interval;
 	chart = ChartFactory.createXYBarChart("Deviation from Average Temperature", "Date", true, "Deviation (" + Temperature.getDefaultUnit() + ")", null, PlotOrientation.VERTICAL, true, true, false);
 
 	chartViewer = new ChartViewer(chart);
+        chartViewer.setPrefSize(500, 300);
 	chartViewer.addChartMouseListener(new ChartMouseListenerFX() {
             @Override
             public void chartMouseClicked(ChartMouseEventFX event) {

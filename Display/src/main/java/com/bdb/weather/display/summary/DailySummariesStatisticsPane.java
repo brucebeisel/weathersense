@@ -17,12 +17,9 @@
 package com.bdb.weather.display.summary;
 
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.List;
 
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import javafx.fxml.FXML;
@@ -35,6 +32,7 @@ import com.bdb.weather.common.Statistics;
 import com.bdb.weather.common.TemperatureRecordType;
 import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.measurement.Depth;
+import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
 /**
@@ -86,33 +84,18 @@ public class DailySummariesStatisticsPane extends VBox {
     private static final int PRESSURE_FIELD_LENGTH = 5;
     private static final int HUMIDITY_FIELD_LENGTH = 4;
     private static final int RAIN_FIELD_LENGTH = 6;
-    private final JTextField   minPressure = new JTextField(PRESSURE_FIELD_LENGTH);
-    private final JTextField   minPressureTime = new JTextField(DATETIME_FIELD_LENGTH);
-    private final JTextField   maxPressure = new JTextField(PRESSURE_FIELD_LENGTH);
-    private final JTextField   maxPressureTime = new JTextField(DATETIME_FIELD_LENGTH);
-    private final JTextField   avgPressure = new JTextField(PRESSURE_FIELD_LENGTH);
-    private final JTextField   smallestPressureRange = new JTextField(PRESSURE_FIELD_LENGTH * 3);
-    private final JTextField   smallestPressureRangeDate = new JTextField(DATE_FIELD_LENGTH);
-    private final JTextField   largestPressureRange = new JTextField(PRESSURE_FIELD_LENGTH * 3);
-    private final JTextField   largestPressureRangeDate = new JTextField(DATE_FIELD_LENGTH);
-    private final JTextField   minHumidity = new JTextField(HUMIDITY_FIELD_LENGTH);
-    private final JTextField   minHumidityTime = new JTextField(DATETIME_FIELD_LENGTH);
-    private final JTextField   maxHumidity = new JTextField(HUMIDITY_FIELD_LENGTH);
-    private final JTextField   maxHumidityTime = new JTextField(DATETIME_FIELD_LENGTH);
-    private final JTextField   avgHumidity = new JTextField(HUMIDITY_FIELD_LENGTH);
-    private final JTextField   smallestHumidityRange = new JTextField(HUMIDITY_FIELD_LENGTH * 3);
-    private final JTextField   smallestHumidityRangeDate = new JTextField(DATE_FIELD_LENGTH);
-    private final JTextField   largestHumidityRange = new JTextField(HUMIDITY_FIELD_LENGTH * 3);
-    private final JTextField   largestHumidityRangeDate = new JTextField(DATE_FIELD_LENGTH);
     private final DefaultTableModel   tableModel = new DefaultTableModel();
     private final JTable       recordTable = new JTable(tableModel);
 
-    @FXML private TitledPane             temperatureTitledPane;
-    @FXML private TemperatureSummaryPane temperatureSummaryPane;
-    @FXML private TitledPane             rainTitledPane;
-    @FXML private RainSummaryPane        rainSummaryPane;
-    @FXML private TitledPane             windTitledPane;
-    @FXML private WindSummaryPane        windSummaryPane;
+    @FXML private TitledPane                temperatureTitledPane;
+    @FXML private TemperatureStatisticsPane temperatureStatisticsPane;
+    @FXML private TitledPane                rainTitledPane;
+    @FXML private RainStatisticsPane        rainStatisticsPane;
+    @FXML private TitledPane                windTitledPane;
+    @FXML private WindStatisticsPane        windStatisticsPane;
+    @FXML private TitledPane                pressureTitledPane;
+    @FXML private PressureStatisticsPane    pressureStatisticsPane;
+    @FXML private HumidityStatisticsPane    humidityStatisticsPane;
 
     private static final String[] COLUMN_NAMES = {
         "Date", "Record", "Type", "Previous Record Date", "Previous Record"
@@ -130,175 +113,13 @@ public class DailySummariesStatisticsPane extends VBox {
 	catch (IOException exception) {
             throw new RuntimeException(exception);
         }
-        minPressure.setEditable(false);
-        minPressureTime.setEditable(false);
-        maxPressure.setEditable(false);
-        maxPressureTime.setEditable(false);
-        avgPressure.setEditable(false);
-        smallestPressureRange.setEditable(false);
-        smallestPressureRangeDate.setEditable(false);
-        largestPressureRange.setEditable(false);
-        largestPressureRangeDate.setEditable(false);
-        minHumidity.setEditable(false);
-        minHumidityTime.setEditable(false);
-        maxHumidity.setEditable(false);
-        maxHumidityTime.setEditable(false);
-        avgHumidity.setEditable(false);
-        smallestHumidityRange.setEditable(false);
-        smallestHumidityRangeDate.setEditable(false);
-        largestHumidityRange.setEditable(false);
-        largestHumidityRangeDate.setEditable(false);
         
-        temperatureTitledPane.setText(temperatureTitledPane.getText() + "(" + Temperature.getDefaultUnit() + ")");
-        rainTitledPane.setText(rainTitledPane.getText() + "(" + Depth.getDefaultUnit() + ")");
-        windTitledPane.setText(windTitledPane.getText() + "(" + Speed.getDefaultUnit() + ")");
+        temperatureTitledPane.setText(temperatureTitledPane.getText() + " (" + Temperature.getDefaultUnit() + ")");
+        rainTitledPane.setText(rainTitledPane.getText() + " (" + Depth.getDefaultUnit() + ")");
+        windTitledPane.setText(windTitledPane.getText() + " (" + Speed.getDefaultUnit() + ")");
+        pressureTitledPane.setText(pressureTitledPane.getText() + " (" + Pressure.getDefaultUnit() + ")");
 
         /*
-        
-        tempTextPanel.add(extremesPanel);
-        
-        JPanel pressurePanel = new JPanel(new GridBagLayout());
-        pressurePanel.setBorder(new TitledBorder(innerBorder, "Pressure (" + Pressure.getDefaultUnit() + ")"));
-        
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        pressurePanel.add(new Label("Minimum:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        pressurePanel.add(minPressure, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        pressurePanel.add(new Label("at"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        pressurePanel.add(minPressureTime, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        pressurePanel.add(new Label("Maximum:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        pressurePanel.add(maxPressure, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        pressurePanel.add(new Label("at"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        pressurePanel.add(maxPressureTime, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        pressurePanel.add(new Label("Average:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        pressurePanel.add(avgPressure, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        pressurePanel.add(new Label("Smallest Range:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        pressurePanel.add(smallestPressureRange, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        pressurePanel.add(new Label("on"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        pressurePanel.add(smallestPressureRangeDate, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        pressurePanel.add(new Label("Largest Range:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        pressurePanel.add(largestPressureRange, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        pressurePanel.add(new Label("on"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        pressurePanel.add(largestPressureRangeDate, gbc);
-        
-        windPressureHumidityPanel.add(pressurePanel);
-        
-        GridPane humidityPanel = new GridPane();
-        //humidityPanel.setBorder(new TitledBorder(innerBorder, "Humidity (%)"));
-        
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        humidityPanel.add(new JBoldLabel("Minimum:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        humidityPanel.add(minHumidity, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        humidityPanel.add(new JLabel("at"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        humidityPanel.add(minHumidityTime, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        humidityPanel.add(new JBoldLabel("Maximum:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        humidityPanel.add(maxHumidity, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        humidityPanel.add(new JLabel("at"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        humidityPanel.add(maxHumidityTime, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        humidityPanel.add(new JBoldLabel("Average:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        humidityPanel.add(avgHumidity, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        humidityPanel.add(new JBoldLabel("Smallest Range:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        humidityPanel.add(smallestHumidityRange, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        humidityPanel.add(new JLabel("on"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        humidityPanel.add(smallestHumidityRangeDate, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.anchor = GridBagConstraints.EAST;
-        humidityPanel.add(new JBoldLabel("Largest Range:"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        humidityPanel.add(largestHumidityRange, gbc);
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.CENTER;
-        humidityPanel.add(new JLabel("on"), gbc);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx++;
-        humidityPanel.add(largestHumidityRangeDate, gbc);
-        
-        windPressureHumidityPanel.add(humidityPanel);
-        
-        add(windPressureHumidityPanel);
-        
         DefaultTableColumnModel colModel = new DefaultTableColumnModel();
         recordTable.setColumnModel(colModel);
 
@@ -324,46 +145,15 @@ public class DailySummariesStatisticsPane extends VBox {
     
     // TODO Get the simple date formatter from a global class, like one that contains some sort of preferences
     public void loadData(Statistics rec, WeatherAverage seasonalAverages, List<Extreme<Temperature,TemperatureRecordType>> records) {
-        temperatureSummaryPane.loadData(rec, seasonalAverages);
-        rainSummaryPane.loadData(rec);
-        windSummaryPane.loadData(rec);
+        temperatureStatisticsPane.loadData(rec, seasonalAverages);
+        rainStatisticsPane.loadData(rec);
+        windStatisticsPane.loadData(rec);
+        pressureStatisticsPane.loadData(rec);
+        humidityStatisticsPane.loadData(rec);
 
-        DateTimeFormatter dateTime = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
-        DateTimeFormatter dateOnly = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-
-        minPressure.setText(rec.getMinBaroPressure().toString());
-        minPressureTime.setText(dateTime.format(rec.getMinBaroPressureTime()));
-        maxPressure.setText(rec.getMaxBaroPressure().toString());
-        maxPressureTime.setText(dateTime.format(rec.getMaxPressureTime()));
-        avgPressure.setText(rec.getAvgBaroPressure().toString());
-        
-        smallestPressureRange.setText("" + rec.getSmallestPressureRange().getRange() +
-                " (" + rec.getSmallestPressureRange().getMin() +
-                ", " + rec.getSmallestPressureRange().getMax() + ")");
-        smallestPressureRangeDate.setText(dateOnly.format(rec.getSmallestPressureRange().getDate()));
-        largestPressureRange.setText("" + rec.getLargestPressureRange().getRange() +
-                " (" + rec.getLargestPressureRange().getMin() +
-                ", " + rec.getLargestPressureRange().getMax() + ")");
-        largestPressureRangeDate.setText(dateOnly.format(rec.getLargestPressureRange().getDate()));
-        
-        minHumidity.setText(rec.getMinOutdoorHumidity().toString());
-        minHumidityTime.setText(dateTime.format(rec.getMinOutdoorHumidityTime()));
-        maxHumidity.setText(rec.getMaxOutdoorHumidity().toString());
-        maxHumidityTime.setText(dateTime.format(rec.getMaxOutdoorHumidityTime()));
-        avgHumidity.setText(rec.getAvgOutdoorHumidity().toString());
-        
-        smallestHumidityRange.setText("" + rec.getSmallestHumidityRange().getRange() +
-                " (" + rec.getSmallestHumidityRange().getMin() +
-                ", " + rec.getSmallestHumidityRange().getMax() + ")");
-        smallestHumidityRangeDate.setText(dateOnly.format(rec.getSmallestHumidityRange().getDate()));
-        largestHumidityRange.setText("" + rec.getLargestHumidityRange().getRange() +
-                " (" + rec.getLargestHumidityRange().getMin() +
-                ", " + rec.getLargestHumidityRange().getMax() + ")");
-        largestHumidityRangeDate.setText(dateOnly.format(rec.getLargestHumidityRange().getDate()));
-        
+        /*
         tableModel.setNumRows(records.size());
         
-        /*
         int n = 0;
         for (Extreme<Temperature,TemperatureRecordType> record : records) {
             tableModel.setValueAt(dateOnly.format(record.getDate()), n, 0);

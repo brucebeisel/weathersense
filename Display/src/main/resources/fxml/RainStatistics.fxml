@@ -3,11 +3,13 @@
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import com.bdb.weather.display.summary.*?>
 
-<fx:root type="BorderPane" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="BorderPane" xmlns:fx="http://javafx.com/fxml">
+    <padding> <Insets bottom="5" top="5" left="5" right="5"/> </padding>
     <left>
         <GridPane hgap="5" vgap="5">
             <Label text="Total:" styleClass="value-label" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="RIGHT" /> 

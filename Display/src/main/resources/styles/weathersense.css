@@ -12,3 +12,27 @@
     -fx-padding: 5;
     -fx-spacing: 5;
 }
+
+.speed-textfield {
+    -fx-pref-column-count: 5
+}
+
+.pressure-textfield {
+    -fx-pref-column-count: 4
+}
+
+.temperature-textfield {
+    -fx-pref-column-count: 5
+}
+
+.humidity-textfield {
+    -fx-pref-column-count: 4
+}
+
+.date-textfield {
+    -fx-pref-column-count: 12
+}
+
+.datetime-textfield {
+    -fx-pref-column-count: 15
+}

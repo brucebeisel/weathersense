@@ -20,18 +20,21 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
+import java.util.Arrays;
 import java.util.List;
 
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
@@ -52,23 +55,23 @@ import com.bdb.weather.common.db.TemperatureRecordTable;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.DateInterval;
 import com.bdb.weather.display.ViewLauncher;
+import com.bdb.weather.display.WeatherSense;
 
 public final class DailySummariesPanel extends BorderPane implements EventHandler, SummarySupporter
 {
-    private final SummariesGraphPanel         graphPanel;
-    private final DailySummariesStatisticsPane     textPanel;
-    private final DailySummaryTable           dailySummaryTable;
-    private final DailyAveragesTable          dailyAveragesTable;
-    private final TemperatureRecordTable      temperatureRecordTable;
-    private final TemperatureBinMgr           temperatureBinMgr;
-    private final WeatherStation              ws;
-    private LocalDate                         startDate;
-    private LocalDate                         endDate;
-    private final DateTimeFormatter           dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-    private final TextField                   startDateTF = new TextField();
-    private final TextField                   endDateTF = new TextField();
-    private final ComboBox                    intervalsCB = new ComboBox();
-    private final Button                      goButton = new Button("Go");
+    private final SummariesGraphPanel          graphPanel;
+    private final DailySummariesStatisticsPane textPanel;
+    private final DailySummaryTable            dailySummaryTable;
+    private final DailyAveragesTable           dailyAveragesTable;
+    private final TemperatureRecordTable       temperatureRecordTable;
+    private final TemperatureBinMgr            temperatureBinMgr;
+    private final WeatherStation               ws;
+    private LocalDate                          startDate;
+    private LocalDate                          endDate;
+    private final DatePicker                   startDatePicker = new DatePicker();
+    private final DatePicker                   endDatePicker = new DatePicker();
+    private final ComboBox                     intervalsCB = new ComboBox();
+    private final Button                       goButton = new Button("Go");
 
     @SuppressWarnings("LeakingThisInConstructor")
     public DailySummariesPanel(WeatherStation ws, DBConnection connection, ViewLauncher launcher, LocalDate start, LocalDate end, DateInterval interval) {
@@ -93,13 +96,17 @@ public final class DailySummariesPanel extends BorderPane implements EventHandle
 
         setCenter(tabPane);
 
+        intervalsCB.getItems().addAll(Arrays.asList(DateInterval.values()));
         HBox cmdPanel = new HBox();
+        cmdPanel.setAlignment(Pos.CENTER);
+        cmdPanel.setPadding(new Insets(10.0, 10.0, 10.0, 10.0));
+        cmdPanel.setSpacing(5.0);
 
         cmdPanel.getChildren().add(intervalsCB);
         cmdPanel.getChildren().add(new Label("Start:"));
-        cmdPanel.getChildren().add(startDateTF);
+        cmdPanel.getChildren().add(startDatePicker);
         cmdPanel.getChildren().add(new Label("End:"));
-        cmdPanel.getChildren().add(endDateTF);
+        cmdPanel.getChildren().add(endDatePicker);
         cmdPanel.getChildren().add(goButton);
 
         setTop(cmdPanel);
@@ -107,27 +114,23 @@ public final class DailySummariesPanel extends BorderPane implements EventHandle
         startDate = start;
         endDate = end;
 
-        startDateTF.setText(dateFormat.format(startDate));
-        endDateTF.setText(dateFormat.format(endDate));
+        startDatePicker.setValue(startDate);
+        endDatePicker.setValue(endDate);
         
         if (interval != DateInterval.CUSTOM) {
-            startDateTF.setEditable(false);
-            endDateTF.setEditable(false);
+            startDatePicker.setEditable(false);
+            endDatePicker.setEditable(false);
+            startDatePicker.setDisable(true);
+            endDatePicker.setDisable(true);
         }
         
         intervalsCB.getSelectionModel().select(interval);
-       // intervalsCB.setMaximumRowCount(intervalsCB.getItemCount());
         intervalsCB.setOnAction(this);
         
         goButton.setOnAction((ae)-> {
-            try {
-                startDate = LocalDate.from(dateFormat.parse(startDateTF.getText()));
-                endDate = LocalDate.from(dateFormat.parse(endDateTF.getText()));
-                loadData(startDate, endDate);
-            }
-            catch (DateTimeParseException e) {
-                // TODO Add dialog that indicates a bad date was entered.
-            }
+            startDate = startDatePicker.getValue();
+            endDate = endDatePicker.getValue();
+            loadData(startDate, endDate);
         });
 
         goButton.setDisable(true);
@@ -169,7 +172,7 @@ public final class DailySummariesPanel extends BorderPane implements EventHandle
 
             DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
             String dateString = df.format(startDate) + " - " + df.format(endDate);
-            //WeatherSense.setStageTitle(this, dateString);
+            WeatherSense.setStageTitle(this, dateString);
         }
     }
 
@@ -205,11 +208,13 @@ public final class DailySummariesPanel extends BorderPane implements EventHandle
 
             boolean editable = interval == DateInterval.CUSTOM;
 
-            startDateTF.setEditable(editable);
-            endDateTF.setEditable(editable);
+            startDatePicker.setEditable(editable);
+            startDatePicker.setDisable(!editable);
+            endDatePicker.setEditable(editable);
+            endDatePicker.setDisable(!editable);
             goButton.setDisable(!editable);
-            startDateTF.setText(dateFormat.format(range.getStart()));
-            endDateTF.setText(dateFormat.format(range.getEnd()));
+            startDatePicker.setValue(range.getStart().toLocalDate());
+            endDatePicker.setValue(range.getEnd().toLocalDate());
             
             if (!editable) {
                 startDate = range.getStart().toLocalDate();
@@ -217,6 +222,5 @@ public final class DailySummariesPanel extends BorderPane implements EventHandle
                 loadData(startDate, endDate);
             }
         }
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

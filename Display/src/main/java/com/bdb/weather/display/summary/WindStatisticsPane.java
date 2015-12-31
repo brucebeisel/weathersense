@@ -31,7 +31,7 @@ import com.bdb.weather.common.Statistics;
  *
  * @author bruce
  */
-public class WindSummaryPane extends GridPane {
+public class WindStatisticsPane extends GridPane {
     @FXML private TextField maximumSpeed;
     @FXML private TextField maximumGust;
     @FXML private TextField windiestDayAverage;
@@ -41,9 +41,9 @@ public class WindSummaryPane extends GridPane {
     @FXML private TextField windiestDayAverageDate;
 
     @SuppressWarnings("LeakingThisInConstructor")
-    public WindSummaryPane() {
+    public WindStatisticsPane() {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/WindSummary.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/WindStatistics.fxml"));
             fxmlLoader.setRoot(this);
             fxmlLoader.setController(this);
             fxmlLoader.load();

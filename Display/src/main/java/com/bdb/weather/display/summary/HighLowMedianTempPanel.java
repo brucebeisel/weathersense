@@ -102,6 +102,7 @@ public class HighLowMedianTempPanel extends ChartDataPane implements ChartMouseL
      */
     @SuppressWarnings("LeakingThisInConstructor")
     public HighLowMedianTempPanel(SummaryInterval interval, ViewLauncher launcher, SummarySupporter supporter) {
+        this.setPrefSize(500, 300);
         this.interval = interval;
         tableHeadings = getTableColumnLabels();
         chart = ChartFactory.createXYLineChart("", "", "", null, PlotOrientation.VERTICAL, true, true, true);
@@ -134,6 +135,7 @@ public class HighLowMedianTempPanel extends ChartDataPane implements ChartMouseL
         plot.setDomainAxis(dateAxis);
         
         chartViewer = new ChartViewer(chart);
+        chartViewer.setPrefSize(500, 300);
         chartViewer.addChartMouseListener(this);
 
 

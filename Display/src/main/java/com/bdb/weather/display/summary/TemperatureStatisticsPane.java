@@ -32,7 +32,7 @@ import com.bdb.weather.common.WeatherAverage;
  *
  * @author bruce
  */
-public class TemperatureSummaryPane extends BorderPane {
+public class TemperatureStatisticsPane extends BorderPane {
     @FXML private TextField minimumLow;
     @FXML private TextField minimumLowTime;
     @FXML private TextField maximumLow;
@@ -61,9 +61,9 @@ public class TemperatureSummaryPane extends BorderPane {
     @FXML private TemperatureBinSummaryPlot temperatureBinSummaryPlot;
 
     @SuppressWarnings("LeakingThisInConstructor")
-    public TemperatureSummaryPane() {
+    public TemperatureStatisticsPane() {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/TemperatureSummary.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/TemperatureStatistics.fxml"));
             fxmlLoader.setRoot(this);
             fxmlLoader.setController(this);
             fxmlLoader.load();

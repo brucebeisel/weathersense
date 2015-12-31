@@ -24,13 +24,11 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.BorderPane;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -108,7 +106,7 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
     
     @SuppressWarnings("LeakingThisInConstructor")
     public HighLowPanel(String title, SummaryInterval interval, ViewLauncher launcher, SummarySupporter supporter, ValueAxis rangeAxis, String domainAxisLabel, SeriesInfo<T>[] seriesList, NumberFormat format) {
-        super();
+        this.setPrefSize(500, 300);
         this.interval = interval;
         this.launcher = launcher;
         this.supporter = supporter;
@@ -132,6 +130,7 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
  
         ChartViewer chartViewer = new ChartViewer(chart);
         chartViewer.addChartMouseListener(this);
+        chartViewer.setPrefSize(500, 300);
         
         series = new OHLCSeries[seriesList.length];
         

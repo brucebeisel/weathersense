@@ -33,7 +33,7 @@ import com.bdb.weather.display.DisplayConstants;
  *
  * @author bruce
  */
-public class RainSummaryPane extends BorderPane {
+public class RainStatisticsPane extends BorderPane {
     @FXML private RainHourChart rainHourChart;
     @FXML private TextField     totalRainfall;
     @FXML private TextField     maxRainfallRate;
@@ -44,9 +44,9 @@ public class RainSummaryPane extends BorderPane {
     @FXML private TextField     maxRainfallDayDate;
 
     @SuppressWarnings("LeakingThisInConstructor")
-    public RainSummaryPane() {
+    public RainStatisticsPane() {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/RainSummary.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/RainStatistics.fxml"));
             fxmlLoader.setRoot(this);
             fxmlLoader.setController(this);
             fxmlLoader.load();
