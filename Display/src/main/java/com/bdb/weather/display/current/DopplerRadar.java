@@ -50,7 +50,7 @@ import com.bdb.weather.common.DopplerRadarImage;
 import com.bdb.weather.common.db.DopplerRadarTable;
 
 /**
- * A Swing component that animates the series of Doppler radar images that are stored in the database.
+ * A JavaFX node that animates the series of Doppler radar images that are stored in the database.
  * 
  * @author Bruce
  *

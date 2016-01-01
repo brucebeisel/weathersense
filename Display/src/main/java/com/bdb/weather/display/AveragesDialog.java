@@ -21,8 +21,6 @@ import java.awt.Frame;
 import javax.swing.JDialog;
 
 public class AveragesDialog extends JDialog {
-    private static final long serialVersionUID = 6387376478791306151L;
-
     public AveragesDialog(Frame frame) {
         pack();
         setLocationRelativeTo(frame);

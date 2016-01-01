@@ -16,9 +16,6 @@
  */
 package com.bdb.weather.display;
 
-
-import javax.swing.JOptionPane;
-
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;

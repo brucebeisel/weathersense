@@ -24,8 +24,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
+import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
+import javafx.scene.layout.FlowPane;
 
 import com.bdb.util.DateButton;
 
@@ -33,10 +34,10 @@ import com.bdb.util.DateButton;
  *
  * @author Bruce
  */
-public class DaySelectionPanel extends JPanel implements ActionListener, PropertyChangeListener {
+public class DaySelectionPanel extends FlowPane {
     private static final String NEXT_CMD = "Next";
     private static final String PREV_CMD = "Prev";
-    private final DateButton dateButton = new DateButton();
+    private final DatePicker datePicker = new DatePicker();
     private final List<DateChangedListener> listeners = new ArrayList<>();
     private LocalDate currentDate;
 
@@ -44,25 +45,28 @@ public class DaySelectionPanel extends JPanel implements ActionListener, Propert
         public void dateChanged(LocalDate date);
     }
 
-    @SuppressWarnings("LeakingThisInConstructor")
     public DaySelectionPanel(LocalDate day) {
-        JButton downButton = new JButton(PREV_CMD);
-        downButton.addActionListener(this);
-        downButton.setActionCommand(PREV_CMD);
+        Button downButton = new Button(PREV_CMD);
+        downButton.setOnAction((event) -> {
+            currentDate = currentDate.minusDays(1);
+            datePicker.setValue(currentDate);
+            notifyListeners();
+        });
 
-        JButton upButton = new JButton(NEXT_CMD);
-        upButton.addActionListener(this);
-        upButton.setActionCommand(NEXT_CMD);
+        Button upButton = new Button(NEXT_CMD);
+        upButton.setOnAction((event) -> {
+            currentDate = currentDate.plusDays(1);
+            datePicker.setValue(currentDate);
+            notifyListeners();
+        });
 
-        this.add(downButton);
-        this.add(dateButton);
-        this.add(upButton);
-
-        dateButton.addPropertyChangeListener(this);
+        this.getChildren().add(downButton);
+        this.getChildren().add(datePicker);
+        this.getChildren().add(upButton);
 
         currentDate = day;
 
-        dateButton.setDate(currentDate);
+        datePicker.setValue(currentDate);
     }
 
     public void addDateChangedListener(DateChangedListener listener) {
@@ -78,32 +82,5 @@ public class DaySelectionPanel extends JPanel implements ActionListener, Propert
         listeners.stream().forEach((listener) -> {
             listener.dateChanged(currentDate);
         });
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        String prop = evt.getPropertyName();
-
-        if (prop.equals(DateButton.DATE_PROPERTY)) {
-            currentDate = (LocalDate)evt.getNewValue();
-            notifyListeners();
-        }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent event) {
-        String cmd = event.getActionCommand();
-
-        switch (cmd) {
-            case NEXT_CMD:
-                currentDate = currentDate.plusDays(1);
-                break;
-            case PREV_CMD:
-                currentDate = currentDate.minusDays(1);
-                break;
-        }
-
-        dateButton.setDate(currentDate);
-        notifyListeners();
     }
 }

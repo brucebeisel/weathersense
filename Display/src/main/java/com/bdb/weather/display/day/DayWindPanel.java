@@ -129,7 +129,7 @@ public class DayWindPanel extends DayXYPlotPanel {
 
     /*
      * (non-Javadoc)
-     * @see com.bdb.weather.display.day.DayXYPlotPanel#loadDataSeries(java.util.List, org.jfree.data.time.TimeSeriesCollection, javax.swing.table.DefaultTableModel)
+     * @see com.bdb.weather.display.day.DayXYPlotPanel#loadDataSeries(java.util.List, org.jfree.data.time.TimeSeriesCollection)
      */
     @Override
     protected void loadDataSeries(List<HistoricalRecord> list) {

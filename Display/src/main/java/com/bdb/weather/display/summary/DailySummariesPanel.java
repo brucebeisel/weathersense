@@ -18,7 +18,6 @@ package com.bdb.weather.display.summary;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +27,9 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -97,6 +98,7 @@ public final class DailySummariesPanel extends BorderPane implements EventHandle
         setCenter(tabPane);
 
         intervalsCB.getItems().addAll(Arrays.asList(DateInterval.values()));
+        intervalsCB.setVisibleRowCount(intervalsCB.getItems().size());
         HBox cmdPanel = new HBox();
         cmdPanel.setAlignment(Pos.CENTER);
         cmdPanel.setPadding(new Insets(10.0, 10.0, 10.0, 10.0));
@@ -145,18 +147,17 @@ public final class DailySummariesPanel extends BorderPane implements EventHandle
         WeatherAverage seasonalAverages = dailyAveragesTable.retrieveCustomAverages(startDate.getMonth(), startDate.getDayOfMonth(),
                                                                                     endDate.getMonth(), endDate.getDayOfMonth());
                                                 
-        if (summaryRecords.isEmpty())
-            //SwingUtilities.invokeLater(() -> {
-            //    JOptionPane.showMessageDialog(getParentFrame(), "No data available for date range", "No Data", JOptionPane.INFORMATION_MESSAGE);
-            ;
+        if (summaryRecords.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "No data available for date range", ButtonType.OK);
+            alert.showAndWait();
             // TODO put combobox back to original value, probably the same for the text fields when in custom mode.
+        }
         else {
             WeatherAverages dailyAverages = dailyAveragesTable.retrieveDailyAverages();
 
             if (dailyAverages == null) {
-                //SwingUtilities.invokeLater(() -> {
-                //    JOptionPane.showMessageDialog(getParentFrame(), "No weather average data", "No Averages", JOptionPane.INFORMATION_MESSAGE);
-                //});
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "No weather average data", ButtonType.OK);
+                alert.showAndWait();
                 return;
             }
 
@@ -194,7 +195,6 @@ public final class DailySummariesPanel extends BorderPane implements EventHandle
     @Override
     public void launchView(ViewLauncher launcher, LocalDate date) {
         launcher.launchDaySummaryView(date);
-        
     }
 
     @Override

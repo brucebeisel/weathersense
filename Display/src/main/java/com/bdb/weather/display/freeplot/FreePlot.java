@@ -17,11 +17,8 @@
 package com.bdb.weather.display.freeplot;
 
 import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Stroke;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,21 +29,24 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
 
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.plot.XYPlot;
 
 import com.bdb.weather.common.DateRange;
 import com.bdb.weather.display.DataRangeSelectionPanel;
+import com.bdb.weather.display.ErrorDisplayer;
 
 /**
  * A JPanel that contains a Free plot. A free plot is one where any value can be displayed
@@ -55,7 +55,7 @@ import com.bdb.weather.display.DataRangeSelectionPanel;
  * @author Bruce
  *
  */
-public class FreePlot implements ActionListener {
+public class FreePlot extends BorderPane implements EventHandler<ActionEvent> {
     /**
      * An interface to create the series collections, the group controls and retrieve the data from the database.
      * 
@@ -63,13 +63,12 @@ public class FreePlot implements ActionListener {
      *
      */
     interface SeriesCollectionFactory {
-        Map<String,SeriesGroupControl> createSeriesGroupControls(ActionListener listener);
+        Map<String,SeriesGroupControl> createSeriesGroupControls(EventHandler<ActionEvent> listener);
         List<FreePlotSeriesCollection> createSeriesCollections(XYPlot plot, int domainAxisIndex, Stroke stroke);
         List<?> retrieveData(LocalDateTime startDate, LocalDateTime endDate) throws SQLException;
     }
     
     private static final String LOAD_DATA_BUTTON = "Load Data";
-    private final JComponent                      component = new JPanel(new BorderLayout());
     private final XYPlot                          plot = new XYPlot();
     private List<FreePlotSeriesCollection>        collections;
     private final Map<String, SeriesGroupControl> controls;
@@ -95,13 +94,13 @@ public class FreePlot implements ActionListener {
     FreePlot(SeriesCollectionFactory seriesFactory) {
         controls = seriesFactory.createSeriesGroupControls(this);
         factory = seriesFactory;
-        component.add(createDataRangeSelectionPanel(), BorderLayout.NORTH);
-        component.add(createDataSelectionPanel(controls.values()), BorderLayout.WEST);
+        this.setTop(createDataRangeSelectionPanel());
+        this.setLeft(createDataSelectionPanel(controls.values()));
         
-        ChartPanel chartPanel = new ChartPanel(new JFreeChart(plot));
-        chartPanel.setMaximumDrawHeight(20000);
-        chartPanel.setMaximumDrawWidth(20000);
-        component.add(chartPanel, BorderLayout.CENTER);
+        ChartViewer chartViewer = new ChartViewer(new JFreeChart(plot));
+        chartViewer.setMaxHeight(20000);
+        chartViewer.setMaxWidth(20000);
+        this.setCenter(chartViewer);
         
         //
         // Create a default Y Axis
@@ -115,15 +114,6 @@ public class FreePlot implements ActionListener {
         plot.setRangeGridlinePaint(Color.BLACK);
         
         buildStrokes();
-    }
-    
-    /**
-     * Get the Swing component that is the container for a Free Plot.
-     * 
-     * @return The Swing container component
-     */
-    public JComponent getComponent() {
-        return component;
     }
     
     /**
@@ -149,12 +139,12 @@ public class FreePlot implements ActionListener {
      * 
      * @return The Swing component
      */
-    private JComponent createDataRangeSelectionPanel() {
+    private Node createDataRangeSelectionPanel() {
         LocalDate start = LocalDate.now();
         LocalDate end = LocalDate.now();
         
         dataRangePanel = new DataRangeSelectionPanel(start, end);
-        return dataRangePanel.getComponent();
+        return dataRangePanel;
     }
     
     /**
@@ -164,27 +154,29 @@ public class FreePlot implements ActionListener {
      * 
      * @return The Swing component
      */
-    private JComponent createDataSelectionPanel(Collection<SeriesGroupControl> controls) {
-        JPanel p = new JPanel();
-        p.setLayout(new BorderLayout());
+    private Node createDataSelectionPanel(Collection<SeriesGroupControl> controls) {
+        BorderPane p = new BorderPane();
         
-        Box box = Box.createVerticalBox();
+        VBox box = new VBox();
 
-        JButton b = new JButton(LOAD_DATA_BUTTON);
-        b.addActionListener(this);
-        b.setActionCommand(LOAD_DATA_BUTTON);
-        b.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        box.add(b);
+        Button b = new Button(LOAD_DATA_BUTTON);
+        b.setOnAction((event) -> {
+            loadData();
+            displayData();
+        });
+        //b.setActionCommand(LOAD_DATA_BUTTON);
+        //b.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        box.getChildren().add(b);
         
         for (SeriesGroupControl control : controls) {
-            JComponent collectionPanel = control.getComponent();
-            box.add(collectionPanel);
+            Node collectionPanel = control;
+            box.getChildren().add(collectionPanel);
         }
         
-        box.add(Box.createVerticalGlue());
+        //box.getChildren().add(VBox.createVerticalGlue());
         
-        p.add(box, BorderLayout.NORTH);
-        p.add(new JPanel(), BorderLayout.CENTER);
+        p.setTop(box);
+        p.setCenter(new FlowPane());
         
         return p;
     }
@@ -265,40 +257,45 @@ public class FreePlot implements ActionListener {
      * 
      * @throws SQLException A database error occurred
      */
-    private void loadData() throws SQLException {
-        collections = new ArrayList<>();
-        List<DateRange> ranges = dataRangePanel.getRanges();
-        
-        //
-        // Clear all of the domain (X) axes and clear out all of the datasets.
-        // We will start from scratch
-        //
-        plot.clearDomainAxes();
-        for (int i = 0; i < plot.getDatasetCount(); i++)
-            plot.setDataset(i, null);
-        
-        int domainAxisIndex = 0;
-        for (DateRange dateRange : ranges) {     
-            //
-            // First set up the domain axis for this date range
-            //
-            plot.setDomainAxis(domainAxisIndex, createDomainAxis(dateRange));
-            plot.setDomainAxisLocation(domainAxisIndex, AxisLocation.BOTTOM_OR_LEFT);
-            
-            List<FreePlotSeriesCollection> seriesCollection = factory.createSeriesCollections(plot, domainAxisIndex, strokes[domainAxisIndex]);
-            domainAxisIndex++;
-            collections.addAll(seriesCollection);
+    private void loadData() {
+        try {
+            collections = new ArrayList<>();
+            List<DateRange> ranges = dataRangePanel.getRanges();
             
             //
-            // Now get the data for the date range
+            // Clear all of the domain (X) axes and clear out all of the datasets.
+            // We will start from scratch
             //
-            List<?> data = factory.retrieveData(dateRange.getStart(), dateRange.getEnd());
-            seriesCollection.stream().forEach((collection) -> {
-                collection.loadData(data);
-            });
+            plot.clearDomainAxes();
+            for (int i = 0; i < plot.getDatasetCount(); i++)
+                plot.setDataset(i, null);
+            
+            int domainAxisIndex = 0;
+            for (DateRange dateRange : ranges) {     
+                //
+                // First set up the domain axis for this date range
+                //
+                plot.setDomainAxis(domainAxisIndex, createDomainAxis(dateRange));
+                plot.setDomainAxisLocation(domainAxisIndex, AxisLocation.BOTTOM_OR_LEFT);
+                
+                List<FreePlotSeriesCollection> seriesCollection = factory.createSeriesCollections(plot, domainAxisIndex, strokes[domainAxisIndex]);
+                domainAxisIndex++;
+                collections.addAll(seriesCollection);
+                
+                //
+                // Now get the data for the date range
+                //
+                List<?> data = factory.retrieveData(dateRange.getStart(), dateRange.getEnd());
+                seriesCollection.stream().forEach((collection) -> {
+                    collection.loadData(data);
+                });
+            }
+            
+            dataLoaded = true;
         }
-        
-        dataLoaded = true;
+        catch (SQLException e) {
+            ErrorDisplayer.getInstance().displayError("A database error occurred");
+        }
     }
     
     /**
@@ -306,16 +303,8 @@ public class FreePlot implements ActionListener {
      * @param e The event that triggered this action
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
-        try {
-            if (e.getActionCommand().equals(LOAD_DATA_BUTTON))
-                loadData();
-
-            displayData();
-        }
-        catch (SQLException e1) {
-            JOptionPane.showConfirmDialog(null, "A database error occurred", "Database Error", JOptionPane.ERROR_MESSAGE);
-        }
+    public void handle(ActionEvent e) {
+        displayData();
     }
 
 }

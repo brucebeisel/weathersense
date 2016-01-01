@@ -16,7 +16,9 @@
  */
 package com.bdb.weather.display;
 
+import java.awt.Dimension;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -37,12 +39,15 @@ import com.bdb.weather.display.current.CurrentWeatherCharts;
 import com.bdb.weather.display.current.CurrentWeatherForm;
 import com.bdb.weather.display.day.DaySummaryGraphPanel;
 import com.bdb.weather.display.day.TodayGraphPanel;
+import com.bdb.weather.display.freeplot.HistoricalFreePlot;
 import com.bdb.weather.display.preferences.UnitsPreferenceDialog;
 import com.bdb.weather.display.preferences.UserPreferences;
 import com.bdb.weather.display.stripchart.MeasurementType;
 import com.bdb.weather.display.stripchart.StripChartManager;
 import com.bdb.weather.display.stripchart.StripChartPane;
 import com.bdb.weather.display.summary.DailySummariesPanel;
+import com.bdb.weather.display.summary.MonthlySummariesPanel;
+import com.bdb.weather.display.summary.YearlySummariesPanel;
 
 /**
  * FXML Controller class
@@ -158,14 +163,23 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchMonthlySummariesView() {
+        LocalDate end = LocalDate.now();
+        LocalDate start = LocalDate.of(end.getYear(), Month.JANUARY, 1);
+
+        MonthlySummariesPanel monthlySummaryPanel = new MonthlySummariesPanel(ws, connection, null, start, end, DateInterval.THIS_YEAR);
+        launchStage(monthlySummaryPanel, "", true);
     }
 
     @FXML
     public void launchYearlySummariesView() {
+        YearlySummariesPanel yearlySummaryPanel = new YearlySummariesPanel(ws, connection, null);
+        launchStage(yearlySummaryPanel, "", true);
     }
 
     @FXML
     public void launchHistoricalFreePlotView() {
+        HistoricalFreePlot freePlot = new HistoricalFreePlot(ws, connection);
+        launchStage(freePlot.getNode(), "Archive Free Plot", true);
     }
 
     @FXML
@@ -253,44 +267,9 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
     }
 
     @Override
-    public void launchDaySummaryView(LocalDate day) {
-        ws = stationTable.getWeatherStation();
-        DaySummaryGraphPanel daySummaryGraphPanel = new DaySummaryGraphPanel(ws, connection, day);
-        launchView("Day Summary", daySummaryGraphPanel, new Dimension(800,600), true);
-        daySummaryGraphPanel.setTitle();
-    }
-
-    private void launchDailySummariesView(LocalDate start, LocalDate end, DateInterval interval) {
-        ws = stationTable.getWeatherStation();
-        DailySummariesPanel summaryPanel = new DailySummariesPanel(ws, connection, this, start, end, interval);
-        launchView("Daily Summary", summaryPanel, new Dimension(800,600), true);
-        summaryPanel.setWindowTitle();
-    }
-
-    @Override
     public void launchStormView() {
         StormPanel stormPanel = new StormPanel(connection);
         launchView("", stormPanel, new Dimension(800,600), false);
-    }
-
-    @Override
-    public void launchDailySummariesView(LocalDate start, LocalDate end) {
-        launchDailySummariesView(start, end, DateInterval.CUSTOM);
-    }
-
-    @Override
-    public void launchDailySummariesView(DateInterval interval) {
-        DateRange range = interval.range();
-        launchDailySummariesView(range.getStart().toLocalDate(), range.getEnd().toLocalDate(), interval);
-    }
-
-    @Override
-    public void launchMonthlySummariesView(DateInterval interval) {
-        LocalDate end = LocalDate.now();
-        LocalDate start = LocalDate.of(end.getYear(), Month.JANUARY, 1);
-
-        MonthlySummariesPanel monthlySummaryPanel = new MonthlySummariesPanel(ws, connection, this, start, end, DateInterval.THIS_YEAR);
-        launchView("", monthlySummaryPanel, new Dimension(800, 600), true);
     }
 
     public void launchYearlySummariesView() {

@@ -20,22 +20,20 @@ import java.awt.BorderLayout;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-import javafx.scene.Node;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
 
 import com.bdb.util.jdbc.DBConnection;
 
 import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.Wind;
 import com.bdb.weather.common.db.HistoryTable;
-import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.DaySelectionPanel;
 import com.bdb.weather.display.DaySelectionPanel.DateChangedListener;
 import com.bdb.weather.display.DisplayConstants;
@@ -68,8 +66,8 @@ public class DayHistoryTable implements DateChangedListener {
         "Rainfall",
         "High Rainfall Rate"
     };
-    private final JPanel               panel;
-    private final JTable               dataTable;
+    private final BorderPane           panel;
+    private final TableView            dataTable;
     private final DefaultTableModel    tableModel;
     private final HistoryTable         historyTable;
 
@@ -82,15 +80,15 @@ public class DayHistoryTable implements DateChangedListener {
     public DayHistoryTable(DBConnection connection) {
         historyTable = new HistoryTable(connection);
         LocalDate date = LocalDate.now();
-        panel = new JPanel(new BorderLayout());
+        panel = new BorderPane();
         DaySelectionPanel selectionPanel = new DaySelectionPanel(date);
         selectionPanel.addDateChangedListener(this);
-        panel.add(selectionPanel, BorderLayout.NORTH);
+        panel.setTop(selectionPanel);
 
         tableModel = new DefaultTableModel();
         DefaultTableColumnModel colModel = new DefaultTableColumnModel();
         
-        dataTable = new JTable();
+        dataTable = new TableView();
         dataTable.setModel(tableModel);
         dataTable.setColumnModel(colModel);
         dataTable.setAutoCreateColumnsFromModel(false);
@@ -112,8 +110,8 @@ public class DayHistoryTable implements DateChangedListener {
         //
         // Insert the JTable component into a scroll pane so that we have scroll bars
         //
-        JScrollPane sp = new JScrollPane(dataTable);
-        panel.add(sp, BorderLayout.CENTER);
+        ScrollPane sp = new ScrollPane(dataTable);
+        panel.setCenter(sp);
 
         loadData(date);
     }

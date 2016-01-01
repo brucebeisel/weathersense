@@ -16,7 +16,6 @@
  */
 package com.bdb.weather.display.summary;
 
-import java.awt.Component;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
@@ -24,12 +23,7 @@ import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
-import javafx.scene.Node;
+import javafx.application.Platform;
 import javafx.scene.layout.BorderPane;
 
 import com.bdb.util.jdbc.DBConnection;
@@ -47,7 +41,6 @@ import com.bdb.weather.common.db.DailySummaryTable;
 import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Temperature;
-import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.DateInterval;
 import com.bdb.weather.display.ViewLauncher;
 import com.bdb.weather.display.WeatherSense;
@@ -77,7 +70,7 @@ public class YearlySummariesPanel extends BorderPane implements SummarySupporter
         setCenter(graphPanel);
 
         /*
-        JPanel cmdPanel = new JPanel();
+        FlowPane cmdPanel = new FlowPane();
 
         cmdPanel.add(intervalsCB);
         cmdPanel.add(new JLabel("Start:"));
@@ -107,9 +100,9 @@ public class YearlySummariesPanel extends BorderPane implements SummarySupporter
         
         goButton.addActionListener(this);
         goButton.setEnabled(false);
-        */
+*/
 
-        loadData(dataRange.getStart().toLocalDate(), dataRange.getEnd().toLocalDate());
+        Platform.runLater(() -> loadData(dataRange.getStart().toLocalDate(), dataRange.getEnd().toLocalDate()));
     }
     
     public void setWindowTitle() {
@@ -177,7 +170,7 @@ public class YearlySummariesPanel extends BorderPane implements SummarySupporter
             }
         }
     }
-    */
+*/
 
     @Override
     public Temperature retrieveAvgOutdoorTemperature(SummaryRecord rec) {

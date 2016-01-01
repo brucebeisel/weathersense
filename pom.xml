@@ -84,7 +84,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <module>Common</module>
         <module>Display</module>
         <module>HealthMonitor</module>
-    <module>WeatherSenseDisplayJavaFX</module>
   </modules>
     <dependencyManagement>
         <dependencies>

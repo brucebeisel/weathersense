@@ -16,20 +16,20 @@
  */
 package com.bdb.weather.display.summary;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
+import java.util.Arrays;
 import java.util.List;
 
-import javafx.event.Event;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
@@ -49,7 +49,7 @@ import com.bdb.weather.display.DateInterval;
 import com.bdb.weather.display.ViewLauncher;
 import com.bdb.weather.display.WeatherSense;
 
-public class MonthlySummariesPanel extends BorderPane implements EventHandler, ActionListener, SummarySupporter {
+public class MonthlySummariesPanel extends BorderPane implements EventHandler<ActionEvent>, SummarySupporter {
     private final SummariesGraphPanel    graphPanel;
     private final MonthlySummaryTable    monthlySummaryTable;
     private final MonthlyAveragesTable   monthlyAveragesTable;
@@ -58,8 +58,8 @@ public class MonthlySummariesPanel extends BorderPane implements EventHandler, A
     private LocalDate                    startDate;
     private LocalDate                    endDate;
     private final DateTimeFormatter      dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-    private final TextField              startDateTF = new TextField();
-    private final TextField              endDateTF = new TextField();
+    private final DatePicker             startDateTF = new DatePicker();
+    private final DatePicker             endDateTF = new DatePicker();
     private final ComboBox<DateInterval> intervalsCB = new ComboBox<>();
     private final Button                 goButton = new Button("Go");
 
@@ -75,7 +75,10 @@ public class MonthlySummariesPanel extends BorderPane implements EventHandler, A
         setCenter(graphPanel);
 
         HBox cmdPane = new HBox();
+        cmdPane.setAlignment(Pos.CENTER);
+        cmdPane.setSpacing(5.0);
 
+        intervalsCB.getItems().addAll(Arrays.asList(DateInterval.values()));
         cmdPane.getChildren().add(intervalsCB);
         cmdPane.getChildren().add(new Label("Start:"));
         cmdPane.getChildren().add(startDateTF);
@@ -88,8 +91,8 @@ public class MonthlySummariesPanel extends BorderPane implements EventHandler, A
         startDate = start;
         endDate = end;
 
-        startDateTF.setText(dateFormat.format(startDate));
-        endDateTF.setText(dateFormat.format(endDate));
+        startDateTF.setValue(startDate);
+        endDateTF.setValue(endDate);
         
         if (interval != DateInterval.CUSTOM) {
             startDateTF.setEditable(false);
@@ -97,13 +100,13 @@ public class MonthlySummariesPanel extends BorderPane implements EventHandler, A
         }
         
         intervalsCB.getSelectionModel().select(interval);
-        //intervalsCB.getSelectionModel().setMaximumRowCount(intervalsCB.getItems().size());
+        intervalsCB.setVisibleRowCount(intervalsCB.getItems().size());
         intervalsCB.setOnAction(this);
         
         goButton.setOnAction(this);
         goButton.setDisable(true);
 
-        loadData(startDate, endDate);
+        Platform.runLater(() -> loadData(startDate, endDate));
     }
     
     public void setWindowTitle() {
@@ -139,7 +142,7 @@ public class MonthlySummariesPanel extends BorderPane implements EventHandler, A
     }
     
     @Override
-    public void actionPerformed(ActionEvent evt) {
+    public void handle(ActionEvent evt) {
         Object source = evt.getSource();
 
         if (source == intervalsCB) {
@@ -152,21 +155,16 @@ public class MonthlySummariesPanel extends BorderPane implements EventHandler, A
             startDateTF.setEditable(editable);
             endDateTF.setEditable(editable);
             goButton.setDisable(!editable);
-            startDateTF.setText(dateFormat.format(range.getStart()));
-            endDateTF.setText(dateFormat.format(range.getEnd()));
+            startDateTF.setValue(range.getStart().toLocalDate());
+            endDateTF.setValue(range.getEnd().toLocalDate());
             
             if (!editable)
                 loadData(range.getStart().toLocalDate(), range.getEnd().toLocalDate());
         }
         else if (source == goButton) {
-            try {
-                startDate = LocalDate.from(dateFormat.parse(startDateTF.getText()));
-                endDate = LocalDate.from(dateFormat.parse(endDateTF.getText()));
-                loadData(startDate, endDate);
-            }
-            catch (DateTimeParseException e) {
-                // TODO Add dialog that indicates a bad date was entered.
-            }
+            startDate = startDateTF.getValue();
+            endDate = endDateTF.getValue();
+            loadData(startDate, endDate);
         }
     }
 
@@ -190,10 +188,5 @@ public class MonthlySummariesPanel extends BorderPane implements EventHandler, A
         LocalDate start = date.withDayOfMonth(1);
         LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
         launcher.launchDailySummariesView(start, end);
-    }
-
-    @Override
-    public void handle(Event event) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

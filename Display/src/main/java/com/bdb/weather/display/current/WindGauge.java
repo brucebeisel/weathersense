@@ -22,12 +22,8 @@ import java.awt.GradientPaint;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import javax.swing.Timer;
-
 import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
@@ -91,7 +87,6 @@ public class WindGauge extends BorderPane {
     private double lastSpeed;
     private double currentSpeed;
     private double speedInterval;
-    private Timer timer;
     private final Label title = new Label();
     private final Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), (actionEvent) -> nextFrame()));
     private final StringProperty titleProperty = new SimpleStringProperty();
@@ -250,9 +245,6 @@ public class WindGauge extends BorderPane {
      * @param windDirs The extra wind directions
      */
     public void loadData(Wind wind, Wind gust, Speed maxWindSpeed, Speed maxWindGust, Speed avgWindSpeed, List<Heading> windDirs) {
-        if (timer != null && timer.isRunning())
-            timer.stop();
-
         if (wind == null)
             return;
 

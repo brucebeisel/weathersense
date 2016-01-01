@@ -16,92 +16,53 @@
  */
 package com.bdb.weather.display;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 
-import javax.swing.Icon;
-import javax.swing.JLabel;
-
-@SuppressWarnings("serial")
-public class JScalableLabel extends JLabel {
-
+public class JScalableLabel extends Label {
     /**
      * Constructor.
      */
     public JScalableLabel() {
-        super();
-    }
-
-    /**
-     * Constructor.
-     * 
-     * @param icon
-     * @param arg1
-     */
-    public JScalableLabel(Icon icon, int arg1) {
-        super(icon, arg1);
+        this("", null);
     }
 
     /**
      * @param icon
      */
-    public JScalableLabel(Icon icon) {
-        super(icon);
-    }
-
-    /**
-     * @param text
-     * @param icon
-     * @param arg2
-     */
-    public JScalableLabel(String text, Icon icon, int arg2) {
-        super(text, icon, arg2);
-    }
-
-    /**
-     * @param text
-     * @param arg1
-     */
-    public JScalableLabel(String text, int arg1) {
-        super(text, arg1);
+    public JScalableLabel(ImageView icon) {
+        this("", icon);
     }
 
     /**
      * @param text
      */
     public JScalableLabel(String text) {
-        super(text);
-    }
-
-    @Override
-    public void paint(Graphics g) {
-        Dimension preferredSize = getPreferredSize();
-        Dimension actualSize = getSize();
-
-        //
-        // If the JComponent has been resized smaller than the preferred size, then scale
-        //
-        //if (actualSize.width < preferredSize.width || actualSize.height < preferredSize.height)
-        //{
-        double wscale = (double) actualSize.width / (double) preferredSize.width;
-        double hscale = (double) actualSize.height / (double) preferredSize.height;
-        double scale = Math.min(wscale, hscale);
-        ((Graphics2D) g).scale(scale, scale);
-        //}
-        super.paint(g);
+        this(text, null);
     }
 
     /**
-     * @param args public static void main(String[] args) { JFrame f = new JFrame();
-     * f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); //JLabel l = new JScalableLabel("Hello World"); ImageIcon im =
-     * new ImageIcon("C:/Program Files/Windows Media Player/wmpnss_color32.jpg"); JLabel l = new JScalableLabel(im);
-     * l.setHorizontalAlignment(SwingConstants.LEFT); l.setVerticalAlignment(SwingConstants.TOP); l.setBorder(new
-     * BevelBorder(BevelBorder.RAISED)); f.getContentPane().setLayout(new BorderLayout()); f.getContentPane().add(l,
-     * BorderLayout.CENTER); //f.getContentPane().add(new JLabel("North"), BorderLayout.NORTH);
-     *
-     * f.pack(); f.setVisible(true);
-     *
-     * }
+     * @param text
+     * @param icon
      */
+    public JScalableLabel(String text, ImageView icon) {
+        super(text, icon);
+        this.widthProperty().addListener((listener) -> setScaling());
+        this.heightProperty().addListener((listener) -> setScaling());
+    }
+
+
+
+    private void setScaling() {
+        //
+        // If the Node has been resized smaller than the preferred size, then scale
+        //
+        //if (actualSize.width < preferredSize.width || actualSize.height < preferredSize.height)
+        //{
+        double wscale = this.getWidth() / this.getPrefWidth();
+        double hscale = this.getHeight() / this.getPrefHeight();
+        double scale = Math.min(wscale, hscale);
+        this.setScaleX(scale);
+        this.setScaleY(scale);
+    }
 }
