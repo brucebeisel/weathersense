@@ -16,23 +16,18 @@
  */
 package com.bdb.weather.display;
 
-import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.common.TemperatureBin;
@@ -43,79 +38,77 @@ import com.bdb.weather.common.ThresholdType;
  * @author Bruce
  */
 @SuppressWarnings("serial")
-public class TemperatureBinEditor extends JPanel {
-    private DefaultListModel<Temperature> belowTemperatureModel = new DefaultListModel<>();
-    private DefaultListModel<Temperature> aboveTemperatureModel = new DefaultListModel<>();
-    private final JList<Temperature> belowTemperatureBinList = new JList<>(belowTemperatureModel);
-    private final JList<Temperature> aboveTemperatureBinList = new JList<>(aboveTemperatureModel);
-    private final JTextField temperatureTF = new JTextField(6);
-    private final JButton belowBinButton = new JButton("<<");
-    private final JButton aboveBinButton = new JButton(">>");
-    private final JButton deleteAboveBinButton = new JButton("Delete");
-    private final JButton deleteBelowBinButton = new JButton("Delete");
+public class TemperatureBinEditor extends GridPane {
+    private ObservableList<Temperature> belowTemperatureModel = new SimpleListProperty<>();
+    private ObservableList<Temperature> aboveTemperatureModel = new SimpleListProperty<>();
+    private final ListView<Temperature> belowTemperatureBinList = new ListView<>(belowTemperatureModel);
+    private final ListView<Temperature> aboveTemperatureBinList = new ListView<>(aboveTemperatureModel);
+    private final TextField temperatureTF = new TextField();
+    private final Button belowBinButton = new Button("<<");
+    private final Button aboveBinButton = new Button(">>");
+    private final Button deleteAboveBinButton = new Button("Delete");
+    private final Button deleteBelowBinButton = new Button("Delete");
     private boolean changed = false;
     
     public TemperatureBinEditor() {
-        setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        
-        belowTemperatureBinList.setFixedCellWidth(100);
-        belowTemperatureBinList.setFixedCellHeight(15);
-        aboveTemperatureBinList.setFixedCellWidth(100);
-        aboveTemperatureBinList.setFixedCellHeight(15);
-        JScrollPane sp = new JScrollPane(belowTemperatureBinList);
-        sp.setBorder(new TitledBorder(new LineBorder(Color.BLACK), "Below Temperatures"));
-        gbc.gridx = 0;
-        add(sp, gbc);
-        gbc.gridx++;
-        add(belowBinButton, gbc);
-        gbc.gridx++;
-        add(temperatureTF, gbc);
-        gbc.gridx++;
-        add(aboveBinButton, gbc);
-        sp = new JScrollPane(aboveTemperatureBinList);
-        sp.setBorder(new TitledBorder(new LineBorder(Color.BLACK), "Above Temperatures"));
-        gbc.gridx++;
-        add(sp, gbc);
+        belowTemperatureBinList.setMinWidth(100);
+        belowTemperatureBinList.setMinHeight(15);
+        aboveTemperatureBinList.setMinWidth(100);
+        aboveTemperatureBinList.setMinHeight(15);
+        ScrollPane sp = new ScrollPane(belowTemperatureBinList);
+        //sp.setBorder(new TitledBorder(new LineBorder(Color.BLACK), "Below Temperatures"));
+        int gridx = 0;
+        int gridy = 0;
+        add(sp, gridx, gridy);
+        gridx++;
+        add(belowBinButton, gridx, gridy);
+        gridx++;
+        add(temperatureTF, gridx, gridy);
+        gridx++;
+        add(aboveBinButton, gridx, gridy);
+        sp = new ScrollPane(aboveTemperatureBinList);
+        //sp.setBorder(new TitledBorder(new LineBorder(Color.BLACK), "Above Temperatures"));
+        gridx++;
+        add(sp, gridx, gridy);
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        add(deleteBelowBinButton, gbc);
-        gbc.gridx = 4;
-        add(deleteAboveBinButton, gbc);
+        gridx = 0;
+        gridy = 1;
+        add(deleteBelowBinButton, gridx, gridy);
+        gridx = 4;
+        add(deleteAboveBinButton, gridx, gridy);
         
-        belowBinButton.addActionListener((ActionEvent e) -> {
+        belowBinButton.setOnAction((ActionEvent e) -> {
             try {
                 Temperature temperature = new Temperature(Double.parseDouble(temperatureTF.getText()));
                 addBelowTemperature(temperature);
             }
             catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Invalid temperature entered", "Input Error", JOptionPane.ERROR_MESSAGE);
+                ErrorDisplayer.getInstance().displayError("Invalid temperature entered");
             }
         });
         
-        aboveBinButton.addActionListener((ActionEvent e) -> {
+        aboveBinButton.setOnAction((ActionEvent e) -> {
             try {
                 Temperature temperature = new Temperature(Double.parseDouble(temperatureTF.getText()));
                 addAboveTemperature(temperature);
             }
             catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Invalid temperature entered", "Input Error", JOptionPane.ERROR_MESSAGE);
+                ErrorDisplayer.getInstance().displayError("Invalid temperature entered");
             }
         });
 
-        deleteAboveBinButton.addActionListener((ActionEvent e) -> {
-            List<Temperature> selectedList = aboveTemperatureBinList.getSelectedValuesList();
+        deleteAboveBinButton.setOnAction((ActionEvent e) -> {
+            List<Temperature> selectedList = aboveTemperatureBinList.getSelectionModel().getSelectedItems();
             for (Temperature t : selectedList) {
-                aboveTemperatureModel.removeElement(t);
+                aboveTemperatureModel.remove(t);
                 changed = true;
             }
         });
 
-        deleteBelowBinButton.addActionListener((ActionEvent e) -> {
-            List<Temperature> selectedList = belowTemperatureBinList.getSelectedValuesList();
+        deleteBelowBinButton.setOnAction((ActionEvent e) -> {
+            List<Temperature> selectedList = belowTemperatureBinList.getSelectionModel().getSelectedItems();
             for (Temperature t : selectedList) {
-                belowTemperatureModel.removeElement(t);
+                belowTemperatureModel.remove(t);
                 changed = true;
             }
         });
@@ -123,8 +116,8 @@ public class TemperatureBinEditor extends JPanel {
 
     private void addAboveTemperature(Temperature t) {
         changed = true;
-        int insertIndex = aboveTemperatureModel.getSize();
-        for (int i = 0; i < aboveTemperatureModel.getSize(); i++) {
+        int insertIndex = aboveTemperatureModel.size();
+        for (int i = 0; i < aboveTemperatureModel.size(); i++) {
             if (t.equals(aboveTemperatureModel.get(i))) {
                 insertIndex = -1;
                 break;
@@ -136,14 +129,14 @@ public class TemperatureBinEditor extends JPanel {
         }
 
         if (insertIndex >= 0)
-            aboveTemperatureModel.insertElementAt(t, insertIndex);
+            aboveTemperatureModel.add(insertIndex, t);
 
     }
 
     private void addBelowTemperature(Temperature t) {
         changed = true;
-        int insertIndex = belowTemperatureModel.getSize();
-        for (int i = 0; i < belowTemperatureModel.getSize(); i++) {
+        int insertIndex = belowTemperatureModel.size();
+        for (int i = 0; i < belowTemperatureModel.size(); i++) {
             if (t.equals(belowTemperatureModel.get(i))) {
                 insertIndex = -1;
                 break;
@@ -154,7 +147,7 @@ public class TemperatureBinEditor extends JPanel {
             }
         }
         if (insertIndex >= 0)
-            belowTemperatureModel.insertElementAt(t, insertIndex);
+            belowTemperatureModel.add(insertIndex, t);
     }
     
     public void loadValues(Collection<TemperatureBin> temperatureBins) {
@@ -169,14 +162,14 @@ public class TemperatureBinEditor extends JPanel {
     public List<TemperatureBin> saveValues() {
         List<TemperatureBin> bins = new ArrayList<>();
         int n = 0;
-        for (int i = 0; i < belowTemperatureBinList.getModel().getSize(); i++) {
-            Temperature t = belowTemperatureBinList.getModel().getElementAt(i);
+        for (int i = 0; i < belowTemperatureBinList.getItems().size(); i++) {
+            Temperature t = belowTemperatureBinList.getItems().get(i);
             TemperatureBin bin = new TemperatureBin(n++, ThresholdType.BELOW_THRESHOLD, t);
             bins.add(bin);
         }
 
-        for (int i = 0; i < aboveTemperatureBinList.getModel().getSize(); i++) {
-            Temperature t = aboveTemperatureBinList.getModel().getElementAt(i);
+        for (int i = 0; i < aboveTemperatureBinList.getItems().size(); i++) {
+            Temperature t = aboveTemperatureBinList.getItems().get(i);
             TemperatureBin bin = new TemperatureBin(n++, ThresholdType.ABOVE_THRESHOLD, t);
             bins.add(bin);
         }

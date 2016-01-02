@@ -26,7 +26,7 @@ import com.bdb.weather.common.CurrentWeather;
 import com.bdb.weather.common.HistoricalRecord;
 
 /**
- * A Swing container that manages the chart panels for this strip chart panel.
+ * A JavaFX node that manages the chart panels for this strip chart panel.
  * 
  * @author Bruce
  */

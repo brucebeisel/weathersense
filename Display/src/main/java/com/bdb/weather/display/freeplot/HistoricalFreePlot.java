@@ -111,9 +111,9 @@ public class HistoricalFreePlot implements SeriesFactory, SeriesCollectionFactor
     }
     
     /**
-     * Return the swing component that is the container for this plot.
+     * Return the JavaFX node that is the container for this plot.
      * 
-     * @return The swing container
+     * @return The JavaFX Node
      */
     public Parent getNode() {
         return freePlot;

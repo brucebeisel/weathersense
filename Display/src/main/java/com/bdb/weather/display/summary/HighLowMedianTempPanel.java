@@ -24,7 +24,6 @@ import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.TimeZone;
 
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
@@ -57,7 +56,7 @@ import com.bdb.weather.display.ViewLauncher;
 import com.bdb.weather.display.axis.TemperatureRangeAxis;
 
 /**
- * Swing component that displays a graph of actual high/low/mean temperatures against location averages (sometimes referred to as "normal").
+ * JavaFX component that displays a graph of actual high/low/mean temperatures against location averages (sometimes referred to as "normal").
  * 
  * @author Bruce
  *
@@ -154,9 +153,7 @@ public class HighLowMedianTempPanel extends ChartDataPane implements ChartMouseL
             //colModel.addColumn(col);
         }
 
-        //tableModel.setColumnCount(tableHeadings.length);
-
-        this.setTabContents(chartViewer, new ScrollPane(dataTable));
+        this.setTabContents(chartViewer, dataTable);
     }
     
     /**

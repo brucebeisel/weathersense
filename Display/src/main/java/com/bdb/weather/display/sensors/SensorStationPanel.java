@@ -18,9 +18,6 @@ package com.bdb.weather.display.sensors;
 
 import java.util.List;
 
-import javax.swing.table.DefaultTableModel;
-
-import javafx.scene.Node;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 
@@ -28,14 +25,12 @@ import com.bdb.util.jdbc.DBConnection;
 
 import com.bdb.weather.common.SensorStationStatus;
 import com.bdb.weather.common.db.SensorStationStatusTable;
-import com.bdb.weather.display.ComponentContainer;
-import com.bdb.weather.display.DisplayConstants;
 
 /**
  *
  * @author Bruce
  */
-public class SensorStationPanel extends BorderPane implements ComponentContainer {
+public class SensorStationPanel extends BorderPane {
     private final TableView<SensorStationStatus> table;
     private final SensorStationStatusTable sensorStationStatusTable;
     private static final String COLUMN_HEADINGS[] = {
@@ -47,11 +42,6 @@ public class SensorStationPanel extends BorderPane implements ComponentContainer
         sensorStationStatusTable = new SensorStationStatusTable(connection);
         //tableModel.setColumnIdentifiers(COLUMN_HEADINGS);
         this.setCenter(table);
-    }
-
-    @Override
-    public Node getComponent() {
-        return this;
     }
 
     public void loadData() {

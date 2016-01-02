@@ -16,7 +16,6 @@
  */
 package com.bdb.weather.display;
 
-import java.awt.Dimension;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -42,6 +41,7 @@ import com.bdb.weather.display.day.TodayGraphPanel;
 import com.bdb.weather.display.freeplot.HistoricalFreePlot;
 import com.bdb.weather.display.preferences.UnitsPreferenceDialog;
 import com.bdb.weather.display.preferences.UserPreferences;
+import com.bdb.weather.display.storm.StormPanel;
 import com.bdb.weather.display.stripchart.MeasurementType;
 import com.bdb.weather.display.stripchart.StripChartManager;
 import com.bdb.weather.display.stripchart.StripChartPane;
@@ -138,6 +138,8 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchStormsView() {
+        StormPanel stormPanel = new StormPanel(connection);
+        launchStage(stormPanel, "Storms", false);
     }
 
     @FXML

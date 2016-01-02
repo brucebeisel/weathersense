@@ -254,43 +254,4 @@ public class StripChart extends BorderPane {
         this.span = span;
         adjustDateAxis(Calendar.getInstance());
     }
-
-    /*
-    public static void main(String args[]) {
-        final StripChart chart = new StripChart(MeasurementType.TEMPERATURE, MeasurementType.HUMIDITY, 1, 10);
-        chart.addSeries("Outdoor", MAP_TO_LEFT_AXIS, Color.BLUE);
-        chart.addSeries("Humidity", MAP_TO_RIGHT_AXIS, Color.CYAN);
-
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame();
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.add(chart);
-            frame.pack();
-            frame.setVisible(true);
-        });
-
-        int delay = 1000; //milliseconds
-        ActionListener taskPerformer = new ActionListener() {
-
-            int timeOffset = 10 * 3600;
-            int counter = 0;
-
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                LocalDateTime now = LocalDateTime.now().minusSeconds(timeOffset);
-                chart.addItem("Outdoor", now, now.atZone(ZoneId.systemDefault()).toEpochSecond());
-                chart.refresh();
-                System.out.println("Added new item and refreshed");
-                timeOffset -= 300;
-                if (++counter == 10) {
-                    chart.setSpanHours(48);
-                }
-                else if (counter == 30) {
-                    chart.setSpanHours(24);
-                }
-            }
-        };
-        new Timer(delay, taskPerformer).start();
-    }
-*/
 }

@@ -158,6 +158,13 @@ public class WeatherSense extends Application {
             return "";
     }
 
+    public static void sizeStageToScene(Node node) {
+        Window window = node.getScene().getWindow();
+        if (window instanceof Stage)
+            ((Stage)window).sizeToScene();
+
+    }
+
     public static void main(String args[]) {
 	launch(args);
     }

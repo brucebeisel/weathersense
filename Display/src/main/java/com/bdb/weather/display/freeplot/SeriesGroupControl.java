@@ -19,8 +19,6 @@ package com.bdb.weather.display.freeplot;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JComponent;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.TilePane;

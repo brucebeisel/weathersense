@@ -16,16 +16,10 @@
  */
 package com.bdb.weather.display.historytable;
 
-import java.awt.BorderLayout;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 
@@ -36,7 +30,6 @@ import com.bdb.weather.common.Wind;
 import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.display.DaySelectionPanel;
 import com.bdb.weather.display.DaySelectionPanel.DateChangedListener;
-import com.bdb.weather.display.DisplayConstants;
 
 /**
  * TODO Provide mechanism to export to a CSV file
@@ -66,10 +59,9 @@ public class DayHistoryTable implements DateChangedListener {
         "Rainfall",
         "High Rainfall Rate"
     };
-    private final BorderPane           panel;
-    private final TableView            dataTable;
-    private final DefaultTableModel    tableModel;
-    private final HistoryTable         historyTable;
+    private final BorderPane                  panel;
+    private final TableView<HistoricalRecord> dataTable;
+    private final HistoryTable                historyTable;
 
     /**
      * Constructor.
@@ -85,33 +77,15 @@ public class DayHistoryTable implements DateChangedListener {
         selectionPanel.addDateChangedListener(this);
         panel.setTop(selectionPanel);
 
-        tableModel = new DefaultTableModel();
-        DefaultTableColumnModel colModel = new DefaultTableColumnModel();
         
         dataTable = new TableView();
-        dataTable.setModel(tableModel);
-        dataTable.setColumnModel(colModel);
-        dataTable.setAutoCreateColumnsFromModel(false);
 
         for (int i = 0; i < TABLE_HEADINGS.length; i++) {
-            TableColumn col = new TableColumn();
-            col.setHeaderValue(TABLE_HEADINGS[i]);
-            col.setModelIndex(i);
-            colModel.addColumn(col);
+            TableColumn<HistoricalRecord,String> col = new TableColumn(TABLE_HEADINGS[i]);
+            dataTable.getColumns().add(col);
         }
 
-        tableModel.setColumnCount(TABLE_HEADINGS.length);
-
-        //
-        // Add a row sorter. TODO add custom sorters for those columns that are not sorted by ascii text, like the date
-        //
-        dataTable.setRowSorter(new TableRowSorter<>(tableModel));
-
-        //
-        // Insert the JTable component into a scroll pane so that we have scroll bars
-        //
-        ScrollPane sp = new ScrollPane(dataTable);
-        panel.setCenter(sp);
+        panel.setCenter(dataTable);
 
         loadData(date);
     }
@@ -124,17 +98,16 @@ public class DayHistoryTable implements DateChangedListener {
     private void loadData(LocalDate date) {
         List<HistoricalRecord> list = historyTable.queryRecordsForDay(date);
 
-        tableModel.setRowCount(list.size());
         int row = 0;
         for (HistoricalRecord rec : list) {
             int col = 0;
-            tableModel.setValueAt(DisplayConstants.formatTime(rec.getTime().toLocalTime()), row, col++);
-            tableModel.setValueAt(rec.getLowOutdoorTemperature(), row, col++);
-            tableModel.setValueAt(rec.getAvgOutdoorTemperature(), row, col++);
-            tableModel.setValueAt(rec.getHighOutdoorTemperature(), row, col++);
-            tableModel.setValueAt(rec.getOutdoorHumidity(), row, col++);
-            tableModel.setValueAt(rec.getIndoorTemperature(), row, col++);
-            tableModel.setValueAt(rec.getIndoorHumidity(), row, col++);
+            //tableModel.setValueAt(DisplayConstants.formatTime(rec.getTime().toLocalTime()), row, col++);
+            //tableModel.setValueAt(rec.getLowOutdoorTemperature(), row, col++);
+            //tableModel.setValueAt(rec.getAvgOutdoorTemperature(), row, col++);
+            //tableModel.setValueAt(rec.getHighOutdoorTemperature(), row, col++);
+            //tableModel.setValueAt(rec.getOutdoorHumidity(), row, col++);
+            //tableModel.setValueAt(rec.getIndoorTemperature(), row, col++);
+            //tableModel.setValueAt(rec.getIndoorHumidity(), row, col++);
 
             loadWind(rec.getAvgWind(), row, col);
             col += 2;
@@ -143,8 +116,9 @@ public class DayHistoryTable implements DateChangedListener {
             loadWind(rec.getWindGust(), row, col);
             col += 2;
 
-            tableModel.setValueAt(rec.getBaroPressure(), row, col++);
+            //tableModel.setValueAt(rec.getBaroPressure(), row, col++);
 
+            /*
             if (rec.getAvgUvIndex() != null)
                 tableModel.setValueAt(rec.getAvgUvIndex(), row, col++);
             else
@@ -172,6 +146,7 @@ public class DayHistoryTable implements DateChangedListener {
 
             tableModel.setValueAt(rec.getRainfall(), row, col++);
             tableModel.setValueAt(rec.getHighRainfallRate(), row, col++);
+            */
 
             row++;
         }
@@ -185,6 +160,7 @@ public class DayHistoryTable implements DateChangedListener {
      * @param col The first column of the wind data
      */
     private void loadWind(Wind w, int row, int col) {
+        /*
         if (w != null) {
             tableModel.setValueAt(w.getSpeed(), row, col++);
             tableModel.setValueAt(w.getDirection().getCompassLabel(), row, col++);
@@ -193,6 +169,7 @@ public class DayHistoryTable implements DateChangedListener {
             tableModel.setValueAt(DisplayConstants.UNKNOWN_VALUE_STRING, row, col++);
             tableModel.setValueAt(DisplayConstants.UNKNOWN_VALUE_STRING, row, col++);
         }
+        */
     }
 
     /**

@@ -16,24 +16,27 @@
  */
 package com.bdb.weather.display;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
+import javafx.application.Application;
+import javafx.scene.Scene;
+
+import javafx.stage.Stage;
 
 /**
  *
  * @author Bruce
  */
-public class TemperatureBinEditorTest {
+public class TemperatureBinEditorTest extends Application {
     
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame();
-            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            TemperatureBinEditor editor = new TemperatureBinEditor();
-            frame.add(editor);
-            frame.pack();
-            frame.setVisible(true);
-        });
+        launch();
+    }
+
+    @Override
+    public void start(Stage stage) {
+        TemperatureBinEditor editor = new TemperatureBinEditor();
+        Scene scene = new Scene(editor);
+        stage.setScene(scene);
+        stage.sizeToScene();
+        stage.show();
     }
 }

@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.TimeZone;
 
 import javafx.scene.Node;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
 
 import org.jfree.chart.ChartFactory;
@@ -49,7 +47,6 @@ import com.bdb.util.TimeUtils;
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.display.ChartDataPane;
-import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.ViewLauncher;
 import com.bdb.weather.display.WeatherSenseConstants;
 import com.bdb.weather.display.axis.WindSpeedRangeAxis;
@@ -131,9 +128,9 @@ public class WindSummary extends ChartDataPane implements ChartMouseListenerFX {
     }
     
     /**
-     * Create the JTable.
+     * Create the table.
      * 
-     * @return The swing component
+     * @return The JavaFX Node
      */
     private Node createTable() {
         dataTable = new TableView();
@@ -155,13 +152,7 @@ public class WindSummary extends ChartDataPane implements ChartMouseListenerFX {
 
         tableModel.setColumnCount(COLUMN_HEADINGS.length);
         */
-
-        //
-        // Insert the JTable component into a scroll pane so that we have scroll bars
-        //
-        ScrollPane sp = new ScrollPane(dataTable);
-        
-        return sp;
+        return dataTable;
     }
     
     /**

@@ -19,11 +19,9 @@ package com.bdb.weather.display.summary;
 import java.io.IOException;
 import java.util.List;
 
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
-
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
 
@@ -84,9 +82,7 @@ public class DailySummariesStatisticsPane extends VBox {
     private static final int PRESSURE_FIELD_LENGTH = 5;
     private static final int HUMIDITY_FIELD_LENGTH = 4;
     private static final int RAIN_FIELD_LENGTH = 6;
-    private final DefaultTableModel   tableModel = new DefaultTableModel();
-    private final JTable       recordTable = new JTable(tableModel);
-
+    private final TableView                 recordTable = new TableView();
     @FXML private TitledPane                temperatureTitledPane;
     @FXML private TemperatureStatisticsPane temperatureStatisticsPane;
     @FXML private TitledPane                rainTitledPane;
@@ -137,7 +133,7 @@ public class DailySummariesStatisticsPane extends VBox {
         
         JPanel recordsPanel = new JPanel(new BorderLayout());
         recordsPanel.setBorder(new TitledBorder(innerBorder, "Records"));
-        recordsPanel.add(new JScrollPane(recordTable), BorderLayout.CENTER);
+        recordsPanel.setCenter(recordTable);
         
         add(recordsPanel);
 */

@@ -16,40 +16,39 @@
  */
 package com.bdb.weather.display.historyeditor;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 
 import javafx.scene.Node;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 
-import com.bdb.util.DateButton;
 import com.bdb.util.jdbc.DBConnection;
 
 import com.bdb.weather.common.DateRange;
+import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.DisplayConstants;
 
 public class HistoryEditorPanel implements ComponentContainer {
-    private final JPanel panel = new JPanel(new BorderLayout());
-    private final JPanel datePanel = new JPanel();
+    private final BorderPane panel = new BorderPane();
+    private final FlowPane datePanel = new FlowPane();
     private final HistoryTable historyTable;
-    private final JTable table = new JTable();
+    private final TableView<HistoricalRecord> table = new TableView<>();
     
     public HistoryEditorPanel(WeatherStation ws, DBConnection connection) {
         historyTable = new HistoryTable(connection);
-        panel.add(datePanel, BorderLayout.NORTH);
-        DateButton dateButton = new DateButton();
-        datePanel.add(dateButton);
+        panel.setTop(datePanel);
+        DatePicker dateButton = new DatePicker();
+        datePanel.getChildren().add(dateButton);
         DateRange range = historyTable.dataRange();
-        datePanel.add(new JLabel(DisplayConstants.formatDateTime(range.getStart())));
-        datePanel.add(new JLabel(DisplayConstants.formatDateTime(range.getEnd())));
+        datePanel.getChildren().add(new Label(DisplayConstants.formatDateTime(range.getStart())));
+        datePanel.getChildren().add(new Label(DisplayConstants.formatDateTime(range.getEnd())));
         
-        panel.add(new JScrollPane(table));
+        panel.setCenter(table);
     }
     
     @Override

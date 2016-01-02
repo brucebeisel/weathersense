@@ -46,9 +46,9 @@ public class SeriesControl {
     }
     
     /**
-     * Get the swing component of this control.
+     * Get the JavaFX node of this control.
      * 
-     * @return The swing component
+     * @return The JavaFX node
      */
     public Node getNode() {
         return checkBox;
@@ -73,14 +73,14 @@ public class SeriesControl {
     }
     
     /**
-     * Enable the swing component for this series.
+     * Enable the JavaFX node for this series.
      */
     public void enable() {
         checkBox.setDisable(false);
     }
     
     /**
-     * Disable the swing component for this series
+     * Disable the JavaFX node for this series
      */
     public void disable() {
         checkBox.setDisable(true);

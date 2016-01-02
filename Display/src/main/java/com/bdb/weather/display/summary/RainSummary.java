@@ -124,11 +124,8 @@ public class RainSummary extends ChartDataPane implements ChartMouseListenerFX {
 
         //tableModel.setColumnCount(TABLE_HEADINGS.length);
 
-        //JScrollPane sp = new JScrollPane(dataTable);
 
-        //JPanel p = new JPanel(new BorderLayout());
-
-        //p.add(sp, BorderLayout.CENTER);
+        //p.setCenter(dataTable);
 
         return chartViewer;
     }

@@ -16,27 +16,24 @@
  */
 package com.bdb.weather.display.preferences;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javafx.event.ActionEvent;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DefaultXYItemRenderer;
@@ -45,11 +42,11 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import com.bdb.weather.display.Changeable;
 
-public class ColorPreferencePanel extends JDialog implements Changeable {
+public class ColorPreferencePanel extends BorderPane implements Changeable {
 
     private class ColorPreferenceEntry {
         public String preferenceName;
-        public JButton button;
+        public Button button;
         public int row;
         public int column;
 
@@ -60,7 +57,6 @@ public class ColorPreferencePanel extends JDialog implements Changeable {
             this.column = column;
         }
     }
-    private static final long serialVersionUID = -7814294389034504261L;
     private static final String COLOR_COL_HEADERS[] = {"", "Current", "High", "Low", "Avg", "Scheme", "Show"};
     private static final String COLOR_ROW_HEADERS[] = {
         "Outdoor Temperature",
@@ -111,55 +107,55 @@ public class ColorPreferencePanel extends JDialog implements Changeable {
         new ColorPreferenceEntry(UserPreferences.MAX_WIND_GUST_COLOR_PREF, 10, 2),
         new ColorPreferenceEntry(UserPreferences.RAIN_COLOR_PREF, 11, 1),};
 
-    public ColorPreferencePanel(JFrame parent, UserPreferences preferences) {
-        super(parent, "Color Preferences", true);
+    public ColorPreferencePanel(UserPreferences preferences) {
         this.preferences = preferences;
-        setLayout(new BorderLayout());
-        JPanel colorPanel = new JPanel(new GridBagLayout());
+        GridPane colorPanel = new GridPane();
 
-        GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.CENTER;
-        c.ipadx = 3;
-        c.ipady = 5;
-        c.gridx = 0;
-        c.gridy = 0;
-        c.fill = GridBagConstraints.NONE;
+        //c.anchor = GridBagConstraints.CENTER;
+        //c.ipadx = 3;
+        //c.ipady = 5;
+        //c.gridx = 0;
+        //c.gridy = 0;
+        //c.fill = GridBagConstraints.NONE;
+        int gridx = 0;
+        int gridy = 0;
 
         //
         // Layout the column headers
         //
         for (int i = 0; i < COLOR_COL_HEADERS.length; i++) {
-            c.gridx = i;
-            colorPanel.add(new JLabel(COLOR_COL_HEADERS[i]), c);
+            gridx = i;
+            colorPanel.add(new Label(COLOR_COL_HEADERS[i]), gridx, gridy);
         }
 
         //
         // Layout the row leaders
         //
-        c.anchor = GridBagConstraints.EAST;
+        //c.anchor = GridBagConstraints.EAST;
         for (String header : COLOR_ROW_HEADERS) {
-            c.gridx = 0;
-            c.gridy++;
-            colorPanel.add(new JLabel(header), c);
-            c.gridx = 5;
+            gridx = 0;
+            gridy++;
+            colorPanel.add(new Label(header), gridx, gridy);
+
+            gridx = 5;
             
             Set<String> names = ColorSchemeCollection.getColorSchemeNames();
             String[] list = new String[names.size()];
             names.toArray(list);
-            JComboBox<String> scheme = new JComboBox<>(list);
-            scheme.putClientProperty("row", c.gridy);
+            ComboBox<String> scheme = new ComboBox<String>(Arrays.asList(list));
+            scheme.putClientProperty("row", gridy);
             colorPanel.add(scheme, c);
-            scheme.addActionListener((ActionEvent e) -> {
+            scheme.setOnAction((ActionEvent e) -> {
                 @SuppressWarnings("unchecked")
-                JComboBox<String> cb = (JComboBox<String>)e.getSource();
+                ComboBox<String> cb = (ComboBox<String>)e.getSource();
                 applyColorScheme((Integer)cb.getClientProperty("row"), cb.getItemAt(cb.getSelectedIndex()));
             });
-            c.gridx = 6;
-            JCheckBox showSeries = new JCheckBox();
-            showSeries.putClientProperty("row", c.gridy);
-            colorPanel.add(showSeries, c);
-            showSeries.addActionListener((ActionEvent e) -> {
-                JCheckBox cb = (JCheckBox)e.getSource();
+            gridx = 6;
+            CheckBox showSeries = new CheckBox();
+            showSeries.putClientProperty("row", gridy);
+            colorPanel.add(showSeries, gridx, gridy);
+            showSeries.setOnAction((ActionEvent e) -> {
+                CheckBox cb = (CheckBox)e.getSource();
                 int row = (Integer)cb.getClientProperty("row");
                 for (ColorPreferenceEntry entry : entries) {
                     if (entry.row == row) {
@@ -171,19 +167,19 @@ public class ColorPreferencePanel extends JDialog implements Changeable {
             });
         }
 
-        c.anchor = GridBagConstraints.CENTER;
+        //c.anchor = GridBagConstraints.CENTER;
         for (ColorPreferenceEntry entry : entries) {
-            c.gridx = entry.column;
-            c.gridy = entry.row;
-            JButton button = new JButton("");
-            button.setBackground(preferences.getColorPref(entry.preferenceName));
-            button.setSize(20, 20);
-            button.setPreferredSize(new Dimension(10, 10));
+            gridx = entry.column;
+            gridy = entry.row;
+            ColorPicker button = new ColorPicker();
+            //button.setBackground(preferences.getColorPref(entry.preferenceName));
+            //button.setSize(20, 20);
+            button.setPrefSize(10, 10);
             button.putClientProperty("entry", entry);
-            button.addActionListener((ActionEvent e) -> {
-                editColor((JButton)e.getSource());
+            button.setOnAction((ActionEvent e) -> {
+                editColor((Button)e.getSource());
             });
-            colorPanel.add(button, c);
+            colorPanel.add(button, gridx, gridy);
             entry.button = button;
         }
 
@@ -191,22 +187,20 @@ public class ColorPreferencePanel extends JDialog implements Changeable {
         XYPlot plot = (XYPlot) chart.getPlot();
         plot.setRenderer(renderer);
 
-        JPanel graphExamplePanel = new ChartPanel(chart);
+        ChartViewer graphExamplePanel = new ChartViewer(chart);
 
-        add(colorPanel, BorderLayout.NORTH);
-        add(graphExamplePanel, BorderLayout.CENTER);
-        JPanel buttonPanel = new JPanel();
-        JButton button = new JButton("OK");
-        button.addActionListener((ActionEvent e) -> {
+        setTop(colorPanel);
+        setCenter(graphExamplePanel);
+        FlowPane buttonPanel = new FlowPane();
+        Button button = new Button("OK");
+        button.setOnAction((ActionEvent e) -> {
             if (dirty)
                 saveData();
 
-            this.dispose();
+            //this.dispose();
         });
-        buttonPanel.add(button);
-        add(buttonPanel, BorderLayout.SOUTH);
-        pack();
-        setLocationRelativeTo(parent);
+        buttonPanel.getChildren().add(button);
+        setBottom(buttonPanel);
     }
     
     private void configureSeriesRenderer(ColorPreferenceEntry entry) {
@@ -263,8 +257,8 @@ public class ColorPreferencePanel extends JDialog implements Changeable {
         }
     }
 
-    private void editColor(JButton button) {
-        Color color = JColorChooser.showDialog(this, "Choose Color", button.getBackground());
+    private void editColor(Button button) {
+        Color color = ColorPicker.showDialog(this, "Choose Color", button.getBackground());
         if (color != null) {
             button.setBackground(color);
             ColorPreferenceEntry entry = (ColorPreferenceEntry) button.getClientProperty("entry");

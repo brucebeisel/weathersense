@@ -137,7 +137,7 @@ public class FreePlot extends BorderPane implements EventHandler<ActionEvent> {
     /**
      * Create the panel that allows the user to select the date ranges
      * 
-     * @return The Swing component
+     * @return The JavaFX Node
      */
     private Node createDataRangeSelectionPanel() {
         LocalDate start = LocalDate.now();
@@ -152,7 +152,7 @@ public class FreePlot extends BorderPane implements EventHandler<ActionEvent> {
      * 
      * @param controls The series display controls
      * 
-     * @return The Swing component
+     * @return The JavaFX Node
      */
     private Node createDataSelectionPanel(Collection<SeriesGroupControl> controls) {
         BorderPane p = new BorderPane();

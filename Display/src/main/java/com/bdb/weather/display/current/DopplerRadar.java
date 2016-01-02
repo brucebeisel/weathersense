@@ -31,13 +31,11 @@ import java.util.logging.Logger;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.web.WebEngine;
@@ -156,8 +154,7 @@ public class DopplerRadar extends BorderPane {
             thumbnails.clear();
 
             for (DopplerRadarImage doppler : dopplerRadarImages) {
-                WritableImage thumbnail = SwingFXUtils.toFXImage(doppler.getImage(), null);
-                ImageView iv = new ImageView(thumbnail);
+                ImageView iv = new ImageView(doppler.getImage());
                 iv.setFitWidth(doppler.getImage().getWidth() / 2);
                 iv.setFitHeight(doppler.getImage().getHeight() / 2);
                 iv.setPreserveRatio(true);
@@ -165,7 +162,7 @@ public class DopplerRadar extends BorderPane {
                 thumbnails.add(iv);
             }
 
-            logger.fine("Currently animating " + thumbnails.size() + " thumbnails");
+            logger.log(Level.FINE, "Currently animating %d thumbnails", thumbnails.size());
         }
         catch (Exception e) {
             logger.log(Level.WARNING, "Caught exception while loading Doppler radar image", e);

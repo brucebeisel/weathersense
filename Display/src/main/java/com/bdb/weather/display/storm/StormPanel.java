@@ -16,25 +16,32 @@
  */
 package com.bdb.weather.display.storm;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.Timer;
-import javax.swing.table.DefaultTableModel;
-
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 
-import com.bdb.util.BBTable;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.TilePane;
+import javafx.util.Duration;
+
 import com.bdb.util.Pair;
 import com.bdb.util.jdbc.DBConnection;
 
@@ -49,68 +56,88 @@ import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.RainPlot;
 import com.bdb.weather.display.RainPlot.RainEntry;
+import com.bdb.weather.display.WeatherSense;
 
 /**
  *
  * @author Bruce
  */
-public class StormPanel extends JPanel implements ComponentContainer {
+public class StormPanel extends BorderPane implements ComponentContainer {
     private static final int ANIMATION_INTERVAL = 100;
-    private final JPanel panel = new JPanel();
-    private final JLabel animationStatus = new JLabel();
-    private final JLabel imageLabel = new JLabel("No Doppler Image Yet");
+    private final Label animationStatus = new Label();
+    private final Label imageLabel = new Label("No Doppler Image Yet");
     private final RainPlot rainPlot;
     private final StormTable stormTable;
     private final HistoryTable historyTable;
     private final StormDopplerRadarTable radarTable;
-    private final BBTable table;
+    private final TableView<Storm> table;
     private List<Storm> storms;
-    private TreeMap<LocalDateTime,Pair<DopplerRadarImage,ImageIcon>> images;
+    private TreeMap<LocalDateTime,Pair<DopplerRadarImage,Image>> images;
     private List<RainEntry> entries;
-    private final Timer animationTimer;
+    private final Timeline animationTimer;
     private int currentFrame;
     private Depth totalRain;
-    private final DefaultTableModel model = new DefaultTableModel();
-     private static final String COLUMN_HEADINGS[] = {
+    private static final String COLUMN_HEADINGS[] = {
         "Start Date", "Start Time", "Stop Date", "Stop Time", "Rainfall"
     };
     
     public StormPanel(DBConnection connection) {
-        animationTimer = new Timer(ANIMATION_INTERVAL, (ActionEvent) -> animate());
-        panel.setLayout(new BorderLayout());
+        animationTimer = new Timeline(new KeyFrame(Duration.millis(ANIMATION_INTERVAL), (ActionEvent) -> animate()));
         stormTable = new StormTable(connection);
         historyTable = new HistoryTable(connection);
         radarTable = new StormDopplerRadarTable(connection);
-        table = new BBTable();
-        panel.add(new JScrollPane(table), BorderLayout.WEST);
-        table.setModel(model);
-        model.setColumnIdentifiers(COLUMN_HEADINGS);
+        table = new TableView<>();
+        table.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        this.setLeft(table);
 
-        JPanel animationPanel = new JPanel(new BorderLayout());
-        JPanel animationControlPanel = new JPanel();
-        JButton button = new JButton("Load");
-        animationControlPanel.add(button);
-        button.addActionListener((ActionEvent) -> loadStorm());
+        BorderPane animationPanel = new BorderPane();
+        FlowPane animationControlPanel = new FlowPane();
+        animationControlPanel.setHgap(5);
+        Button button = new Button("Load");
+        animationControlPanel.getChildren().add(button);
+        button.setOnAction((ActionEvent) -> loadStorm());
 
-        button = new JButton("Play");
-        animationControlPanel.add(button);
-        button.addActionListener((ActionEvent) -> startAnimation());
+        button = new Button("Play");
+        animationControlPanel.getChildren().add(button);
+        button.setOnAction((ActionEvent) -> startAnimation());
 
-        button = new JButton("Stop");
-        animationControlPanel.add(button);
-        button.addActionListener((ActionEvent) -> stopAnimation());
+        button = new Button("Stop");
+        animationControlPanel.getChildren().add(button);
+        button.setOnAction((ActionEvent) -> stopAnimation());
 
         animationStatus.setText("Animation not running");
-        animationControlPanel.add(animationStatus);
-        JPanel p = new JPanel(new GridLayout(2,1));
+        animationControlPanel.getChildren().add(animationStatus);
+        TilePane tilePane = new TilePane();
+        tilePane.setPrefRows(2);
+        tilePane.setPrefColumns(1);
         rainPlot = new RainPlot();
-        p.add(imageLabel);
-        //p.add(rainPlot.getComponent());
-        animationPanel.add(animationControlPanel, BorderLayout.NORTH);
-        animationPanel.add(p, BorderLayout.CENTER);
-        panel.add(animationPanel, BorderLayout.CENTER);
+        tilePane.getChildren().add(imageLabel);
+        tilePane.getChildren().add(rainPlot);
+        animationPanel.setTop(animationControlPanel);
+        animationPanel.setCenter(tilePane);
+        this.setCenter(animationPanel);
 
-        loadStormData();
+        TableColumn<Storm,String> column = new TableColumn<>("Start Date");
+        column.setCellValueFactory((rec)->new ReadOnlyStringWrapper(DisplayConstants.formatDate(rec.getValue().getStartTime().toLocalDate())));
+        table.getColumns().add(column);
+
+        column = new TableColumn<>("Start Time");
+        column.setCellValueFactory((rec)->new ReadOnlyStringWrapper(DisplayConstants.formatTime(rec.getValue().getStartTime().toLocalTime())));
+        table.getColumns().add(column);
+
+        column = new TableColumn<>("End Date");
+        column.setCellValueFactory((rec)->new ReadOnlyStringWrapper(rec.getValue().isStormActive() ? "Active" : DisplayConstants.formatDate(rec.getValue().getEndTime().toLocalDate())));
+        table.getColumns().add(column);
+
+        column = new TableColumn<>("End Time");
+        column.setCellValueFactory((rec)->new ReadOnlyStringWrapper(rec.getValue().isStormActive() ? "Active" : DisplayConstants.formatTime(rec.getValue().getEndTime().toLocalTime())));
+        table.getColumns().add(column);
+
+        column = new TableColumn<>("Rainfall");
+        column.setCellValueFactory((rec)->new ReadOnlyStringWrapper(rec.getValue().getStormRainfall().toString()));
+        table.getColumns().add(column);
+
+        Platform.runLater(() -> loadStormData());
     }
 
     @Override
@@ -121,36 +148,23 @@ public class StormPanel extends JPanel implements ComponentContainer {
     private void loadStormData() {
         animationStatus.setText("Animation not running");
         storms = stormTable.query();
-        model.setRowCount(storms.size());
+	ObservableList<Storm> dataModel = FXCollections.observableList(storms);
+        table.setItems(dataModel);
         int row = 0;
-        for (Storm storm : storms) {
-            model.setValueAt(DisplayConstants.formatDate(storm.getStartTime().toLocalDate()), row, 0);
-            model.setValueAt(DisplayConstants.formatTime(storm.getStartTime().toLocalTime()), row, 1);
-            if (storm.isStormActive()) {
-                model.setValueAt("Active", row, 2);
-                model.setValueAt("Active", row, 3);
-            }
-            else {
-                model.setValueAt(DisplayConstants.formatDate(storm.getEndTime().toLocalDate()), row, 2);
-                model.setValueAt(DisplayConstants.formatTime(storm.getEndTime().toLocalTime()), row, 3);
-            }
-
-            model.setValueAt(storm.getStormRainfall(), row++, 4);
-        }
 
         if (!storms.isEmpty())
-            table.getSelectionModel().addSelectionInterval(0, 0);
+            table.getSelectionModel().clearSelection();
 
         currentFrame = 0;
     }
 
     private void loadStorm() {
-        int row = table.getSelectedRow();
+        int row = table.getSelectionModel().getSelectedIndex();
         Storm storm = storms.get(row);
         images = new TreeMap<>();
         entries = new ArrayList<>();
         List<DopplerRadarImage> dopplerList = radarTable.getRadarImagesForStorm(storm.getStartTime());
-        dopplerList.forEach((DopplerRadarImage dri) -> images.put(dri.getTime(), new Pair<>(dri, new ImageIcon(dri.getImage()))));
+        dopplerList.forEach((DopplerRadarImage dri) -> images.put(dri.getTime(), new Pair<>(dri, dri.getImage())));
 
         if (!images.isEmpty()) {
             LocalDateTime endTime = storm.getEndTime();
@@ -158,7 +172,7 @@ public class StormPanel extends JPanel implements ComponentContainer {
             if (endTime == null)
                 endTime = images.lastKey();
 
-            imageLabel.setIcon(images.firstEntry().getValue().second);
+            imageLabel.setGraphic(new ImageView(images.firstEntry().getValue().second));
             imageLabel.setText(null);
 
             List<HistoricalRecord> records = historyTable.queryRecordsForTimePeriod(storm.getStartTime(), endTime);
@@ -176,13 +190,16 @@ public class StormPanel extends JPanel implements ComponentContainer {
 
             rainPlot.setRainData(entries);
         }
-        panel.invalidate();
+
+        WeatherSense.sizeStageToScene(this);
     }
 
     private void startAnimation() {
+        animationTimer.setCycleCount(entries.size());
         if (!entries.isEmpty())
             totalRain = entries.get(0).rainfall;
-        animationTimer.start();
+        currentFrame = 0;
+        animationTimer.playFromStart();
     }
 
     private void stopAnimation() {
@@ -199,9 +216,9 @@ public class StormPanel extends JPanel implements ComponentContainer {
             RainEntry rain = entries.get(currentFrame);
             totalRain = totalRain.add(rain.rainfall);
 
-            Map.Entry<LocalDateTime,Pair<DopplerRadarImage,ImageIcon>> entry = images.ceilingEntry(rain.time);
+            Map.Entry<LocalDateTime,Pair<DopplerRadarImage,Image>> entry = images.ceilingEntry(rain.time);
             if (entry != null)
-                imageLabel.setIcon(entry.getValue().second);
+                imageLabel.setGraphic(new ImageView(entry.getValue().second));
 
             rainPlot.addMarker(rain.time);
 

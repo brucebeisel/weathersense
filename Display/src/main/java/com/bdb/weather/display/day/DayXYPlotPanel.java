@@ -35,7 +35,6 @@ import javafx.event.EventHandler;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
@@ -68,6 +67,7 @@ import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.astronomical.SolarEventCalculator;
+import com.bdb.weather.display.ChartDataPane;
 import com.bdb.weather.display.DisplayConstants;
 
 
@@ -78,7 +78,7 @@ import com.bdb.weather.display.DisplayConstants;
  * 
  * @author Bruce
  */
-abstract public class DayXYPlotPanel extends TabPane implements EventHandler<ActionEvent> {
+abstract public class DayXYPlotPanel extends ChartDataPane implements EventHandler<ActionEvent> {
     protected static final String TIME_HEADING = "Time";
     protected static final int TIME_COLUMN = 0;
 
@@ -111,19 +111,12 @@ abstract public class DayXYPlotPanel extends TabPane implements EventHandler<Act
     protected final void createElements() {
         createChartElements();
 
-	this.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-
-	Tab tab = new Tab(DisplayConstants.GRAPH_TAB_NAME);
-	tab.setContent(chartViewer);
-        this.getTabs().add(tab);
-
         //
         // Build the table for the data tab
         //
         dataTable = new TableView<>();
-	tab = new Tab(DisplayConstants.DATA_TAB_NAME);
-	tab.setContent(dataTable);
-        this.getTabs().add(tab);
+
+        this.setTabContents(chartViewer, dataTable);
 
         TableColumn<HistoricalRecord,String> col = new TableColumn<>(TIME_HEADING);
         col.setCellValueFactory((rec)->new ReadOnlyStringWrapper(DisplayConstants.formatTime(rec.getValue().getTime().toLocalTime())));

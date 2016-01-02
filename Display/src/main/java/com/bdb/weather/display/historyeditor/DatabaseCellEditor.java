@@ -16,32 +16,27 @@
  */
 package com.bdb.weather.display.historyeditor;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-public class DatabaseCellEditor extends JPanel implements ActionListener {
-    private static final long serialVersionUID = -9201809790961007288L;
-    private final JCheckBox isNullCB = new JCheckBox();
-    private final JTextField value = new JTextField(5); // TODO Use formatted text field?
+public class DatabaseCellEditor extends BorderPane implements EventHandler<ActionEvent> {
+    private final CheckBox isNullCB = new CheckBox();
+    private final TextField value = new TextField(); // TODO Use formatted text field?
     
     @SuppressWarnings("LeakingThisInConstructor")
     public DatabaseCellEditor() {
-        super(new BorderLayout());
         setNull(true);
-        isNullCB.addActionListener(this);
-        JPanel p = new JPanel();
-        p.add(isNullCB);
-        p.add(new JLabel("null  "));
-        add(p, BorderLayout.WEST);
-        add(value, BorderLayout.CENTER);
+        isNullCB.setOnAction(this);
+        FlowPane p = new FlowPane();
+        p.getChildren().add(isNullCB);
+        p.getChildren().add(new Label("null  "));
+        setLeft(p);
+        setCenter(value);
     }
     
     public DatabaseCellEditor(String value) {
@@ -68,17 +63,7 @@ public class DatabaseCellEditor extends JPanel implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void handle(ActionEvent e) {
         value.setEditable(!isNullCB.isSelected());
     }
-    
-    public static void main(String [] args) {
-        JFrame frame = new JFrame("Database Cell Editor Test");
-        frame.setLayout(new GridLayout(3,3));
-        for (int i = 0; i < 9; i++)
-            frame.add(new DatabaseCellEditor());
-        frame.pack();
-        frame.setVisible(true);
-    }
-
 }

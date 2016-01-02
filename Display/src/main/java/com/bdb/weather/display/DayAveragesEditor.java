@@ -17,30 +17,27 @@
 package com.bdb.weather.display;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.Format;
 import java.text.ParsePosition;
 import java.time.LocalDate;
+import java.util.Arrays;
 
-import javax.swing.DefaultCellEditor;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.border.EtchedBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
+
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+import javafx.stage.FileChooser;
 
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.weather.common.DayWeatherAverages;
@@ -49,6 +46,7 @@ import com.bdb.weather.common.Location;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.db.DailyAveragesTable;
+import static com.sun.javafx.fxml.expression.Expression.add;
 
 
 /**
@@ -57,113 +55,98 @@ import com.bdb.weather.common.db.DailyAveragesTable;
  * @author Bruce
  *
  */
-public final class DayAveragesEditor extends JDialog implements ActionListener {
-    private static final long serialVersionUID = -1789278579624833961L;
+public final class DayAveragesEditor extends BorderPane implements EventHandler<ActionEvent> {
     private static final String OK_COMMAND = "OK";
     private static final String CANCEL_COMMAND = "CANCEL";
     private static final String IMPORT_COMMAND = "IMPORT";
     private static final String EXPORT_COMMAND = "EXPORT";
     private final String                  locationName;
-    private final JFrame                  frame;
-    private final JTable                  averagesTable;
+    private final TableView<DayWeatherAverages> averagesTable;
     private final DailyAveragesTable      dailyAveragesDbTable;
     private DayWeatherAverages      averages;
     private final FileNameExtensionFilter fileFilter = new FileNameExtensionFilter("CSV", "csv");
     
     @SuppressWarnings("LeakingThisInConstructor")
-    private DayAveragesEditor(JFrame owner, DBConnection connection, String locationName) {
-        super(owner, true);
-        frame = owner;
+    private DayAveragesEditor(DBConnection connection, String locationName) {
         this.locationName = locationName;
         dailyAveragesDbTable = new DailyAveragesTable(connection);
         averages = dailyAveragesDbTable.retrieveDailyAverages();
         if (averages == null)
             averages = new DayWeatherAverages();
         
-        setTitle("Edit Location - " + locationName);
+        WeatherSense.setStageTitle(this, "Edit Location - " + locationName);
 
-        setLayout(new BorderLayout());
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setBorder(new EtchedBorder());
-        JButton button = new JButton("OK");
-        button.setActionCommand(OK_COMMAND);
-        button.addActionListener(this);
-        buttonPanel.add(button);
+        FlowPane buttonPanel = new FlowPane();
+
+        //buttonPanel.setBorder(new EtchedBorder());
+        Button button = new Button("OK");
+        //button.setActionCommand(OK_COMMAND);
+        button.setOnAction(this);
+        buttonPanel.getChildren().add(button);
         
-        button = new JButton("Cancel");
-        button.setActionCommand(CANCEL_COMMAND);
-        button.addActionListener(this);
-        buttonPanel.add(button);
+        button = new Button("Cancel");
+        //button.setActionCommand(CANCEL_COMMAND);
+        button.setOnAction(this);
+        buttonPanel.getChildren().add(button);
         
         add(buttonPanel, BorderLayout.SOUTH);
         
-        JPanel attributePanel = new JPanel();
-        attributePanel.setLayout(new BorderLayout());
-        attributePanel.setBorder(new EtchedBorder());
+        BorderPane attributePanel = new BorderPane();
+        //attributePanel.setBorder(new EtchedBorder());
         
-        JPanel p = new JPanel();
-        p.setLayout(new BorderLayout());
+        BorderPane p = new BorderPane();
         averagesTable = new AveragesTable(averages);
-        JScrollPane sp = new JScrollPane(averagesTable);
-        p.add(sp, BorderLayout.CENTER);
+        p.setCenter(averagesTable);
         
-        buttonPanel = new JPanel();
+        buttonPanel = new FlowPane();
         
-        button = new JButton("Import...");
-        button.setActionCommand(IMPORT_COMMAND);
-        button.addActionListener(this);
-        buttonPanel.add(button);
+        button = new Button("Import...");
+        //button.setActionCommand(IMPORT_COMMAND);
+        button.setOnAction(this);
+        buttonPanel.getChildren().add(button);
         
-        button = new JButton("Export...");
-        button.setActionCommand(EXPORT_COMMAND);
-        button.addActionListener(this);
-        buttonPanel.add(button);
-        p.add(buttonPanel, BorderLayout.SOUTH);
+        button = new Button("Export...");
+        //button.setActionCommand(EXPORT_COMMAND);
+        button.setOnAction(this);
+        buttonPanel.getChildren().add(button);
+        p.setBottom(buttonPanel);
         
-        attributePanel.add(p, BorderLayout.CENTER);
+        attributePanel.setCenter(p);
  
-        add(attributePanel, BorderLayout.CENTER);
-        
-        pack();
-        
-        setLocationRelativeTo(owner);
-        
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setCenter(attributePanel);
     }
     
-    public static void editAverages(JFrame frame, DBConnection connection, String locationName) {
-        JDialog dialog = new DayAveragesEditor(frame, connection, locationName);
-        dialog.setVisible(true);
+    public static void editAverages(DBConnection connection, String locationName) {
+        //JDialog dialog = new DayAveragesEditor(frame, connection, locationName);
+        //dialog.setVisible(true);
     }
     
     @Override
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+    public void handle(ActionEvent event) {
+        String command = event.toString();
         switch (command) {
             case EXPORT_COMMAND: {
-                JFileChooser chooser = new JFileChooser();
-                chooser.addChoosableFileFilter(fileFilter);
-                chooser.setApproveButtonText("Export");
-                int returnVal = chooser.showOpenDialog(frame);
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File file = chooser.getSelectedFile();
+                FileChooser chooser = new FileChooser();
+                chooser.getExtensionFilters().addAll(Arrays.asList(fileFilter));
+                //chooser.setApproveButtonText("Export");
+                File file = chooser.showOpenDialog(frame);
+                if (file != null) {
                     try {
                         Location.exportCSVFile(file, locationName, averages);
-                        JOptionPane.showMessageDialog(frame, "Averages successfully exported", "Export", JOptionPane.INFORMATION_MESSAGE);
+                        ErrorDisplayer.getInstance().displayInformation("Averages successfully exported");
                     }
                     catch (FileNotFoundException e) {
-                        JOptionPane.showMessageDialog(frame, "Error saving CSV file", "File Error", JOptionPane.ERROR_MESSAGE);
+                        ErrorDisplayer.getInstance().displayError("Error saving CSV file");
                     }
                 }
                 break;
             }
             case IMPORT_COMMAND: {
-                JFileChooser chooser = new JFileChooser();
-                chooser.addChoosableFileFilter(fileFilter);
-                chooser.setApproveButtonText("Import");
-                int returnVal = chooser.showOpenDialog(frame);
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File file = chooser.getSelectedFile();
+                FileChooser chooser = new FileChooser();
+                //chooser.addChoosableFileFilter(fileFilter);
+                //chooser.setApproveButtonText("Import");
+                File file = chooser.showOpenDialog(frame);
+                if (file != null) {
                     try {
                         Location.importCSVFile(file, locationName, averages);
                         ((AbstractTableModel)averagesTable.getModel()).fireTableDataChanged();
@@ -191,25 +174,27 @@ public final class DayAveragesEditor extends JDialog implements ActionListener {
  * @author Bruce
  *
  */
-class AveragesTable extends JTable {
-    private static final long serialVersionUID = -3780972995860735557L;
+class AveragesTable extends TableView<DayWeatherAverages> {
     private final AveragesTableModel model;
 
     public AveragesTable(DayWeatherAverages avgs) {
-        super(new AveragesTableModel(avgs));
-        model = (AveragesTableModel)getModel();
-        JTextField tmp = new JTextField();
-        setRowHeight(tmp.getPreferredSize().height);
+        //super(new AveragesTableModel(avgs));
+        //model = (AveragesTableModel)getModel();
+        TextField tmp = new TextField();
+        //setRowHeight(tmp.getPrefHeight());
+        model = null;
     }
     
     public void setValues(DayWeatherAverages avgs) {
         model.setValues(avgs);
     }
     
+    /*
     @Override
     public TableCellEditor getCellEditor(int row, int column) {
         return model.getColumnEditor(column);
     }
+    */
 }
 
 //
@@ -244,6 +229,7 @@ class AveragesTableModel extends AbstractTableModel {
         Depth.getDefaultFormatter(),
     };
     
+    /*
     private static final TableCellEditor CELL_EDITORS[] = {
         null,
         new DefaultCellEditor(new JFormattedTextField(COLUMN_FORMAT[1])),
@@ -251,6 +237,7 @@ class AveragesTableModel extends AbstractTableModel {
         new DefaultCellEditor(new JFormattedTextField(COLUMN_FORMAT[3])),
         new DefaultCellEditor(new JFormattedTextField(COLUMN_FORMAT[4]))
     };
+*/
     
     public AveragesTableModel(DayWeatherAverages avgs) {
         lookupDate = lookupDate.withYear(YEAR_THAT_IS_NOT_A_LEAP_YEAR);

@@ -24,7 +24,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.TimeZone;
 
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
@@ -158,8 +157,7 @@ public class TemperatureDeviationPlotPanel extends ChartDataPane {
 
 	//tableModel.setColumnCount(TABLE_HEADINGS.length);
 
-	ScrollPane sp = new ScrollPane(dataTable);
-        this.setTabContents(chartViewer, sp);
+        this.setTabContents(chartViewer, dataTable);
 
 	lowRenderer.setBasePaint(Color.BLUE);
 	lowRenderer.setBaseItemLabelGenerator(labelGen);
