@@ -42,6 +42,7 @@ import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.DateInterval;
+import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.ViewLauncher;
 import com.bdb.weather.display.WeatherSense;
 
@@ -107,7 +108,7 @@ public class YearlySummariesPanel extends BorderPane implements SummarySupporter
     
     public void setWindowTitle() {
         String dateString = dateFormat.format(dataRange.getStart()) + " - " + dateFormat.format(dataRange.getEnd());
-        WeatherSense.setStageTitle(this, dateString);
+        StageUtilities.setStageTitle(this, dateString);
     }
 
     private void loadData(LocalDate startDate, LocalDate endDate) {

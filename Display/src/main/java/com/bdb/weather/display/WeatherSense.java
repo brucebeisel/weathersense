@@ -30,14 +30,12 @@ import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.weather.common.WeatherStation;
@@ -142,26 +140,6 @@ public class WeatherSense extends Application {
     public void stop() {
 	timer.shutdownNow();
         controller.stop();
-
-    }
-
-    public static void setStageTitle(Node node, String title) {
-        Window window = node.getScene().getWindow();
-        if (window instanceof Stage)
-            ((Stage)window).setTitle(title);
-    }
-    public static String getStageTitle(Node node) {
-        Window window = node.getScene().getWindow();
-        if (window instanceof Stage)
-            return ((Stage)window).getTitle();
-        else
-            return "";
-    }
-
-    public static void sizeStageToScene(Node node) {
-        Window window = node.getScene().getWindow();
-        if (window instanceof Stage)
-            ((Stage)window).sizeToScene();
 
     }
 

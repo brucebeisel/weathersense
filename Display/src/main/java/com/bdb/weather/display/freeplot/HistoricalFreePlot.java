@@ -48,6 +48,7 @@ import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.common.measurement.SolarRadiation;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
+import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.WeatherSenseConstants;
 import com.bdb.weather.display.axis.HumidityRangeAxis;
 import com.bdb.weather.display.axis.PressureRangeAxis;
@@ -248,8 +249,8 @@ public class HistoricalFreePlot implements SeriesFactory, SeriesCollectionFactor
     private List<FreePlotSeries<HistoricalRecord>> createTemperatureSeries(Stroke stroke, Function<HistoricalRecord,TemporalAccessor> timeMethod) {
         List<FreePlotSeries<HistoricalRecord>> list = new ArrayList<>();
         int n = 0;
-        list.add(new FreePlotSeries<>(OUTDOOR_TEMPERATURE_SERIES_NAME, n++, UserPreferences.getInstance().getOutdoorTempColorPref(), stroke, HistoricalRecord::getAvgOutdoorTemperature, timeMethod, INTERVAL_CLASS));
-        list.add(new FreePlotSeries<>(INDOOR_TEMPERATURE_SERIES_NAME, n++, UserPreferences.getInstance().getIndoorTempColorPref(), stroke, HistoricalRecord::getIndoorTemperature, timeMethod, INTERVAL_CLASS));
+        list.add(new FreePlotSeries<>(OUTDOOR_TEMPERATURE_SERIES_NAME, n++, StageUtilities.toAwtColor(UserPreferences.getInstance().getOutdoorTempColorPref()), stroke, HistoricalRecord::getAvgOutdoorTemperature, timeMethod, INTERVAL_CLASS));
+        list.add(new FreePlotSeries<>(INDOOR_TEMPERATURE_SERIES_NAME, n++, StageUtilities.toAwtColor(UserPreferences.getInstance().getIndoorTempColorPref()), stroke, HistoricalRecord::getIndoorTemperature, timeMethod, INTERVAL_CLASS));
         list.add(new FreePlotSeries<>(DEW_POINT_SERIES_NAME, n++, Color.BLUE, stroke, HistoricalRecord::getDewPoint, timeMethod, INTERVAL_CLASS));
         list.add(new FreePlotSeries<>(HEAT_INDEX_SERIES_NAME, n++, Color.MAGENTA, stroke, HistoricalRecord::getHeatIndex, timeMethod, INTERVAL_CLASS));
         list.add(new FreePlotSeries<>(WIND_CHILL_SERIES_NAME, n++, Color.PINK, stroke, HistoricalRecord::getWindChill, timeMethod, INTERVAL_CLASS));

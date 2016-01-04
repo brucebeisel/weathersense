@@ -46,6 +46,7 @@ import com.bdb.weather.common.db.MonthlyAveragesTable;
 import com.bdb.weather.common.db.MonthlySummaryTable;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.DateInterval;
+import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.ViewLauncher;
 import com.bdb.weather.display.WeatherSense;
 
@@ -112,7 +113,7 @@ public class MonthlySummariesPanel extends BorderPane implements EventHandler<Ac
     public void setWindowTitle() {
         DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
         String dateString = df.format(startDate) + " - " + df.format(endDate);
-        WeatherSense.setStageTitle(this, dateString);
+        StageUtilities.setStageTitle(this, dateString);
     }
 
     private void loadData(LocalDate startDate, LocalDate endDate) {

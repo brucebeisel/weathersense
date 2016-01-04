@@ -16,22 +16,13 @@
  */
 package com.bdb.weather.display.preferences;
 
-import java.awt.Color;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
-import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.paint.Color;
 
 import com.bdb.weather.common.db.DatabaseConstants;
-import com.bdb.weather.common.measurement.Depth;
-import com.bdb.weather.common.measurement.Distance;
-import com.bdb.weather.common.measurement.Pressure;
-import com.bdb.weather.common.measurement.Speed;
-import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.ErrorDisplayer;
 import com.bdb.weather.display.WeatherSense;
 
@@ -117,50 +108,68 @@ public class UserPreferences {
     public void sync() {
         try {
             plotColorNode.sync();
+            dbNode.sync();
         }
         catch (BackingStoreException e) {
             ErrorDisplayer.getInstance().displayError("User preference storage error. Please contact support");
         }
     }
 
+    private static String colorToString(Color color) {
+        return String.format("#%02x%02x%02x", (int)(color.getRed() * 255), (int)(color.getGreen() * 255), (int)(color.getBlue() * 255));
+    }
+
     public void putColorPref(String preferenceName, Color color) {
-        plotColorNode.putInt(preferenceName, color.getRGB());
+        plotColorNode.put(preferenceName, colorToString(color));
     }
     
+    private Color getColorPref(String preferenceName, Color defaultColor) {
+        try {
+            String value = plotColorNode.get(preferenceName, null);
+            if (value != null)
+                return Color.web(value);
+            else
+                return defaultColor;
+        }
+        catch (IllegalArgumentException e) {
+            return defaultColor;
+        }
+    }
+
     public Color getColorPref(String preferenceName) {
-        return new Color(plotColorNode.getInt(preferenceName, Color.RED.getRGB()));
+        return getColorPref(preferenceName, Color.RED);
     }
     
     public void putHighOutdoorTempColorPref(Color color) {
-        plotColorNode.putInt(HIGH_OUTDOOR_TEMP_COLOR_PREF, color.getRGB());
+        plotColorNode.put(HIGH_OUTDOOR_TEMP_COLOR_PREF, colorToString(color));
     }
 
     public Color getHighOutdoorTempColorPref() {
-        return new Color(plotColorNode.getInt(HIGH_OUTDOOR_TEMP_COLOR_PREF, Color.RED.getRGB()));
+        return getColorPref(HIGH_OUTDOOR_TEMP_COLOR_PREF, Color.RED);
     }
 
     public void putLowOutdoorTempColorPref(Color color) {
-        plotColorNode.putInt(LOW_OUTDOOR_TEMP_COLOR_PREF, color.getRGB());
+        plotColorNode.put(LOW_OUTDOOR_TEMP_COLOR_PREF, colorToString(color));
     }
 
     public Color getLowOutdoorTempColorPref() {
-        return new Color(plotColorNode.getInt(LOW_OUTDOOR_TEMP_COLOR_PREF, Color.BLUE.getRGB()));
+        return getColorPref(LOW_OUTDOOR_TEMP_COLOR_PREF, Color.BLUE);
     }
 
     public void putIndoorTempColorPref(Color color) {
-        plotColorNode.putInt(INDOOR_TEMP_COLOR_PREF, color.getRGB());
+        plotColorNode.put(INDOOR_TEMP_COLOR_PREF, colorToString(color));
     }
 
     public Color getIndoorTempColorPref() {
-        return new Color(plotColorNode.getInt(INDOOR_TEMP_COLOR_PREF, Color.CYAN.getRGB()));
+        return getColorPref(INDOOR_TEMP_COLOR_PREF, Color.CYAN);
     }
 
     public void putOutdoorTempColorPref(Color color) {
-        plotColorNode.putInt(OUTDOOR_TEMP_COLOR_PREF, color.getRGB());
+        plotColorNode.put(OUTDOOR_TEMP_COLOR_PREF, colorToString(color));
     }
 
     public Color getOutdoorTempColorPref() {
-        return new Color(plotColorNode.getInt(OUTDOOR_TEMP_COLOR_PREF, Color.MAGENTA.getRGB()));
+        return getColorPref(OUTDOOR_TEMP_COLOR_PREF, Color.MAGENTA);
     }
 
     public String getDbHostPref() {

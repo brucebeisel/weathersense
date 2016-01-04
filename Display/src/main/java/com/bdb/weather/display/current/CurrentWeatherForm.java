@@ -41,6 +41,7 @@ import com.bdb.weather.common.CurrentWeather;
 import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.measurement.Humidity;
 import com.bdb.weather.common.measurement.Temperature;
+import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.WeatherSense;
 
 /**
@@ -135,11 +136,11 @@ public class CurrentWeatherForm extends GridPane implements CurrentWeatherProces
     @Override
     public void updateCurrentWeather(CurrentWeather cw) {
         if (frameTitle == null)
-            frameTitle = WeatherSense.getStageTitle(this);
+            frameTitle = StageUtilities.getStageTitle(this);
 
         String date = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.MEDIUM).format(cw.getTime());
         String ammendedFrameTitle = frameTitle + " " + date;
-        WeatherSense.setStageTitle(this, ammendedFrameTitle);
+        StageUtilities.setStageTitle(this, ammendedFrameTitle);
 
         indoorTemperature.setText(cw.getIndoorTemperature().toString());
         outdoorTemperature.setText(cw.getOutdoorTemperature().toString());

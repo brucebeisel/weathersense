@@ -51,6 +51,7 @@ import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.display.CurrentWeatherProcessor;
 import com.bdb.weather.display.RainBucket;
 import com.bdb.weather.display.RainPlot;
+import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.WeatherDataMgr;
 import com.bdb.weather.display.WeatherSense;
 import com.bdb.weather.display.preferences.UnitsPreferences;
@@ -212,7 +213,7 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
      */
     public void loadData(CurrentWeather cw) throws SQLException {
 	if (frameTitle == null)
-	    frameTitle = WeatherSense.getStageTitle(this);
+	    frameTitle = StageUtilities.getStageTitle(this);
 
         // TODO check the age of the current weather. if it is more that about 20 minutes old, ignore it
         LocalDateTime now = LocalDateTime.now();
@@ -323,7 +324,7 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         calendarYearRain.setRainfallAmount(cw.getRainCalendarYear().get());
 	String date = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.MEDIUM).format(cw.getTime());
 	String ammendedFrameTitle = frameTitle + " " + date;
-	WeatherSense.setStageTitle(this, ammendedFrameTitle);
+	StageUtilities.setStageTitle(this, ammendedFrameTitle);
     }
 
     public void closing() {

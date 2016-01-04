@@ -16,6 +16,7 @@
  */
 package com.bdb.weather.display.storm;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +29,8 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -38,8 +39,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.TilePane;
 import javafx.util.Duration;
 
 import com.bdb.util.Pair;
@@ -52,25 +51,25 @@ import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.common.db.StormDopplerRadarTable;
 import com.bdb.weather.common.db.StormTable;
 import com.bdb.weather.common.measurement.Depth;
-import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.RainPlot;
 import com.bdb.weather.display.RainPlot.RainEntry;
+import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.WeatherSense;
 
 /**
  *
  * @author Bruce
  */
-public class StormPanel extends BorderPane implements ComponentContainer {
+public class StormPanel extends BorderPane {
     private static final int ANIMATION_INTERVAL = 100;
-    private final Label animationStatus = new Label();
-    private final Label imageLabel = new Label("No Doppler Image Yet");
-    private final RainPlot rainPlot;
     private final StormTable stormTable;
     private final HistoryTable historyTable;
     private final StormDopplerRadarTable radarTable;
-    private final TableView<Storm> table;
+    @FXML  private TableView<Storm> table;
+    @FXML private Label animationStatus = new Label();
+    @FXML private Label dopplerRadarImage = new Label("No Doppler Image Yet");
+    @FXML private RainPlot rainPlot;
     private List<Storm> storms;
     private TreeMap<LocalDateTime,Pair<DopplerRadarImage,Image>> images;
     private List<RainEntry> entries;
@@ -86,36 +85,19 @@ public class StormPanel extends BorderPane implements ComponentContainer {
         stormTable = new StormTable(connection);
         historyTable = new HistoryTable(connection);
         radarTable = new StormDopplerRadarTable(connection);
-        table = new TableView<>();
+
+
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/StormPane.fxml"));
+            fxmlLoader.setRoot(this);
+            fxmlLoader.setController(this);
+            fxmlLoader.load();
+        }
+	catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+
         table.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        this.setLeft(table);
-
-        BorderPane animationPanel = new BorderPane();
-        FlowPane animationControlPanel = new FlowPane();
-        animationControlPanel.setHgap(5);
-        Button button = new Button("Load");
-        animationControlPanel.getChildren().add(button);
-        button.setOnAction((ActionEvent) -> loadStorm());
-
-        button = new Button("Play");
-        animationControlPanel.getChildren().add(button);
-        button.setOnAction((ActionEvent) -> startAnimation());
-
-        button = new Button("Stop");
-        animationControlPanel.getChildren().add(button);
-        button.setOnAction((ActionEvent) -> stopAnimation());
-
-        animationStatus.setText("Animation not running");
-        animationControlPanel.getChildren().add(animationStatus);
-        TilePane tilePane = new TilePane();
-        tilePane.setPrefRows(2);
-        tilePane.setPrefColumns(1);
-        rainPlot = new RainPlot();
-        tilePane.getChildren().add(imageLabel);
-        tilePane.getChildren().add(rainPlot);
-        animationPanel.setTop(animationControlPanel);
-        animationPanel.setCenter(tilePane);
-        this.setCenter(animationPanel);
 
         TableColumn<Storm,String> column = new TableColumn<>("Start Date");
         column.setCellValueFactory((rec)->new ReadOnlyStringWrapper(DisplayConstants.formatDate(rec.getValue().getStartTime().toLocalDate())));
@@ -140,11 +122,6 @@ public class StormPanel extends BorderPane implements ComponentContainer {
         Platform.runLater(() -> loadStormData());
     }
 
-    @Override
-    public Node getComponent() {
-        return null;
-    }
-
     private void loadStormData() {
         animationStatus.setText("Animation not running");
         storms = stormTable.query();
@@ -158,6 +135,7 @@ public class StormPanel extends BorderPane implements ComponentContainer {
         currentFrame = 0;
     }
 
+    @FXML
     private void loadStorm() {
         int row = table.getSelectionModel().getSelectedIndex();
         Storm storm = storms.get(row);
@@ -172,8 +150,8 @@ public class StormPanel extends BorderPane implements ComponentContainer {
             if (endTime == null)
                 endTime = images.lastKey();
 
-            imageLabel.setGraphic(new ImageView(images.firstEntry().getValue().second));
-            imageLabel.setText(null);
+            dopplerRadarImage.setGraphic(new ImageView(images.firstEntry().getValue().second));
+            dopplerRadarImage.setText(null);
 
             List<HistoricalRecord> records = historyTable.queryRecordsForTimePeriod(storm.getStartTime(), endTime);
             boolean foundFirstRain = false;
@@ -191,9 +169,10 @@ public class StormPanel extends BorderPane implements ComponentContainer {
             rainPlot.setRainData(entries);
         }
 
-        WeatherSense.sizeStageToScene(this);
+        StageUtilities.sizeStageToScene(this);
     }
 
+    @FXML
     private void startAnimation() {
         animationTimer.setCycleCount(entries.size());
         if (!entries.isEmpty())
@@ -202,6 +181,7 @@ public class StormPanel extends BorderPane implements ComponentContainer {
         animationTimer.playFromStart();
     }
 
+    @FXML
     private void stopAnimation() {
         animationTimer.stop();
     }
@@ -218,7 +198,7 @@ public class StormPanel extends BorderPane implements ComponentContainer {
 
             Map.Entry<LocalDateTime,Pair<DopplerRadarImage,Image>> entry = images.ceilingEntry(rain.time);
             if (entry != null)
-                imageLabel.setGraphic(new ImageView(entry.getValue().second));
+                dopplerRadarImage.setGraphic(new ImageView(entry.getValue().second));
 
             rainPlot.addMarker(rain.time);
 

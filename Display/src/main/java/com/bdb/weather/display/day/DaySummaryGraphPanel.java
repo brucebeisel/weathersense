@@ -41,6 +41,7 @@ import com.bdb.weather.common.db.DailyRecordsTable;
 import com.bdb.weather.common.db.DailySummaryTable;
 import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.display.DisplayConstants;
+import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.WeatherSense;
 
 /**
@@ -100,7 +101,7 @@ public class DaySummaryGraphPanel extends BorderPane {
      */
     public void setTitle() {
         String dateString = DisplayConstants.formatDate(date);
-        WeatherSense.setStageTitle(this, dateString);
+        StageUtilities.setStageTitle(this, dateString);
     }
 
     /**

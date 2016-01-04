@@ -16,10 +16,9 @@
  */
 package com.bdb.weather.display.preferences;
 
-import java.awt.Color;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
@@ -41,12 +40,14 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import com.bdb.weather.display.Changeable;
+import com.bdb.weather.display.StageUtilities;
+import com.bdb.weather.display.WeatherSense;
 
 public class ColorPreferencePanel extends BorderPane implements Changeable {
 
     private class ColorPreferenceEntry {
         public String preferenceName;
-        public Button button;
+        public ColorPicker button;
         public int row;
         public int column;
 
@@ -72,7 +73,7 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
         "Rain"
     };
     private static final Logger logger = Logger.getLogger(ColorPreferencePanel.class.getName());
-    private final UserPreferences preferences;
+    private final UserPreferences preferences = UserPreferences.getInstance();
     private final XYSeriesCollection dataset = new XYSeriesCollection();
     private final DefaultXYItemRenderer renderer = new DefaultXYItemRenderer();
     private boolean dirty = false;
@@ -105,18 +106,12 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
         new ColorPreferenceEntry(UserPreferences.AVG_WIND_SPEED_COLOR_PREF, 9, 4),
         new ColorPreferenceEntry(UserPreferences.WIND_GUST_COLOR_PREF, 10, 1),
         new ColorPreferenceEntry(UserPreferences.MAX_WIND_GUST_COLOR_PREF, 10, 2),
-        new ColorPreferenceEntry(UserPreferences.RAIN_COLOR_PREF, 11, 1),};
+        new ColorPreferenceEntry(UserPreferences.RAIN_COLOR_PREF, 11, 1)
+    };
 
-    public ColorPreferencePanel(UserPreferences preferences) {
-        this.preferences = preferences;
+    public ColorPreferencePanel() {
         GridPane colorPanel = new GridPane();
 
-        //c.anchor = GridBagConstraints.CENTER;
-        //c.ipadx = 3;
-        //c.ipady = 5;
-        //c.gridx = 0;
-        //c.gridy = 0;
-        //c.fill = GridBagConstraints.NONE;
         int gridx = 0;
         int gridy = 0;
 
@@ -140,23 +135,21 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
             gridx = 5;
             
             Set<String> names = ColorSchemeCollection.getColorSchemeNames();
-            String[] list = new String[names.size()];
-            names.toArray(list);
-            ComboBox<String> scheme = new ComboBox<String>(Arrays.asList(list));
-            scheme.putClientProperty("row", gridy);
-            colorPanel.add(scheme, c);
+            ComboBox<String> scheme = new ComboBox<>();
+            scheme.getItems().addAll(names);
+            scheme.setUserData(gridy);
+            colorPanel.add(scheme, gridx, gridy);
             scheme.setOnAction((ActionEvent e) -> {
-                @SuppressWarnings("unchecked")
                 ComboBox<String> cb = (ComboBox<String>)e.getSource();
-                applyColorScheme((Integer)cb.getClientProperty("row"), cb.getItemAt(cb.getSelectedIndex()));
+                applyColorScheme((Integer)cb.getUserData(), cb.getSelectionModel().getSelectedItem());
             });
             gridx = 6;
             CheckBox showSeries = new CheckBox();
-            showSeries.putClientProperty("row", gridy);
+            showSeries.setUserData(gridy);
             colorPanel.add(showSeries, gridx, gridy);
             showSeries.setOnAction((ActionEvent e) -> {
                 CheckBox cb = (CheckBox)e.getSource();
-                int row = (Integer)cb.getClientProperty("row");
+                int row = (Integer)cb.getUserData();
                 for (ColorPreferenceEntry entry : entries) {
                     if (entry.row == row) {
                         addRemoveSeries(entry.preferenceName, cb.isSelected());
@@ -172,13 +165,9 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
             gridx = entry.column;
             gridy = entry.row;
             ColorPicker button = new ColorPicker();
-            //button.setBackground(preferences.getColorPref(entry.preferenceName));
-            //button.setSize(20, 20);
-            button.setPrefSize(10, 10);
-            button.putClientProperty("entry", entry);
-            button.setOnAction((ActionEvent e) -> {
-                editColor((Button)e.getSource());
-            });
+            button.setValue(preferences.getColorPref(entry.preferenceName));
+            //button.setPrefSize(10, 10);
+            button.setUserData(entry);
             colorPanel.add(button, gridx, gridy);
             entry.button = button;
         }
@@ -206,7 +195,7 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
     private void configureSeriesRenderer(ColorPreferenceEntry entry) {
         int index = dataset.indexOf(entry.preferenceName);
         if (index >= 0)
-            renderer.setSeriesPaint(index, entry.button.getBackground());
+            renderer.setSeriesPaint(index, StageUtilities.toAwtColor(entry.button.getValue()));
     }
 
     private void applyColorScheme(int row, String schemeName) {
@@ -215,7 +204,7 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
             if (entry.row == row) {
                 int column = entry.column - 1;
                 if (column < scheme.getSchemeColorCount()) {
-                    entry.button.setBackground(scheme.getColor(column));
+                    entry.button.setValue(scheme.getColor(column));
                     configureSeriesRenderer(entry);
                     dirty = true;
                 }
@@ -238,8 +227,9 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
             XYSeries series = dataset.getSeries(i);
             series.clear();
             for (int j = 0; j < 360; j++) {
-                series.add(j / 360.0, Math.sin(Math.toRadians(j + (i * (360.0 / dataset.getSeriesCount())))));
+                series.add(j / 360.0, Math.sin(Math.toRadians(j + (i * (360.0 / dataset.getSeriesCount())))), false);
             }
+            series.fireSeriesChanged();
         }
     }
 
@@ -250,22 +240,23 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
 
             for (ColorPreferenceEntry entry : entries) {
                 if (entry.preferenceName.equals(seriesName)) {
-                    renderer.setSeriesPaint(i, entry.button.getBackground());
+                    renderer.setSeriesPaint(i, StageUtilities.toAwtColor(entry.button.getValue()));
                     break;
                 }
             }
         }
     }
 
+    /*
     private void editColor(Button button) {
         Color color = ColorPicker.showDialog(this, "Choose Color", button.getBackground());
         if (color != null) {
-            button.setBackground(color);
             ColorPreferenceEntry entry = (ColorPreferenceEntry) button.getClientProperty("entry");
             configureSeriesRenderer(entry);
             dirty = true;
         }
     }
+    */
 
     /*
      * (non-Javadoc)
@@ -293,7 +284,7 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
     @Override
     public boolean saveData() {
         for (ColorPreferenceEntry entry : entries) {
-            preferences.putColorPref(entry.preferenceName, entry.button.getBackground());
+            preferences.putColorPref(entry.preferenceName, entry.button.getValue());
         }
         return true;
     }

@@ -55,6 +55,7 @@ import com.bdb.weather.common.db.DailySummaryTable;
 import com.bdb.weather.common.db.TemperatureRecordTable;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.DateInterval;
+import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.ViewLauncher;
 import com.bdb.weather.display.WeatherSense;
 
@@ -173,7 +174,7 @@ public final class DailySummariesPanel extends BorderPane implements EventHandle
 
             DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
             String dateString = df.format(startDate) + " - " + df.format(endDate);
-            WeatherSense.setStageTitle(this, dateString);
+            StageUtilities.setStageTitle(this, dateString);
         }
     }
 

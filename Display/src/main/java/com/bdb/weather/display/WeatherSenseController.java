@@ -39,6 +39,7 @@ import com.bdb.weather.display.current.CurrentWeatherForm;
 import com.bdb.weather.display.day.DaySummaryGraphPanel;
 import com.bdb.weather.display.day.TodayGraphPanel;
 import com.bdb.weather.display.freeplot.HistoricalFreePlot;
+import com.bdb.weather.display.preferences.ColorPreferencePanel;
 import com.bdb.weather.display.preferences.UnitsPreferenceDialog;
 import com.bdb.weather.display.preferences.UserPreferences;
 import com.bdb.weather.display.storm.StormPanel;
@@ -224,6 +225,8 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchColorPreference() {
+        ColorPreferencePanel dialog = new ColorPreferencePanel();
+        launchModalStage(dialog, "Color Preferences");
     }
 
     @FXML
@@ -247,6 +250,8 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchSeasonalAverages() {
+        DayAveragesEditor pane = new DayAveragesEditor(connection, "");
+	launchStage(pane, "Day Average Editor", false);
     }
 
     @FXML
@@ -298,24 +303,9 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
     }
 
     @Override
-    public void launchTodayView() {
-        if (todayGraphPanel == null) {
-        }
-        else
-            todayFrame.setVisible(true);
-    }
-
-    @Override
     public void launchHistoryEditor() {
         HistoryEditorPanel editor = new HistoryEditorPanel(ws, connection);
         launchView(HISTORY_EDITOR_CMD, editor, new Dimension(800, 600), true);
-    }
-
-    @Override
-    public void launchStripChart() {
-        StripChartPanel stripChart = new StripChartPanel(connection, null);
-        launchView(STRIP_CHART_CMD, stripChart, new Dimension(800, 600), false);
-        cwpList.add(stripChart);
     }
 
     private void launchSensorView() {

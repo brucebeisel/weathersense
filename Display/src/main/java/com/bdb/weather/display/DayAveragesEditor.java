@@ -16,28 +16,24 @@
  */
 package com.bdb.weather.display;
 
-import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.Format;
-import java.text.ParsePosition;
-import java.time.LocalDate;
-import java.util.Arrays;
 
-import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellEditor;
-
+import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.weather.common.DayWeatherAverages;
@@ -46,7 +42,6 @@ import com.bdb.weather.common.Location;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.db.DailyAveragesTable;
-import static com.sun.javafx.fxml.expression.Expression.add;
 
 
 /**
@@ -56,26 +51,25 @@ import static com.sun.javafx.fxml.expression.Expression.add;
  *
  */
 public final class DayAveragesEditor extends BorderPane implements EventHandler<ActionEvent> {
+    private static final int YEAR_THAT_IS_NOT_A_LEAP_YEAR = 2001;
     private static final String OK_COMMAND = "OK";
     private static final String CANCEL_COMMAND = "CANCEL";
     private static final String IMPORT_COMMAND = "IMPORT";
     private static final String EXPORT_COMMAND = "EXPORT";
-    private final String                  locationName;
-    private final TableView<DayWeatherAverages> averagesTable;
-    private final DailyAveragesTable      dailyAveragesDbTable;
-    private DayWeatherAverages      averages;
-    private final FileNameExtensionFilter fileFilter = new FileNameExtensionFilter("CSV", "csv");
+    private final String                    locationName;
+    private final TableView<WeatherAverage> averagesTable = new TableView<>();
+    private final DailyAveragesTable        dailyAveragesDbTable;
+    private DayWeatherAverages              averages;
+    private final ExtensionFilter           fileFilter = new ExtensionFilter("CSV", "csv");
+    private static final String COLUMN_NAMES[] = {
+        "Date", "Avg Low", "Avg Mean", "Avg High", "Rainfall"
+    };
     
     @SuppressWarnings("LeakingThisInConstructor")
-    private DayAveragesEditor(DBConnection connection, String locationName) {
+    public DayAveragesEditor(DBConnection connection, String locationName) {
         this.locationName = locationName;
         dailyAveragesDbTable = new DailyAveragesTable(connection);
-        averages = dailyAveragesDbTable.retrieveDailyAverages();
-        if (averages == null)
-            averages = new DayWeatherAverages();
         
-        WeatherSense.setStageTitle(this, "Edit Location - " + locationName);
-
         FlowPane buttonPanel = new FlowPane();
 
         //buttonPanel.setBorder(new EtchedBorder());
@@ -89,13 +83,13 @@ public final class DayAveragesEditor extends BorderPane implements EventHandler<
         button.setOnAction(this);
         buttonPanel.getChildren().add(button);
         
-        add(buttonPanel, BorderLayout.SOUTH);
+        setBottom(buttonPanel);
         
         BorderPane attributePanel = new BorderPane();
         //attributePanel.setBorder(new EtchedBorder());
         
         BorderPane p = new BorderPane();
-        averagesTable = new AveragesTable(averages);
+        averagesTable.setEditable(true);
         p.setCenter(averagesTable);
         
         buttonPanel = new FlowPane();
@@ -114,22 +108,63 @@ public final class DayAveragesEditor extends BorderPane implements EventHandler<
         attributePanel.setCenter(p);
  
         setCenter(attributePanel);
+
+        createColumns();
+
+        loadData();
+        Platform.runLater(() -> StageUtilities.setStageTitle(this, "Edit Location - " + locationName));
+    }
+
+    private void createColumns() {
+        TableColumn<WeatherAverage,String> column = new TableColumn<>("Date");
+        column.setCellValueFactory((rec)-> new ReadOnlyStringWrapper(String.format("%d/%d", rec.getValue().getMonth().getValue(), rec.getValue().getDay())));
+        column.setEditable(false);
+        averagesTable.getColumns().add(column);
+
+        column = new TableColumn<>("Avg Low");
+        column.setCellValueFactory((rec)-> new ReadOnlyStringWrapper(rec.getValue().getLowTemperature().toString()));
+        column.setCellFactory(TextFieldTableCell.forTableColumn());
+        column.setOnEditCommit((t) -> ((WeatherAverage) t.getTableView().getItems().get(t.getTablePosition().getRow())).setLowTemperature(new Temperature(Double.parseDouble(t.getNewValue()))));
+        averagesTable.getColumns().add(column);
+
+        column = new TableColumn<>("Avg Mean");
+        column.setCellValueFactory((rec)-> new ReadOnlyStringWrapper(rec.getValue().getMeanTemperature().toString()));
+        column.setCellFactory(TextFieldTableCell.forTableColumn());
+        column.setOnEditCommit((t) -> ((WeatherAverage) t.getTableView().getItems().get(t.getTablePosition().getRow())).setMeanTemperature(new Temperature(Double.parseDouble(t.getNewValue()))));
+        averagesTable.getColumns().add(column);
+
+        column = new TableColumn<>("Avg High");
+        column.setCellValueFactory((rec)-> new ReadOnlyStringWrapper(rec.getValue().getHighTemperature().toString()));
+        column.setCellFactory(TextFieldTableCell.forTableColumn());
+        column.setOnEditCommit((t) -> ((WeatherAverage) t.getTableView().getItems().get(t.getTablePosition().getRow())).setHighTemperature(new Temperature(Double.parseDouble(t.getNewValue()))));
+        averagesTable.getColumns().add(column);
+
+        column = new TableColumn<>("Rainfall");
+        column.setCellValueFactory((rec)-> new ReadOnlyStringWrapper(rec.getValue().getRainfall().toString()));
+        column.setCellFactory(TextFieldTableCell.forTableColumn());
+        column.setOnEditCommit((t) -> ((WeatherAverage) t.getTableView().getItems().get(t.getTablePosition().getRow())).setRainfall(new Depth(Double.parseDouble(t.getNewValue()))));
+        averagesTable.getColumns().add(column);
     }
     
-    public static void editAverages(DBConnection connection, String locationName) {
-        //JDialog dialog = new DayAveragesEditor(frame, connection, locationName);
-        //dialog.setVisible(true);
+    private void loadData() {
+        averages = dailyAveragesDbTable.retrieveDailyAverages();
+        if (averages == null)
+            averages = new DayWeatherAverages();
+
+	ObservableList<WeatherAverage> dataModel = FXCollections.observableList(averages.getAllAverages());
+        averagesTable.setItems(dataModel);
+
     }
-    
+
     @Override
     public void handle(ActionEvent event) {
         String command = event.toString();
         switch (command) {
             case EXPORT_COMMAND: {
                 FileChooser chooser = new FileChooser();
-                chooser.getExtensionFilters().addAll(Arrays.asList(fileFilter));
+                chooser.getExtensionFilters().add(fileFilter);
                 //chooser.setApproveButtonText("Export");
-                File file = chooser.showOpenDialog(frame);
+                File file = chooser.showOpenDialog(this.getScene().getWindow());
                 if (file != null) {
                     try {
                         Location.exportCSVFile(file, locationName, averages);
@@ -145,15 +180,15 @@ public final class DayAveragesEditor extends BorderPane implements EventHandler<
                 FileChooser chooser = new FileChooser();
                 //chooser.addChoosableFileFilter(fileFilter);
                 //chooser.setApproveButtonText("Import");
-                File file = chooser.showOpenDialog(frame);
+                File file = chooser.showOpenDialog(this.getScene().getWindow());
                 if (file != null) {
                     try {
                         Location.importCSVFile(file, locationName, averages);
-                        ((AbstractTableModel)averagesTable.getModel()).fireTableDataChanged();
-                        JOptionPane.showMessageDialog(frame, "Averages successfully imported", "Import", JOptionPane.INFORMATION_MESSAGE);
+                        //((AbstractTableModel)averagesTable.getModel()).fireTableDataChanged();
+                        ErrorDisplayer.getInstance().displayInformation("Averages successfully imported");
                     }
                     catch (IOException e) {
-                        JOptionPane.showMessageDialog(frame, "Error importing CSV file", "File Error", JOptionPane.ERROR_MESSAGE);
+                        ErrorDisplayer.getInstance().displayError("Error importing CSV file");
                     }
                 }
                 break;
@@ -161,185 +196,10 @@ public final class DayAveragesEditor extends BorderPane implements EventHandler<
             default:
                 if (command.equals(OK_COMMAND)) {
                     if (!dailyAveragesDbTable.updateDailyAverages(averages))
-                        JOptionPane.showConfirmDialog(this, "Error storing day averages", "Database Error", JOptionPane.ERROR_MESSAGE);
+                        ErrorDisplayer.getInstance().displayError("Error storing day averages");
                 }
                 setVisible(false);
                 break;
         }
-    }
-}
-/**
- * The specialized JTable for the averages data.
- * 
- * @author Bruce
- *
- */
-class AveragesTable extends TableView<DayWeatherAverages> {
-    private final AveragesTableModel model;
-
-    public AveragesTable(DayWeatherAverages avgs) {
-        //super(new AveragesTableModel(avgs));
-        //model = (AveragesTableModel)getModel();
-        TextField tmp = new TextField();
-        //setRowHeight(tmp.getPrefHeight());
-        model = null;
-    }
-    
-    public void setValues(DayWeatherAverages avgs) {
-        model.setValues(avgs);
-    }
-    
-    /*
-    @Override
-    public TableCellEditor getCellEditor(int row, int column) {
-        return model.getColumnEditor(column);
-    }
-    */
-}
-
-//
-// TODO Add the CellEditor as a JFormattedTextField with a decimal for date formatter.
-//
-/**
- * The table model for the averages data. It uses a Location object for the data storage
- */
-class AveragesTableModel extends AbstractTableModel {
-    private static final long serialVersionUID = 7605015851451686390L;
-    private LocalDate lookupDate = LocalDate.now();
-    private DayWeatherAverages dayWeatherAverages;
-    private static final int YEAR_THAT_IS_NOT_A_LEAP_YEAR = 2001;
-    private static final int DAYS_IN_A_NON_LEAP_YEAR = 365;
-    private static final int DATE_COLUMN = 0;
-    private static final int LOW_COLUMN = 1;
-    private static final int MEAN_COLUMN = 2;
-    private static final int HIGH_COLUMN = 3;
-    private static final int RAIN_COLUMN = 4;
-    private static final String COLUMN_NAMES[] = {
-        "Date", "Avg Low", "Avg Mean", "Avg High", "Rainfall"
-    };
-    private static final Class<?> COLUMN_CLASSES[] = {
-        String.class, Temperature.class, Temperature.class, Temperature.class, Depth.class, String.class, String.class
-    };
-    
-    private static final Format COLUMN_FORMAT[] = {
-        null,
-        Temperature.getDefaultFormatter(),
-        Temperature.getDefaultFormatter(),
-        Temperature.getDefaultFormatter(),
-        Depth.getDefaultFormatter(),
-    };
-    
-    /*
-    private static final TableCellEditor CELL_EDITORS[] = {
-        null,
-        new DefaultCellEditor(new JFormattedTextField(COLUMN_FORMAT[1])),
-        new DefaultCellEditor(new JFormattedTextField(COLUMN_FORMAT[2])),
-        new DefaultCellEditor(new JFormattedTextField(COLUMN_FORMAT[3])),
-        new DefaultCellEditor(new JFormattedTextField(COLUMN_FORMAT[4]))
-    };
-*/
-    
-    public AveragesTableModel(DayWeatherAverages avgs) {
-        lookupDate = lookupDate.withYear(YEAR_THAT_IS_NOT_A_LEAP_YEAR);
-        dayWeatherAverages = avgs;
-    }
-    
-    public void setValues(DayWeatherAverages avgs) {
-        dayWeatherAverages = avgs;
-    }
-
-    @Override
-    public int getColumnCount() {
-        return RAIN_COLUMN + 1;
-    }
-
-    @Override
-    public int getRowCount() {
-        return DAYS_IN_A_NON_LEAP_YEAR;
-    }
-    
-    @Override
-    public String getColumnName(int column) {
-        return COLUMN_NAMES[column];
-    }
-    
-    @Override
-    public Class<?> getColumnClass(int column) {
-        return COLUMN_CLASSES[column];
-    }
-    
-    public TableCellEditor getColumnEditor(int column) {
-        return CELL_EDITORS[column];
-    }
-
-    @Override
-    public Object getValueAt(int row, int column) {
-        lookupDate = lookupDate.withDayOfYear(row + 1);
-        WeatherAverage avgs = dayWeatherAverages.getAverage(lookupDate);
-        
-        switch (column) {
-            case DATE_COLUMN:
-                return String.format("%d/%d", lookupDate.getMonth().getValue(), lookupDate.getDayOfMonth());
-                
-            case LOW_COLUMN:
-                return avgs.getLowTemperature();
-                
-            case MEAN_COLUMN:
-                return avgs.getMeanTemperature();
-                
-            case HIGH_COLUMN:
-                return avgs.getHighTemperature();
-                
-            case RAIN_COLUMN:
-                return avgs.getRainfall();
-        }
-        
-        return null;
-    }
-    
-    @Override
-    public boolean isCellEditable(int row, int column) {
-        return column >= 1;    
-    }
-    
-    @Override
-    public void setValueAt(Object value, int row, int column) {
-        lookupDate = lookupDate.withDayOfYear(row + 1);
-        WeatherAverage avgs = dayWeatherAverages.getAverage(lookupDate);
-        
-        Temperature low = avgs.getLowTemperature();
-        Temperature mean = avgs.getMeanTemperature();
-        Temperature high = avgs.getHighTemperature();
-        Depth rainfall = avgs.getRainfall();
-        
-        switch (column) {
-            case DATE_COLUMN:
-                return; // Error
-                
-            case LOW_COLUMN:
-                String stringValue = (String)value;
-                low = new Temperature(Double.parseDouble(stringValue));
-                break;
-                
-            case MEAN_COLUMN:
-                stringValue = (String)value;
-                mean = new Temperature(Double.parseDouble(stringValue));
-                break;
-                
-            case HIGH_COLUMN:
-                stringValue = (String)value;
-                high = new Temperature(Double.parseDouble(stringValue));
-                break;
-                
-            case RAIN_COLUMN:
-                stringValue = (String)value;
-                Double temp = (Double)COLUMN_FORMAT[RAIN_COLUMN].parseObject(stringValue, new ParsePosition(0));
-                if (temp != null)
-                    rainfall = new Depth(temp);
-                break;
-        }
-        
-        WeatherAverage updatedAvgs = new WeatherAverage(avgs.getMonth(), avgs.getDay(), high, low, mean, rainfall);
-        dayWeatherAverages.putAverage(updatedAvgs, lookupDate);
     }
 }

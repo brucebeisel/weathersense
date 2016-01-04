@@ -16,30 +16,32 @@
  */
 package com.bdb.weather.display.preferences;
 
-import java.awt.Color;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
+import javafx.scene.paint.Color;
+
 
 public final class ColorSchemeCollection {
     private static final Map<String,ColorScheme> schemes;
     
     static {
         schemes = new TreeMap<>();
-        schemes.put("Scheme 41", new ColorScheme("Scheme 41", new Color(0x79BEDB), new Color(0x593E1A), new Color(0x6B78B4), new Color(0x266A2E)));
-        schemes.put("Scheme 50", new ColorScheme("Scheme 50", new Color(0x005A04), new Color(0xCCFFBB), new Color(0x3A5F0B), new Color(0x005502)));
-        schemes.put("Scheme 13", new ColorScheme("Scheme 13", new Color(0x443266), new Color(0xC3C3E5), new Color(0xF1F0FF), new Color(0x8C489F)));
-        schemes.put("Scheme 33", new ColorScheme("Scheme 33", new Color(0x660033), new Color(0xE0E6FF), new Color(0x777B88), new Color(0x330033)));
-        schemes.put("Scheme 52", new ColorScheme("Scheme 52", new Color(0x003366), new Color(0x3399FF), new Color(0xFFCC99), new Color(0xFF9966)));
-        schemes.put("Scheme 56", new ColorScheme("Scheme 56", new Color(0x003333), new Color(0xCCCC99), new Color(0x666699), new Color(0x003366)));
-        schemes.put("Scheme 58", new ColorScheme("Scheme 58", new Color(0x333333), new Color(0xFFCC00), new Color(0x669966), new Color(0x993366)));
-        schemes.put("Scheme 77", new ColorScheme("Scheme 77", new Color(0x666633), new Color(0x999966), new Color(0xCC6666), new Color(0x663333)));
-        schemes.put("Scheme 111", new ColorScheme("Scheme 111", new Color(0xCE0000), new Color(0x000063), new Color(0x5A79A5), new Color(0x9CAAC6), new Color(0xDEE7EF)));
-        schemes.put("Scheme 114", new ColorScheme("Scheme 114", new Color(0x009A31), new Color(0x84CF96), new Color(0xC6E7CE), new Color(0xCEFFCE)));
-        schemes.put("Scheme 117", new ColorScheme("Scheme 117", new Color(0x005B9A), new Color(0x0191C8), new Color(0x74C2E1), new Color(0x8C8984)));
-        schemes.put("Scheme 134", new ColorScheme("Scheme 134", new Color(0x9DAF72), new Color(0x566047), new Color(0x562F32), new Color(0x462D44), new Color(0x859731), new Color(0x640E27)));
-        schemes.put("Scheme 137", new ColorScheme("Scheme 137", new Color(0x6BCAE2), new Color(0x51A5BA), new Color(0x41924B), new Color(0xAFEAAA), new Color(0x87E293), new Color(0xFE8402)));
-        schemes.put("Scheme 141", new ColorScheme("Scheme 141", new Color(0x4D8963), new Color(0x69A583), new Color(0xE1B378), new Color(0xE0CC97), new Color(0xEC799A), new Color(0x9F0251)));
+        schemes.put("Scheme 41", new ColorScheme("Scheme 41", Color.web("0x79BEDB"), Color.web("0x593E1A"), Color.web("0x6B78B4"), Color.web("0x266A2E")));
+        schemes.put("Scheme 50", new ColorScheme("Scheme 50", Color.web("0x005A04"), Color.web("0xCCFFBB"), Color.web("0x3A5F0B"), Color.web("0x005502")));
+        schemes.put("Scheme 13", new ColorScheme("Scheme 13", Color.web("0x443266"), Color.web("0xC3C3E5"), Color.web("0xF1F0FF"), Color.web("0x8C489F")));
+        schemes.put("Scheme 33", new ColorScheme("Scheme 33", Color.web("0x660033"), Color.web("0xE0E6FF"), Color.web("0x777B88"), Color.web("0x330033")));
+        schemes.put("Scheme 52", new ColorScheme("Scheme 52", Color.web("0x003366"), Color.web("0x3399FF"), Color.web("0xFFCC99"), Color.web("0xFF9966")));
+        schemes.put("Scheme 56", new ColorScheme("Scheme 56", Color.web("0x003333"), Color.web("0xCCCC99"), Color.web("0x666699"), Color.web("0x003366")));
+        schemes.put("Scheme 58", new ColorScheme("Scheme 58", Color.web("0x333333"), Color.web("0xFFCC00"), Color.web("0x669966"), Color.web("0x993366")));
+        schemes.put("Scheme 77", new ColorScheme("Scheme 77", Color.web("0x666633"), Color.web("0x999966"), Color.web("0xCC6666"), Color.web("0x663333")));
+        schemes.put("Scheme 111", new ColorScheme("Scheme 111", Color.web("0xCE0000"), Color.web("0x000063"), Color.web("0x5A79A5"), Color.web("0x9CAAC6"), Color.web("0xDEE7EF")));
+        schemes.put("Scheme 114", new ColorScheme("Scheme 114", Color.web("0x009A31"), Color.web("0x84CF96"), Color.web("0xC6E7CE"), Color.web("0xCEFFCE")));
+        schemes.put("Scheme 117", new ColorScheme("Scheme 117", Color.web("0x005B9A"), Color.web("0x0191C8"), Color.web("0x74C2E1"), Color.web("0x8C8984")));
+        schemes.put("Scheme 134", new ColorScheme("Scheme 134", Color.web("0x9DAF72"), Color.web("0x566047"), Color.web("0x562F32"), Color.web("0x462D44"), Color.web("0x859731"), Color.web("0x640E27")));
+        schemes.put("Scheme 137", new ColorScheme("Scheme 137", Color.web("0x6BCAE2"), Color.web("0x51A5BA"), Color.web("0x41924B"), Color.web("0xAFEAAA"), Color.web("0x87E293"), Color.web("0xFE8402")));
+        schemes.put("Scheme 141", new ColorScheme("Scheme 141", Color.web("0x4D8963"), Color.web("0x69A583"), Color.web("0xE1B378"), Color.web("0xE0CC97"), Color.web("0xEC799A"), Color.web("0x9F0251")));
     }
 
     public static int getColorSchemeCount() {

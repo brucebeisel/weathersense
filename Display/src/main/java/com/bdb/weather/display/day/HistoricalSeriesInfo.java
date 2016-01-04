@@ -16,16 +16,18 @@
  */
 package com.bdb.weather.display.day;
 
-import java.awt.Color;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import javafx.scene.paint.Color;
+
 import com.bdb.util.measurement.Measurement;
 import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.Sensor;
+import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.preferences.UserPreferences;
 
 /**
@@ -173,7 +175,7 @@ public class HistoricalSeriesInfo {
             return sensorAccessor.apply(record, sensorId);
     }
 
-    public Color getPaint() {
-        return paint;
+    public java.awt.Color getPaint() {
+        return StageUtilities.toAwtColor(paint);
     }
 }
