@@ -18,6 +18,6 @@
         </HBox>
     </top>
     <center>
-        <DayGraphPanel fx:id="graphPanel"/>
+        <DayGraphPane fx:id="graphPanel"/>
     </center>
 </fx:root>

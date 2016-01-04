@@ -19,11 +19,11 @@
         <RowConstraints percentHeight="34" />
         <RowConstraints percentHeight="33" />
     </rowConstraints>
-    <DayTemperaturePlot fx:id="temperaturePlot" GridPane.columnIndex="0" GridPane.rowIndex="0"/> 
-    <DayHumidityPanel fx:id="humidityPlot" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2" /> 
-    <DayRainPanel fx:id="rainPlot" GridPane.columnIndex="0" GridPane.rowIndex="1"/> 
-    <DayPressurePanel fx:id="pressurePlot" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2" /> 
-    <DayWindPanel fx:id="windPlot" GridPane.columnIndex="0" GridPane.rowIndex="2"/> 
-    <WindDirPlot fx:id="windDirectionPlot" GridPane.columnIndex="1" GridPane.rowIndex="2"/> 
+    <DayTemperaturePane fx:id="temperaturePlot" GridPane.columnIndex="0" GridPane.rowIndex="0"/> 
+    <DayHumidityPane fx:id="humidityPlot" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2" /> 
+    <DayRainPane fx:id="rainPlot" GridPane.columnIndex="0" GridPane.rowIndex="1"/> 
+    <DayPressurePane fx:id="pressurePlot" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2" /> 
+    <DayWindPane fx:id="windPlot" GridPane.columnIndex="0" GridPane.rowIndex="2"/> 
+    <WindDirPane fx:id="windDirectionPlot" GridPane.columnIndex="1" GridPane.rowIndex="2"/> 
     <WindRosePane fx:id="windRose" GridPane.columnIndex="2" GridPane.rowIndex="2"/> 
 </fx:root>
