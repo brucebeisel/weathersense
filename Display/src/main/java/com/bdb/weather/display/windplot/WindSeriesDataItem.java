@@ -22,9 +22,7 @@ import org.jfree.data.time.TimeSeriesDataItem;
 /**
  *
  * @author Bruce
- * @param <E> The time period for this wind plot
  */
-@SuppressWarnings("serial")
 public class WindSeriesDataItem extends TimeSeriesDataItem {
     /** The wind direction associated with the time period */
     private Number windDirection;

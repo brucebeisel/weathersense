@@ -39,7 +39,6 @@ import org.jfree.ui.RectangleEdge;
  *
  * @author Bruce
  */
-@SuppressWarnings("serial")
 public class WindItemRenderer extends XYLineAndShapeRenderer {
     private Paint windDirectionPaint = Color.BLACK;
     private Stroke windDirectionStroke = new BasicStroke();

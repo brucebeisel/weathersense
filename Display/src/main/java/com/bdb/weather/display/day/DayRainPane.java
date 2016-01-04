@@ -25,12 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -51,9 +50,8 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 import com.bdb.weather.common.DayHourRain;
 import com.bdb.weather.common.HistoricalRecord;
-import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.measurement.Depth;
-import com.bdb.weather.display.DisplayConstants;
+import com.bdb.weather.display.ChartDataPane;
 import com.bdb.weather.display.RainItemLabelGenerator;
 import com.bdb.weather.display.axis.RainRangeAxis;
 
@@ -63,7 +61,7 @@ import com.bdb.weather.display.axis.RainRangeAxis;
  * @author Bruce
  *
  */
-public class DayRainPanel extends TabPane {
+public class DayRainPane extends ChartDataPane {
     private static final String HOUR_ROW_KEY = "Hour";
     private static final String RAIN_ROW_KEY = "Rain";
     private static final String ET_ROW_KEY = "ET";
@@ -77,21 +75,22 @@ public class DayRainPanel extends TabPane {
     private LocalDateTime             timeCache = LocalDate.now().atStartOfDay();
 
     public final class RainItem {
-        private IntegerProperty hour;
-        private DoubleProperty rainfall;
-        private DoubleProperty et;
+        private final IntegerProperty hourProperty;
+        private final ObjectProperty<Depth> rainProperty;
+        private final ObjectProperty<Depth> etProperty;
         
-        public RainItem(int hour, double rainfall, double ET) {
+        public RainItem(int hour, Depth rainfall, Depth ET) {
+            hourProperty = new SimpleIntegerProperty(this, HOUR_ROW_KEY);
+            rainProperty = new SimpleObjectProperty<>(this, RAIN_ROW_KEY);
+            etProperty = new SimpleObjectProperty<>(this, ET_ROW_KEY);
+
             setHour(hour);
-            setRainfall(rainfall);
+            setRain(rainfall);
             setET(ET);
         }
         
         public IntegerProperty hourProperty() {
-            if (hour == null)
-                hour = new SimpleIntegerProperty(this, HOUR_ROW_KEY);
-            
-            return hour;
+            return hourProperty;
         }
         
         public void setHour(int hour) {
@@ -99,45 +98,38 @@ public class DayRainPanel extends TabPane {
         }
         
         public int getHour() {
-            return hour.getValue();
+            return hourProperty.getValue();
         }
         
-        public DoubleProperty rainfallProperty() {
-            if (rainfall == null)
-                rainfall = new SimpleDoubleProperty(this, RAIN_ROW_KEY);
-            
-            return rainfall;
+        public ObjectProperty<Depth> rainProperty() {
+            return rainProperty;
         }
         
-        public void setRainfall(double rainfall) {
-            rainfallProperty().set(rainfall);
+        public void setRain(Depth rain) {
+            rainProperty().set(rain);
         }
         
-        public double getRainfall() {
-            return rainfall.getValue();
+        public Depth getRain() {
+            return rainProperty.getValue();
         }
         
-        public DoubleProperty etProperty() {
-            if (et == null)
-                et = new SimpleDoubleProperty(this, ET_ROW_KEY);
-            
-            return et;
+        public ObjectProperty<Depth> etProperty() {
+            return etProperty;
         }
         
-        public void setET(double et) {
+        public void setET(Depth et) {
             etProperty().set(et);
         }
         
-        public double getET() {
-            return et.getValue();
+        public Depth getET() {
+            return etProperty.getValue();
         }
     }
     /**
      * Constructor.
      */
-    public DayRainPanel() {
+    public DayRainPane() {
         setPrefSize(400, 300);
-        this.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         chart = ChartFactory.createBarChart("Water Cycle", "Hour", "", null, PlotOrientation.VERTICAL, true, true, false);
 
         chartViewer = new ChartViewer(chart);
@@ -149,7 +141,6 @@ public class DayRainPanel extends TabPane {
         renderer.setBasePaint(Color.BLUE);
         renderer.setSeriesPaint(0, Color.BLUE);
         renderer.setSeriesPaint(1, Color.RED);
-        //renderer.setBaseItemLabelsVisible(true);
         renderer.setSeriesItemLabelGenerator(0, new RainItemLabelGenerator(StandardCategoryItemLabelGenerator.DEFAULT_LABEL_FORMAT_STRING, Depth.getDefaultFormatter()));
         StandardCategoryToolTipGenerator ttgen = new StandardCategoryToolTipGenerator(StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT, Depth.getDefaultFormatter());
         rainPlot.getRenderer().setSeriesToolTipGenerator(0, ttgen);
@@ -160,32 +151,24 @@ public class DayRainPanel extends TabPane {
         ttgen = new StandardCategoryToolTipGenerator(StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT, etFormatter);
         rainPlot.getRenderer().setSeriesToolTipGenerator(1, ttgen);
 
-
         rainPlot.setRangeAxis(valueAxis);
         rainPlot.getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
 
-        Tab tab = new Tab(DisplayConstants.GRAPH_TAB_NAME);
-        tab.setContent(chartViewer);
-        this.getTabs().add(tab);
-        
         dataTable = new TableView();
        
         TableColumn<RainItem,Integer> hourColumn = new TableColumn<>(HOUR_ROW_KEY);
         hourColumn.setCellValueFactory(new PropertyValueFactory(HOUR_ROW_KEY));
         dataTable.getColumns().add(hourColumn);
         
-        TableColumn<RainItem,Double> rainfallColumn = new TableColumn<>(RAIN_ROW_KEY);
+        TableColumn<RainItem,Depth> rainfallColumn = new TableColumn<>("Rainfall");
         rainfallColumn.setCellValueFactory(new PropertyValueFactory(RAIN_ROW_KEY));
         dataTable.getColumns().add(rainfallColumn);
         
-        TableColumn<RainItem,Double> etColumn = new TableColumn<>(ET_ROW_KEY);
-        rainfallColumn.setCellValueFactory(new PropertyValueFactory(ET_ROW_KEY));
+        TableColumn<RainItem,Depth> etColumn = new TableColumn<>(ET_ROW_KEY);
+        etColumn.setCellValueFactory(new PropertyValueFactory(ET_ROW_KEY));
         dataTable.getColumns().add(etColumn);
         
-        tab = new Tab(DisplayConstants.DATA_TAB_NAME);
-        tab.setContent(dataTable);
-        this.getTabs().add(tab);
-
+        this.setTabContents(chartViewer, dataTable);
     }
     
     /**
@@ -205,8 +188,8 @@ public class DayRainPanel extends TabPane {
      * @param data The data to load
      * @param records The list of historical records
      */
-    public void loadData(SummaryRecord data, List<HistoricalRecord> records) {
-        if (data == null) {
+    public void loadData(DayHourRain hourlyRain, List<HistoricalRecord> records) {
+        if (hourlyRain == null) {
             dataTable.setItems(null);
             rainPlot.setDataset(null);
             return;
@@ -214,7 +197,6 @@ public class DayRainPanel extends TabPane {
         
         List<RainItem> rows = new ArrayList<>();
         DefaultCategoryDataset rainDataset = new DefaultCategoryDataset();
-        DayHourRain hourlyRain = data.getHourlyRainfall();
 
         int n = 0;
 
@@ -231,7 +213,7 @@ public class DayRainPanel extends TabPane {
             rainDataset.addValue(et.get(), ET_ROW_KEY, label);
 
             n++;
-            RainItem row = new RainItem(hour, hourlyRain.getRain(hour).get(), et.get());
+            RainItem row = new RainItem(hour, hourlyRain.getRain(hour), et);
             rows.add(row);
         }
         dataTable.setItems(FXCollections.observableList(rows));

@@ -27,7 +27,6 @@ import com.bdb.weather.common.measurement.Pressure;
  *
  */
 public final class PressureRangeAxis extends NumberAxis {
-    private static final long serialVersionUID = 2950815262204521691L;
     private static final String AXIS_LABEL = "Pressure";
 
     /**

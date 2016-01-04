@@ -27,7 +27,6 @@ import com.bdb.weather.common.measurement.Humidity;
  *
  */
 public final class HumidityRangeAxis extends NumberAxis {
-    private static final long serialVersionUID = -6181318333459918570L;
     private static final String AXIS_LABEL = "Humidity (%)";
     
     /**

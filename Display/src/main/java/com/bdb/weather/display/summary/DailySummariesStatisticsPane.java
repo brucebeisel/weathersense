@@ -75,7 +75,6 @@ import com.bdb.weather.common.measurement.Temperature;
  *
  */
 
-@SuppressWarnings("serial")
 public class DailySummariesStatisticsPane extends VBox {
     private static final int DATE_FIELD_LENGTH = 10;
     private static final int DATETIME_FIELD_LENGTH = 15;

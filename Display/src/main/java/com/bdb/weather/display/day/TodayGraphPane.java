@@ -38,26 +38,26 @@ import com.bdb.weather.common.db.WeatherStationTable;
 import com.bdb.weather.display.Refreshable;
 
 /**
- * Specialized version of a DayGraphPanel that refreshes automatically and always displays data for the current day.
+ * Specialized version of a DayGraphPane that refreshes automatically and always displays data for the current day.
  * 
  * @author Bruce
  *
  */
-public class TodayGraphPanel extends DayGraphPanel implements Refreshable {
+public class TodayGraphPane extends DayGraphPane implements Refreshable {
     private final HistoryTable historyTable;
     private final DailySummaryTable dailySummaryTable;
     private final DailyAveragesTable dailyAveragesTable;
     private final DailyRecordsTable dailyRecordsTable;
     private final TemperatureBinMgr temperatureBinMgr;
     private final WeatherStationTable wsTable;
-    private static final Logger logger = Logger.getLogger(TodayGraphPanel.class.getName());
+    private static final Logger logger = Logger.getLogger(TodayGraphPane.class.getName());
 
     /**
      * Constructor.
      * 
      * @param connection The database connection
      */
-    public TodayGraphPanel( DBConnection connection) {
+    public TodayGraphPane( DBConnection connection) {
 	dailySummaryTable = new DailySummaryTable(connection);
 	historyTable = new HistoryTable(connection);
 	dailyRecordsTable = new DailyRecordsTable(connection);

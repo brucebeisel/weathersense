@@ -23,8 +23,11 @@ import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import java.time.temporal.ChronoField;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import javafx.scene.control.TabPane.TabClosingPolicy;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.FXCollections;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import org.jfree.chart.ChartFactory;
@@ -41,12 +44,11 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.util.ShapeUtilities;
 
 import com.bdb.weather.common.HistoricalRecord;
-import com.bdb.weather.common.Wind;
 import com.bdb.weather.display.ChartDataPane;
 import com.bdb.weather.display.CompassPolarItemRenderer;
+import com.bdb.weather.display.DisplayConstants;
 
 class ItemRenderer extends CompassPolarItemRenderer {
-    private static final long serialVersionUID = 6655248313645839714L;
     /**
      * Creates a new instance of DayWindDirRenderer
      */
@@ -97,17 +99,14 @@ class ItemRenderer extends CompassPolarItemRenderer {
     }
 }
 
-public class WindDirPlot extends ChartDataPane {
-    private PolarPlot   plot;
-    private JFreeChart  chart;
-    private TableView   table;
-    private XYSeries    windDirSeries = new XYSeries("Wind Direction", false);
-    private ChartViewer chartViewer;
+public class WindDirPane extends ChartDataPane {
+    private final PolarPlot                   plot;
+    private final TableView<HistoricalRecord> table = new TableView<>();
+    private XYSeries                          windDirSeries = new XYSeries("Wind Direction", false);
     
-    public WindDirPlot() {
+    public WindDirPane() {
         setPrefSize(300, 300);
-        this.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
-        chart = ChartFactory.createPolarChart(null, null, false, true, false);
+        JFreeChart chart = ChartFactory.createPolarChart(null, null, false, true, false);
         
         ChartFactory.getChartTheme().apply(chart);
 
@@ -125,7 +124,6 @@ public class WindDirPlot extends ChartDataPane {
         ((NumberAxis)plot.getAxis()).setRange(-240.0, 60.0 * 24);
         ((NumberAxis)plot.getAxis()).setAutoRange(false);
         ((NumberAxis)plot.getAxis()).setTickUnit(new NumberTickUnit(240.0, new DecimalFormat("00")) {
-            private static final long serialVersionUID = 1L;
             @Override
             public String valueToString(double number) {
                 if (number < 0.0 || (int)number % 240 != 0)
@@ -135,21 +133,27 @@ public class WindDirPlot extends ChartDataPane {
             }
         });
         
-        chartViewer = new ChartViewer(chart);
+        ChartViewer chartViewer = new ChartViewer(chart);
         this.setTabContents(chartViewer, table);
 
-        //plot.setAngleTicks(Arrays.asList(TICKS));
         plot.setDataset(new XYSeriesCollection(windDirSeries));
+
+        TableColumn<HistoricalRecord,String> column = new TableColumn<>("Time");
+        column.setCellValueFactory((rec) -> new ReadOnlyStringWrapper(DisplayConstants.formatTime(rec.getValue().getTime().toLocalTime())));
+        table.getColumns().add(column);
+
+        column = new TableColumn<>("Direction");
+        column.setCellValueFactory((rec) -> new ReadOnlyStringWrapper(rec.getValue().getAvgWind().getDirection().getCompassLabel()));
+        table.getColumns().add(column);
     }
     
     public void loadData(List<HistoricalRecord> list) {
         windDirSeries.clear();
 
-        for (HistoricalRecord rec : list) {
-            Wind wind = rec.getAvgWind();
+        List<HistoricalRecord> windy = list.stream().filter((rec) -> rec.getAvgWind() != null && rec.getAvgWind().getSpeed().get() != 0.0).collect(Collectors.toList());
 
-            if (wind != null && wind.getSpeed().get() != 0.0) 
-                windDirSeries.add(wind.getDirection().get(), rec.getTime().get(ChronoField.MINUTE_OF_DAY));
-        }
+        windy.forEach((rec) -> windDirSeries.add(rec.getAvgWind().getDirection().get(), rec.getTime().get(ChronoField.MINUTE_OF_DAY)));
+
+        table.setItems(FXCollections.observableList(windy));
     }
 }

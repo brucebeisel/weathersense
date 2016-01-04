@@ -23,7 +23,6 @@ import org.jfree.data.time.TimeSeriesDataItem;
  *
  * @author Bruce
  */
-@SuppressWarnings("serial")
 public class WindSeries extends TimeSeries {
     /**
      * Creates a new (empty) time series.  By default, a daily time series is

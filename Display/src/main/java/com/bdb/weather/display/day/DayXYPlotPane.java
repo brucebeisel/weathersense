@@ -77,7 +77,7 @@ import com.bdb.weather.display.DisplayConstants;
  * 
  * @author Bruce
  */
-abstract public class DayXYPlotPanel extends ChartDataPane implements EventHandler<ActionEvent> {
+abstract public class DayXYPlotPane extends ChartDataPane implements EventHandler<ActionEvent> {
     protected static final String TIME_HEADING = "Time";
     protected static final int TIME_COLUMN = 0;
 
@@ -98,7 +98,7 @@ abstract public class DayXYPlotPanel extends ChartDataPane implements EventHandl
     private final TimeSeriesCollection datasetRight;
     private List<SeriesEntry>    entries;
 
-    protected DayXYPlotPanel(ValueAxis leftAxis, ValueAxis rightAxis) {
+    protected DayXYPlotPane(ValueAxis leftAxis, ValueAxis rightAxis) {
         this.setPrefSize(400, 300);
         this.leftAxis = leftAxis;
         this.rightAxis = rightAxis;

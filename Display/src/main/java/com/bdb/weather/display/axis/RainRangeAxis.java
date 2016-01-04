@@ -28,7 +28,6 @@ import com.bdb.weather.common.measurement.Depth;
  *
  */
 public final class RainRangeAxis extends NumberAxis {
-    private static final long serialVersionUID = -3897750402592855081L;
     private static final String AXIS_LABEL = "Rainfall";
     private static final double UPPER_MARGIN = .2;
 

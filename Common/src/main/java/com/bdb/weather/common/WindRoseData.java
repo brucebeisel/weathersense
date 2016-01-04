@@ -30,7 +30,7 @@ public class WindRoseData {
     LocalDate	    date;
     WindSlice	    slices[];
     Duration	    totalSeconds = Duration.ZERO; // Total seconds for this period
-    Duration	    calmSeconds = Duration.ZERO;	// Seconds the wind is calm
+    Duration	    calmSeconds = Duration.ZERO;  // Seconds the wind is calm
     List<SpeedBin>  speedBins;
 
     public WindRoseData(LocalDate date, WindParameters windParameters) {
@@ -86,6 +86,10 @@ public class WindRoseData {
 
     public WindSlice getSlice(int index) {
         return slices[index];
+    }
+
+    public List<WindSlice> getSlices() {
+        return Collections.unmodifiableList(Arrays.asList(slices));
     }
 
     public Duration getCalmDuration() {

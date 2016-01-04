@@ -39,20 +39,20 @@ import com.bdb.weather.display.windrose.WindRosePane;
  * @author Bruce
  *
  */
-public class DayGraphPanel extends GridPane {
-    @FXML private DayHumidityPanel humidityPlot;
-    @FXML private DayRainPanel     rainPlot;
-    @FXML private DayXYPlotPanel   temperaturePlot;
-    @FXML private DayXYPlotPanel   pressurePlot;
-    @FXML private DayWindPanel     windPlot;
-    @FXML private WindDirPlot      windDirectionPlot;
+public class DayGraphPane extends GridPane {
+    @FXML private DayHumidityPane humidityPlot;
+    @FXML private DayRainPane     rainPlot;
+    @FXML private DayXYPlotPane   temperaturePlot;
+    @FXML private DayXYPlotPane   pressurePlot;
+    @FXML private DayWindPane     windPlot;
+    @FXML private WindDirPane      windDirectionPlot;
     @FXML private WindRosePane     windRose;
 
     /**
      * Constructor.
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public DayGraphPanel() {
+    public DayGraphPane() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/TodayPlots.fxml"));
             fxmlLoader.setRoot(this);
@@ -87,7 +87,7 @@ public class DayGraphPanel extends GridPane {
         pressurePlot.loadData(date, list, summaryRecord, records, averages, location);
         windPlot.loadData(date, list, summaryRecord, records, averages, location);
         humidityPlot.loadData(date, list, summaryRecord, records, averages, location);
-        rainPlot.loadData(summaryRecord, list);
+        rainPlot.loadData(summaryRecord.getHourlyRainfall(), list);
         windDirectionPlot.loadData(list);
     }
 }

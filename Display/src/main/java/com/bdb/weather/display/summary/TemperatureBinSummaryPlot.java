@@ -38,7 +38,6 @@ import com.bdb.weather.common.TemperatureBin;
 import com.bdb.weather.common.ThresholdType;
 import com.bdb.weather.common.measurement.Temperature;
 
-@SuppressWarnings("serial")
 public class TemperatureBinSummaryPlot extends BorderPane {
     private final CombinedDomainCategoryPlot plot;
     private final ChartViewer                chartViewer;

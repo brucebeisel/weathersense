@@ -36,8 +36,8 @@ import com.bdb.weather.common.CurrentWeatherSubscriber;
 import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.display.current.CurrentWeatherCharts;
 import com.bdb.weather.display.current.CurrentWeatherForm;
-import com.bdb.weather.display.day.DaySummaryGraphPanel;
-import com.bdb.weather.display.day.TodayGraphPanel;
+import com.bdb.weather.display.day.DaySummaryGraphPane;
+import com.bdb.weather.display.day.TodayGraphPane;
 import com.bdb.weather.display.freeplot.HistoricalFreePlot;
 import com.bdb.weather.display.preferences.ColorPreferencePanel;
 import com.bdb.weather.display.preferences.UnitsPreferenceDialog;
@@ -132,7 +132,7 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchTodayView() {
-        TodayGraphPanel todayGraphPanel = new TodayGraphPanel(connection);
+        TodayGraphPane todayGraphPanel = new TodayGraphPane(connection);
 	launchStage(todayGraphPanel, "Today Weather", true);
         todayGraphPanel.refresh();
     }
@@ -153,7 +153,7 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchDaySummaryView() {
-        DaySummaryGraphPanel graphPanel = new DaySummaryGraphPanel(ws, connection, LocalDate.now());
+        DaySummaryGraphPane graphPanel = new DaySummaryGraphPane(ws, connection, LocalDate.now());
 	launchStage(graphPanel, "Weather", true);
         graphPanel.loadData();
     }

@@ -38,11 +38,11 @@ import com.bdb.weather.display.axis.HumidityRangeAxis;
  * @author Bruce
  *
  */
-public class DayHumidityPanel extends DayXYPlotPanel {
+public class DayHumidityPane extends DayXYPlotPane {
     /**
      * Constructor.
      */
-    public DayHumidityPanel() {
+    public DayHumidityPane() {
         super(new HumidityRangeAxis(), null);
         createElements();
     }
@@ -62,7 +62,7 @@ public class DayHumidityPanel extends DayXYPlotPanel {
 
     /*
      * (non-Javadoc)
-     * @see com.bdb.weather.display.day.DayXYPlotPanel#addAnnotations(org.jfree.chart.plot.XYPlot, com.bdb.weather.common.SummaryRecord)
+     * @see com.bdb.weather.display.day.DayXYPlotPane#addAnnotations(org.jfree.chart.plot.XYPlot, com.bdb.weather.common.SummaryRecord)
      */
     @Override
     protected void addAnnotations(XYPlot plot, SummaryRecord summaryRecord) {

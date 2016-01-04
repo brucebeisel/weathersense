@@ -53,7 +53,7 @@ import com.bdb.weather.display.windplot.WindSeriesDataItem;
  * @author Bruce
  *
  */
-public class DayWindPanel extends DayXYPlotPanel {
+public class DayWindPane extends DayXYPlotPane {
     private static final int GUST_SERIES_INDEX = 1;
     private static final int WIND_SPEED_COLUMN = 1;
     private static final int DIRECTION_COLUMN = 2;
@@ -67,7 +67,7 @@ public class DayWindPanel extends DayXYPlotPanel {
     private final TimeSeries gustSeries = new TimeSeries(COLUMN_LABELS[GUST_COLUMN]);
     private TimeSeriesCollection dataset;
 
-    public DayWindPanel() {
+    public DayWindPane() {
         this(null);
     }
     /**
@@ -75,7 +75,7 @@ public class DayWindPanel extends DayXYPlotPanel {
      * 
      * @param ws The weather station for which the data is being plotted
      */
-    public DayWindPanel(WeatherStation ws) {
+    public DayWindPane(WeatherStation ws) {
         super(new WindSpeedRangeAxis(), null);
         createElements();
     }
@@ -105,7 +105,7 @@ public class DayWindPanel extends DayXYPlotPanel {
     
     /*
      * (non-Javadoc)
-     * @see com.bdb.weather.display.day.DayXYPlotPanel#addAnnotations(org.jfree.chart.plot.XYPlot, com.bdb.weather.common.SummaryRecord)
+     * @see com.bdb.weather.display.day.DayXYPlotPane#addAnnotations(org.jfree.chart.plot.XYPlot, com.bdb.weather.common.SummaryRecord)
      */
     @Override
     protected void addAnnotations(XYPlot plot, SummaryRecord summaryRecord) {
@@ -129,7 +129,7 @@ public class DayWindPanel extends DayXYPlotPanel {
 
     /*
      * (non-Javadoc)
-     * @see com.bdb.weather.display.day.DayXYPlotPanel#loadDataSeries(java.util.List, org.jfree.data.time.TimeSeriesCollection)
+     * @see com.bdb.weather.display.day.DayXYPlotPane#loadDataSeries(java.util.List, org.jfree.data.time.TimeSeriesCollection)
      */
     @Override
     protected void loadDataSeries(List<HistoricalRecord> list) {

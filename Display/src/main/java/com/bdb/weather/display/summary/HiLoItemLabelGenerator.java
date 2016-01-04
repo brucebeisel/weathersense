@@ -24,7 +24,6 @@ import org.jfree.chart.labels.HighLowItemLabelGenerator;
 import org.jfree.data.xy.OHLCDataset;
 import org.jfree.data.xy.XYDataset;
 
-@SuppressWarnings("serial")
 public class HiLoItemLabelGenerator extends HighLowItemLabelGenerator {
     private final DateFormat   dateFormat;
     private final NumberFormat numberFormat;

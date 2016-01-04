@@ -36,7 +36,6 @@ import com.bdb.weather.common.measurement.Temperature;
  *
  * @author Bruce
  */
-@SuppressWarnings("serial")
 public class UnitsPreferenceDialog extends BorderPane {
     @FXML private RadioButton celsius;
     @FXML private RadioButton fahrenheit;

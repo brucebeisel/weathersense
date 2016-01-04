@@ -54,7 +54,7 @@ import com.bdb.weather.display.preferences.UserPreferences;
  * @author Bruce
  *
  */
-public class DayTemperaturePlot extends DayXYPlotPanel implements EventHandler<ActionEvent> {
+public class DayTemperaturePane extends DayXYPlotPane implements EventHandler<ActionEvent> {
     private Temperature             recordLow;
     private Temperature             recordHigh;
     private final CheckMenuItem     minMaxLabelsItem = new CheckMenuItem("Min/Max Labels");
@@ -63,7 +63,7 @@ public class DayTemperaturePlot extends DayXYPlotPanel implements EventHandler<A
     /**
      * Constructor.
      */
-    public DayTemperaturePlot() {
+    public DayTemperaturePane() {
 	super(new TemperatureRangeAxis(), null);
         createElements();
         minMaxLabelsItem.setSelected(true);
@@ -94,7 +94,7 @@ public class DayTemperaturePlot extends DayXYPlotPanel implements EventHandler<A
 
     /*
      * (non-Javadoc)
-     * @see com.bdb.weather.display.day.DayXYPlotPanel#addExtremeMarkers(org.jfree.chart.plot.XYPlot, com.bdb.weather.common.DailyRecords, com.bdb.weather.common.DailyAverages)
+     * @see com.bdb.weather.display.day.DayXYPlotPane#addExtremeMarkers(org.jfree.chart.plot.XYPlot, com.bdb.weather.common.DailyRecords, com.bdb.weather.common.DailyAverages)
      */
     @Override
     public void addExtremeMarkers(XYPlot plot, DailyRecords records, WeatherAverage averages) {
@@ -137,7 +137,7 @@ public class DayTemperaturePlot extends DayXYPlotPanel implements EventHandler<A
 
     /*
      * (non-Javadoc)
-     * @see com.bdb.weather.display.day.DayXYPlotPanel#addAnnotations(org.jfree.chart.plot.XYPlot, com.bdb.weather.common.SummaryRecord)
+     * @see com.bdb.weather.display.day.DayXYPlotPane#addAnnotations(org.jfree.chart.plot.XYPlot, com.bdb.weather.common.SummaryRecord)
      */
     @Override
     public void addAnnotations(XYPlot plot, SummaryRecord summaryRecord) {
@@ -184,7 +184,7 @@ public class DayTemperaturePlot extends DayXYPlotPanel implements EventHandler<A
     
     /*
      * (non-Javadoc)
-     * @see com.bdb.weather.display.day.DayXYPlotPanel#finishLoadData()
+     * @see com.bdb.weather.display.day.DayXYPlotPane#finishLoadData()
      */
     @Override
     public void finishLoadData() {
@@ -204,7 +204,7 @@ public class DayTemperaturePlot extends DayXYPlotPanel implements EventHandler<A
 
     /*
      * (non-Javadoc)
-     * @see com.bdb.weather.display.day.DayXYPlotPanel#actionPerformed(java.awt.event.ActionEvent)
+     * @see com.bdb.weather.display.day.DayXYPlotPane#actionPerformed(java.awt.event.ActionEvent)
      */
     @Override
     public void handle(ActionEvent event) {

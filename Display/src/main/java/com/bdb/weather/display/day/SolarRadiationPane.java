@@ -28,11 +28,11 @@ import com.bdb.weather.display.axis.UvIndexAxis;
  *
  * @author Bruce
  */
-public class SolarRadiationPlot extends DayXYPlotPanel {
+public class SolarRadiationPane extends DayXYPlotPane {
     /**
      * Constructor.
      */
-    public SolarRadiationPlot() {
+    public SolarRadiationPane() {
         super(new SolarRadiationAxis(), new UvIndexAxis());
     }
 

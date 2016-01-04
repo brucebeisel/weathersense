@@ -51,8 +51,8 @@ import com.bdb.weather.display.WeatherSense;
  * @author Bruce
  * TODO This name is confusing with the other summary graphs. Should change the name.
  */
-public class DaySummaryGraphPanel extends BorderPane {
-    @FXML private DayGraphPanel       graphPanel;
+public class DaySummaryGraphPane extends BorderPane {
+    @FXML private DayGraphPane       graphPanel;
     @FXML private DatePicker          datePicker;
     private final DailySummaryTable   dailySummaryTable;
     private final DailyAveragesTable  dailyAveragesTable;
@@ -70,7 +70,7 @@ public class DaySummaryGraphPanel extends BorderPane {
      * @param day The day whose data is being displayed
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public DaySummaryGraphPanel(WeatherStation ws, DBConnection connection, LocalDate day) {
+    public DaySummaryGraphPane(WeatherStation ws, DBConnection connection, LocalDate day) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/DayPlots.fxml"));
             fxmlLoader.setRoot(this);

@@ -37,7 +37,6 @@ import com.bdb.weather.common.ThresholdType;
  *
  * @author Bruce
  */
-@SuppressWarnings("serial")
 public class TemperatureBinEditor extends GridPane {
     private ObservableList<Temperature> belowTemperatureModel = new SimpleListProperty<>();
     private ObservableList<Temperature> aboveTemperatureModel = new SimpleListProperty<>();

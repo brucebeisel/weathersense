@@ -29,11 +29,11 @@ import com.bdb.weather.display.axis.TemperatureRangeAxis;
  *
  * @author Bruce
  */
-public class DewPointPlotPanel extends DayXYPlotPanel {
+public class DewPointPlotPane extends DayXYPlotPane {
     /**
      * Constructor.
      */
-    public DewPointPlotPanel() {
+    public DewPointPlotPane() {
         super(new TemperatureRangeAxis(), new HumidityRangeAxis());
     }
 

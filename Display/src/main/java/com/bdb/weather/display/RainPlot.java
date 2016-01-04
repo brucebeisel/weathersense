@@ -149,7 +149,6 @@ private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:m
     /**
      * Constructor.
      */
-    @SuppressWarnings("serial")
     public RainPlot() {
 	setPrefSize(400, 200);
 	createChartElements();

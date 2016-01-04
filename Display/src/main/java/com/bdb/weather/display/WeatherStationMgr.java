@@ -34,7 +34,6 @@ import com.bdb.weather.common.db.WeatherStationTable;
  *
  * @author Bruce
  */
-@SuppressWarnings("serial")
 public class WeatherStationMgr {
     private static DBConnection connection;
     

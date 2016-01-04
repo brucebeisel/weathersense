@@ -217,7 +217,7 @@ public class Heading extends Measurement {
     }
 
     public String getCompassLabel() {
-        String label = null;
+        String label = "UNK";
 
         for (CompassPoint COMPASS_LABEL1 : COMPASS_LABEL)
             if (isBetween(COMPASS_LABEL1.min, COMPASS_LABEL1.max, CompareMode.NON_INCLUSIVE_INCLUSIVE))

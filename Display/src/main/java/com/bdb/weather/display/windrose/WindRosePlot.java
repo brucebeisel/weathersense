@@ -44,8 +44,6 @@ import com.bdb.weather.display.CompassPolarItemRenderer;
  *
  */
 public class WindRosePlot extends PolarPlot {
-    private static final long serialVersionUID = -7912104012268783992L;
-
     private final DefaultPolarItemRenderer renderer;
     private WindRoseData	     data;
     private static final Logger      logger = Logger.getLogger(WindRosePlot.class.getName());

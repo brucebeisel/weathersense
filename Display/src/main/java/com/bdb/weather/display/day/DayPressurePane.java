@@ -42,11 +42,11 @@ import com.bdb.weather.display.axis.SolarRadiationAxis;
  * 
  * @author Bruce
  */
-public class DayPressurePanel extends DayXYPlotPanel {
+public class DayPressurePane extends DayXYPlotPane {
     /**
      * Constructor.
      */
-    public DayPressurePanel() {
+    public DayPressurePane() {
         super(new PressureRangeAxis(), new SolarRadiationAxis());
         createElements();
     }
@@ -67,7 +67,7 @@ public class DayPressurePanel extends DayXYPlotPanel {
 
     /*
      * (non-Javadoc)
-     * @see com.bdb.weather.display.day.DayXYPlotPanel#addAnnotations(org.jfree.chart.plot.XYPlot, com.bdb.weather.common.SummaryRecord)
+     * @see com.bdb.weather.display.day.DayXYPlotPane#addAnnotations(org.jfree.chart.plot.XYPlot, com.bdb.weather.common.SummaryRecord)
      */
     @Override
     protected void addAnnotations(XYPlot plot, SummaryRecord summaryRecord) {

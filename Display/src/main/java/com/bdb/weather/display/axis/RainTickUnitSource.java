@@ -24,8 +24,6 @@ import org.jfree.chart.axis.TickUnits;
 import com.bdb.weather.common.measurement.Depth;
 
 public class RainTickUnitSource extends TickUnits {
-    private static final long serialVersionUID = -5092712597838074580L;
-
     public RainTickUnitSource() {
         NumberFormat format = Depth.getDefaultFormatter();
 

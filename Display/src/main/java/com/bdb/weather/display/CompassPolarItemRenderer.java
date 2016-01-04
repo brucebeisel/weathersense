@@ -31,7 +31,6 @@ import org.jfree.ui.TextAnchor;
  * @author Bruce
  */
 public class CompassPolarItemRenderer extends DefaultPolarItemRenderer {
-    private static final long serialVersionUID = 6655248313645839714L;
     private static final NumberTick TICKS[] = {
         new NumberTick(Double.valueOf(0.0),   "N",   TextAnchor.BOTTOM_CENTER, TextAnchor.CENTER, 0.0),
         new NumberTick(Double.valueOf(22.5),  "NNE", TextAnchor.BOTTOM_LEFT, TextAnchor.CENTER, 0.0),

@@ -20,7 +20,14 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
 
+import javafx.beans.property.ReadOnlyDoubleWrapper;
+import javafx.beans.property.ReadOnlyFloatWrapper;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -45,21 +52,15 @@ import com.bdb.weather.display.LabeledFieldPane;
  *
  */
 public class WindRosePane extends ChartDataPane {
-    private final WindRosePlot 	          windRosePlot = new WindRosePlot();
-    private final JFreeChart	 	  chart = new JFreeChart(windRosePlot);
-    private final ChartViewer	          chartViewer = new ChartViewer(chart);
-    private final TableView		  dataTable;
-    //private final DefaultTableModel	  tableModel = new DefaultTableModel();
-    //private final DefaultTableColumnModel columnModel = new DefaultTableColumnModel();
-    private final TextField		  timeField = new TextField();
-    private final TextField		  calmField = new TextField();
+    private final WindRosePlot            windRosePlot = new WindRosePlot();
+    private final JFreeChart              chart = new JFreeChart(windRosePlot);
+    private final ChartViewer             chartViewer = new ChartViewer(chart);
+    private final TableView<WindSlice>    dataTable;
+    private final TextField               timeField = new TextField();
+    private final TextField               calmField = new TextField();
     private boolean                       initialized = false;
-    private static final int              HEADING_COLUMN = 0;
-    private static final int              PERCENT_OF_WIND_COLUMN = 1;
-    private static final int              AVG_SPEED_COLUMN = 2;
-    private static final int              MAX_SPEED_COLUMN = 3;
 
-    private static final String	DEFAULT_HEADINGS[] = {
+    private static final String DEFAULT_HEADINGS[] = {
             "Heading",
             "% of Wind",
             "Avg Speed",
@@ -92,6 +93,24 @@ public class WindRosePane extends ChartDataPane {
         p.setCenter(dataTable);
         p.setTop(summaryPanel);
         this.setTabContents(chartViewer, p);
+
+        TableColumn<WindSlice,String> headingColumn = new TableColumn<>("Heading");
+        headingColumn.setCellValueFactory((rec) -> new ReadOnlyStringWrapper(Heading.headingForSlice(rec.getValue().getHeadingIndex(), 16).getCompassLabel()));
+
+        dataTable.getColumns().add(headingColumn);
+
+        TableColumn<WindSlice,String> percentOfWindColumn = new TableColumn<>("% of Wind");
+        percentOfWindColumn.setCellValueFactory((rec) -> new ReadOnlyStringWrapper(String.format("%.1f", rec.getValue().getPercentageOfWind())));
+        dataTable.getColumns().add(percentOfWindColumn);
+
+        TableColumn<WindSlice,Speed> avgSpeedColumn = new TableColumn<>("Avg Speed");
+        avgSpeedColumn.setCellValueFactory((rec) -> new ReadOnlyObjectWrapper<>(rec.getValue().getAvgSpeed()));
+        dataTable.getColumns().add(avgSpeedColumn);
+
+        TableColumn<WindSlice,Speed> maxSpeedColumn = new TableColumn<>("Max Speed");
+        maxSpeedColumn.setCellValueFactory((rec) -> new ReadOnlyObjectWrapper<>(rec.getValue().getMaxSpeed()));
+        dataTable.getColumns().add(maxSpeedColumn);
+
     }
     
     /**
@@ -105,27 +124,13 @@ public class WindRosePane extends ChartDataPane {
         
         initialized = true;
         
-        //
-        // Setup the table heading and columns
-        //
-        String tableHeadings[] = new String[DEFAULT_HEADINGS.length + bins.size()];
-        int n = 0;
-        for (String heading : DEFAULT_HEADINGS)
-            tableHeadings[n++] = heading;
-        
-        for (SpeedBin bin : bins)
-            tableHeadings[n++] = bin.toString();
-
-        /*
-        for (int i = 0; i < tableHeadings.length; i++) {
-            TableColumn col = new TableColumn();
-            col.setHeaderValue(tableHeadings[i]);
-            col.setModelIndex(i);
-            columnModel.addColumn(col);
+        int binNumber = 0;
+        for (SpeedBin bin : bins) {
+            TableColumn<WindSlice,String> column = new TableColumn<>(bin.speedString());
+            column.setUserData(binNumber++);
+            column.setCellValueFactory((rec) -> new ReadOnlyStringWrapper(String.format("%.1f", rec.getValue().speedBinPercentage((int)rec.getTableColumn().getUserData()))));
+            dataTable.getColumns().add(column);
         }
-
-        tableModel.setColumnCount(tableHeadings.length);
-        */
     }
 
     /**
@@ -137,12 +142,12 @@ public class WindRosePane extends ChartDataPane {
         windRosePlot.clearCornerTextItems();
 
         if (data == null) {
-            //tableModel.setRowCount(0);
             windRosePlot.setDataset((WindRoseData)null);
             return;
         }
-        
+
         init(data.getSpeedBins());
+        
         DateTimeFormatter sdf = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
         windRosePlot.setDataset(data);
         float calmPercent = ((float)data.getCalmDuration().getSeconds() / (float)data.getTotalDuration().getSeconds()) * 100.0f;
@@ -155,18 +160,12 @@ public class WindRosePane extends ChartDataPane {
         double speedSum = 0.0;
 
         //
-        // Load the table
+        // Calculate annotation data
         //
-        //tableModel.setRowCount(data.getNumSlices());
-
         for (int i = 0; i < data.getNumSlices(); i++) {
             WindSlice slice = data.getSlice(i);
 
             Heading heading = Heading.headingForSlice(slice.getHeadingIndex(), data.getNumSlices());
-            //tableModel.setValueAt(heading.getCompassLabel(), i, HEADING_COLUMN);
-            //tableModel.setValueAt(String.format("%.1f", slice.getPercentageOfWind()), i, PERCENT_OF_WIND_COLUMN);
-            //tableModel.setValueAt(slice.getAvgSpeed(), i, AVG_SPEED_COLUMN);
-            //tableModel.setValueAt(slice.getMaxSpeed(), i, MAX_SPEED_COLUMN);
 
             if (slice.getMaxSpeed().get() > maxSpeed.get()) {
                 maxSpeed = slice.getMaxSpeed();
@@ -174,9 +173,6 @@ public class WindRosePane extends ChartDataPane {
             }
 
             speedSum += slice.getAvgSpeed().get() * slice.getSliceDuration().getSeconds();
-
-            //for (int j = 0; j < slice.getNumSpeedBins(); j++)
-            //    tableModel.setValueAt(String.format("%.1f", slice.speedBinPercentage(j)), i, DEFAULT_HEADINGS.length + j);
         }
 
         //
@@ -187,5 +183,7 @@ public class WindRosePane extends ChartDataPane {
             Speed avgSpeed = new Speed(speedSum / data.getTotalDuration().getSeconds());
             windRosePlot.addCornerTextItem(String.format("Avg: %s", avgSpeed));
         }
+
+        dataTable.setItems(FXCollections.observableList(data.getSlices()));
     }
 }
