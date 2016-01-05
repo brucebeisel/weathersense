@@ -19,7 +19,9 @@ package com.bdb.weather.display;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.bdb.util.jdbc.DBConnection;
@@ -92,78 +94,87 @@ public final class WeatherDataMgr {
         summaryTable = new DailySummaryTable(connection);
         wsTable = new WeatherStationTable(connection);
         temperatureBinMgr = new TemperatureBinMgr(connection);
-        refreshData();
     }
 
-    public void refreshData() {
-        Thread currentThread = Thread.currentThread();
+    public synchronized void refreshData() {
+        try {
+            logger.info("Refreshing Weather Data");
+            Thread currentThread = Thread.currentThread();
 
-        if (thread == null) {
-            thread = currentThread;
-            today = LocalDate.now();
+            if (thread == null) {
+                thread = currentThread;
+                today = LocalDate.now();
+            }
+            else if (thread != currentThread)
+                logger.warning("Refreshing data on a different thread");
+
+            WeatherStation ws = wsTable.getWeatherStation();
+            temperatureBinMgr.refresh();
+
+            LocalDateTime now = LocalDateTime.now();
+
+            LocalDateTime start = now.minusHours(25);
+            recentData = historyTable.queryRecordsForTimePeriod(start, now);
+
+            if (needHourRain) {
+                LocalDateTime hourBegin = now.minusHours(1);
+                hourRain = historyTable.rainTotal(hourBegin, now);
+            }
+            
+            if (need24HourRain) {
+                start = now.minusHours(24);
+                last24HourRain = historyTable.rainTotal(start, now);
+            }
+            
+            if (needTodayRain) {
+                start = now.toLocalDate().atStartOfDay();
+                todayRain = historyTable.rainTotal(start, now);
+            }
+            
+            LocalDateTime yearBegin = LocalDate.now().withDayOfYear(1).atStartOfDay();
+            if (needCalendarYearRain) {
+                ytdRain = historyTable.rainTotal(yearBegin, now);
+            }
+
+            if (needWeatherYearRain) {
+                yearBegin = yearBegin.withMonth(weatherYearStartMonth.getValue());
+
+                if (now.getMonth().getValue() < weatherYearStartMonth.getValue())
+                    yearBegin = yearBegin.minusYears(1);
+
+                weatherYearRain = historyTable.rainTotal(yearBegin, now);
+            }
+            
+            if (needThisMonthRain) {
+                LocalDate nowDate = LocalDate.now();
+                LocalDate monthBegin = nowDate.withDayOfMonth(1);
+                thisMonthRain = historyTable.rainTotal(monthBegin.atStartOfDay(), now);
+            }
+
+            LocalDate monthBegin = LocalDate.now().withDayOfMonth(1).minusMonths(1);
+            LocalDate monthEnd = monthBegin.plusDays(monthBegin.lengthOfMonth());
+            lastMonthRain = historyTable.rainTotal(monthBegin.atStartOfDay(), monthEnd.atTime(23, 59, 59));
+
+            todaysSummary = summaryTable.retrieveTodaysSummary(ws.getWindParameters(), temperatureBinMgr);
         }
-        else if (thread != currentThread)
-            logger.warning("Refreshing data on a different thread");
-
-        WeatherStation ws = wsTable.getWeatherStation();
-        temperatureBinMgr.refresh();
-
-        LocalDateTime now = LocalDateTime.now();
-
-        LocalDateTime start = now.minusHours(25);
-        recentData = historyTable.queryRecordsForTimePeriod(start, now);
-
-        if (needHourRain) {
-            LocalDateTime hourBegin = now.minusHours(1);
-            hourRain = historyTable.rainTotal(hourBegin, now);
+        catch (Exception e) {
+            logger.log(Level.SEVERE, "Error refreshing weather data", e);
         }
-        
-        if (need24HourRain) {
-            start = now.minusHours(24);
-            last24HourRain = historyTable.rainTotal(start, now);
-        }
-        
-        if (needTodayRain) {
-            start = now.toLocalDate().atStartOfDay();
-            todayRain = historyTable.rainTotal(start, now);
-        }
-        
-        LocalDateTime yearBegin = LocalDate.now().withDayOfYear(1).atStartOfDay();
-        if (needCalendarYearRain) {
-            ytdRain = historyTable.rainTotal(yearBegin, now);
-        }
-
-        if (needWeatherYearRain) {
-            yearBegin = yearBegin.withMonth(weatherYearStartMonth.getValue());
-
-            if (now.getMonth().getValue() < weatherYearStartMonth.getValue())
-                yearBegin = yearBegin.minusYears(1);
-
-            weatherYearRain = historyTable.rainTotal(yearBegin, now);
-        }
-        
-        if (needThisMonthRain) {
-            LocalDate nowDate = LocalDate.now();
-            LocalDate monthBegin = nowDate.withDayOfMonth(1);
-            thisMonthRain = historyTable.rainTotal(monthBegin.atStartOfDay(), now);
-        }
-
-        LocalDate monthBegin = LocalDate.now().withDayOfMonth(1).minusMonths(1);
-        LocalDate monthEnd = monthBegin.plusDays(monthBegin.lengthOfMonth());
-        lastMonthRain = historyTable.rainTotal(monthBegin.atStartOfDay(), monthEnd.atTime(23, 59, 59));
-
-        todaysSummary = summaryTable.retrieveTodaysSummary(ws.getWindParameters(), temperatureBinMgr);
     }
 
-    public SummaryRecord getTodaysSummary() {
+    public synchronized SummaryRecord getTodaysSummary() {
         return todaysSummary;
     }
 
-    public Depth getLastMonthRain() {
+    public synchronized List<HistoricalRecord> getRecentHistoricalRecords() {
+        return Collections.unmodifiableList(recentData);
+    }
+
+    public synchronized Depth getLastMonthRain() {
         return lastMonthRain;
     }
 
-    public void fillInCurrentWeather(CurrentWeather cw) {
+    public synchronized void fillInCurrentWeather(CurrentWeather cw) {
         // TODO: Fill in other possible missing data
         cw.setRainCalendarYear(ytdRain);
     }

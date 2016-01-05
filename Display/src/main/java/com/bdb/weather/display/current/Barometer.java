@@ -52,13 +52,13 @@ import com.bdb.weather.common.WeatherTrend;
 public class Barometer extends BorderPane {
     private final DefaultValueDataset dataset = new DefaultValueDataset(50.0);
     private final DialPlot            plot = new DialPlot(dataset);
-    private StandardDialRange   range;
+    private StandardDialRange         range;
     private final Label               title = new Label();
-    private StandardDialScale scale;
+    private StandardDialScale         scale;
     private final DialTextAnnotation  trendAnnotation = new DialTextAnnotation("Trend");
-    private final StringProperty titleProperty = new SimpleStringProperty();
-    private final DoubleProperty minValue = new SimpleDoubleProperty();
-    private final DoubleProperty maxValue = new SimpleDoubleProperty();
+    private final StringProperty      titleProperty = new SimpleStringProperty();
+    private final DoubleProperty      minValue = new SimpleDoubleProperty();
+    private final DoubleProperty      maxValue = new SimpleDoubleProperty();
 
     public Barometer() {
 	this("", new Pressure(900.0, Pressure.Unit.MILLIBAR), new Pressure(1100.0, Pressure.Unit.MILLIBAR));
@@ -137,7 +137,6 @@ public class Barometer extends BorderPane {
         chartViewer.setMaxHeight(250);
         chartViewer.setMaxWidth(250);
 
-        //chartViewer.setBackground(Color.GRAY);
         //chartViewer.setBorder(new BevelBorder(BevelBorder.RAISED));
 
         return chartViewer;

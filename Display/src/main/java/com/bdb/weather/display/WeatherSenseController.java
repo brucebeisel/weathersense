@@ -38,6 +38,7 @@ import com.bdb.weather.display.current.CurrentWeatherCharts;
 import com.bdb.weather.display.current.CurrentWeatherForm;
 import com.bdb.weather.display.day.DaySummaryGraphPane;
 import com.bdb.weather.display.day.TodayGraphPane;
+import com.bdb.weather.display.historytable.DayHistoryTable;
 import com.bdb.weather.display.freeplot.HistoricalFreePlot;
 import com.bdb.weather.display.preferences.ColorPreferencePanel;
 import com.bdb.weather.display.preferences.UnitsPreferenceDialog;
@@ -85,7 +86,7 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
         logger.fine(String.format("Updating %s current weather processors", cwpList.size()));
         
         WeatherDataMgr.getInstance().fillInCurrentWeather(curWeather);
-        cwpList.forEach((cwp) -> Platform.runLater(() -> cwp.updateCurrentWeather(curWeather)));
+        Platform.runLater(() -> cwpList.forEach((cwp) -> cwp.updateCurrentWeather(curWeather)));
     }
 
     private Stage launchStage(Parent root, String title, boolean maximize) {
@@ -145,6 +146,8 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchArchiveTableView() {
+        DayHistoryTable dayHistoryTable = new DayHistoryTable(connection);
+        launchStage(dayHistoryTable, "Day Historical Table", false);
     }
 
     @FXML

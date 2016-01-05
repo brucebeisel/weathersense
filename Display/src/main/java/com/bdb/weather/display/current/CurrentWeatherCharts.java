@@ -53,11 +53,10 @@ import com.bdb.weather.display.RainBucket;
 import com.bdb.weather.display.RainPlot;
 import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.WeatherDataMgr;
-import com.bdb.weather.display.WeatherSense;
 import com.bdb.weather.display.preferences.UnitsPreferences;
 
 /**
- * The top-level component for displaying the current weather.
+ * The top-level component for displaying the current weather charts.
  * 
  * @author Bruce
  *
@@ -81,7 +80,6 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
     @FXML private RainBucket              lastMonthRain;
     @FXML private RainBucket              calendarYearRain;
     @FXML private RainBucket              weatherYearRain;
-    private final HistoryTable            historyTable;
     private final MonthlyAveragesTable    monthlyAverageTable;
     private String                        frameTitle = null;
     private final UnitsPreferences        prefs = UnitsPreferences.getInstance();
@@ -97,7 +95,6 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
     public CurrentWeatherCharts(WeatherStation ws, DBConnection connection) {
         this.ws = ws;
 
-        historyTable = new HistoryTable(connection);
 	monthlyAverageTable = new MonthlyAveragesTable(connection);
 
         try {
@@ -182,7 +179,6 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         lastMonthRain.setAverage(lastMonthAverage.get());
     }
     
-    @SuppressWarnings("unchecked")
     private <T extends Measurement> Pair<WeatherTrend,T> processTrend(T current, T historical, T delta) {
         WeatherTrend trend = WeatherTrend.STEADY;
         
@@ -224,8 +220,7 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         // TODO: All this logic should be in the collector so that there are no null values
         // when we get here.
         //
-        LocalDateTime start = now.minusHours(25);
-        List<HistoricalRecord> list = historyTable.queryRecordsForTimePeriod(start, now);
+        List<HistoricalRecord> list = WeatherDataMgr.getInstance().getRecentHistoricalRecords();
         
         //
         // The pair is the current rain amount, the hourly rain rate

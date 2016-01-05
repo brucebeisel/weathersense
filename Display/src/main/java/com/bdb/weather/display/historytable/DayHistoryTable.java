@@ -19,6 +19,9 @@ package com.bdb.weather.display.historytable;
 import java.time.LocalDate;
 import java.util.List;
 
+import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.FXCollections;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
@@ -30,12 +33,14 @@ import com.bdb.weather.common.Wind;
 import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.display.DaySelectionPanel;
 import com.bdb.weather.display.DaySelectionPanel.DateChangedListener;
+import com.bdb.weather.display.DisplayConstants;
+import com.bdb.weather.display.TableColumnValueFactory;
 
 /**
  * TODO Provide mechanism to export to a CSV file
  * @author Bruce
  */
-public class DayHistoryTable implements DateChangedListener {
+public class DayHistoryTable extends BorderPane implements DateChangedListener {
     private static final String TABLE_HEADINGS[] = {
         "Time",
         "Low Outdoor Temperature",
@@ -59,7 +64,6 @@ public class DayHistoryTable implements DateChangedListener {
         "Rainfall",
         "High Rainfall Rate"
     };
-    private final BorderPane                  panel;
     private final TableView<HistoricalRecord> dataTable;
     private final HistoryTable                historyTable;
 
@@ -72,22 +76,28 @@ public class DayHistoryTable implements DateChangedListener {
     public DayHistoryTable(DBConnection connection) {
         historyTable = new HistoryTable(connection);
         LocalDate date = LocalDate.now();
-        panel = new BorderPane();
         DaySelectionPanel selectionPanel = new DaySelectionPanel(date);
         selectionPanel.addDateChangedListener(this);
-        panel.setTop(selectionPanel);
+        this.setTop(selectionPanel);
 
         
         dataTable = new TableView();
 
-        for (int i = 0; i < TABLE_HEADINGS.length; i++) {
-            TableColumn<HistoricalRecord,String> col = new TableColumn(TABLE_HEADINGS[i]);
-            dataTable.getColumns().add(col);
-        }
+        TableColumn<HistoricalRecord,String> col = new TableColumn("Time");
+        col.setCellValueFactory((rec)->new ReadOnlyStringWrapper(DisplayConstants.formatTime(rec.getValue().getTime().toLocalTime())));
+        dataTable.getColumns().add(col);
 
-        panel.setCenter(dataTable);
+        col = new TableColumn("Low Outdoor Temperature");
+        col.setCellValueFactory(new TableColumnValueFactory("Low Outdoor Temperature", HistoricalRecord::getLowOutdoorTemperature));
+        dataTable.getColumns().add(col);
 
-        loadData(date);
+        col = new TableColumn("High Solar Radiation");
+        col.setCellValueFactory(new TableColumnValueFactory("High Solar Radiation", HistoricalRecord::getHighSolarRadiation));
+        dataTable.getColumns().add(col);
+
+        this.setCenter(dataTable);
+
+        Platform.runLater(() -> loadData(date));
     }
 
     /**
@@ -97,7 +107,9 @@ public class DayHistoryTable implements DateChangedListener {
      */
     private void loadData(LocalDate date) {
         List<HistoricalRecord> list = historyTable.queryRecordsForDay(date);
+        dataTable.setItems(FXCollections.observableList(list));
 
+        /*
         int row = 0;
         for (HistoricalRecord rec : list) {
             int col = 0;
@@ -118,7 +130,6 @@ public class DayHistoryTable implements DateChangedListener {
 
             //tableModel.setValueAt(rec.getBaroPressure(), row, col++);
 
-            /*
             if (rec.getAvgUvIndex() != null)
                 tableModel.setValueAt(rec.getAvgUvIndex(), row, col++);
             else
@@ -146,10 +157,10 @@ public class DayHistoryTable implements DateChangedListener {
 
             tableModel.setValueAt(rec.getRainfall(), row, col++);
             tableModel.setValueAt(rec.getHighRainfallRate(), row, col++);
-            */
 
             row++;
         }
+    */
     }
 
     /**

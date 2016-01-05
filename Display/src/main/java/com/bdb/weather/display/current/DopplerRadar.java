@@ -94,8 +94,7 @@ public class DopplerRadar extends BorderPane {
         executor.scheduleAtFixedRate(() -> loadImages(), DOPPLER_IMAGE_REFRESH_INTERVAL, DOPPLER_IMAGE_REFRESH_INTERVAL, TimeUnit.MINUTES);
 
 	Timeline timeline = new Timeline(
-	    new KeyFrame(Duration.ZERO, (actionEvent) -> nextFrame()),
-	    new KeyFrame(Duration.millis(ANIMATION_INTERVAL))
+	    new KeyFrame(Duration.millis(ANIMATION_INTERVAL), (actionEvent) -> nextFrame())
 	);
 
 	timeline.setCycleCount(Timeline.INDEFINITE);

@@ -211,6 +211,22 @@ private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:m
      * @param list The list of historical records for the rainfall graph.
      */
     public void setRainData(List<RainEntry> list) {
+        if (list.size() == rainSeries.getItemCount()) {
+            RegularTimePeriod n0 = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(list.get(0).time), TimeZone.getDefault());
+            RegularTimePeriod n1 = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(list.get(list.size() - 1).time), TimeZone.getDefault());
+
+            RegularTimePeriod e0 = rainSeries.getDataItem(0).getPeriod();
+            RegularTimePeriod e1 = rainSeries.getDataItem(rainSeries.getItemCount() - 1).getPeriod();
+
+            //
+            // If the first and last times are the same between what's been plotted and what was passed in, the graph is up to date,
+            // do nothing.
+            //
+            if (n0.equals(e0) && n1.equals(e1)) {
+                return;
+            }
+        }
+
         rainSeries.clear();
         rainRateSeries.clear();
         
