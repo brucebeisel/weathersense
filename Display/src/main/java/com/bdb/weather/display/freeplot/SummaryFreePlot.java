@@ -27,7 +27,7 @@ import java.util.function.Function;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Node;
+import javafx.scene.Parent;
 
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DefaultXYItemRenderer;
@@ -45,7 +45,6 @@ import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.common.measurement.SolarRadiation;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
-import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.axis.HumidityRangeAxis;
 import com.bdb.weather.display.axis.PressureRangeAxis;
 import com.bdb.weather.display.axis.RainRangeAxis;
@@ -115,6 +114,15 @@ public abstract class SummaryFreePlot implements SeriesFactory<SummaryRecord>, S
         temperatureBinMgr.refresh();
     }
     
+    /**
+     * Return the JavaFX node that is the container for this plot.
+     * 
+     * @return The JavaFX Node
+     */
+    public Parent getNode() {
+        return freePlot;
+    }
+
    /*
     * (non-Javadoc)
     * @see com.bdb.weather.display.freeplot.FreePlot.SeriesCollectionFactory#createSeriesGroupControls(java.awt.event.ActionListener)

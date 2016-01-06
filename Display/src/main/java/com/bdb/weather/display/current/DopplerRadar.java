@@ -68,6 +68,7 @@ public class DopplerRadar extends BorderPane {
     private DopplerRadarTable               dopplerRadarTable = null;
     private final ScheduledExecutorService  executor = Executors.newSingleThreadScheduledExecutor();
     private WebEngine                       webEngine;
+    private final Timeline                  timeline;
     private static final Logger             logger = Logger.getLogger(DopplerRadar.class.getName());
     
     public DopplerRadar() {
@@ -93,7 +94,7 @@ public class DopplerRadar extends BorderPane {
 
         executor.scheduleAtFixedRate(() -> loadImages(), DOPPLER_IMAGE_REFRESH_INTERVAL, DOPPLER_IMAGE_REFRESH_INTERVAL, TimeUnit.MINUTES);
 
-	Timeline timeline = new Timeline(
+	timeline = new Timeline(
 	    new KeyFrame(Duration.millis(ANIMATION_INTERVAL), (actionEvent) -> nextFrame())
 	);
 
@@ -137,6 +138,10 @@ public class DopplerRadar extends BorderPane {
         this.animate = animate;
     }
     
+    public void cleanup() {
+        executor.shutdownNow();
+        timeline.stop();
+    }
     /**
      * Load the Doppler radar images from the database.
      */

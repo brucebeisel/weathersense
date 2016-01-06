@@ -16,6 +16,7 @@
  */
 package com.bdb.weather.display;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -32,11 +33,22 @@ import com.bdb.weather.common.HistoricalRecord;
  */
 public class TableColumnValueFactory implements Callback<TableColumn.CellDataFeatures<HistoricalRecord,String>,ObservableValue<String>> {
     private final Function<HistoricalRecord,Measurement> accessor;
+    private final BiFunction<HistoricalRecord,Integer,Measurement> accessorWithArg;
     private final String columnName;
+    private final int argument;
     
     public TableColumnValueFactory(String columnName, Function<HistoricalRecord,Measurement> accessor) {
         this.columnName = columnName;
         this.accessor = accessor;
+        this.accessorWithArg = null;
+        this.argument = 0;
+    }
+    
+    public TableColumnValueFactory(String columnName, BiFunction<HistoricalRecord,Integer,Measurement> accessor, int arg) {
+        this.columnName = columnName;
+        this.accessorWithArg = accessor;
+        this.accessor = null;
+        this.argument = arg;
     }
     
     public String getColumnName() {
@@ -46,7 +58,11 @@ public class TableColumnValueFactory implements Callback<TableColumn.CellDataFea
     @Override
     public ObservableValue<String> call(TableColumn.CellDataFeatures<HistoricalRecord,String> cdf) {
         HistoricalRecord r = cdf.getValue();
-        Measurement m = accessor.apply(r);
+        Measurement m;
+        if (accessor != null)
+            m = accessor.apply(r);
+        else
+            m = accessorWithArg.apply(r, argument);
 
         String value = DisplayConstants.UNKNOWN_VALUE_STRING;
         if (m != null)

@@ -16,6 +16,7 @@
  */
 package com.bdb.weather.display;
 
+import java.awt.Dimension;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.weather.common.CurrentWeather;
@@ -38,11 +40,16 @@ import com.bdb.weather.display.current.CurrentWeatherCharts;
 import com.bdb.weather.display.current.CurrentWeatherForm;
 import com.bdb.weather.display.day.DaySummaryGraphPane;
 import com.bdb.weather.display.day.TodayGraphPane;
+import com.bdb.weather.display.freeplot.DailyFreePlot;
 import com.bdb.weather.display.historytable.DayHistoryTable;
 import com.bdb.weather.display.freeplot.HistoricalFreePlot;
+import com.bdb.weather.display.freeplot.MonthlyFreePlot;
+import com.bdb.weather.display.historyeditor.HistoryEditorPanel;
 import com.bdb.weather.display.preferences.ColorPreferencePanel;
 import com.bdb.weather.display.preferences.UnitsPreferenceDialog;
 import com.bdb.weather.display.preferences.UserPreferences;
+import com.bdb.weather.display.sensors.SensorPanel;
+import com.bdb.weather.display.sensors.SensorStationPanel;
 import com.bdb.weather.display.storm.StormPanel;
 import com.bdb.weather.display.stripchart.MeasurementType;
 import com.bdb.weather.display.stripchart.StripChartManager;
@@ -89,29 +96,39 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
         Platform.runLater(() -> cwpList.forEach((cwp) -> cwp.updateCurrentWeather(curWeather)));
     }
 
-    private Stage launchStage(Parent root, String title, boolean maximize) {
+    private Stage launchStage(Parent root, String title, boolean maximize, boolean modal) {
 	Stage stage = new Stage();
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/weathersense.css");
-        stage.setTitle(title);
-        stage.setScene(scene);
-        stage.sizeToScene();
-        stage.setMaximized(maximize);
-        stage.show();
-        return stage;
-    }
+        if (modal)
+            stage.initModality(Modality.APPLICATION_MODAL);
 
-    private Stage launchModalStage(Parent root, String title) {
-	Stage stage = new Stage();
-        stage.initModality(Modality.APPLICATION_MODAL);
         stage.initOwner(topLevelStage);
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/weathersense.css");
         stage.setTitle(title);
         stage.setScene(scene);
         stage.sizeToScene();
-        stage.showAndWait();
+
+        if (root instanceof Hideable) {
+            stage.setOnHidden((event) -> ((Hideable)((Window)event.getSource()).getScene().getRoot()).hide());
+        }
+
+        if (!modal)
+            stage.setMaximized(maximize);
+
+        if (modal)
+            stage.showAndWait();
+        else
+            stage.show();
+
         return stage;
+
+    }
+    private Stage launchStage(Parent root, String title, boolean maximize) {
+        return launchStage(root, title, maximize, false);
+    }
+
+    private Stage launchModalStage(Parent root, String title) {
+        return launchStage(root, title, false, true);
     }
 
     @FXML
@@ -152,6 +169,8 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchArchiveEditorView() {
+        HistoryEditorPanel editor = new HistoryEditorPanel(ws, connection);
+        launchStage(editor, "Archive Editor", true);
     }
 
     @FXML
@@ -190,10 +209,13 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchDailyFreePlotView() {
+        DailyFreePlot freePlot = new DailyFreePlot(ws, connection);
     }
 
     @FXML
     public void launchMonthlyFreePlotView() {
+        MonthlyFreePlot freePlot = new MonthlyFreePlot(ws, connection);
+        launchStage(freePlot.getNode(), "Monthly Free Plot", true);
     }
 
     @FXML
@@ -245,10 +267,15 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchSensors() {
+        SensorPanel sensorPanel = new SensorPanel(connection);
+        launchStage(sensorPanel, "Sensors", false);
     }
 
     @FXML
     public void launchSensorStations() {
+        SensorStationPanel sensorStationPanel = new SensorStationPanel(connection);
+        launchStage(sensorStationPanel, "Sensor Stations", false);
+        sensorStationPanel.loadData();
     }
 
     @FXML
@@ -265,61 +292,4 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
     public void exit() {
 	Platform.exit();
     }
-
-    /*
-    private JInternalFrame launchView(String title, ComponentContainer container, Dimension geometry, boolean maximize) {
-        return null;
-    }
-
-    public void launchHistoricalTableView() {
-        DayHistoryTable dayHistoryTable = new DayHistoryTable(connection);
-        launchView("Day Historical Table", dayHistoryTable, null, true);
-    }
-
-    @Override
-    public void launchStormView() {
-        StormPanel stormPanel = new StormPanel(connection);
-        launchView("", stormPanel, new Dimension(800,600), false);
-    }
-
-    public void launchYearlySummariesView() {
-        YearlySummariesPanel yearlySummaryPanel = new YearlySummariesPanel(ws, connection, this);
-        launchView("", yearlySummaryPanel, new Dimension(800, 600), true);
-    }
-
-    @Override
-    public void launchHistoricalFreePlotView() {
-        HistoricalFreePlot freePlot = new HistoricalFreePlot(ws, connection);
-        launchView(HISTORICAL_FREE_PLOT_VIEW_NAME, freePlot, new Dimension(800, 600), true);
-    }
-
-    @Override
-    public void launchDailyFreePlotView() {
-        SummaryFreePlot freePlot = new DailyFreePlot(ws, connection);
-        launchView(DAILY_SUMMARY_FREE_PLOT_VIEW_NAME, freePlot, new Dimension(800, 600), true);
-    }
-
-    @Override
-    public void launchMonthlyFreePlotView() {
-        MonthlyFreePlot freePlot = new MonthlyFreePlot(ws, connection);
-        launchView(MONTHLY_FREE_PLOT_VIEW_NAME, freePlot, new Dimension(800, 600), true);
-    }
-
-    @Override
-    public void launchHistoryEditor() {
-        HistoryEditorPanel editor = new HistoryEditorPanel(ws, connection);
-        launchView(HISTORY_EDITOR_CMD, editor, new Dimension(800, 600), true);
-    }
-
-    private void launchSensorView() {
-        SensorPanel sensorPanel = new SensorPanel(connection);
-        launchView("", sensorPanel, new Dimension(800, 600), true);
-    }
-
-    private void launchSensorStationView() {
-        SensorStationPanel sensorStationPanel = new SensorStationPanel(connection);
-        sensorStationPanel.loadData();
-        launchView("Sensor Stations", sensorStationPanel, new Dimension(800, 600), false);
-    }
-*/
 }

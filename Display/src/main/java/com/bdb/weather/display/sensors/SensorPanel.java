@@ -18,55 +18,46 @@ package com.bdb.weather.display.sensors;
 
 import java.util.List;
 
-import javafx.scene.Node;
+import javafx.beans.property.ReadOnlyIntegerWrapper;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.FXCollections;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 
 import com.bdb.util.jdbc.DBConnection;
 
 import com.bdb.weather.common.Sensor;
+import com.bdb.weather.common.SensorType;
 import com.bdb.weather.common.db.SensorTable;
-import com.bdb.weather.display.ComponentContainer;
 
 /**
  *
  * @author Bruce
  */
-public class SensorPanel extends BorderPane implements ComponentContainer {
-    private TableView<Sensor> table;
-    private SensorTable sensorTable;
-    private static final String COLUMN_HEADINGS[] = {
-        "Sensor ID", "Sensor Type", "Sensor Name", ""
-    };
+public class SensorPanel extends BorderPane {
+    private final TableView<Sensor> table = new TableView<>();
+    private final SensorTable sensorTable;
 
     public SensorPanel(DBConnection connection) {
         sensorTable = new SensorTable(connection);
         List<Sensor> sensors = sensorTable.getSensorList();
-        /*
-        model.setColumnIdentifiers(COLUMN_HEADINGS);
-        model.setRowCount(sensors.size());
-        
-        for (int i = 0; i < sensors.size(); i++) {
-            model.setValueAt(sensors.get(i).getSensorId(), i, 0);
-            model.setValueAt(sensors.get(i).getType(), i, 1);
-            model.setValueAt(sensors.get(i).getName(), i, 2);
-            model.setValueAt("Change Name", i, 3);
-        }
 
-        table = new TableView<>();
-        TableColumn column = table.getColumn("");
-        column.setCellRenderer((JTable table1, Object value, boolean isSelected, boolean hasFocus, int row, int col) -> {
-            JButton button = new JButton(value.toString());
-            return button;
-        });
+        TableColumn<Sensor,Number> idColumn = new TableColumn<>("Sensor ID");
+        idColumn.setCellValueFactory((rec) -> new ReadOnlyIntegerWrapper(rec.getValue().getSensorId()));
+        table.getColumns().add(idColumn);
 
+        TableColumn<Sensor,SensorType> typeColumn = new TableColumn<>("Sensor Type");
+        typeColumn.setCellValueFactory((rec) -> new ReadOnlyObjectWrapper<>(rec.getValue().getType()));
+        table.getColumns().add(typeColumn);
+
+        TableColumn<Sensor,String> nameColumn = new TableColumn<>("Sensor Name");
+        nameColumn.setCellValueFactory((rec) -> new ReadOnlyStringWrapper(rec.getValue().getName()));
+        table.getColumns().add(nameColumn);
+
+        table.setItems(FXCollections.observableList(sensors));
 
         this.setCenter(table);
-*/
-    }
-
-    @Override
-    public Node getComponent() {
-        return this;
     }
 }

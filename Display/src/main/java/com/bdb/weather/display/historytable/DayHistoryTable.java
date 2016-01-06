@@ -29,6 +29,9 @@ import javafx.scene.layout.BorderPane;
 import com.bdb.util.jdbc.DBConnection;
 
 import com.bdb.weather.common.HistoricalRecord;
+import com.bdb.weather.common.Sensor;
+import com.bdb.weather.common.SensorManager;
+import com.bdb.weather.common.SensorType;
 import com.bdb.weather.common.Wind;
 import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.display.DaySelectionPanel;
@@ -95,6 +98,16 @@ public class DayHistoryTable extends BorderPane implements DateChangedListener {
         col.setCellValueFactory(new TableColumnValueFactory("High Solar Radiation", HistoricalRecord::getHighSolarRadiation));
         dataTable.getColumns().add(col);
 
+        //col = new TableColumn("UV Index");
+        //col.setCellValueFactory(new TableColumnValueFactory("UV Index", HistoricalRecord::getHighUvIndex));
+        //dataTable.getColumns().add(col);
+
+        List<Sensor> sensors = SensorManager.getInstance().getExtraSensors(SensorType.THERMOMETER);
+        for (Sensor sensor : sensors) {
+            col = new TableColumn(sensor.getName());
+            col.setCellValueFactory(new TableColumnValueFactory("High Solar Radiation", HistoricalRecord::getTemperatureForSensor, sensor.getSensorId()));
+            dataTable.getColumns().add(col);
+        }
         this.setCenter(dataTable);
 
         Platform.runLater(() -> loadData(date));

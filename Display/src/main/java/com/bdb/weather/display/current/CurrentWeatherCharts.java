@@ -42,13 +42,13 @@ import com.bdb.weather.common.MonthWeatherAverages;
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.WeatherTrend;
-import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.common.db.MonthlyAveragesTable;
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Heading;
 import com.bdb.weather.common.measurement.Humidity;
 import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.display.CurrentWeatherProcessor;
+import com.bdb.weather.display.Hideable;
 import com.bdb.weather.display.RainBucket;
 import com.bdb.weather.display.RainPlot;
 import com.bdb.weather.display.StageUtilities;
@@ -61,8 +61,7 @@ import com.bdb.weather.display.preferences.UnitsPreferences;
  * @author Bruce
  *
  */
-public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcessor  {
-    private final WeatherStation          ws;
+public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcessor, Hideable  {
     @FXML private Barometer               barometer;
     @FXML private WindGauge               windGauge;
     @FXML private Hygrometer              indoorHumidity;
@@ -93,7 +92,6 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
      */
     @SuppressWarnings("LeakingThisInConstructor")
     public CurrentWeatherCharts(WeatherStation ws, DBConnection connection) {
-        this.ws = ws;
 
 	monthlyAverageTable = new MonthlyAveragesTable(connection);
 
@@ -322,9 +320,11 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
 	StageUtilities.setStageTitle(this, ammendedFrameTitle);
     }
 
-    public void closing() {
+    @Override
+    public void hide() {
         outdoorTemperature.unitProperty().unbind();
         indoorTemperature.unitProperty().unbind();
+        dopplerRadar.cleanup();
     }
     /**
      * Update the display with the current weather data.

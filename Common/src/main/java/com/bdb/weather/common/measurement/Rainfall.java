@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 bruce
+ * Copyright (C) 2016 bruce
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,28 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.bdb.weather.display;
-
-import javafx.scene.Node;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+package com.bdb.weather.common.measurement;
 
 /**
  *
  * @author bruce
  */
-public abstract class ChartDataPane extends TabPane {
-    private final Tab chartTab = new Tab(DisplayConstants.GRAPH_TAB_NAME);
-    private final Tab dataTab = new Tab(DisplayConstants.DATA_TAB_NAME);
-
-    public ChartDataPane() {
-        this.getTabs().add(chartTab);
-        this.getTabs().add(dataTab);
-        this.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+public class Rainfall extends Depth {
+    /**
+     * Construct a Depth measurement object using the default units.
+     * @param rainfall The value to initialize the rainfall measurement
+     */
+    public Rainfall(double rainfall) {
+        this(rainfall, getDefaultUnit());
     }
 
-    protected final void setTabContents(Node chartNode, Node dataNode) {
-        chartTab.setContent(chartNode);
-        dataTab.setContent(dataNode);
+    /**
+     * Construct a Depth measurement object using the specified unit.
+     * 
+     * @param rainfall The value for the measurement
+     * @param unit The unit of the value
+     */
+    public Rainfall(double rainfall, Unit unit) {
+        super(rainfall, unit);
+    }
+    
+    private Rainfall() {
+        this(0.0);
     }
 }

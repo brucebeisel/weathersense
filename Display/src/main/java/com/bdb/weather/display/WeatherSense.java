@@ -139,6 +139,7 @@ public class WeatherSense extends Application {
 
     @Override
     public void stop() {
+        System.out.println("Stopping application");
 	timer.shutdownNow();
         controller.stop();
 

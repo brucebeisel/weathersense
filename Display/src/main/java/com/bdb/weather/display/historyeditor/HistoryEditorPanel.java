@@ -17,7 +17,6 @@
 package com.bdb.weather.display.historyeditor;
 
 
-import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
@@ -30,30 +29,22 @@ import com.bdb.weather.common.DateRange;
 import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.common.db.HistoryTable;
-import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.DisplayConstants;
 
-public class HistoryEditorPanel implements ComponentContainer {
-    private final BorderPane panel = new BorderPane();
+public class HistoryEditorPanel extends BorderPane {
     private final FlowPane datePanel = new FlowPane();
     private final HistoryTable historyTable;
     private final TableView<HistoricalRecord> table = new TableView<>();
     
     public HistoryEditorPanel(WeatherStation ws, DBConnection connection) {
         historyTable = new HistoryTable(connection);
-        panel.setTop(datePanel);
+        this.setTop(datePanel);
         DatePicker dateButton = new DatePicker();
         datePanel.getChildren().add(dateButton);
         DateRange range = historyTable.dataRange();
         datePanel.getChildren().add(new Label(DisplayConstants.formatDateTime(range.getStart())));
         datePanel.getChildren().add(new Label(DisplayConstants.formatDateTime(range.getEnd())));
         
-        panel.setCenter(table);
+        this.setCenter(table);
     }
-    
-    @Override
-    public Node getComponent() {
-        return null;
-    }
-
 }
