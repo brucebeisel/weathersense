@@ -119,7 +119,7 @@ public class Barometer extends BorderPane {
         plot.addPointer(pointer);
 
         DialCap cap = new DialCap();
-        cap.setFillPaint(Color.gray);
+        cap.setRadius(cap.getRadius() * 1.5);
         plot.setCap(cap);
 
         range = new StandardDialRange(0.0, 360.0, Color.BLACK);

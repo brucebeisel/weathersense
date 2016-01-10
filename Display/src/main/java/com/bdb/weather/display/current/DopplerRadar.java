@@ -32,6 +32,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
@@ -62,7 +63,7 @@ public class DopplerRadar extends BorderPane {
     private List<DopplerRadarImage>         dopplerRadarImages;
     private boolean                         animate = true;
     private int                             animationFrame = 0;
-    private final Label                     radarImage = new Label();
+    private final Group                     radarImage = new Group();
     private final Label                     frameInfo = new Label();
     private final DateTimeFormatter         sdf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.SHORT);    
     private DopplerRadarTable               dopplerRadarTable = null;
@@ -83,7 +84,7 @@ public class DopplerRadar extends BorderPane {
      */
     public DopplerRadar(DBConnection connection, URL url) {
         frameInfo.setTextAlignment(TextAlignment.CENTER);
-        radarImage.setGraphicTextGap(0);
+        //radarImage.setGraphicTextGap(0);
         this.setCenter(radarImage);
         BorderPane.setAlignment(frameInfo, Pos.CENTER);
         this.setTop(frameInfo);
@@ -99,7 +100,7 @@ public class DopplerRadar extends BorderPane {
 	);
 
 	timeline.setCycleCount(Timeline.INDEFINITE);
-	timeline.play();
+        timeline.play();
     }
 
     private void setTooltip(String url) {
@@ -110,7 +111,7 @@ public class DopplerRadar extends BorderPane {
             Tooltip  tip = new Tooltip();
             tip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
             tip.setGraphic(web);
-            radarImage.setTooltip(tip);
+            //radarImage.setTooltip(tip);
         }
     }
 
@@ -193,7 +194,7 @@ public class DopplerRadar extends BorderPane {
 	    // Load the radar image and the date/time text
 	    //
 	    LocalDateTime time = dopplerRadarImages.get(animationFrame).getTime();
-	    radarImage.setGraphic(thumbnails.get(animationFrame++));
+	    radarImage.getChildren().setAll(thumbnails.get(animationFrame++));
 	    frameInfo.setText("" + animationFrame + " of " + thumbnails.size() + " (" + sdf.format(time) + ")");
 	}
     }

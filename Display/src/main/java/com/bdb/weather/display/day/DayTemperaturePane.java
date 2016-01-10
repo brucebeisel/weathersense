@@ -46,7 +46,7 @@ import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.axis.TemperatureRangeAxis;
-import com.bdb.weather.display.preferences.UserPreferences;
+import com.bdb.weather.display.preferences.ColorPreferences;
 
 /**
  * Class to display a day's worth of temperature data.
@@ -106,14 +106,14 @@ public class DayTemperaturePane extends DayXYPlotPane implements EventHandler<Ac
                 ValueMarker marker = new ValueMarker(recordHigh.get());
                 marker.setLabel("Record High " + recordHigh.toString() + " " + unit + " (" + records.getMaxHighTemperatureYear() + ")");
                 marker.setLabelTextAnchor(TextAnchor.BASELINE_LEFT);
-                marker.setPaint(StageUtilities.toAwtColor(UserPreferences.getInstance().getHighOutdoorTempColorPref()));
+                marker.setPaint(StageUtilities.toAwtColor(ColorPreferences.getInstance().getHighOutdoorTempColorPref()));
                 plot.addRangeMarker(marker);
 
                 recordLow = records.getMinLowTemperature();
                 marker = new ValueMarker(recordLow.get());
                 marker.setLabel("Record Low " + recordLow.toString() + " " + unit + " (" + records.getMinLowTemperatureYear() + ")");
                 marker.setLabelTextAnchor(TextAnchor.BASELINE_LEFT);
-                marker.setPaint(StageUtilities.toAwtColor(UserPreferences.getInstance().getLowOutdoorTempColorPref()));
+                marker.setPaint(StageUtilities.toAwtColor(ColorPreferences.getInstance().getLowOutdoorTempColorPref()));
                 plot.addRangeMarker(marker);
             }
     
@@ -122,14 +122,14 @@ public class DayTemperaturePane extends DayXYPlotPane implements EventHandler<Ac
                 ValueMarker marker = new ValueMarker(value.get());
                 marker.setLabel("Average High " + value.toString() + " " + unit);
                 marker.setLabelTextAnchor(TextAnchor.BASELINE_LEFT);
-                marker.setPaint(StageUtilities.toAwtColor(UserPreferences.getInstance().getHighOutdoorTempColorPref()));
+                marker.setPaint(StageUtilities.toAwtColor(ColorPreferences.getInstance().getHighOutdoorTempColorPref()));
                 plot.addRangeMarker(marker);
 
                 value = averages.getLowTemperature();
                 marker = new ValueMarker(value.get());
                 marker.setLabel("Average Low " + value.toString() + " " + unit);
                 marker.setLabelTextAnchor(TextAnchor.BASELINE_LEFT);
-                marker.setPaint(StageUtilities.toAwtColor(UserPreferences.getInstance().getLowOutdoorTempColorPref()));
+                marker.setPaint(StageUtilities.toAwtColor(ColorPreferences.getInstance().getLowOutdoorTempColorPref()));
                 plot.addRangeMarker(marker);
             }
         }

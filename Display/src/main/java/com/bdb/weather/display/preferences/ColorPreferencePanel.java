@@ -18,7 +18,6 @@ package com.bdb.weather.display.preferences;
 
 import java.util.Set;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
@@ -41,7 +40,6 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import com.bdb.weather.display.Changeable;
 import com.bdb.weather.display.StageUtilities;
-import com.bdb.weather.display.WeatherSense;
 
 public class ColorPreferencePanel extends BorderPane implements Changeable {
 
@@ -73,40 +71,40 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
         "Rain"
     };
     private static final Logger logger = Logger.getLogger(ColorPreferencePanel.class.getName());
-    private final UserPreferences preferences = UserPreferences.getInstance();
+    private final ColorPreferences preferences = ColorPreferences.getInstance();
     private final XYSeriesCollection dataset = new XYSeriesCollection();
     private final DefaultXYItemRenderer renderer = new DefaultXYItemRenderer();
     private boolean dirty = false;
     private ColorPreferenceEntry entries[] = {
-        new ColorPreferenceEntry(UserPreferences.OUTDOOR_TEMP_COLOR_PREF, 1, 1),
-        new ColorPreferenceEntry(UserPreferences.HIGH_OUTDOOR_TEMP_COLOR_PREF, 1, 2),
-        new ColorPreferenceEntry(UserPreferences.LOW_OUTDOOR_TEMP_COLOR_PREF, 1, 3),
-        new ColorPreferenceEntry(UserPreferences.MEAN_OUTDOOR_TEMP_COLOR_PREF, 1, 4),
-        new ColorPreferenceEntry(UserPreferences.INDOOR_TEMP_COLOR_PREF, 2, 1),
-        new ColorPreferenceEntry(UserPreferences.HIGH_INDOOR_TEMP_COLOR_PREF, 2, 2),
-        new ColorPreferenceEntry(UserPreferences.LOW_INDOOR_TEMP_COLOR_PREF, 2, 3),
-        new ColorPreferenceEntry(UserPreferences.MEAN_INDOOR_TEMP_COLOR_PREF, 2, 4),
-        new ColorPreferenceEntry(UserPreferences.OUTDOOR_HUMIDITY_COLOR_PREF, 3, 1),
-        new ColorPreferenceEntry(UserPreferences.HIGH_OUTDOOR_HUMIDITY_COLOR_PREF, 3, 2),
-        new ColorPreferenceEntry(UserPreferences.LOW_OUTDOOR_HUMIDITY_COLOR_PREF, 3, 3),
-        new ColorPreferenceEntry(UserPreferences.MEAN_OUTDOOR_HUMIDITY_COLOR_PREF, 3, 4),
-        new ColorPreferenceEntry(UserPreferences.INDOOR_HUMIDITY_COLOR_PREF, 4, 1),
-        new ColorPreferenceEntry(UserPreferences.HIGH_INDOOR_HUMIDITY_COLOR_PREF, 4, 2),
-        new ColorPreferenceEntry(UserPreferences.LOW_INDOOR_HUMIDITY_COLOR_PREF, 4, 3),
-        new ColorPreferenceEntry(UserPreferences.MEAN_INDOOR_HUMIDITY_COLOR_PREF, 4, 4),
-        new ColorPreferenceEntry(UserPreferences.BARO_PRESSURE_COLOR_PREF, 5, 1),
-        new ColorPreferenceEntry(UserPreferences.HIGH_BARO_PRESSURE_COLOR_PREF, 5, 2),
-        new ColorPreferenceEntry(UserPreferences.LOW_BARO_PRESSURE_COLOR_PREF, 5, 3),
-        new ColorPreferenceEntry(UserPreferences.MEAN_BARO_PRESSURE_COLOR_PREF, 5, 4),
-        new ColorPreferenceEntry(UserPreferences.DEW_POINT_COLOR_PREF, 6, 1),
-        new ColorPreferenceEntry(UserPreferences.HEAT_INDEX_COLOR_PREF, 7, 1),
-        new ColorPreferenceEntry(UserPreferences.WIND_CHILL_COLOR_PREF, 8, 1),
-        new ColorPreferenceEntry(UserPreferences.WIND_SPEED_COLOR_PREF, 9, 1),
-        new ColorPreferenceEntry(UserPreferences.MAX_WIND_SPEED_COLOR_PREF, 9, 2),
-        new ColorPreferenceEntry(UserPreferences.AVG_WIND_SPEED_COLOR_PREF, 9, 4),
-        new ColorPreferenceEntry(UserPreferences.WIND_GUST_COLOR_PREF, 10, 1),
-        new ColorPreferenceEntry(UserPreferences.MAX_WIND_GUST_COLOR_PREF, 10, 2),
-        new ColorPreferenceEntry(UserPreferences.RAIN_COLOR_PREF, 11, 1)
+        new ColorPreferenceEntry(ColorPreferences.OUTDOOR_TEMP, 1, 1),
+        new ColorPreferenceEntry(ColorPreferences.HIGH_OUTDOOR_TEMP, 1, 2),
+        new ColorPreferenceEntry(ColorPreferences.LOW_OUTDOOR_TEMP, 1, 3),
+        new ColorPreferenceEntry(ColorPreferences.MEAN_OUTDOOR_TEMP, 1, 4),
+        new ColorPreferenceEntry(ColorPreferences.INDOOR_TEMP, 2, 1),
+        new ColorPreferenceEntry(ColorPreferences.HIGH_INDOOR_TEMP, 2, 2),
+        new ColorPreferenceEntry(ColorPreferences.LOW_INDOOR_TEMP, 2, 3),
+        new ColorPreferenceEntry(ColorPreferences.MEAN_INDOOR_TEMP, 2, 4),
+        new ColorPreferenceEntry(ColorPreferences.OUTDOOR_HUMIDITY, 3, 1),
+        new ColorPreferenceEntry(ColorPreferences.HIGH_OUTDOOR_HUMIDITY, 3, 2),
+        new ColorPreferenceEntry(ColorPreferences.LOW_OUTDOOR_HUMIDITY, 3, 3),
+        new ColorPreferenceEntry(ColorPreferences.MEAN_OUTDOOR_HUMIDITY, 3, 4),
+        new ColorPreferenceEntry(ColorPreferences.INDOOR_HUMIDITY, 4, 1),
+        new ColorPreferenceEntry(ColorPreferences.HIGH_INDOOR_HUMIDITY, 4, 2),
+        new ColorPreferenceEntry(ColorPreferences.LOW_INDOOR_HUMIDITY, 4, 3),
+        new ColorPreferenceEntry(ColorPreferences.MEAN_INDOOR_HUMIDITY, 4, 4),
+        new ColorPreferenceEntry(ColorPreferences.BARO_PRESSURE, 5, 1),
+        new ColorPreferenceEntry(ColorPreferences.HIGH_BARO_PRESSURE, 5, 2),
+        new ColorPreferenceEntry(ColorPreferences.LOW_BARO_PRESSURE, 5, 3),
+        new ColorPreferenceEntry(ColorPreferences.MEAN_BARO_PRESSURE, 5, 4),
+        new ColorPreferenceEntry(ColorPreferences.DEW_POINT, 6, 1),
+        new ColorPreferenceEntry(ColorPreferences.HEAT_INDEX, 7, 1),
+        new ColorPreferenceEntry(ColorPreferences.WIND_CHILL, 8, 1),
+        new ColorPreferenceEntry(ColorPreferences.WIND_SPEED, 9, 1),
+        new ColorPreferenceEntry(ColorPreferences.MAX_WIND_SPEED, 9, 2),
+        new ColorPreferenceEntry(ColorPreferences.AVG_WIND_SPEED, 9, 4),
+        new ColorPreferenceEntry(ColorPreferences.WIND_GUST, 10, 1),
+        new ColorPreferenceEntry(ColorPreferences.MAX_WIND_GUST, 10, 2),
+        new ColorPreferenceEntry(ColorPreferences.RAIN, 11, 1)
     };
 
     public ColorPreferencePanel() {
@@ -185,8 +183,6 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
         button.setOnAction((ActionEvent e) -> {
             if (dirty)
                 saveData();
-
-            //this.dispose();
         });
         buttonPanel.getChildren().add(button);
         setBottom(buttonPanel);
@@ -248,17 +244,6 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
     }
 
     /*
-    private void editColor(Button button) {
-        Color color = ColorPicker.showDialog(this, "Choose Color", button.getBackground());
-        if (color != null) {
-            ColorPreferenceEntry entry = (ColorPreferenceEntry) button.getClientProperty("entry");
-            configureSeriesRenderer(entry);
-            dirty = true;
-        }
-    }
-    */
-
-    /*
      * (non-Javadoc)
      * @see com.bdb.weather.display.Changeable#hasChanged()
      */
@@ -286,17 +271,7 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
         for (ColorPreferenceEntry entry : entries) {
             preferences.putColorPref(entry.preferenceName, entry.button.getValue());
         }
+        preferences.sync();
         return true;
     }
-
-//    public static void main(String[] args) {
-//        JFrame frame = new JFrame();
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//
-//        frame.add(new ColorPreferencePanel());
-//
-//        frame.pack();
-//
-//        frame.setVisible(true);
-//    }
 }
