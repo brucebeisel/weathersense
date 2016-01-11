@@ -52,11 +52,16 @@ public:
     virtual ~VantagePro2Driver();
 
     /**
-     * Intialize the driver.
+     * Initialize the driver.
      * 
      * @return 0 on success or non-zero on error
      */
     int initialize();
+
+    /**
+     * Close and open the station.
+     */
+    bool reopenStation();
 
     /**
      * Request that the main loop exits.

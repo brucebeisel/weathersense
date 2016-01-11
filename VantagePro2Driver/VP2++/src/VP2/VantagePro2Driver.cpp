@@ -205,6 +205,17 @@ VantagePro2Driver::processArchive(const vector<ArchivePacket> & archive) {
     return true;
 }
 
+bool
+VantagePro2Driver::reopenStation() {
+    station.closeStation();
+    bool success = station.openStation();
+
+    if (!success)
+        log.log(VP2Logger::VP2_ERROR) << "Failed to reopen weather station" << endl;
+
+    return sucess;
+}
+
 void
 VantagePro2Driver::mainLoop() {
     DateTime stationTime = station.getTime();
@@ -214,7 +225,18 @@ VantagePro2Driver::mainLoop() {
 
     while (!exitLoop) {
         try {
-            station.wakeupStation();
+            //
+            // If the weather station could not be woken, then close and open
+            // the console. It has been observed that on a rare occasion the console
+            // never wakes up. Only restarting this driver fixes the issue. Reopening
+            // the serial port will hopefully fix this issue. It is hoped that if
+            // the this does not work will cause the health monitor to restart the
+            // driver, also fixing the issue.
+            //
+            if (!station.wakeupStation()) {
+                reopenStation();
+                continue;
+            }
 
             //
             // If it has been more than a day since the time was set, set the time
