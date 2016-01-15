@@ -28,8 +28,6 @@ import org.jfree.data.category.CategoryDataset;
  *
  */
 public class RainItemLabelGenerator extends StandardCategoryItemLabelGenerator {
-    private static final long serialVersionUID = 5589030784570666877L;
-
     /**
      * Constructor.
      * 

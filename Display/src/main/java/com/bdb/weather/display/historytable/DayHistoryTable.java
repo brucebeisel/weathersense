@@ -16,34 +16,34 @@
  */
 package com.bdb.weather.display.historytable;
 
-import java.awt.BorderLayout;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
+import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.FXCollections;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
 
 import com.bdb.util.jdbc.DBConnection;
 
 import com.bdb.weather.common.HistoricalRecord;
+import com.bdb.weather.common.Sensor;
+import com.bdb.weather.common.SensorManager;
+import com.bdb.weather.common.SensorType;
 import com.bdb.weather.common.Wind;
 import com.bdb.weather.common.db.HistoryTable;
-import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.DaySelectionPanel;
 import com.bdb.weather.display.DaySelectionPanel.DateChangedListener;
 import com.bdb.weather.display.DisplayConstants;
+import com.bdb.weather.display.TableColumnValueFactory;
 
 /**
  * TODO Provide mechanism to export to a CSV file
  * @author Bruce
  */
-public class DayHistoryTable implements ComponentContainer, DateChangedListener {
+public class DayHistoryTable extends BorderPane implements DateChangedListener {
     private static final String TABLE_HEADINGS[] = {
         "Time",
         "Low Outdoor Temperature",
@@ -67,10 +67,8 @@ public class DayHistoryTable implements ComponentContainer, DateChangedListener 
         "Rainfall",
         "High Rainfall Rate"
     };
-    private final JPanel               panel;
-    private final JTable               dataTable;
-    private final DefaultTableModel    tableModel;
-    private final HistoryTable         historyTable;
+    private final TableView<HistoricalRecord> dataTable;
+    private final HistoryTable                historyTable;
 
     /**
      * Constructor.
@@ -81,40 +79,38 @@ public class DayHistoryTable implements ComponentContainer, DateChangedListener 
     public DayHistoryTable(DBConnection connection) {
         historyTable = new HistoryTable(connection);
         LocalDate date = LocalDate.now();
-        panel = new JPanel(new BorderLayout());
         DaySelectionPanel selectionPanel = new DaySelectionPanel(date);
         selectionPanel.addDateChangedListener(this);
-        panel.add(selectionPanel, BorderLayout.NORTH);
+        this.setTop(selectionPanel);
 
-        tableModel = new DefaultTableModel();
-        DefaultTableColumnModel colModel = new DefaultTableColumnModel();
         
-        dataTable = new JTable();
-        dataTable.setModel(tableModel);
-        dataTable.setColumnModel(colModel);
-        dataTable.setAutoCreateColumnsFromModel(false);
+        dataTable = new TableView();
 
-        for (int i = 0; i < TABLE_HEADINGS.length; i++) {
-            TableColumn col = new TableColumn();
-            col.setHeaderValue(TABLE_HEADINGS[i]);
-            col.setModelIndex(i);
-            colModel.addColumn(col);
+        TableColumn<HistoricalRecord,String> col = new TableColumn("Time");
+        col.setCellValueFactory((rec)->new ReadOnlyStringWrapper(DisplayConstants.formatTime(rec.getValue().getTime().toLocalTime())));
+        dataTable.getColumns().add(col);
+
+        col = new TableColumn("Low Outdoor Temperature");
+        col.setCellValueFactory(new TableColumnValueFactory("Low Outdoor Temperature", HistoricalRecord::getLowOutdoorTemperature));
+        dataTable.getColumns().add(col);
+
+        col = new TableColumn("High Solar Radiation");
+        col.setCellValueFactory(new TableColumnValueFactory("High Solar Radiation", HistoricalRecord::getHighSolarRadiation));
+        dataTable.getColumns().add(col);
+
+        //col = new TableColumn("UV Index");
+        //col.setCellValueFactory(new TableColumnValueFactory("UV Index", HistoricalRecord::getHighUvIndex));
+        //dataTable.getColumns().add(col);
+
+        List<Sensor> sensors = SensorManager.getInstance().getExtraSensors(SensorType.THERMOMETER);
+        for (Sensor sensor : sensors) {
+            col = new TableColumn(sensor.getName());
+            col.setCellValueFactory(new TableColumnValueFactory("High Solar Radiation", HistoricalRecord::getTemperatureForSensor, sensor.getSensorId()));
+            dataTable.getColumns().add(col);
         }
+        this.setCenter(dataTable);
 
-        tableModel.setColumnCount(TABLE_HEADINGS.length);
-
-        //
-        // Add a row sorter. TODO add custom sorters for those columns that are not sorted by ascii text, like the date
-        //
-        dataTable.setRowSorter(new TableRowSorter<>(tableModel));
-
-        //
-        // Insert the JTable component into a scroll pane so that we have scroll bars
-        //
-        JScrollPane sp = new JScrollPane(dataTable);
-        panel.add(sp, BorderLayout.CENTER);
-
-        loadData(date);
+        Platform.runLater(() -> loadData(date));
     }
 
     /**
@@ -124,18 +120,19 @@ public class DayHistoryTable implements ComponentContainer, DateChangedListener 
      */
     private void loadData(LocalDate date) {
         List<HistoricalRecord> list = historyTable.queryRecordsForDay(date);
+        dataTable.setItems(FXCollections.observableList(list));
 
-        tableModel.setRowCount(list.size());
+        /*
         int row = 0;
         for (HistoricalRecord rec : list) {
             int col = 0;
-            tableModel.setValueAt(DisplayConstants.formatTime(rec.getTime().toLocalTime()), row, col++);
-            tableModel.setValueAt(rec.getLowOutdoorTemperature(), row, col++);
-            tableModel.setValueAt(rec.getAvgOutdoorTemperature(), row, col++);
-            tableModel.setValueAt(rec.getHighOutdoorTemperature(), row, col++);
-            tableModel.setValueAt(rec.getOutdoorHumidity(), row, col++);
-            tableModel.setValueAt(rec.getIndoorTemperature(), row, col++);
-            tableModel.setValueAt(rec.getIndoorHumidity(), row, col++);
+            //tableModel.setValueAt(DisplayConstants.formatTime(rec.getTime().toLocalTime()), row, col++);
+            //tableModel.setValueAt(rec.getLowOutdoorTemperature(), row, col++);
+            //tableModel.setValueAt(rec.getAvgOutdoorTemperature(), row, col++);
+            //tableModel.setValueAt(rec.getHighOutdoorTemperature(), row, col++);
+            //tableModel.setValueAt(rec.getOutdoorHumidity(), row, col++);
+            //tableModel.setValueAt(rec.getIndoorTemperature(), row, col++);
+            //tableModel.setValueAt(rec.getIndoorHumidity(), row, col++);
 
             loadWind(rec.getAvgWind(), row, col);
             col += 2;
@@ -144,7 +141,7 @@ public class DayHistoryTable implements ComponentContainer, DateChangedListener 
             loadWind(rec.getWindGust(), row, col);
             col += 2;
 
-            tableModel.setValueAt(rec.getBaroPressure(), row, col++);
+            //tableModel.setValueAt(rec.getBaroPressure(), row, col++);
 
             if (rec.getAvgUvIndex() != null)
                 tableModel.setValueAt(rec.getAvgUvIndex(), row, col++);
@@ -176,6 +173,7 @@ public class DayHistoryTable implements ComponentContainer, DateChangedListener 
 
             row++;
         }
+    */
     }
 
     /**
@@ -186,6 +184,7 @@ public class DayHistoryTable implements ComponentContainer, DateChangedListener 
      * @param col The first column of the wind data
      */
     private void loadWind(Wind w, int row, int col) {
+        /*
         if (w != null) {
             tableModel.setValueAt(w.getSpeed(), row, col++);
             tableModel.setValueAt(w.getDirection().getCompassLabel(), row, col++);
@@ -194,16 +193,7 @@ public class DayHistoryTable implements ComponentContainer, DateChangedListener 
             tableModel.setValueAt(DisplayConstants.UNKNOWN_VALUE_STRING, row, col++);
             tableModel.setValueAt(DisplayConstants.UNKNOWN_VALUE_STRING, row, col++);
         }
-    }
-
-    /**
-     * Get the component that is the main window of this view.
-     * 
-     * @return The component
-     */
-    @Override
-    public JComponent getComponent() {
-        return panel;
+        */
     }
 
     /**

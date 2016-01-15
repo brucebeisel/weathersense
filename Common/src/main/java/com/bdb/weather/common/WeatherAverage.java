@@ -36,15 +36,15 @@ public class WeatherAverage implements Comparable<WeatherAverage> {
         CUSTOM
     };
     
-    private final Interval    interval;
-    private final Month       month;
-    private final int         day;
-    private final Month       endMonth;
-    private final int         endDay;
-    private final Temperature highTemperature;
-    private final Temperature lowTemperature;
-    private final Temperature meanTemperature;
-    private final Depth       rainfall;
+    private final Interval interval;
+    private final Month    month;
+    private final int      day;
+    private final Month    endMonth;
+    private final int      endDay;
+    private Temperature    highTemperature;
+    private Temperature    lowTemperature;
+    private Temperature    meanTemperature;
+    private Depth          rainfall;
     
     /**
      * Constructor.
@@ -136,6 +136,10 @@ public class WeatherAverage implements Comparable<WeatherAverage> {
         return highTemperature;
     }
     
+    public void setHighTemperature(Temperature value) {
+        highTemperature = value;
+    }
+    
     /**
      * Get the average low temperature for this location/month.
      * 
@@ -143,6 +147,10 @@ public class WeatherAverage implements Comparable<WeatherAverage> {
      */
     public Temperature getLowTemperature() {
         return lowTemperature;
+    }
+    
+    public void setLowTemperature(Temperature value) {
+        lowTemperature = value;
     }
     
     /**
@@ -155,6 +163,10 @@ public class WeatherAverage implements Comparable<WeatherAverage> {
         return meanTemperature;
     }
     
+    public void setMeanTemperature(Temperature value) {
+        meanTemperature = value;
+    }
+    
     /**
      * Get the average rainfall for this location/month.
      * 
@@ -162,6 +174,10 @@ public class WeatherAverage implements Comparable<WeatherAverage> {
      */
     public Depth getRainfall() {
         return rainfall;
+    }
+
+    public void setRainfall(Depth value) {
+        rainfall = value;
     }
     
     @Override

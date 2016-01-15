@@ -34,7 +34,6 @@ import org.jfree.chart.plot.dial.DialScale;
  * 
  */
 public class WindDirPointer extends DialPointer.Pointer {
-    private static final long serialVersionUID = -6771147010152648848L;
     private static final double ARC_LENGTH = 10;
     private double outerRadius;
     private double innerOffset;

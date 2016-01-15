@@ -16,30 +16,23 @@
  */
 package com.bdb.weather.display.summary;
 
-import java.awt.BorderLayout;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
+import javafx.scene.Node;
+import javafx.scene.control.TableView;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartMouseEvent;
-import org.jfree.chart.ChartMouseListener;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.entity.CategoryItemEntity;
 import org.jfree.chart.entity.ChartEntity;
+import org.jfree.chart.fx.ChartViewer;
+import org.jfree.chart.fx.interaction.ChartMouseEventFX;
+import org.jfree.chart.fx.interaction.ChartMouseListenerFX;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -51,22 +44,18 @@ import org.jfree.data.time.TimeSeriesCollection;
 import com.bdb.util.TimeUtils;
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.measurement.Depth;
-import com.bdb.weather.display.DisplayConstants;
-import com.bdb.weather.display.ViewLauncher;
+import com.bdb.weather.display.ChartDataPane;
 import com.bdb.weather.display.axis.RainRangeAxis;
 
 /**
  * Plot to summarize rain over a specified period of time
  */
-public class RainSummary implements ChartMouseListener {
-    private final JTabbedPane       component = new JTabbedPane();
-    private final XYPlot            rainPlot;
-    private final JFreeChart        chart;
-    private final ChartPanel        chartPanel;
-    private final JTable            dataTable;
+public class RainSummary extends ChartDataPane implements ChartMouseListenerFX {
+    private XYPlot            rainPlot;
+    private JFreeChart        chart;
+    private final TableView         dataTable;
     private final ValueAxis         valueAxis = new RainRangeAxis();
-    private final DefaultTableModel tableModel = new DefaultTableModel();
-    private final ViewLauncher      viewLauncher;
+    //private DefaultTableModel tableModel = new DefaultTableModel();
     private final SummaryInterval   interval;
     private final SummarySupporter  supporter;
     private static final String     RAIN_ROW_KEY = "Rain";
@@ -82,14 +71,26 @@ public class RainSummary implements ChartMouseListener {
     };
 
  
+    public RainSummary() {
+        this(SummaryInterval.DAY_INTERVAL, null);
+    }
+
     @SuppressWarnings("LeakingThisInConstructor")
-    public RainSummary(SummaryInterval interval, ViewLauncher launcher, SummarySupporter supporter) {
+    public RainSummary(SummaryInterval interval, SummarySupporter supporter) {
+        this.setPrefSize(500, 300);
         this.interval = interval;
-        chart = ChartFactory.createXYBarChart("Water Cycle", "Date", true, "", null, PlotOrientation.VERTICAL, true, true, false);
-        chartPanel = new ChartPanel(chart);
-        chartPanel.addChartMouseListener(this);
-        viewLauncher = launcher;
         this.supporter = supporter;
+        Node component = createChartElements();
+        dataTable = new TableView();
+
+        this.setTabContents(component, dataTable);
+    }
+
+    private Node createChartElements() {
+        chart = ChartFactory.createXYBarChart("Water Cycle", "Date", true, "", null, PlotOrientation.VERTICAL, true, true, false);
+        ChartViewer chartViewer = new ChartViewer(chart);
+        chartViewer.setPrefSize(500, 300);
+        chartViewer.addChartMouseListener(this);
 
         rainPlot = (XYPlot)chart.getPlot();
         DateAxis dateAxis = (DateAxis)rainPlot.getDomainAxis();
@@ -107,45 +108,28 @@ public class RainSummary implements ChartMouseListener {
         //renderer.setSeriesPaint(1, Color.RED); // TODO Use color preferences
         
         rainPlot.setRangeAxis(valueAxis);
-
         rainPlot.getDomainAxis().setVerticalTickLabels(true);
         
-        component.addTab(DisplayConstants.GRAPH_TAB_NAME, chartPanel);
-
-        DefaultTableColumnModel colModel = new DefaultTableColumnModel();
-
-        dataTable = new JTable();
-        dataTable.setModel(tableModel);
-        dataTable.setColumnModel(colModel);
-        dataTable.setAutoCreateColumnsFromModel(false);
-
-        for (int i = 0; i < TABLE_HEADINGS.length; i++) {
-            TableColumn col = new TableColumn();
-            col.setHeaderValue(TABLE_HEADINGS[i]);
-            col.setModelIndex(i);
-            colModel.addColumn(col);
+        //DefaultTableColumnModel colModel = new DefaultTableColumnModel();
+        //dataTable.setModel(tableModel);
+        //dataTable.setColumnModel(colModel);
+        //dataTable.setAutoCreateColumnsFromModel(false);
+        for (String columnHeading : TABLE_HEADINGS) {
+            //TableColumn col = new TableColumn(columnHeading);
+            //col.setHeaderValue(TABLE_HEADINGS[i]);
+            //col.setModelIndex(i);
+            //colModel.addColumn(col);
+            //dataTable.getColumns().add(col);
         }
 
-        tableModel.setColumnCount(TABLE_HEADINGS.length);
+        //tableModel.setColumnCount(TABLE_HEADINGS.length);
 
-        JScrollPane sp = new JScrollPane(dataTable);
 
-        JPanel p = new JPanel(new BorderLayout());
+        //p.setCenter(dataTable);
 
-        p.add(sp, BorderLayout.CENTER);
-
-        component.addTab(DisplayConstants.DATA_TAB_NAME, p);
+        return chartViewer;
     }
     
-    /**
-     * Get the swing component that contains the plot.
-     * 
-     * @return The swing container
-     */
-    public JComponent getComponent() {
-        return component;
-    }
-
     /**
      * Load the data into the plot.
      * 
@@ -158,7 +142,7 @@ public class RainSummary implements ChartMouseListener {
         
         int n = 0;
 
-        tableModel.setRowCount(list.size());
+        //tableModel.setRowCount(list.size());
 
         Depth totalRain = new Depth(0.0);
         Depth totalET = new Depth(0.0);
@@ -170,19 +154,19 @@ public class RainSummary implements ChartMouseListener {
             Depth rain = rec.getTotalRainfall();
 
             String dateString = interval.getFormat().format(rec.getDate());
-            tableModel.setValueAt(dateString, n, INTERVAL_COLUMN);
+            //tableModel.setValueAt(dateString, n, INTERVAL_COLUMN);
             RegularTimePeriod tp = RegularTimePeriod.createInstance(interval.getFreeChartClass(), TimeUtils.localDateTimeToDate(rec.getDate()), TimeZone.getDefault());
 
             if (rain != null) {
                 rainSeries.add(tp, rain.get());
-                tableModel.setValueAt(Depth.getDefaultFormatter().format(rain.get()), n, RAINFALL_COLUMN);
+                //tableModel.setValueAt(Depth.getDefaultFormatter().format(rain.get()), n, RAINFALL_COLUMN);
                 totalRain = totalRain.add(rain);
             }
 
             Depth et = rec.getTotalET();
             if (et != null) {
                 etSeries.add(tp, et.get());
-                tableModel.setValueAt(Depth.getDefaultFormatter().format(et.get()), n, ET_COLUMN);
+                //tableModel.setValueAt(Depth.getDefaultFormatter().format(et.get()), n, ET_COLUMN);
                 totalET = totalET.add(et);
             }
 
@@ -201,7 +185,7 @@ public class RainSummary implements ChartMouseListener {
      * @see org.jfree.chart.ChartMouseListener#chartMouseClicked(org.jfree.chart.ChartMouseEvent)
      */
     @Override
-    public void chartMouseClicked(ChartMouseEvent event) {
+    public void chartMouseClicked(ChartMouseEventFX event) {
         ChartEntity entity = event.getEntity();
         //
         // Was a point on the plot selected?
@@ -211,8 +195,8 @@ public class RainSummary implements ChartMouseListener {
                 CategoryItemEntity itemEntity = (CategoryItemEntity)entity;
                 LocalDate date = LocalDate.from(interval.getFormat().parse((String)itemEntity.getColumnKey()));
 
-                if (event.getTrigger().getClickCount() == 2)
-                    supporter.launchView(viewLauncher, date);
+                //if (event.getTrigger().getClickCount() == 2)
+                //    supporter.launchView(viewLauncher, date);
             }
             catch (DateTimeParseException e) {
                 // This will never happen because the same date formatter is used to create the category labels and parse the column key
@@ -226,7 +210,7 @@ public class RainSummary implements ChartMouseListener {
      * @see org.jfree.chart.ChartMouseListener#chartMouseMoved(org.jfree.chart.ChartMouseEvent)
      */
     @Override
-    public void chartMouseMoved(ChartMouseEvent event) {
+    public void chartMouseMoved(ChartMouseEventFX event) {
         // Do nothing with mouse movement
     }
 }

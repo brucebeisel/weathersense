@@ -16,68 +16,67 @@
  */
 package com.bdb.weather.display;
 
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.TilePane;
 
 import com.bdb.weather.common.DateRange;
 
-public class DataRangeSelectionPanel implements ActionListener {
-    private static final int DATE_FIELD_WIDTH = 15;
-    private final JComponent              component = new JPanel(new GridLayout(0,1));
+public class DataRangeSelectionPanel extends TilePane implements EventHandler<ActionEvent> {
     private LocalDate                     startDate;
     private LocalDate                     endDate;
-    private final DateTimeFormatter       dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-    private final JTextField              startDateTF = new JTextField(DATE_FIELD_WIDTH);
-    private final JTextField              endDateTF = new JTextField(DATE_FIELD_WIDTH);
-    private final JComboBox<DateInterval> intervalsCB = new JComboBox<>(DateInterval.availableIntervals());
-    private final JCheckBox               compareCB = new JCheckBox("Compare");
-    private final JComboBox<DateDelta>    offsetCB = new JComboBox<>(DateDelta.values());
-    private final JTextField              compareStartDateTF = new JTextField(DATE_FIELD_WIDTH);
+    private final DatePicker              startDateTF = new DatePicker();
+    private final DatePicker              endDateTF = new DatePicker();
+    private final ComboBox<DateInterval>  intervalsCB = new ComboBox<>();
+    private final CheckBox                compareCB = new CheckBox("Compare");
+    private final ComboBox<DateDelta>     offsetCB = new ComboBox<DateDelta>();
+    private final DatePicker              compareStartDateTF = new DatePicker();
     private DateRange                     dataRange;
     private final List<LocalDate>         comparisonStartDates = new ArrayList<>();
     private static final Logger           logger = Logger.getLogger(DataRangeSelectionPanel.class.getName());
     
     @SuppressWarnings("LeakingThisInConstructor")
     public DataRangeSelectionPanel(LocalDate firstData, LocalDate lastData) {
-        JPanel p = new JPanel();
-        startDateTF.setColumns(15);
-        endDateTF.setColumns(15);
-        compareStartDateTF.setColumns(10);
-        intervalsCB.setMaximumRowCount(DateInterval.values().length);
-        p.add(intervalsCB);
-        p.add(new JLabel("Start:"));
-        p.add(startDateTF);
-        p.add(new JLabel("End:"));
-        p.add(endDateTF);
-        component.add(p);
+        this.setPrefRows(0);
+        this.setPrefColumns(1);
+
+        intervalsCB.getItems().addAll(Arrays.asList(DateInterval.values()));
+        offsetCB.getItems().addAll(Arrays.asList(DateDelta.values()));
+        offsetCB.getSelectionModel().selectFirst();
+
+        FlowPane p = new FlowPane();
+        //compareStartDateTF.setColumns(10);
+        //intervalsCB.setMaximumRowCount(DateInterval.values().length);
+        p.getChildren().add(intervalsCB);
+        p.getChildren().add(new Label("Start:"));
+        p.getChildren().add(startDateTF);
+        p.getChildren().add(new Label("End:"));
+        p.getChildren().add(endDateTF);
+        this.getChildren().add(p);
         
-        p = new JPanel();
-        p.add(compareCB);
-        p.add(offsetCB);
-        p.add(compareStartDateTF);
+        p = new FlowPane();
+        p.getChildren().add(compareCB);
+        p.getChildren().add(offsetCB);
+        p.getChildren().add(compareStartDateTF);
         
-        component.add(p);
-        
+        this.getChildren().add(p);
         
         DateRange range = DateInterval.TODAY.range();
         startDate = range.getStart().toLocalDate();
@@ -86,18 +85,14 @@ public class DataRangeSelectionPanel implements ActionListener {
         
         startDateTF.setEditable(false);
         endDateTF.setEditable(false);
-        intervalsCB.setSelectedItem(DateInterval.TODAY);
-        intervalsCB.addActionListener(this);
-        offsetCB.setEnabled(false);
-        offsetCB.addActionListener(this);
-        compareCB.addActionListener(this);
+        intervalsCB.getSelectionModel().select(DateInterval.TODAY);
+        intervalsCB.setOnAction(this);
+        offsetCB.setDisable(true);
+        offsetCB.setOnAction(this);
+        compareCB.setOnAction(this);
         compareStartDateTF.setEditable(false);
  
         dataRange = new DateRange(firstData.atStartOfDay(), lastData.atStartOfDay());
-    }
-    
-    public JComponent getComponent() {
-        return component;
     }
     
     public void setLastDataTime(LocalDateTime lastData) {
@@ -107,12 +102,12 @@ public class DataRangeSelectionPanel implements ActionListener {
     public List<DateRange> getRanges() {
         final int OFFSET_INCREMENT = 2000000000;
         List<DateRange> list = new ArrayList<>();
-        LocalDate locaStartDate = getStartDate();
-        LocalDate locaEndDate = getEndDate();
+        LocalDate locaStartDate = startDateTF.getValue();
+        LocalDate locaEndDate = endDateTF.getValue();
         list.add(new DateRange(locaStartDate.atStartOfDay(), locaEndDate.atStartOfDay()));
         
         if (compareCB.isSelected()) {
-            LocalDate start = dateFromTextField(compareStartDateTF);
+            LocalDate start = compareStartDateTF.getValue();
             LocalDate end = start;
             Duration delta = Duration.between(start, end);
 
@@ -127,47 +122,24 @@ public class DataRangeSelectionPanel implements ActionListener {
     }
     
     private void loadDates() {
-        startDateTF.setText(dateFormat.format(startDate));
-        endDateTF.setText(dateFormat.format(endDate));
+        startDateTF.setValue(startDate);
+        endDateTF.setValue(endDate);
         
-        DateDelta delta = (DateDelta)offsetCB.getSelectedItem();
+        DateDelta delta = offsetCB.getSelectionModel().getSelectedItem();
         if (delta != DateDelta.CUSTOM) {
-            LocalDate start = delta.applyDelta(getStartDate());
-            compareStartDateTF.setText(dateFormat.format(start));
+            LocalDate start = delta.applyDelta(startDateTF.getValue());
+            compareStartDateTF.setValue(start);
         }
     }
     
-    private LocalDate dateFromTextField(JTextField tf) {
-        try {
-            String dateString = tf.getText();
-            LocalDate date = LocalDate.from(dateFormat.parse(dateString));
-            return date;
-        }
-        catch (DateTimeParseException e) {
-            ErrorDisplayer.getInstance().displayError("Invalid date entered, using today as default");
-            logger.log(Level.WARNING, "Invalid date entered", e);
-            return LocalDate.now();
-        }
-    }
-    
-    public LocalDate getStartDate() {
-        LocalDate date = dateFromTextField(startDateTF);
-        return date;
-    }
-
-    public LocalDate getEndDate() {
-        LocalDate date = dateFromTextField(endDateTF);
-        return date;
-    }
-
     public List<LocalDate> getComparisonStartDates() {
         return Collections.unmodifiableList(comparisonStartDates);
     }
 
     @Override
-    public void actionPerformed(ActionEvent event) {
+    public void handle(ActionEvent event) {
         if (event.getSource() == intervalsCB) {
-            DateInterval interval = (DateInterval)intervalsCB.getSelectedItem();
+            DateInterval interval = (DateInterval)intervalsCB.getSelectionModel().getSelectedItem();
             DateRange range = interval.range();
             startDate = range.getStart().toLocalDate();
             endDate = range.getEnd().toLocalDate();
@@ -180,10 +152,10 @@ public class DataRangeSelectionPanel implements ActionListener {
             endDateTF.setEditable(editable);
         }
         else if (event.getSource() == compareCB) {
-            offsetCB.setEnabled(compareCB.isSelected());
+            offsetCB.setDisable(!compareCB.isSelected());
         }
         else if (event.getSource() == offsetCB) {
-            DateDelta delta = (DateDelta)offsetCB.getSelectedItem();
+            DateDelta delta = (DateDelta)offsetCB.getSelectionModel().getSelectedItem();
             boolean editable = delta == DateDelta.CUSTOM;
             compareStartDateTF.setEditable(editable);
             loadDates();

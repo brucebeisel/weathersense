@@ -21,10 +21,12 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Map;
 
-import org.jfree.chart.ChartPanel;
+import javafx.scene.layout.BorderPane;
+
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.CombinedDomainCategoryPlot;
@@ -36,21 +38,19 @@ import com.bdb.weather.common.TemperatureBin;
 import com.bdb.weather.common.ThresholdType;
 import com.bdb.weather.common.measurement.Temperature;
 
-@SuppressWarnings("serial")
-public class TemperatureBinSummaryPlot extends ChartPanel {
+public class TemperatureBinSummaryPlot extends BorderPane {
     private final CombinedDomainCategoryPlot plot;
+    private final ChartViewer                chartViewer;
     private final DefaultCategoryDataset     countDataset = new DefaultCategoryDataset();
     private final CategoryPlot               countPlot = new CategoryPlot();
     private final DefaultCategoryDataset     durationDataset = new DefaultCategoryDataset();
     private final CategoryPlot               durationPlot = new CategoryPlot();
     
     public TemperatureBinSummaryPlot() {
-        super(null);
         plot = new CombinedDomainCategoryPlot();
         JFreeChart chart = new JFreeChart(plot);
-        setChart(chart);
-        setMaximumDrawHeight(10000);
-        setMaximumDrawWidth(10000);
+        setMaxHeight(10000);
+        setMaxWidth(10000);
         
         NumberAxis countAxis = new NumberAxis("Day Count");
         countAxis.setUpperMargin(.2);
@@ -81,6 +81,9 @@ public class TemperatureBinSummaryPlot extends ChartPanel {
         plot.getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.DOWN_90);
         plot.add(countPlot);
         plot.add(durationPlot);
+
+        chartViewer = new ChartViewer(chart);
+        this.setCenter(chartViewer);
     }
     
     private String buildDatasetName(ThresholdType type, Temperature threshold) {

@@ -18,7 +18,6 @@ package com.bdb.weather.display.freeplot;
 
 import java.awt.Color;
 import java.awt.Stroke;
-import java.awt.event.ActionListener;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 
-import javax.swing.JComponent;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Parent;
 
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DefaultXYItemRenderer;
@@ -44,7 +45,6 @@ import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.common.measurement.SolarRadiation;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
-import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.axis.HumidityRangeAxis;
 import com.bdb.weather.display.axis.PressureRangeAxis;
 import com.bdb.weather.display.axis.RainRangeAxis;
@@ -60,7 +60,7 @@ import com.bdb.weather.display.freeplot.FreePlotSeriesCollection.SeriesFactory;
  * @author Bruce
  *
  */
-public abstract class SummaryFreePlot implements ComponentContainer, SeriesFactory<SummaryRecord>, SeriesCollectionFactory {
+public abstract class SummaryFreePlot implements SeriesFactory<SummaryRecord>, SeriesCollectionFactory {
     private static final String TEMPERATURE_COLLECTION_NAME = "Temperature";
     private static final String HUMIDITY_COLLECTION_NAME = "Humidity";
     private static final String PRESSURE_COLLECTION_NAME = "Pressure";
@@ -115,21 +115,20 @@ public abstract class SummaryFreePlot implements ComponentContainer, SeriesFacto
     }
     
     /**
-     * Return the Swing component that is the container of this plot.
+     * Return the JavaFX node that is the container for this plot.
      * 
-     * @return The swing container
+     * @return The JavaFX Node
      */
-    @Override
-    public JComponent getComponent() {
-        return freePlot.getComponent();
+    public Parent getNode() {
+        return freePlot;
     }
-    
+
    /*
     * (non-Javadoc)
     * @see com.bdb.weather.display.freeplot.FreePlot.SeriesCollectionFactory#createSeriesGroupControls(java.awt.event.ActionListener)
     */
     @Override
-    public Map<String,SeriesGroupControl> createSeriesGroupControls(ActionListener listener) {
+    public Map<String,SeriesGroupControl> createSeriesGroupControls(EventHandler<ActionEvent> listener) {
         Map<String,SeriesGroupControl> list = new TreeMap<>();
         
         SeriesGroupControl groupControl = new SeriesGroupControl(TEMPERATURE_COLLECTION_NAME, new TemperatureRangeAxis(), listener);

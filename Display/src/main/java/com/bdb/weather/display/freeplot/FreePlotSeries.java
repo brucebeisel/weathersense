@@ -16,6 +16,7 @@
  */
 package com.bdb.weather.display.freeplot;
 
+import java.awt.Color;
 import java.awt.Paint;
 import java.awt.Stroke;
 import java.time.temporal.TemporalAccessor;
@@ -40,7 +41,7 @@ import com.bdb.util.measurement.Measurement;
 public class FreePlotSeries<T> {
     private final String     name;
     private int              seriesIndex;
-    private final Paint      paint;
+    private final Color      paint;
     private final Stroke     stroke;
     private final TimeSeries series;
     private final Function<T,? extends Measurement>     getDataMethod;
@@ -59,7 +60,7 @@ public class FreePlotSeries<T> {
      * @param getTimeMethod The method used to get the time of the data of this series (Reflection used)
      * @param timePeriod The time increment of this data.
      */
-    public FreePlotSeries(String name, int seriesIndex, Paint paint, Stroke stroke, Function<T,Measurement> getDataMethod, Function<T,TemporalAccessor> getTimeMethod, Class<?> timePeriod) {
+    public FreePlotSeries(String name, int seriesIndex, Color paint, Stroke stroke, Function<T,Measurement> getDataMethod, Function<T,TemporalAccessor> getTimeMethod, Class<?> timePeriod) {
         this.name = name;
         this.seriesIndex = seriesIndex;
         this.paint = paint;

@@ -18,7 +18,6 @@ package com.bdb.weather.display.freeplot;
 
 import java.awt.Color;
 import java.awt.Stroke;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAccessor;
@@ -28,7 +27,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 
-import javax.swing.JComponent;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Parent;
 
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DefaultXYItemRenderer;
@@ -47,7 +48,7 @@ import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.common.measurement.SolarRadiation;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
-import com.bdb.weather.display.ComponentContainer;
+import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.WeatherSenseConstants;
 import com.bdb.weather.display.axis.HumidityRangeAxis;
 import com.bdb.weather.display.axis.PressureRangeAxis;
@@ -58,14 +59,14 @@ import com.bdb.weather.display.axis.UvIndexAxis;
 import com.bdb.weather.display.axis.WindSpeedRangeAxis;
 import com.bdb.weather.display.freeplot.FreePlot.SeriesCollectionFactory;
 import com.bdb.weather.display.freeplot.FreePlotSeriesCollection.SeriesFactory;
-import com.bdb.weather.display.preferences.UserPreferences;
+import com.bdb.weather.display.preferences.ColorPreferences;
 
 /**
  * Class to plot historical records (the smallest data).
  * 
  * @author Bruce
  */
-public class HistoricalFreePlot implements ComponentContainer, SeriesFactory, SeriesCollectionFactory {
+public class HistoricalFreePlot implements SeriesFactory, SeriesCollectionFactory {
     private static final String TEMPERATURE_COLLECTION_NAME = "Temperature";
     private static final String HUMIDITY_COLLECTION_NAME = "Humidity";
     private static final String PRESSURE_COLLECTION_NAME = "Pressure";
@@ -111,13 +112,12 @@ public class HistoricalFreePlot implements ComponentContainer, SeriesFactory, Se
     }
     
     /**
-     * Return the swing component that is the container for this plot.
+     * Return the JavaFX node that is the container for this plot.
      * 
-     * @return The swing container
+     * @return The JavaFX Node
      */
-    @Override
-    public JComponent getComponent() {
-        return freePlot.getComponent();
+    public Parent getNode() {
+        return freePlot;
     }
 
     /*
@@ -125,7 +125,7 @@ public class HistoricalFreePlot implements ComponentContainer, SeriesFactory, Se
      * @see com.bdb.weather.display.freeplot.FreePlot.SeriesCollectionFactory#createSeriesGroupControls(java.awt.event.ActionListener)
      */
     @Override
-    public Map<String,SeriesGroupControl> createSeriesGroupControls(ActionListener listener) {
+    public Map<String,SeriesGroupControl> createSeriesGroupControls(EventHandler<ActionEvent> listener) {
         Map<String,SeriesGroupControl> list = new TreeMap<>();
         
         SeriesGroupControl groupControl = new SeriesGroupControl(TEMPERATURE_COLLECTION_NAME, new TemperatureRangeAxis(), listener);
@@ -249,8 +249,8 @@ public class HistoricalFreePlot implements ComponentContainer, SeriesFactory, Se
     private List<FreePlotSeries<HistoricalRecord>> createTemperatureSeries(Stroke stroke, Function<HistoricalRecord,TemporalAccessor> timeMethod) {
         List<FreePlotSeries<HistoricalRecord>> list = new ArrayList<>();
         int n = 0;
-        list.add(new FreePlotSeries<>(OUTDOOR_TEMPERATURE_SERIES_NAME, n++, UserPreferences.getInstance().getOutdoorTempColorPref(), stroke, HistoricalRecord::getAvgOutdoorTemperature, timeMethod, INTERVAL_CLASS));
-        list.add(new FreePlotSeries<>(INDOOR_TEMPERATURE_SERIES_NAME, n++, UserPreferences.getInstance().getIndoorTempColorPref(), stroke, HistoricalRecord::getIndoorTemperature, timeMethod, INTERVAL_CLASS));
+        list.add(new FreePlotSeries<>(OUTDOOR_TEMPERATURE_SERIES_NAME, n++, StageUtilities.toAwtColor(ColorPreferences.getInstance().getOutdoorTempColorPref()), stroke, HistoricalRecord::getAvgOutdoorTemperature, timeMethod, INTERVAL_CLASS));
+        list.add(new FreePlotSeries<>(INDOOR_TEMPERATURE_SERIES_NAME, n++, StageUtilities.toAwtColor(ColorPreferences.getInstance().getIndoorTempColorPref()), stroke, HistoricalRecord::getIndoorTemperature, timeMethod, INTERVAL_CLASS));
         list.add(new FreePlotSeries<>(DEW_POINT_SERIES_NAME, n++, Color.BLUE, stroke, HistoricalRecord::getDewPoint, timeMethod, INTERVAL_CLASS));
         list.add(new FreePlotSeries<>(HEAT_INDEX_SERIES_NAME, n++, Color.MAGENTA, stroke, HistoricalRecord::getHeatIndex, timeMethod, INTERVAL_CLASS));
         list.add(new FreePlotSeries<>(WIND_CHILL_SERIES_NAME, n++, Color.PINK, stroke, HistoricalRecord::getWindChill, timeMethod, INTERVAL_CLASS));

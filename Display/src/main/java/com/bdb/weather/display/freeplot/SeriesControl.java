@@ -16,10 +16,11 @@
  */
 package com.bdb.weather.display.freeplot;
 
-import java.awt.event.ActionListener;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
+import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
 
 /**
  * The control that determines whether a series should be visible
@@ -28,7 +29,7 @@ import javax.swing.JComponent;
  *
  */
 public class SeriesControl {
-    private final JCheckBox checkBox;
+    private final CheckBox checkBox;
     private final String    name;
     
     /**
@@ -37,18 +38,19 @@ public class SeriesControl {
      * @param name The name of the series of this control
      * @param listener The object listening for changes to the check box state
      */
-    public SeriesControl(String name, ActionListener listener) {
+    public SeriesControl(String name, EventHandler<ActionEvent> listener) {
         this.name = name;
-        checkBox = new JCheckBox(name, true);
-        checkBox.addActionListener(listener);
+        checkBox = new CheckBox(name);
+        checkBox.setScaleShape(true);
+        checkBox.setOnAction(listener);
     }
     
     /**
-     * Get the swing component of this control.
+     * Get the JavaFX node of this control.
      * 
-     * @return The swing component
+     * @return The JavaFX node
      */
-    public JComponent getComponent() {
+    public Node getNode() {
         return checkBox;
     }
     
@@ -71,16 +73,16 @@ public class SeriesControl {
     }
     
     /**
-     * Enable the swing component for this series.
+     * Enable the JavaFX node for this series.
      */
     public void enable() {
-        checkBox.setEnabled(true);
+        checkBox.setDisable(false);
     }
     
     /**
-     * Disable the swing component for this series
+     * Disable the JavaFX node for this series
      */
     public void disable() {
-        checkBox.setEnabled(false);
+        checkBox.setDisable(true);
     }
 }

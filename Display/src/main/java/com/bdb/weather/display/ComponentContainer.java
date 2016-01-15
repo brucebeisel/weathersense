@@ -16,13 +16,13 @@
  */
 package com.bdb.weather.display;
 
-import javax.swing.JComponent;
+import javafx.scene.Node;
 
 /**
  *
  * @author Bruce
  */
 public interface ComponentContainer {
-    JComponent getComponent();
+    Node getComponent();
     
 }

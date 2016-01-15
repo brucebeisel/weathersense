@@ -16,8 +16,6 @@
  */
 package com.bdb.weather.display.summary;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
@@ -25,12 +23,8 @@ import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javafx.application.Platform;
+import javafx.scene.layout.BorderPane;
 
 import com.bdb.util.jdbc.DBConnection;
 
@@ -47,16 +41,16 @@ import com.bdb.weather.common.db.DailySummaryTable;
 import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Temperature;
-import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.DateInterval;
+import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.ViewLauncher;
+import com.bdb.weather.display.WeatherSense;
 
 /**
  *
  * @author Bruce
  */
-public class YearlySummariesPanel implements ComponentContainer, SummarySupporter {
-    private final JComponent             component = new JPanel(new BorderLayout());
+public class YearlySummariesPanel extends BorderPane implements SummarySupporter {
     private final SummariesGraphPanel    graphPanel;
     private final DailySummaryTable      dailySummaryTable;
     private final TemperatureBinMgr      temperatureBinMgr;
@@ -74,10 +68,10 @@ public class YearlySummariesPanel implements ComponentContainer, SummarySupporte
 
         graphPanel = new SummariesGraphPanel(SummaryInterval.YEAR_INTERVAL, connection, launcher, this);
 
-        component.add(graphPanel.getComponent(), BorderLayout.CENTER);
+        setCenter(graphPanel);
 
         /*
-        JPanel cmdPanel = new JPanel();
+        FlowPane cmdPanel = new FlowPane();
 
         cmdPanel.add(intervalsCB);
         cmdPanel.add(new JLabel("Start:"));
@@ -107,38 +101,14 @@ public class YearlySummariesPanel implements ComponentContainer, SummarySupporte
         
         goButton.addActionListener(this);
         goButton.setEnabled(false);
-        */
+*/
 
-        loadData(dataRange.getStart().toLocalDate(), dataRange.getEnd().toLocalDate());
-    }
-    
-    @Override
-    public JComponent getComponent() {
-        return component;
-    }
-
-    @SuppressWarnings("empty-statement")
-    private Component getParentFrame() {
-        Component c;
-
-        for (c = component.getParent();
-             c != null && !(c instanceof JFrame) && !(c instanceof JInternalFrame);
-             c = c.getParent());
-        
-        return c;
+        Platform.runLater(() -> loadData(dataRange.getStart().toLocalDate(), dataRange.getEnd().toLocalDate()));
     }
     
     public void setWindowTitle() {
-        Component c = getParentFrame();
-
-        if (c != null) {
-            String dateString = dateFormat.format(dataRange.getStart()) + " - " + dateFormat.format(dataRange.getEnd());
-
-            if (c instanceof JFrame)
-                ((JFrame)c).setTitle(dateString);
-            else 
-                ((JInternalFrame)c).setTitle(dateString);
-        }
+        String dateString = dateFormat.format(dataRange.getStart()) + " - " + dateFormat.format(dataRange.getEnd());
+        StageUtilities.setStageTitle(this, dateString);
     }
 
     private void loadData(LocalDate startDate, LocalDate endDate) {
@@ -147,9 +117,8 @@ public class YearlySummariesPanel implements ComponentContainer, SummarySupporte
         List<SummaryRecord> summaryRecords = retrieveRange(ws, startDate, endDate, temperatureBinMgr);
         
         if (summaryRecords.isEmpty())
-            SwingUtilities.invokeLater(() -> {
-                JOptionPane.showMessageDialog(getParentFrame(), "No data available for date range", "No Data", JOptionPane.INFORMATION_MESSAGE);
-            });
+            //JOptionPane.showMessageDialog(getParentFrame(), "No data available for date range", "No Data", JOptionPane.INFORMATION_MESSAGE);
+            ;
             // TODO put combobox back to original value, probably the same for the text fields when in custom mode.
         else {
             WeatherAverage avg = new WeatherAverage(new Temperature(77.5, Temperature.Unit.FAHRENHEIT),
@@ -202,7 +171,7 @@ public class YearlySummariesPanel implements ComponentContainer, SummarySupporte
             }
         }
     }
-    */
+*/
 
     @Override
     public Temperature retrieveAvgOutdoorTemperature(SummaryRecord rec) {

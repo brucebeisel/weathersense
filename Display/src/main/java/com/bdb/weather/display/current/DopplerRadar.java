@@ -16,27 +16,32 @@
  */
 package com.bdb.weather.display.current;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import javax.swing.Timer;
-import javax.swing.border.BevelBorder;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import javafx.util.Duration;
 
 import com.bdb.util.jdbc.DBConnection;
 
@@ -44,30 +49,33 @@ import com.bdb.weather.common.DopplerRadarImage;
 import com.bdb.weather.common.db.DopplerRadarTable;
 
 /**
- * A Swing component that animates the series of Doppler radar images that are stored in the database.
+ * A JavaFX node that animates the series of Doppler radar images that are stored in the database.
  * 
  * @author Bruce
  *
  */
-public class DopplerRadar implements ActionListener {
-    private static final int DOPPLER_IMAGE_REFRESH_INTERVAL = 120000;
+public class DopplerRadar extends BorderPane {
+    private static final int DOPPLER_IMAGE_REFRESH_INTERVAL = 2;
     private static final int ANIMATION_INTERVAL = 500;
     private static final int NUM_ANIMATION_IMAGES = 20;
     private static final int DELAY_FRAMES = 2;
-    private final JComponent              component = new JPanel(new BorderLayout());
-    private final List<ImageIcon>         thumbnails = new ArrayList<>();
-    private List<DopplerRadarImage>       dopplerRadarImages;
-    private boolean                       animate = true;
-    private final Timer                   animationTimer = new Timer(ANIMATION_INTERVAL, this);
-    private final Timer                   loadImageTimer = new Timer(DOPPLER_IMAGE_REFRESH_INTERVAL, this);
-    private int                           animationFrame = 0;
-    private final JLabel                  radarImage = new JLabel();
-    private final JLabel                  frameInfo = new JLabel("", SwingConstants.CENTER);
-    private final DateTimeFormatter       sdf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.SHORT);    
-    private final DopplerRadarTable       dopplerRadarTable;
+    private final List<ImageView>           thumbnails = new ArrayList<>();
+    private List<DopplerRadarImage>         dopplerRadarImages;
+    private boolean                         animate = true;
+    private int                             animationFrame = 0;
+    private final Group                     radarImage = new Group();
+    private final Label                     frameInfo = new Label();
+    private final DateTimeFormatter         sdf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.SHORT);    
+    private DopplerRadarTable               dopplerRadarTable = null;
+    private final ScheduledExecutorService  executor = Executors.newSingleThreadScheduledExecutor();
+    private WebEngine                       webEngine;
+    private final Timeline                  timeline;
+    private static final Logger             logger = Logger.getLogger(DopplerRadar.class.getName());
     
-    private static final Logger    logger = Logger.getLogger(DopplerRadar.class.getName());
-    
+    public DopplerRadar() {
+	this(null, null);
+    }
+
     /**
      * Constructor.
      * 
@@ -75,26 +83,42 @@ public class DopplerRadar implements ActionListener {
      * @param url The URL from where the Doppler radar image should be retrieved
      */
     public DopplerRadar(DBConnection connection, URL url) {
-        dopplerRadarTable = new DopplerRadarTable(connection);    
-        animationTimer.start();
-        loadImageTimer.start();
-        radarImage.setBackground(Color.gray);
-        radarImage.setBorder(new BevelBorder(BevelBorder.RAISED));
-        radarImage.setIconTextGap(0);
-        component.add(radarImage, BorderLayout.CENTER);
-        component.add(frameInfo, BorderLayout.NORTH);
+        frameInfo.setTextAlignment(TextAlignment.CENTER);
+        //radarImage.setGraphicTextGap(0);
+        this.setCenter(radarImage);
+        BorderPane.setAlignment(frameInfo, Pos.CENTER);
+        this.setTop(frameInfo);
         if (url != null)
-            radarImage.setToolTipText("<html><img src=" + url + "></html>");
-        loadImage();
+            setTooltip(url.toString());
+
+        loadImages();
+
+        executor.scheduleAtFixedRate(() -> loadImages(), DOPPLER_IMAGE_REFRESH_INTERVAL, DOPPLER_IMAGE_REFRESH_INTERVAL, TimeUnit.MINUTES);
+
+	timeline = new Timeline(
+	    new KeyFrame(Duration.millis(ANIMATION_INTERVAL), (actionEvent) -> nextFrame())
+	);
+
+	timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
     }
-    
-    /**
-     * Get the Swing component that contains the Doppler Radar image panel.
-     * 
-     * @return The Swing component containing the Doppler Radar image panel
-     */
-    public JComponent getComponent() {
-        return component;
+
+    private void setTooltip(String url) {
+        if (url != null) {
+            WebView  web = new WebView();
+            webEngine = web.getEngine();
+            webEngine.loadContent("<html><img src=" + url + "></html>");
+            Tooltip  tip = new Tooltip();
+            tip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+            tip.setGraphic(web);
+            //radarImage.setTooltip(tip);
+        }
+    }
+
+    public void configure(DBConnection connection, String url) {
+        setTooltip(url);
+        dopplerRadarTable = new DopplerRadarTable(connection);    
+	loadImages();
     }
     
     /**
@@ -115,24 +139,35 @@ public class DopplerRadar implements ActionListener {
         this.animate = animate;
     }
     
+    public void cleanup() {
+        executor.shutdownNow();
+        timeline.stop();
+    }
     /**
      * Load the Doppler radar images from the database.
      */
-    private void loadImage() {
-        logger.fine("Loading doppler radar images");
-
+    private synchronized void loadImages() {
         try {
+            logger.fine("Loading doppler radar images");
+            if (dopplerRadarTable == null)
+                return;
+
+            Platform.runLater(() -> webEngine.reload());
+
             dopplerRadarImages = dopplerRadarTable.getNewerRadarImages(NUM_ANIMATION_IMAGES);
 
             thumbnails.clear();
 
             for (DopplerRadarImage doppler : dopplerRadarImages) {
-                ImageIcon thumbnail = new ImageIcon(doppler.getImage().getScaledInstance(doppler.getImage().getWidth() / 2,
-                                                                                         doppler.getImage().getHeight() / 2, Image.SCALE_DEFAULT));
-                thumbnails.add(thumbnail);
+                ImageView iv = new ImageView(doppler.getImage());
+                iv.setFitWidth(doppler.getImage().getWidth() / 2);
+                iv.setFitHeight(doppler.getImage().getHeight() / 2);
+                iv.setPreserveRatio(true);
+                iv.setSmooth(true);
+                thumbnails.add(iv);
             }
 
-            logger.fine("Currently animating " + thumbnails.size() + " thumbnails");
+            logger.log(Level.FINE, "Currently animating %d thumbnails", thumbnails.size());
         }
         catch (Exception e) {
             logger.log(Level.WARNING, "Caught exception while loading Doppler radar image", e);
@@ -143,29 +178,24 @@ public class DopplerRadar implements ActionListener {
      * (non-Javadoc)
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
-    @Override
-    public void actionPerformed(ActionEvent event) {
-        if (event.getSource() == animationTimer) {
-            if (!animate)
-                return;
+    private synchronized void nextFrame() {
+	if (!animate)
+	    return;
 
-            //
-            // If the extra delay frames have passed then go back to the beginning of the loop
-            //
-            if (animationFrame >= thumbnails.size() + DELAY_FRAMES)
-                animationFrame = 0;
-            else if (animationFrame >= thumbnails.size())
-                animationFrame++;
-            else {
-                //
-                // Load the radar image and the date/time text
-                //
-                LocalDateTime time = dopplerRadarImages.get(animationFrame).getTime();
-                radarImage.setIcon(thumbnails.get(animationFrame++));
-                frameInfo.setText("" + animationFrame + " of " + thumbnails.size() + " (" + sdf.format(time) + ")");
-            }
-        }
-        else if (event.getSource() == loadImageTimer)
-            loadImage();
+	//
+	// If the extra delay frames have passed then go back to the beginning of the loop
+	//
+	if (animationFrame >= thumbnails.size() + DELAY_FRAMES)
+	    animationFrame = 0;
+	else if (animationFrame >= thumbnails.size())
+	    animationFrame++;
+	else {
+	    //
+	    // Load the radar image and the date/time text
+	    //
+	    LocalDateTime time = dopplerRadarImages.get(animationFrame).getTime();
+	    radarImage.getChildren().setAll(thumbnails.get(animationFrame++));
+	    frameInfo.setText("" + animationFrame + " of " + thumbnails.size() + " (" + sdf.format(time) + ")");
+	}
     }
 }

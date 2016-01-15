@@ -16,151 +16,195 @@
  */
 package com.bdb.weather.display.preferences;
 
-import com.bdb.util.RadioButtonPanel;
+import java.io.IOException;
+
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+
 import com.bdb.weather.common.measurement.Depth;
+import com.bdb.weather.common.measurement.Distance;
 import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
-
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import com.bdb.weather.common.measurement.Distance;
 
 /**
  *
  * @author Bruce
  */
-@SuppressWarnings("serial")
-public class UnitsPreferenceDialog extends JDialog {
-    private RadioButtonPanel temperatureRBP;
-    private RadioButtonPanel depthRBP;
-    private RadioButtonPanel elevationRBP;
-    private RadioButtonPanel speedRBP;
-    private RadioButtonPanel pressureRBP;
-    private UserPreferences  prefs = UserPreferences.getInstance();
+public class UnitsPreferenceDialog extends BorderPane {
+    @FXML private RadioButton celsius;
+    @FXML private RadioButton fahrenheit;
+    @FXML private RadioButton kelvin;
+    @FXML private RadioButton rainfallInches;
+    @FXML private RadioButton rainfallCentimeters;
+    @FXML private RadioButton rainfallMillimeters;
+    @FXML private RadioButton elevationFeet;
+    @FXML private RadioButton elevationMeters;
+    @FXML private RadioButton speedKPH;
+    @FXML private RadioButton speedMPS;
+    @FXML private RadioButton speedMPH;
+    @FXML private RadioButton speedKTS;
+    @FXML private RadioButton pressureKPA;
+    @FXML private RadioButton pressureHPA;
+    @FXML private RadioButton pressureMB;
+    @FXML private RadioButton pressureINHG;
+    @FXML private ToggleGroup temperatureToggleGroup;
+    @FXML private ToggleGroup rainfallToggleGroup;
+    @FXML private ToggleGroup elevationToggleGroup;
+    @FXML private ToggleGroup windSpeedToggleGroup;
+    @FXML private ToggleGroup barometricPressureToggleGroup;
+    private final UnitsPreferences  prefs = UnitsPreferences.getInstance();
     
+    @SuppressWarnings("LeakingThisInConstructor")
     public UnitsPreferenceDialog() {
-        super();
-        setModal(true);
-        setTitle("User Units Preferences");
-        setLayout(new BorderLayout());
-              
-        JPanel p = new JPanel();
-        JButton b = new JButton("OK");
-        b.addActionListener((ActionEvent e) -> {
-            prefs.putTemperatureUnitsPref(Temperature.Unit.values()[temperatureRBP.getSelectedIndex()]);
-            prefs.putDepthUnitsPref(Depth.Unit.values()[depthRBP.getSelectedIndex()]);
-            prefs.putDistanceUnitsPref(Distance.Unit.values()[elevationRBP.getSelectedIndex()]);
-            prefs.putPressureUnitsPref(Pressure.Unit.values()[pressureRBP.getSelectedIndex()]);
-            prefs.putSpeedUnitsPref(Speed.Unit.values()[speedRBP.getSelectedIndex()]);
-            setVisible(false);
-        });
-        p.add(b);
-        
-        b = new JButton("Cancel");
-        b.addActionListener((ActionEvent e) -> {
-            setVisible(false);
-            dispose();
-        });
-        p.add(b);
-        
-        add(p, BorderLayout.SOUTH);
-        add(createUnitsPanel(), BorderLayout.CENTER);
-        
-        this.pack(); 
-        this.setLocationRelativeTo(null);
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/MeasurementUnits.fxml"));
+            fxmlLoader.setRoot(this);
+            fxmlLoader.setController(this);
+            fxmlLoader.load();
+        }
+	catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+
+        celsius.setUserData(Temperature.Unit.CELSIUS);
+        fahrenheit.setUserData(Temperature.Unit.FAHRENHEIT);
+        kelvin.setUserData(Temperature.Unit.KELVIN);
+        rainfallCentimeters.setUserData(Depth.Unit.CENTIMETERS);
+        rainfallMillimeters.setUserData(Depth.Unit.MILLIMETERS);
+        rainfallInches.setUserData(Depth.Unit.INCHES);
+        elevationFeet.setUserData(Distance.Unit.FEET);
+        elevationMeters.setUserData(Distance.Unit.METERS);
+        speedKPH.setUserData(Speed.Unit.KM_PER_HOUR);
+        speedMPS.setUserData(Speed.Unit.METERS_PER_SEC);
+        speedMPH.setUserData(Speed.Unit.MILES_PER_HOUR);
+        speedKTS.setUserData(Speed.Unit.KNOTS);
+        pressureKPA.setUserData(Pressure.Unit.KILO_PASCAL);
+        pressureHPA.setUserData(Pressure.Unit.HECTO_PASCAL);
+        pressureMB.setUserData(Pressure.Unit.MILLIBAR);
+        pressureINHG.setUserData(Pressure.Unit.IN_HG);
+
+        switch (prefs.getTemperatureUnit()) {
+            case CELSIUS:
+                celsius.setSelected(true);
+                break;
+
+            case FAHRENHEIT:
+                fahrenheit.setSelected(true);
+                break;
+
+            default:
+                kelvin.setSelected(true);
+                break;
+        }
+
+        switch (prefs.getRainfallUnit()) {
+            case CENTIMETERS:
+                rainfallCentimeters.setSelected(true);
+                break;
+
+            case INCHES:
+                rainfallInches.setSelected(true);
+                break;
+
+            default:
+            case MILLIMETERS:
+                rainfallMillimeters.setSelected(true);
+                break;
+        }
+
+        switch (prefs.getElevationUnit()) {
+            case FEET:
+                elevationFeet.setSelected(true);
+                break;
+
+            default:
+            case METERS:
+                elevationMeters.setSelected(true);
+                break;
+        }
+
+        switch (prefs.getSpeedUnit()) {
+            case KM_PER_HOUR:
+                speedKPH.setSelected(true);
+                break;
+
+            default:
+            case METERS_PER_SEC:
+                speedMPS.setSelected(true);
+                break;
+
+            case MILES_PER_HOUR:
+                speedMPH.setSelected(true);
+                break;
+
+            case KNOTS:
+                speedKTS.setSelected(true);
+                break;
+        }
+
+        switch (prefs.getPressureUnit()) {
+            case KILO_PASCAL:
+                pressureKPA.setSelected(true);
+                break;
+
+            case HECTO_PASCAL:
+                pressureHPA.setSelected(true);
+                break;
+
+            case MILLIBAR:
+                pressureMB.setSelected(true);
+                break;
+
+            case IN_HG:
+                pressureINHG.setSelected(true);
+                break;
+
+        }
     }
     
-    private JPanel createUnitsPanel() {
-        JPanel p = new JPanel(new GridBagLayout());
-        temperatureRBP = new RadioButtonPanel();
+    public void handleOK() {
+        Toggle selected = temperatureToggleGroup.getSelectedToggle();
+        prefs.setTemperatureUnit((Temperature.Unit)selected.getUserData());
 
-        GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.LINE_START;
-        c.ipadx = 3;
-        c.ipady = 5;
-        c.gridx = 0;
-        c.gridy = 0;
-        c.insets = new Insets(5, 5, 5, 5);
-        p.add(new JLabel("Temperature"), c);
-        c.gridx = 1;
-        p.add(temperatureRBP, c);
+        selected = rainfallToggleGroup.getSelectedToggle();
+        prefs.setRainfallUnit((Depth.Unit)selected.getUserData());
 
-        Temperature.Unit units[] = Temperature.Unit.values();
+        selected = elevationToggleGroup.getSelectedToggle();
+        prefs.setElevationUnit((Distance.Unit)selected.getUserData());
 
-        for (int i = 0; i < units.length; i++) {
-            temperatureRBP.addItem(units[i].toString());
-            if (units[i] == Temperature.getDefaultUnit())
-                temperatureRBP.setSelectedIndex(i);
-        }
-        
-        depthRBP = new RadioButtonPanel();
-        c.gridx = 0;
-        c.gridy++;
-        p.add(new JLabel("Rainfall"), c);
-        c.gridx = 1;
-        p.add(depthRBP, c);
-        
-        Depth.Unit depthUnits[] = Depth.Unit.values();
-        
-        for (int i = 0; i < depthUnits.length; i++) {
-            depthRBP.addItem(depthUnits[i].toString());
-            if (depthUnits[i] == Depth.getDefaultUnit())
-                depthRBP.setSelectedIndex(i);
-        }
-        
-        elevationRBP = new RadioButtonPanel();
-        c.gridx = 0;
-        c.gridy++;
-        p.add(new JLabel("Elevation"), c);
-        c.gridx = 1;
-        p.add(elevationRBP, c);
-        
-        for (int i = 0; i < depthUnits.length; i++) {
-            elevationRBP.addItem(depthUnits[i].toString());
-            if (depthUnits[i] == Distance.getDefaultUnit())
-                elevationRBP.setSelectedIndex(i);
-        }
-        
-        speedRBP = new RadioButtonPanel();
-        c.gridx = 0;
-        c.gridy++;
-        p.add(new JLabel("Wind Speed"), c);
-        c.gridx = 1;
-        p.add(speedRBP, c);
-        
-        Speed.Unit speedUnits[] = Speed.Unit.values();
-        
-        for (int i = 0; i < speedUnits.length; i++) {
-            speedRBP.addItem(speedUnits[i].toString());
-            if (speedUnits[i] == Speed.getDefaultUnit())
-                speedRBP.setSelectedIndex(i);
-        }
+        selected = windSpeedToggleGroup.getSelectedToggle();
+        prefs.setSpeedUnit((Speed.Unit)selected.getUserData());
 
-        pressureRBP = new RadioButtonPanel();
-        c.gridx = 0;
-        c.gridy++;
-        p.add(new JLabel("Barometric Pressure"), c);
-        c.gridx = 1;
-        p.add(pressureRBP, c);
+        selected = barometricPressureToggleGroup.getSelectedToggle();
+        prefs.setPressureUnit((Pressure.Unit)selected.getUserData());
 
-        Pressure.Unit pressureUnits[] = Pressure.Unit.values();
+        prefs.sync();
+        handleCancel();
+    }
 
-        for (int i = 0; i < pressureUnits.length; i++) {
-            pressureRBP.addItem(pressureUnits[i].toString());
-            if (pressureUnits[i] == Pressure.getDefaultUnit())
-                pressureRBP.setSelectedIndex(i);
-        }
+    public void handleCancel() {
+        ((Stage)getScene().getWindow()).close();
+    }
 
-        return p;
+    public void handleMetric() {
+        celsius.setSelected(true);
+        rainfallMillimeters.setSelected(true);
+        elevationMeters.setSelected(true);
+        speedMPS.setSelected(true);
+        pressureHPA.setSelected(true);
+    }
+
+    public void handleImperial() {
+        fahrenheit.setSelected(true);
+        rainfallInches.setSelected(true);
+        elevationFeet.setSelected(true);
+        speedMPH.setSelected(true);
+        pressureINHG.setSelected(true);
     }
 }

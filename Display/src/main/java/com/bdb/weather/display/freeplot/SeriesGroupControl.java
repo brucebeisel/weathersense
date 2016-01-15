@@ -16,17 +16,13 @@
  */
 package com.bdb.weather.display.freeplot;
 
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 
 import org.jfree.chart.axis.NumberAxis;
 
@@ -38,15 +34,14 @@ import com.bdb.weather.display.RadioButtonPanel;
  * @author Bruce
  *
  */
-public class SeriesGroupControl {
+public class SeriesGroupControl extends VBox {
     private static final String CUSTOM_LABEL = "Custom";
     private static final String NONE_LABEL = "None";
     private static final String ALL_LABEL = "All";
     private static final String BUTTONS[] = {ALL_LABEL, NONE_LABEL, CUSTOM_LABEL};
     private final String              groupName;
     private final RadioButtonPanel    radioButtonPanel = new RadioButtonPanel(BUTTONS);
-    private final JPanel              panel = new JPanel();
-    private final JPanel              innerPanel = new JPanel();
+    private final TilePane            innerPanel = new TilePane();
     private final NumberAxis          rangeAxis;
     private int                       rangeAxisIndex;
     private final List<SeriesControl> controls = new ArrayList<>();
@@ -58,9 +53,9 @@ public class SeriesGroupControl {
      * @param rangeAxis The axis for the X axis
      * @param listener A listener that is watching for changes to the radio buttons
      */
-    public SeriesGroupControl(String name, NumberAxis rangeAxis, ActionListener listener) {
+    public SeriesGroupControl(String name, NumberAxis rangeAxis, EventHandler<ActionEvent> listener) {
         groupName = name;
-        radioButtonPanel.addActionListener((ActionEvent e) -> {
+        radioButtonPanel.addEventHandler((ActionEvent e) -> {
             controls.stream().forEach((control) -> {
                 if (!radioButtonPanel.selectedButton().equals(CUSTOM_LABEL))
                     control.disable();
@@ -68,12 +63,12 @@ public class SeriesGroupControl {
                     control.enable();
             });
         });
-        radioButtonPanel.addActionListener(listener); 
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.add(radioButtonPanel);
-        panel.setBorder(new TitledBorder(LineBorder.createBlackLineBorder(), name));
-        innerPanel.setLayout(new GridLayout(0,1));
-        panel.add(innerPanel);
+        radioButtonPanel.addEventHandler(listener); 
+        this.getChildren().add(radioButtonPanel);
+        //panel.setBorder(new TitledBorder(LineBorder.createBlackLineBorder(), name));
+        innerPanel.setPrefRows(0);
+        innerPanel.setPrefColumns(1);
+        this.getChildren().add(innerPanel);
         this.rangeAxis = rangeAxis;
     }
     
@@ -83,7 +78,7 @@ public class SeriesGroupControl {
      * @param control The control to add
      */
     public void addSeriesControl(SeriesControl control) {
-        innerPanel.add(control.getComponent());
+        innerPanel.getChildren().add(control.getNode());
         controls.add(control);
         if (!radioButtonPanel.selectedButton().equals(CUSTOM_LABEL))
             control.disable();
@@ -134,10 +129,6 @@ public class SeriesGroupControl {
      */
     public String getGroupName() {
         return groupName;
-    }
-    
-    public JComponent getComponent() {
-        return panel;
     }
     
     /**

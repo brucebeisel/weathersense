@@ -21,23 +21,18 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
+import javafx.scene.Node;
+import javafx.scene.control.TableView;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartMouseEvent;
-import org.jfree.chart.ChartMouseListener;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.XYItemEntity;
+import org.jfree.chart.fx.ChartViewer;
+import org.jfree.chart.fx.interaction.ChartMouseEventFX;
+import org.jfree.chart.fx.interaction.ChartMouseListenerFX;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -51,7 +46,7 @@ import com.bdb.util.TimeUtils;
 
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.measurement.Speed;
-import com.bdb.weather.display.DisplayConstants;
+import com.bdb.weather.display.ChartDataPane;
 import com.bdb.weather.display.ViewLauncher;
 import com.bdb.weather.display.WeatherSenseConstants;
 import com.bdb.weather.display.axis.WindSpeedRangeAxis;
@@ -62,13 +57,11 @@ import com.bdb.weather.display.axis.WindSpeedRangeAxis;
  * @author Bruce
  *
  */
-public class WindSummary implements ChartMouseListener {
-    private final JTabbedPane         component = new JTabbedPane();
-    private XYPlot              plot;
-    private DateAxis            dateAxis;
-    private NumberAxis          valueAxis;
-    private JTable              dataTable;
-    private final DefaultTableModel   tableModel = new DefaultTableModel();
+public class WindSummary extends ChartDataPane implements ChartMouseListenerFX {
+    private XYPlot                    plot;
+    private DateAxis                  dateAxis;
+    private NumberAxis                valueAxis;
+    private TableView                 dataTable;
     private final SummaryInterval     interval;
     private final ViewLauncher        launcher;
     private final SummarySupporter    supporter;
@@ -84,23 +77,13 @@ public class WindSummary implements ChartMouseListener {
     private static final int GUST_SERIES = 1;
     
     public WindSummary(SummaryInterval interval, ViewLauncher launcher, SummarySupporter supporter) {
+        this.setPrefSize(500, 300);
         this.interval = interval;
         this.launcher = launcher;
         this.supporter = supporter;
-        ChartPanel panel = createPlot();
-        JComponent table = createTable();
-        
-        component.add(DisplayConstants.GRAPH_TAB_NAME, panel);
-        component.add(DisplayConstants.DATA_TAB_NAME, table);
-    }
-    
-    /**
-     * Get the swing component that contains the plot.
-     * 
-     * @return The swing container
-     */
-    public JComponent getComponent() {
-        return component;
+        ChartViewer panel = createPlot();
+        Node node = createTable();
+        this.setTabContents(panel, node);
     }
     
     /**
@@ -108,10 +91,11 @@ public class WindSummary implements ChartMouseListener {
      * 
      * @return The panel that contains the plot
      */
-    private ChartPanel createPlot() {
+    private ChartViewer createPlot() {
         JFreeChart chart = ChartFactory.createXYLineChart("", "", "", null, PlotOrientation.VERTICAL, true, true, true);
         plot = (XYPlot)chart.getPlot();
-        ChartPanel panel = new ChartPanel(chart);
+        ChartViewer panel = new ChartViewer(chart);
+        panel.setPrefSize(500, 300);
         panel.addChartMouseListener(this);
         
         //
@@ -144,17 +128,13 @@ public class WindSummary implements ChartMouseListener {
     }
     
     /**
-     * Create the JTable.
+     * Create the table.
      * 
-     * @return The swing component
+     * @return The JavaFX Node
      */
-    private JComponent createTable() {
-        //
-        // Build the table for the data tab
-        //
-        DefaultTableColumnModel colModel = new DefaultTableColumnModel();
-        
-        dataTable = new JTable();
+    private Node createTable() {
+        dataTable = new TableView();
+        /*
         dataTable.setModel(tableModel);
         dataTable.setColumnModel(colModel);
 
@@ -171,13 +151,8 @@ public class WindSummary implements ChartMouseListener {
         }
 
         tableModel.setColumnCount(COLUMN_HEADINGS.length);
-
-        //
-        // Insert the JTable component into a scroll pane so that we have scroll bars
-        //
-        JScrollPane sp = new JScrollPane(dataTable);
-        
-        return sp;
+        */
+        return dataTable;
     }
     
     /**
@@ -192,7 +167,7 @@ public class WindSummary implements ChartMouseListener {
         TimeSeriesCollection gustDataset = new TimeSeriesCollection();
         TimeSeries windGustSeries = new TimeSeries("Maximum Gust");
         
-        tableModel.setRowCount(records.size());
+        //tableModel.setRowCount(records.size());
      
         for (int i = 0; i < records.size(); i++) {
             RegularTimePeriod p = RegularTimePeriod.createInstance(interval.getFreeChartClass(), TimeUtils.localDateTimeToDate(records.get(i).getDate().atStartOfDay()), TimeZone.getDefault());
@@ -202,14 +177,14 @@ public class WindSummary implements ChartMouseListener {
             
             if (gust != null) {
                 windGustSeries.add(p, gust.get());
-                tableModel.setValueAt(gust, i, MAX_GUST_COLUMN);
+                //tableModel.setValueAt(gust, i, MAX_GUST_COLUMN);
             }
-            else
-                tableModel.setValueAt(DisplayConstants.UNKNOWN_VALUE_STRING, i, MAX_GUST_COLUMN);
+            //else
+                //tableModel.setValueAt(DisplayConstants.UNKNOWN_VALUE_STRING, i, MAX_GUST_COLUMN);
                 
-            tableModel.setValueAt(interval.getFormat().format(records.get(i).getDate()), i, DATE_COLUMN);
-            tableModel.setValueAt(records.get(i).getMaxWindSpeed(), i, MAX_WIND_COLUMN);
-            tableModel.setValueAt(records.get(i).getAvgWindSpeed(), i, AVG_WIND_COLUMN);
+            //tableModel.setValueAt(interval.getFormat().format(records.get(i).getDate()), i, DATE_COLUMN);
+            //tableModel.setValueAt(records.get(i).getMaxWindSpeed(), i, MAX_WIND_COLUMN);
+            //tableModel.setValueAt(records.get(i).getAvgWindSpeed(), i, AVG_WIND_COLUMN);
                      
         }
         sustainedDataset.addSeries(avgSpeedSeries);
@@ -221,7 +196,7 @@ public class WindSummary implements ChartMouseListener {
     }
 
     @Override
-    public void chartMouseClicked(ChartMouseEvent event) {
+    public void chartMouseClicked(ChartMouseEventFX event) {
         ChartEntity entity = event.getEntity();
         //
         // Was a point on the plot selected?
@@ -238,7 +213,7 @@ public class WindSummary implements ChartMouseListener {
     }
 
     @Override
-    public void chartMouseMoved(ChartMouseEvent event) {
+    public void chartMouseMoved(ChartMouseEventFX event) {
         // Do nothing
     }
 }

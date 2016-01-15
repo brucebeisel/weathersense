@@ -16,62 +16,64 @@
  */
 package com.bdb.weather.display.sensors;
 
-import java.awt.BorderLayout;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
+import javafx.beans.property.ReadOnlyFloatWrapper;
+import javafx.beans.property.ReadOnlyIntegerWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.FXCollections;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
 
 import com.bdb.util.jdbc.DBConnection;
+import com.bdb.util.jdbc.DBTable;
 
 import com.bdb.weather.common.SensorStationStatus;
 import com.bdb.weather.common.db.SensorStationStatusTable;
-import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.DisplayConstants;
 
 /**
  *
  * @author Bruce
  */
-public class SensorStationPanel implements ComponentContainer {
-    private final JComponent panel;
-    private final JTable table;
-    private final DefaultTableModel tableModel;
+public class SensorStationPanel extends BorderPane {
+    private final TableView<SensorStationStatus> table;
     private final SensorStationStatusTable sensorStationStatusTable;
-    private static final String COLUMN_HEADINGS[] = {
-        "Time", "Sensor Station ID", "Battery Voltage", "Battery Status", "Link Quality"
-    };
 
     public SensorStationPanel(DBConnection connection) {
-        panel = new JPanel(new BorderLayout());
+        table = new TableView<>();
         sensorStationStatusTable = new SensorStationStatusTable(connection);
-        tableModel = new DefaultTableModel();
-        tableModel.setColumnIdentifiers(COLUMN_HEADINGS);
-        table = new JTable(tableModel);
-        JScrollPane pane = new JScrollPane(table);
-        panel.add(pane, BorderLayout.CENTER);
-    }
 
-    @Override
-    public JComponent getComponent() {
-        return panel;
+        TableColumn<SensorStationStatus,String> timeColumn = new TableColumn<>("Time");
+        timeColumn.setCellValueFactory((rec) -> new ReadOnlyStringWrapper(DisplayConstants.formatDateTime(rec.getValue().getTime())));
+        table.getColumns().add(timeColumn);
+
+        TableColumn<SensorStationStatus,Number> idColumn = new TableColumn<>("Senaor Station ID");
+        idColumn.setCellValueFactory((rec) -> new ReadOnlyIntegerWrapper(rec.getValue().getSensorStationId()));
+        table.getColumns().add(idColumn);
+
+        TableColumn<SensorStationStatus,Number> voltageColumn = new TableColumn<>("Battery Voltage");
+        voltageColumn.setCellValueFactory((rec) -> new ReadOnlyFloatWrapper(rec.getValue().getBatteryVoltage() == null ? 99.9F : rec.getValue().getBatteryVoltage()));
+        table.getColumns().add(voltageColumn);
+
+        TableColumn<SensorStationStatus,String> batteryColumn = new TableColumn<>("Battery Status");
+        batteryColumn.setCellValueFactory((rec) -> new ReadOnlyStringWrapper(rec.getValue().isBatteryOk() ? "Good" : "Bad"));
+        table.getColumns().add(batteryColumn);
+
+        TableColumn<SensorStationStatus,Number> linkQualityColumn = new TableColumn<>("Link Quality");
+        linkQualityColumn.setCellValueFactory((rec) -> new ReadOnlyIntegerWrapper(rec.getValue().getLinkQuality() == null ? 999 : rec.getValue().getLinkQuality()));
+        table.getColumns().add(linkQualityColumn);
+
+        this.setCenter(table);
     }
 
     public void loadData() {
-        List<SensorStationStatus> stations = sensorStationStatusTable.query();
-        tableModel.setRowCount(stations.size());
+        LocalDateTime time = LocalDateTime.now().minusDays(30);
+        String clause = "where time>'" + DBTable.dateTimeFormatter().format(time) + "'";
+        List<SensorStationStatus> stations = sensorStationStatusTable.query(clause);
 
-        int row = 0;
-        for (SensorStationStatus status : stations) {
-            tableModel.setValueAt(DisplayConstants.formatDateTime(status.getTime()), row, 0);
-            tableModel.setValueAt(status.getSensorStationId(), row, 1);
-            tableModel.setValueAt(status.getBatteryVoltage(), row, 2);
-            tableModel.setValueAt(status.isBatteryOk() ? "Good" : "Bad", row, 3);
-            tableModel.setValueAt(status.getLinkQuality(), row, 4);
-            row++;
-        }
+        table.setItems(FXCollections.observableList(stations));
     }
 }

@@ -16,20 +16,21 @@
  */
 package com.bdb.weather.display.stripchart;
 
-import com.bdb.weather.common.CurrentWeather;
-import com.bdb.weather.common.HistoricalRecord;
-import java.awt.GridLayout;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import javax.swing.JPanel;
+
+import javafx.scene.layout.TilePane;
+
+import com.bdb.weather.common.CurrentWeather;
+import com.bdb.weather.common.HistoricalRecord;
 
 /**
- * A Swing container that manages the chart panels for this strip chart panel.
+ * A JavaFX node that manages the chart panels for this strip chart panel.
  * 
  * @author Bruce
  */
-public class StripChartContainer extends JPanel implements StripChartManager {
+public class StripChartContainer extends TilePane implements StripChartManagerOld {
     private final Map<String,StripChartController> controllers = new TreeMap<>();
     private int nextControllerId = 0;
     
@@ -37,7 +38,6 @@ public class StripChartContainer extends JPanel implements StripChartManager {
      * Constructor.
      */
     public StripChartContainer() {
-        super(new GridLayout(0,1));
     }
     
     /**
@@ -54,8 +54,7 @@ public class StripChartContainer extends JPanel implements StripChartManager {
         String id = Integer.toString(nextControllerId++);
         StripChartController controller = new StripChartController(id, leftAxis, rightAxis, initialData, hours, maxHours, this);
         controllers.put(id, controller);
-        add(controller);
-        controller.revalidate();
+        getChildren().add(controller);
     }
     
     /**
@@ -90,7 +89,6 @@ public class StripChartContainer extends JPanel implements StripChartManager {
     public void removeStripChart(String name) {
         StripChartController controller = controllers.remove(name);
         controller.setVisible(false);
-        this.remove(controller);
-        this.revalidate();
+        this.getChildren().remove(controller);
     }
 }

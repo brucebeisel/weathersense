@@ -16,34 +16,26 @@
  */
 package com.bdb.weather.display.summary;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.text.DateFormat;
-import java.text.Format;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartMouseEvent;
-import org.jfree.chart.ChartMouseListener;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.XYItemEntity;
+import org.jfree.chart.fx.ChartViewer;
+import org.jfree.chart.fx.interaction.ChartMouseEventFX;
+import org.jfree.chart.fx.interaction.ChartMouseListenerFX;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
 import org.jfree.chart.labels.StandardXYItemLabelGenerator;
@@ -63,17 +55,15 @@ import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.WeatherAverages;
 import com.bdb.weather.common.measurement.Temperature;
-import com.bdb.weather.display.DisplayConstants;
+import com.bdb.weather.display.ChartDataPane;
 import com.bdb.weather.display.ViewLauncher;
 
-public class TemperatureDeviationPlotPanel {
-    private final JTabbedPane       component = new JTabbedPane();
+public class TemperatureDeviationPlotPanel extends ChartDataPane {
     private final XYPlot            deviationPlot;
     private final JFreeChart        chart;
-    private final ChartPanel        chartPanel;
-    private final JTable            dataTable;
+    private final ChartViewer       chartViewer;
+    private final TableView         dataTable;
     private final ValueAxis         valueAxis;
-    private final DefaultTableModel tableModel = new DefaultTableModel();
     private final SummaryInterval   interval;
     private final XYBarRenderer     lowRenderer = new XYBarRenderer(.7);
     private final XYBarRenderer     meanRenderer = new XYBarRenderer(.7);
@@ -98,13 +88,15 @@ public class TemperatureDeviationPlotPanel {
     };
 
     public TemperatureDeviationPlotPanel(SummaryInterval interval, ViewLauncher theLauncher, SummarySupporter theSupporter) {
+        this.setPrefSize(500, 300);
         this.interval = interval;
 	chart = ChartFactory.createXYBarChart("Deviation from Average Temperature", "Date", true, "Deviation (" + Temperature.getDefaultUnit() + ")", null, PlotOrientation.VERTICAL, true, true, false);
 
-	chartPanel = new ChartPanel(chart);
-	chartPanel.addChartMouseListener(new ChartMouseListener() {
+	chartViewer = new ChartViewer(chart);
+        chartViewer.setPrefSize(500, 300);
+	chartViewer.addChartMouseListener(new ChartMouseListenerFX() {
             @Override
-            public void chartMouseClicked(ChartMouseEvent event) {
+            public void chartMouseClicked(ChartMouseEventFX event) {
                 ChartEntity entity = event.getEntity();
                 //
                 // Was a point on the plot selected?
@@ -122,7 +114,7 @@ public class TemperatureDeviationPlotPanel {
             }
 
             @Override
-            public void chartMouseMoved(ChartMouseEvent event) {
+            public void chartMouseMoved(ChartMouseEventFX event) {
                 // Do nothing
             }
         });
@@ -148,33 +140,25 @@ public class TemperatureDeviationPlotPanel {
         dateAxis.setDateFormatOverride(dateFormat);
         //dateAxis.setTickUnit(interval.getDateTickUnit());
         
-	component.addTab(DisplayConstants.GRAPH_TAB_NAME, chartPanel);
+	//DefaultTableColumnModel colModel = new DefaultTableColumnModel();
 
-	DefaultTableColumnModel colModel = new DefaultTableColumnModel();
+	dataTable = new TableView();
+	//dataTable.setModel(tableModel);
+	//dataTable.setColumnModel(colModel);
 
-	dataTable = new JTable();
-	dataTable.setModel(tableModel);
-	dataTable.setColumnModel(colModel);
-
-	dataTable.setAutoCreateColumnsFromModel(false);
+	//dataTable.setAutoCreateColumnsFromModel(false);
 
 	for (int i = 0; i < TABLE_HEADINGS.length; i++) {
 	    TableColumn col = new TableColumn();
-	    col.setHeaderValue(TABLE_HEADINGS[i]);
-	    col.setModelIndex(i);
-	    colModel.addColumn(col);
+	    col.setText(TABLE_HEADINGS[i]);
+	    //col.setModelIndex(i);
+	    //colModel.addColumn(col);
 	}
 
-	tableModel.setColumnCount(TABLE_HEADINGS.length);
+	//tableModel.setColumnCount(TABLE_HEADINGS.length);
 
-	JScrollPane sp = new JScrollPane(dataTable);
+        this.setTabContents(chartViewer, dataTable);
 
-	JPanel p = new JPanel(new BorderLayout());
-
-	p.add(sp, BorderLayout.CENTER);
-
-	component.addTab(DisplayConstants.DATA_TAB_NAME, p);
-	
 	lowRenderer.setBasePaint(Color.BLUE);
 	lowRenderer.setBaseItemLabelGenerator(labelGen);
 	lowRenderer.setBaseToolTipGenerator(ttGen);
@@ -193,10 +177,6 @@ public class TemperatureDeviationPlotPanel {
 	highRenderer.setShadowVisible(false);
     }
     
-    public JComponent getComponent() {
-        return component;
-    }
-
     public void loadData(List<SummaryRecord> list, WeatherAverages averagesCollection) {
 	TimeSeriesCollection lowCollection = new TimeSeriesCollection();
 	TimeSeriesCollection meanCollection = new TimeSeriesCollection();
@@ -208,7 +188,7 @@ public class TemperatureDeviationPlotPanel {
 
 	int n = 0;
 
-	tableModel.setRowCount(list.size());
+	//tableModel.setRowCount(list.size());
 	
 	DateTimeFormatter dateFormat = interval.getFormat();
 
@@ -216,23 +196,23 @@ public class TemperatureDeviationPlotPanel {
 	    WeatherAverage averages = averagesCollection.getAverage(record.getDate());
 	    
 	    String dateString = dateFormat.format(record.getDate());
-	    tableModel.setValueAt(dateString, n, DATE_COLUMN);
+	    //tableModel.setValueAt(dateString, n, DATE_COLUMN);
 
 	    Temperature deviation = supporter.retrieveLowOutdoorTemperature(record).subtract(averages.getLowTemperature());
 	    RegularTimePeriod period = RegularTimePeriod.createInstance(interval.getFreeChartClass(), TimeUtils.localDateTimeToDate(record.getDate().atStartOfDay()), TimeZone.getDefault());
 	    TimeSeriesDataItem item = new TimeSeriesDataItem(period, deviation.get());
 	    lowSeries.add(item);
-	    tableModel.setValueAt(deviation, n, LOW_COLUMN);
+	    //tableModel.setValueAt(deviation, n, LOW_COLUMN);
 
 	    deviation = supporter.retrieveAvgOutdoorTemperature(record).subtract(averages.getMeanTemperature());
             item = new TimeSeriesDataItem(period, deviation.get());
             meanSeries.add(item);
-	    tableModel.setValueAt(deviation, n, MEAN_COLUMN);
+	    //tableModel.setValueAt(deviation, n, MEAN_COLUMN);
 
 	    deviation = supporter.retrieveHighOutdoorTemperature(record).subtract(averages.getHighTemperature());
             item = new TimeSeriesDataItem(period, deviation.get());
             highSeries.add(item);
-	    tableModel.setValueAt(deviation, n, HIGH_COLUMN);
+	    //tableModel.setValueAt(deviation, n, HIGH_COLUMN);
 	    
 	    n++;
 	}

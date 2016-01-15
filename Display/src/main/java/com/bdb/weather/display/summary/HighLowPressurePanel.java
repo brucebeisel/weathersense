@@ -22,7 +22,6 @@ import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.display.ViewLauncher;
 import com.bdb.weather.display.axis.PressureRangeAxis;
 
-@SuppressWarnings("unchecked")
 public class HighLowPressurePanel extends HighLowPanel<Pressure> {
     private static final SeriesInfo<Pressure>[] seriesInfo;
     

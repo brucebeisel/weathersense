@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
 
-import javax.swing.JComponent;
+import javafx.scene.layout.BorderPane;
 
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
@@ -57,7 +57,7 @@ import com.bdb.weather.display.axis.RainRangeAxis;
  * @author Bruce
  *
  */
-public class RainPlot {
+public class RainPlot extends BorderPane {
 public static class RainEntry {
     public LocalDateTime time;
     public Depth    rainfall;
@@ -70,17 +70,17 @@ public static class RainEntry {
 };
 private static final String RAIN_DOMAIN = "Rainfall";
 private static final String RAIN_RATE_DOMAIN_PREFIX = "Rate (%s/hr)";
-private JFreeChart                           chart;
-private ChartPanel                           chartPanel;
-private CombinedDomainXYPlot                 plot;
-private XYPlot                               rainPlot;
-private XYPlot                               rainRatePlot;
-private TimeSeriesCollection                 rainDataset;
-private TimeSeriesCollection                 rainRateDataset;
-private TimeSeries                           rainSeries;
-private TimeSeries                           rainRateSeries;
-private final String                         rateDomain;
-private final DateTimeFormatter              formatter = DateTimeFormatter.ofPattern("HH:mm"); // TODO use preferences
+private JFreeChart           chart;
+private ChartViewer          chartViewer;
+private CombinedDomainXYPlot plot;
+private XYPlot               rainPlot;
+private XYPlot               rainRatePlot;
+private TimeSeriesCollection rainDataset;
+private TimeSeriesCollection rainRateDataset;
+private TimeSeries           rainSeries;
+private TimeSeries           rainRateSeries;
+private String               rateDomain;
+private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:mm"); // TODO use preferences
     
     /**
      * Class to generate the labels for the tool tips
@@ -149,8 +149,13 @@ private final DateTimeFormatter              formatter = DateTimeFormatter.ofPat
     /**
      * Constructor.
      */
-    @SuppressWarnings("serial")
     public RainPlot() {
+	setPrefSize(400, 200);
+	createChartElements();
+	this.setCenter(chartViewer);
+    }
+
+    private void createChartElements() {
         String unitString = Depth.getDefaultUnit().toString();
         rateDomain = String.format(RAIN_RATE_DOMAIN_PREFIX, unitString);
         rainPlot = new XYPlot();
@@ -167,11 +172,11 @@ private final DateTimeFormatter              formatter = DateTimeFormatter.ofPat
         chart = new JFreeChart(plot);
         chart.getLegend().setPosition(RectangleEdge.RIGHT);
         
-        chartPanel = new ChartPanel(chart);
-        chartPanel.setMaximumDrawHeight(10000);
-        chartPanel.setMaximumDrawWidth(10000);
-        chartPanel.setMinimumDrawHeight(0);
-        chartPanel.setMinimumDrawWidth(0);
+        chartViewer = new ChartViewer(chart);
+        chartViewer.setMaxHeight(10000);
+        chartViewer.setMaxWidth(10000);
+        chartViewer.setMinHeight(200);
+        chartViewer.setMinWidth(400);
 
         rainDataset = new TimeSeriesCollection();
         rainSeries = new TimeSeries(RAIN_DOMAIN);
@@ -201,20 +206,27 @@ private final DateTimeFormatter              formatter = DateTimeFormatter.ofPat
     }
     
     /**
-     * Return the swing component that contains the graph.
-     * 
-     * @return The swing container
-     */
-    public JComponent getComponent() {
-        return chartPanel;
-    }
-    
-    /**
      * Load the rain data.
      * 
      * @param list The list of historical records for the rainfall graph.
      */
     public void setRainData(List<RainEntry> list) {
+        if (list.size() == rainSeries.getItemCount()) {
+            RegularTimePeriod n0 = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(list.get(0).time), TimeZone.getDefault());
+            RegularTimePeriod n1 = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(list.get(list.size() - 1).time), TimeZone.getDefault());
+
+            RegularTimePeriod e0 = rainSeries.getDataItem(0).getPeriod();
+            RegularTimePeriod e1 = rainSeries.getDataItem(rainSeries.getItemCount() - 1).getPeriod();
+
+            //
+            // If the first and last times are the same between what's been plotted and what was passed in, the graph is up to date,
+            // do nothing.
+            //
+            if (n0.equals(e0) && n1.equals(e1)) {
+                return;
+            }
+        }
+
         rainSeries.clear();
         rainRateSeries.clear();
         

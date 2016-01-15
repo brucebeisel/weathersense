@@ -16,7 +16,6 @@
  */
 package com.bdb.weather.common.db;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +32,9 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.sql.rowset.serial.SerialBlob;
+
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
 
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.util.jdbc.DBTable;
@@ -150,7 +152,7 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
      * @param image The image to be saved to the database
      * @return True if image saved successfully
      */
-    public boolean addRadarImage(BufferedImage image) {
+    public boolean addRadarImage(Image image) {
          DopplerRadarImage dri = new DopplerRadarImage(LocalDateTime.now(), image);
          return addRadarImage(dri);
     }
@@ -244,7 +246,7 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
         return images;
     }
     
-    public BufferedImage getNewestRadarImage() throws SQLException, IOException
+    public Image getNewestRadarImage() throws SQLException, IOException
     {
         int maxSequence = getNewestSequence();
         
@@ -259,18 +261,19 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
             return images.get(images.size() - 1).getImage();
     }
     
-    public static BufferedImage blobToImage(Blob blob) throws SQLException, IOException {
-        BufferedImage image;
+    public static Image blobToImage(Blob blob) throws SQLException, IOException {
+        Image image;
         try (InputStream is = blob.getBinaryStream()) {
-            image = ImageIO.read(is);
+            image = new Image(is);
         }
         return image;
     }
     
-    public static Blob imageToBlob(BufferedImage image) throws SQLException, IOException {
+    public static Blob imageToBlob(Image image) throws SQLException, IOException {
         byte[] bytesOut;
+
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-            ImageIO.write(image, "jpeg", os);
+            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "jpeg", os);
             bytesOut = os.toByteArray();
         }
         

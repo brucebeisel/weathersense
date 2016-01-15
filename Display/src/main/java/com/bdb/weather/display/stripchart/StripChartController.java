@@ -16,18 +16,16 @@
  */
 package com.bdb.weather.display.stripchart;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.event.ActionEvent;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.border.LineBorder;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.layout.BorderPane;
 
 import com.bdb.weather.common.CurrentWeather;
 import com.bdb.weather.common.HistoricalRecord;
@@ -37,14 +35,14 @@ import com.bdb.weather.common.HistoricalRecord;
  * 
  * @author Bruce
  */
-public class StripChartController extends JPanel {
+public class StripChartController extends BorderPane {
     private final String name;
     private final StripChart chart;
     private final MeasurementType leftAxisType;
     private final MeasurementType rightAxisType;
-    private JMenu rightAxisMenu;
-    private JMenu leftAxisMenu;
-    private final StripChartManager manager;
+    private Menu rightAxisMenu;
+    private Menu leftAxisMenu;
+    private final StripChartManagerOld manager;
     private static final String[] TEMPERATURE_DATASETS = {
         "Outdoor Temperature", "Indoor Temperature", "Heat Index", "Wind Chill", "Dew Point" // Dependent on sensors available
     };
@@ -81,36 +79,31 @@ public class StripChartController extends JPanel {
      * @param maxHours The maximum number of hours that will ever be displayed. This is used to trim the dataset as more data is added.
      * @param theManager
      */
-    public StripChartController(String theName, MeasurementType leftAxisType, MeasurementType rightAxisType, List<HistoricalRecord> initialData, int spanHours, int maxHours, StripChartManager theManager) {
-        super(new BorderLayout());
+    public StripChartController(String theName, MeasurementType leftAxisType, MeasurementType rightAxisType, List<HistoricalRecord> initialData, int spanHours, int maxHours, StripChartManagerOld theManager) {
         this.name = theName;
         this.leftAxisType = leftAxisType;
         this.rightAxisType = rightAxisType;
         this.manager = theManager;
-        this.setBorder(new LineBorder(Color.BLACK));
         chart = new StripChart(leftAxisType, rightAxisType, spanHours, maxHours);
 
-        JPopupMenu plotMenu = chart.getPopupMenu();
-        plotMenu.add(new JPopupMenu.Separator());
+        ContextMenu plotMenu = chart.getChartViewer().getContextMenu();
+        plotMenu.getItems().add(new SeparatorMenuItem());
         
-        JMenuItem item = new JMenuItem("Remove This Chart");
-        plotMenu.add(item);
-        item.setActionCommand(name);
-        item.addActionListener((ActionEvent e) -> {
-            manager.removeStripChart(name);
-        });
+        MenuItem item = new MenuItem("Remove This Chart");
+        plotMenu.getItems().add(item);
+        item.setOnAction((actionEvent) -> manager.removeStripChart(name));
 
         if (leftAxisType != MeasurementType.NONE) {
             leftAxisMenu = createDatasetMenu(leftAxisType, StripChart.MAP_TO_LEFT_AXIS);
-            plotMenu.add(leftAxisMenu);
+            plotMenu.getItems().add(leftAxisMenu);
         }
 
         if (rightAxisType != MeasurementType.NONE) {
             rightAxisMenu = createDatasetMenu(rightAxisType, StripChart.MAP_TO_RIGHT_AXIS);
-            plotMenu.add(rightAxisMenu);
+            plotMenu.getItems().add(rightAxisMenu);
         }
 
-        add(chart, BorderLayout.CENTER);
+        setCenter(chart);
 
         loadInitialData(initialData);
     }
@@ -122,7 +115,7 @@ public class StripChartController extends JPanel {
      * @param leftAxis Whether the menu is for the dataset registered with the left or right axis
      * @return The menu
      */
-    private JMenu createDatasetMenu(MeasurementType axisType, boolean leftAxis) {
+    private Menu createDatasetMenu(MeasurementType axisType, boolean leftAxis) {
         String[] datasetNames = null;
         switch (axisType) {
             case TEMPERATURE:
@@ -148,18 +141,18 @@ public class StripChartController extends JPanel {
                 break;
         }
 
-        JMenu menu = new JMenu(axisType.toString() + " Datasets");
+        Menu menu = new Menu(axisType.toString() + " Datasets");
         for (String label : datasetNames) {
-            JCheckBoxMenuItem item = new JCheckBoxMenuItem(label);
+            CheckMenuItem item = new CheckMenuItem(label);
             item.setSelected(true);
-            item.setActionCommand(leftAxis ? LEFT_AXIS_ACTION_CMD : RIGHT_AXIS_ACTION_CMD);
-            menu.add(item);
-            item.addActionListener((ActionEvent e) -> {
-                JMenuItem item1 = (JMenuItem) e.getSource();
+            item.setUserData(leftAxis ? LEFT_AXIS_ACTION_CMD : RIGHT_AXIS_ACTION_CMD);
+            menu.getItems().add(item);
+            item.setOnAction((actionEvent) -> {
+                CheckMenuItem item1 = (CheckMenuItem)actionEvent.getSource();
                 if (item1.isSelected())
-                    chart.showSeries(item1.getText(), e.getActionCommand().equals(LEFT_AXIS_ACTION_CMD));
+                    chart.showSeries(item1.getText(), ((String)item1.getUserData()).equals(LEFT_AXIS_ACTION_CMD));
                 else
-                    chart.hideSeries(item1.getText(), e.getActionCommand().equals(LEFT_AXIS_ACTION_CMD));
+                    chart.hideSeries(item1.getText(), ((String)item1.getUserData()).equals(LEFT_AXIS_ACTION_CMD));
             });
             chart.addSeries(label, leftAxis, Color.BLACK);
             chart.showSeries(label, leftAxis);

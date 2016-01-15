@@ -16,9 +16,7 @@
  */
 package com.bdb.weather.display.summary;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.text.DateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,24 +24,18 @@ import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartMouseEvent;
-import org.jfree.chart.ChartMouseListener;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.XYItemEntity;
+import org.jfree.chart.fx.ChartViewer;
+import org.jfree.chart.fx.interaction.ChartMouseEventFX;
+import org.jfree.chart.fx.interaction.ChartMouseListenerFX;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -59,17 +51,17 @@ import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.WeatherAverages;
 import com.bdb.weather.common.measurement.Temperature;
-import com.bdb.weather.display.DisplayConstants;
+import com.bdb.weather.display.ChartDataPane;
 import com.bdb.weather.display.ViewLauncher;
 import com.bdb.weather.display.axis.TemperatureRangeAxis;
 
 /**
- * Swing component that displays a graph of actual high/low/mean temperatures against location averages (sometimes referred to as "normal").
+ * JavaFX component that displays a graph of actual high/low/mean temperatures against location averages (sometimes referred to as "normal").
  * 
  * @author Bruce
  *
  */
-public class HighLowMedianTempPanel implements ChartMouseListener { 
+public class HighLowMedianTempPanel extends ChartDataPane implements ChartMouseListenerFX { 
     private static final int LOW_DATASET = 0;
     private static final int HIGH_DATASET = 1;
     private static final int MEDIAN_DATASET = 2;
@@ -83,14 +75,13 @@ public class HighLowMedianTempPanel implements ChartMouseListener {
     private static final int MEDIAN_TEMP_COLUMN = 5;
     private static final int AVG_MEAN_TEMP_COLUMN = 6;
     
-    private final JTabbedPane component = new JTabbedPane();
     private final XYPlot               plot;
     private final JFreeChart           chart;
-    private final ChartPanel           chartPanel;
-    private final JTable               dataTable;
+    private final ChartViewer          chartViewer;
+    private final TableView            dataTable;
     private final DateAxis             dateAxis;
     private final NumberAxis           valueAxis = new TemperatureRangeAxis();
-    private final DefaultTableModel    tableModel = new DefaultTableModel();
+    //private final DefaultTableModel    tableModel = new DefaultTableModel();
     protected DateTimeFormatter        dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
     private final String               tableHeadings[];
     private final XYDifferenceRenderer diffRenderer = new XYDifferenceRenderer(new Color(100, 200, 100, 128), new Color(200, 100, 100, 128), false);
@@ -110,6 +101,7 @@ public class HighLowMedianTempPanel implements ChartMouseListener {
      */
     @SuppressWarnings("LeakingThisInConstructor")
     public HighLowMedianTempPanel(SummaryInterval interval, ViewLauncher launcher, SummarySupporter supporter) {
+        this.setPrefSize(500, 300);
         this.interval = interval;
         tableHeadings = getTableColumnLabels();
         chart = ChartFactory.createXYLineChart("", "", "", null, PlotOrientation.VERTICAL, true, true, true);
@@ -141,50 +133,29 @@ public class HighLowMedianTempPanel implements ChartMouseListener {
 
         plot.setDomainAxis(dateAxis);
         
-        chartPanel = new ChartPanel(chart);
-        chartPanel.addChartMouseListener(this);
+        chartViewer = new ChartViewer(chart);
+        chartViewer.setPrefSize(500, 300);
+        chartViewer.addChartMouseListener(this);
 
-        JPanel p = new JPanel(new BorderLayout());
 
-        p.add(chartPanel, BorderLayout.CENTER);
+        //DefaultTableColumnModel colModel = new DefaultTableColumnModel();
 
-        component.addTab(DisplayConstants.GRAPH_TAB_NAME, p);
+        dataTable = new TableView();
+        //dataTable.setModel(tableModel);
+        //dataTable.setColumnModel(colModel);
 
-        DefaultTableColumnModel colModel = new DefaultTableColumnModel();
-
-        dataTable = new JTable();
-        dataTable.setModel(tableModel);
-        dataTable.setColumnModel(colModel);
-
-        dataTable.setAutoCreateColumnsFromModel(false);
+        //dataTable.setAutoCreateColumnsFromModel(false);
 
         for (int i = 0; i < tableHeadings.length; i++) {
             TableColumn col = new TableColumn();
-            col.setHeaderValue(tableHeadings[i]);
-            col.setModelIndex(i);
-            colModel.addColumn(col);
+            //col.setHeaderValue(tableHeadings[i]);
+            //col.setModelIndex(i);
+            //colModel.addColumn(col);
         }
 
-        tableModel.setColumnCount(tableHeadings.length);
-
-        JScrollPane sp = new JScrollPane(dataTable);
-
-        p = new JPanel(new BorderLayout());
-
-        p.add(sp, BorderLayout.CENTER);
-
-        component.addTab(DisplayConstants.DATA_TAB_NAME, p);
+        this.setTabContents(chartViewer, dataTable);
     }
     
-    /**
-     * Get the root Swing component for this graph.
-     * 
-     * @return The Swing component
-     */
-    public JComponent getComponent() {
-        return component;
-    }
-
     /**
      * Get the labels for the JTable containing the values.
      * 
@@ -211,7 +182,6 @@ public class HighLowMedianTempPanel implements ChartMouseListener {
                                 TimeSeriesCollection lowDataset,
                                 TimeSeriesCollection highDataset,
                                 TimeSeriesCollection meanDataset,
-                                DefaultTableModel tableModel,
                                 WeatherAverages averagesCollection) {
 
         TimeSeries highSeries = new TimeSeries("High");
@@ -224,7 +194,7 @@ public class HighLowMedianTempPanel implements ChartMouseListener {
         int n = 0;
 
         for (SummaryRecord r : summaryList) {
-            tableModel.setValueAt(dateFormat.format(r.getDate()), n, DATE_COLUMN);
+            //tableModel.setValueAt(dateFormat.format(r.getDate()), n, DATE_COLUMN);
 
             RegularTimePeriod p = RegularTimePeriod.createInstance(interval.getFreeChartClass(), TimeUtils.localDateTimeToDate(r.getDate().atStartOfDay()), TimeZone.getDefault());
 
@@ -232,29 +202,29 @@ public class HighLowMedianTempPanel implements ChartMouseListener {
             averageLowSeries.add(p, averages.getLowTemperature().get());
             averageHighSeries.add(p, averages.getHighTemperature().get());
             averageMeanSeries.add(p, averages.getMeanTemperature().get());
-            tableModel.setValueAt(averages.getHighTemperature().toString(), n, AVG_HIGH_TEMP_COLUMN);
-            tableModel.setValueAt(averages.getLowTemperature().toString(), n, AVG_LOW_TEMP_COLUMN);
-            tableModel.setValueAt(averages.getMeanTemperature().toString(), n, AVG_MEAN_TEMP_COLUMN);
+            //tableModel.setValueAt(averages.getHighTemperature().toString(), n, AVG_HIGH_TEMP_COLUMN);
+            //tableModel.setValueAt(averages.getLowTemperature().toString(), n, AVG_LOW_TEMP_COLUMN);
+            //tableModel.setValueAt(averages.getMeanTemperature().toString(), n, AVG_MEAN_TEMP_COLUMN);
 
             Temperature t = supporter.retrieveHighOutdoorTemperature(r);
 
             if (t != null) {
                 highSeries.add(p, t.get());
-                tableModel.setValueAt(t.toString(), n, HIGH_TEMP_COLUMN);
+                //tableModel.setValueAt(t.toString(), n, HIGH_TEMP_COLUMN);
             }
 
             t = supporter.retrieveLowOutdoorTemperature(r);
 
             if (t != null) {
                 lowSeries.add(p, t.get());
-                tableModel.setValueAt(t.toString(), n, LOW_TEMP_COLUMN);
+                //tableModel.setValueAt(t.toString(), n, LOW_TEMP_COLUMN);
             }
 
             t = supporter.retrieveAvgOutdoorTemperature(r);
 
             if (t != null) {
                 meanSeries.add(p, t.get());
-                tableModel.setValueAt(t.toString(), n, MEDIAN_TEMP_COLUMN);
+                //tableModel.setValueAt(t.toString(), n, MEDIAN_TEMP_COLUMN);
             }
 
             n++;
@@ -287,13 +257,13 @@ public class HighLowMedianTempPanel implements ChartMouseListener {
      * @param averages The averages to load
      */
     public void loadData(List<SummaryRecord> summaryList, WeatherAverages averages) {
-        tableModel.setRowCount(summaryList.size());
+        //tableModel.setRowCount(summaryList.size());
 
         highDataset = new TimeSeriesCollection();
         lowDataset = new TimeSeriesCollection();
         meanDataset = new TimeSeriesCollection();
 
-        loadDataSeries(summaryList, lowDataset, highDataset, meanDataset, tableModel, averages);
+        loadDataSeries(summaryList, lowDataset, highDataset, meanDataset, averages);
 
         plot.setDataset(LOW_DATASET, lowDataset);
         plot.setDataset(HIGH_DATASET, highDataset);
@@ -305,7 +275,7 @@ public class HighLowMedianTempPanel implements ChartMouseListener {
      * @see org.jfree.chart.ChartMouseListener#chartMouseClicked(org.jfree.chart.ChartMouseEvent)
      */
     @Override
-    public void chartMouseClicked(ChartMouseEvent event) {
+    public void chartMouseClicked(ChartMouseEventFX event) {
         ChartEntity entity = event.getEntity();
         //
         // Was a point on the plot selected?
@@ -326,7 +296,7 @@ public class HighLowMedianTempPanel implements ChartMouseListener {
      * @see org.jfree.chart.ChartMouseListener#chartMouseMoved(org.jfree.chart.ChartMouseEvent)
      */
     @Override
-    public void chartMouseMoved(ChartMouseEvent event) {
+    public void chartMouseMoved(ChartMouseEventFX event) {
         // Do nothing   
     }
 }

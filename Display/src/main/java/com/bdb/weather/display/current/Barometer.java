@@ -19,11 +19,16 @@ package com.bdb.weather.display.current;
 import java.awt.Color;
 import java.awt.GradientPaint;
 
-import javax.swing.JComponent;
-import javax.swing.border.BevelBorder;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.plot.dial.DialBackground;
 import org.jfree.chart.plot.dial.DialCap;
 import org.jfree.chart.plot.dial.DialPlot;
@@ -44,23 +49,51 @@ import com.bdb.weather.common.WeatherTrend;
  * @author Bruce
  * 
  */
-public class Barometer {
+public class Barometer extends BorderPane {
     private final DefaultValueDataset dataset = new DefaultValueDataset(50.0);
     private final DialPlot            plot = new DialPlot(dataset);
-    private final StandardDialRange   range;
-    private final ChartPanel          chartPanel;
+    private StandardDialRange         range;
+    private final Label               title = new Label();
+    private StandardDialScale         scale;
     private final DialTextAnnotation  trendAnnotation = new DialTextAnnotation("Trend");
+    private final StringProperty      titleProperty = new SimpleStringProperty();
+    private final DoubleProperty      minValue = new SimpleDoubleProperty();
+    private final DoubleProperty      maxValue = new SimpleDoubleProperty();
 
+    public Barometer() {
+	this("", new Pressure(900.0, Pressure.Unit.MILLIBAR), new Pressure(1100.0, Pressure.Unit.MILLIBAR));
+    }
     /**
      * Constructor.
      * 
-     * @param title The title to display with the dial
+     * @param titleString The title to display with the dial
      * @param min The minimum of the dial's scale
      * @param max The maximum of the dial's scale
      */
-    public Barometer(String title, Pressure min, Pressure max) {
+    public Barometer(String titleString, Pressure min, Pressure max) {
+	this.setPrefSize(250.0, 250.0);
+	title.setText(titleString);
+
+	ChartViewer chartViewer = createChartElements(min, max);
+	this.setTop(title);
+        this.setCenter(chartViewer);
+	BorderPane.setAlignment(title, Pos.CENTER);
+    }
+
+    private ChartViewer createChartElements(Pressure min, Pressure max) {
         plot.addLayer(new DialBackground(new GradientPaint(0.0f, 0.0f, Color.LIGHT_GRAY, 100.0f, 0.0f, Color.blue)));
-        StandardDialScale scale = new StandardDialScale(min.get(), max.get(), 240.0, -300.0, 0.2, 10);
+        double dialTickIncrements = .2;
+        switch (Pressure.getDefaultUnit()) {
+            case IN_HG:
+                dialTickIncrements = .2;
+                break;
+            case HECTO_PASCAL:
+            case MILLIBAR:
+                dialTickIncrements = 10.0;
+                break;
+        }
+
+        scale = new StandardDialScale(min.get(), max.get(), 240.0, -300.0, dialTickIncrements, 10);
         scale.setTickRadius(.9);
         scale.setTickLabelFormatter(Pressure.getDefaultFormatter());
         scale.setTickLabelOffset(.25);
@@ -86,7 +119,7 @@ public class Barometer {
         plot.addPointer(pointer);
 
         DialCap cap = new DialCap();
-        cap.setFillPaint(Color.gray);
+        cap.setRadius(cap.getRadius() * 1.5);
         plot.setCap(cap);
 
         range = new StandardDialRange(0.0, 360.0, Color.BLACK);
@@ -96,26 +129,56 @@ public class Barometer {
         plot.addLayer(range);
 
         JFreeChart chart = new JFreeChart(plot);
-        chart.setTitle(title);
         chart.setBackgroundPaint(Color.GRAY);
 
-        chartPanel = new ChartPanel(chart);
-        chartPanel.setMinimumDrawHeight(250);
-        chartPanel.setMinimumDrawWidth(250);
-        chartPanel.setMaximumDrawHeight(250);
-        chartPanel.setMaximumDrawWidth(250);
+        ChartViewer chartViewer = new ChartViewer(chart);
+        chartViewer.setMinHeight(250);
+        chartViewer.setMinWidth(250);
+        chartViewer.setMaxHeight(250);
+        chartViewer.setMaxWidth(250);
 
-        chartPanel.setBackground(Color.GRAY);
-        chartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        //chartViewer.setBorder(new BevelBorder(BevelBorder.RAISED));
+
+        return chartViewer;
+    }
+
+    public Pressure getMinValue() {
+	return new Pressure(minValue.getValue(), Pressure.Unit.MILLIBAR);
+    }
+
+    public void setMinValue(Pressure value) {
+	minValue.setValue(value.get(Pressure.Unit.MILLIBAR));
+	scale.setLowerBound(value.get());
+    }
+
+    public DoubleProperty minValueProperty() {
+	return minValue;
     }
     
-    /**
-     * Return the Swing component that contains the guage.
-     * 
-     * @return The swing component
-     */
-    public JComponent getComponent() {
-        return chartPanel;
+    public Pressure getMaxValue() {
+	return new Pressure(maxValue.getValue(), Pressure.Unit.MILLIBAR);
+    }
+
+    public void setMaxValue(Pressure value) {
+	maxValue.setValue(value.get(Pressure.Unit.MILLIBAR));
+	scale.setUpperBound(value.get());
+    }
+
+    public DoubleProperty maxValueProperty() {
+	return maxValue;
+    }
+    
+    public String getTitle() {
+	return titleProperty.getValue();
+    }
+
+    public void setTitle(String value) {
+	titleProperty.setValue(value);
+	title.setText(value);
+    }
+
+    public StringProperty titleProperty() {
+	return titleProperty;
     }
 
     /**
@@ -130,8 +193,7 @@ public class Barometer {
     public void loadData(Pressure current, Pressure min, Pressure max, Pressure delta, WeatherTrend trend) {
         dataset.setValue(current.get());
         if (!min.equals(max)) {
-            range.setLowerBound(min.get());
-            range.setUpperBound(max.get());
+            range.setBounds(min.get(), max.get());
         }
         
         if (trend == WeatherTrend.STEADY)

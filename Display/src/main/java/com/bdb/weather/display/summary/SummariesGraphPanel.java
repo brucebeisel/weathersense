@@ -16,60 +16,56 @@
  */
 package com.bdb.weather.display.summary;
 
-import java.awt.BorderLayout;
 import java.util.List;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherAverages;
 import com.bdb.weather.common.WindRoseData;
 import com.bdb.weather.display.ViewLauncher;
-import com.bdb.weather.display.windrose.WindRosePanel;
+import com.bdb.weather.display.windrose.WindRosePane;
 
-public class SummariesGraphPanel {
-    private final JComponent                     component = new JPanel(new BorderLayout());
+public class SummariesGraphPanel extends GridPane {
     private final HighLowMedianTempPanel         temperaturePanel;
     private final TemperatureDeviationPlotPanel  deltaPanel;
     private final RainSummary                    rainPanel;
     private final WindSummary                    windPanel;
-    private final WindRosePanel                  windRosePanel;
+    private final WindRosePane                   windRosePanel;
     private final HighLowHumidityPanel           highLowHumidityPanel;
     private final HighLowPressurePanel           highLowPressurePanel;
 
     public SummariesGraphPanel(SummaryInterval interval, DBConnection connection, ViewLauncher launcher, SummarySupporter supporter) {
         temperaturePanel = new HighLowMedianTempPanel(interval, launcher, supporter);
         deltaPanel = new TemperatureDeviationPlotPanel(interval, launcher, supporter);
-        rainPanel = new RainSummary(interval, launcher, supporter);
+        rainPanel = new RainSummary(interval, supporter);
         windPanel = new WindSummary(interval, launcher, supporter);
-        windRosePanel = new WindRosePanel();
+        windRosePanel = new WindRosePane();
         highLowHumidityPanel = new HighLowHumidityPanel(interval, launcher, supporter);
         highLowPressurePanel = new HighLowPressurePanel(interval, launcher, supporter);
 
-        JSplitPane sp1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, temperaturePanel.getComponent(), deltaPanel.getComponent());
-        JSplitPane sp2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, windPanel.getComponent(), windRosePanel.getComponent());       
-        JSplitPane sp3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, rainPanel.getComponent(), sp2);
-        JSplitPane sp4 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, sp1, sp3);
-        JSplitPane sp5 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, highLowHumidityPanel.getComponent(), highLowPressurePanel.getComponent());
-        JSplitPane sp6 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, sp4, sp5);
-        
-        component.add(sp6, BorderLayout.CENTER);
-        
-        sp1.setResizeWeight(.5);
-        sp2.setResizeWeight(.7);
-        sp3.setResizeWeight(.5);
-        sp4.setResizeWeight(.5);
-        sp5.setResizeWeight(.5);
-        sp6.setResizeWeight(.7);
+        ColumnConstraints constraint = new ColumnConstraints();
+        constraint.setPercentWidth(16.67);
+        this.getColumnConstraints().add(constraint);
+        this.getColumnConstraints().add(constraint);
+        this.getColumnConstraints().add(constraint);
+        this.getColumnConstraints().add(constraint);
+        this.getColumnConstraints().add(constraint);
+        this.getColumnConstraints().add(constraint);
+
+        this.add(temperaturePanel, 0, 0, 3, 1);
+        this.add(deltaPanel,       3, 0, 3, 1);
+
+        this.add(rainPanel,     0, 1, 3, 1);
+        this.add(windPanel,     3, 1, 2, 1);
+        this.add(windRosePanel, 5, 1, 1, 1);
+
+        this.add(highLowHumidityPanel, 0, 2, 3, 1);
+        this.add(highLowPressurePanel, 3, 2, 3, 1);
     }
     
-    public JComponent getComponent() {
-        return component;
-    }
-
     public void loadData(List<SummaryRecord> list, WeatherAverages averages) {        
         temperaturePanel.loadData(list, averages);
         deltaPanel.loadData(list, averages);

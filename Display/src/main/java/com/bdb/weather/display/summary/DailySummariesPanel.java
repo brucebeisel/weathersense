@@ -16,28 +16,28 @@
  */
 package com.bdb.weather.display.summary;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
+import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
+import javafx.application.Platform;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 
 import com.bdb.util.jdbc.DBConnection;
 
@@ -54,27 +54,26 @@ import com.bdb.weather.common.db.DailyAveragesTable;
 import com.bdb.weather.common.db.DailySummaryTable;
 import com.bdb.weather.common.db.TemperatureRecordTable;
 import com.bdb.weather.common.measurement.Temperature;
-import com.bdb.weather.display.ComponentContainer;
 import com.bdb.weather.display.DateInterval;
+import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.ViewLauncher;
+import com.bdb.weather.display.WeatherSense;
 
-public final class DailySummariesPanel implements ComponentContainer, ActionListener, SummarySupporter
+public final class DailySummariesPanel extends BorderPane implements EventHandler, SummarySupporter
 {
-    private final JComponent                  component = new JPanel(new BorderLayout());
-    private final SummariesGraphPanel         graphPanel;
-    private final DailySummariesTextPanel     textPanel;
-    private final DailySummaryTable           dailySummaryTable;
-    private final DailyAveragesTable          dailyAveragesTable;
-    private final TemperatureRecordTable      temperatureRecordTable;
-    private final TemperatureBinMgr           temperatureBinMgr;
-    private final WeatherStation              ws;
-    private LocalDate                         startDate;
-    private LocalDate                         endDate;
-    private final DateTimeFormatter           dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-    private final JFormattedTextField         startDateTF = new JFormattedTextField(dateFormat);
-    private final JFormattedTextField         endDateTF = new JFormattedTextField(dateFormat);
-    private final JComboBox                   intervalsCB = new JComboBox(DateInterval.availableIntervals());
-    private final JButton                     goButton = new JButton("Go");
+    private final SummariesGraphPanel          graphPanel;
+    private final DailySummariesStatisticsPane textPanel;
+    private final DailySummaryTable            dailySummaryTable;
+    private final DailyAveragesTable           dailyAveragesTable;
+    private final TemperatureRecordTable       temperatureRecordTable;
+    private final TemperatureBinMgr            temperatureBinMgr;
+    private final WeatherStation               ws;
+    private LocalDate                          startDate;
+    private LocalDate                          endDate;
+    private final DatePicker                   startDatePicker = new DatePicker();
+    private final DatePicker                   endDatePicker = new DatePicker();
+    private final ComboBox                     intervalsCB = new ComboBox();
+    private final Button                       goButton = new Button("Go");
 
     @SuppressWarnings("LeakingThisInConstructor")
     public DailySummariesPanel(WeatherStation ws, DBConnection connection, ViewLauncher launcher, LocalDate start, LocalDate end, DateInterval interval) {
@@ -85,86 +84,63 @@ public final class DailySummariesPanel implements ComponentContainer, ActionList
         temperatureBinMgr = new TemperatureBinMgr(connection);
 
         graphPanel = new SummariesGraphPanel(SummaryInterval.DAY_INTERVAL, connection, launcher, this);
-        textPanel = new DailySummariesTextPanel();
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Graphs", graphPanel.getComponent());
-        tabbedPane.addTab("Statistics", new JScrollPane(textPanel));
+        textPanel = new DailySummariesStatisticsPane();
+        TabPane tabPane = new TabPane();
+        Tab tab = new Tab("Charts");
+        tab.setClosable(false);
+        tab.setContent(graphPanel);
+        tabPane.getTabs().add(tab);
 
+        tab = new Tab("Statistics");
+        tab.setClosable(false);
+        tab.setContent(new ScrollPane(textPanel));
+        tabPane.getTabs().add(tab);
 
-        component.add(tabbedPane, BorderLayout.CENTER);
+        setCenter(tabPane);
 
-        JPanel cmdPanel = new JPanel();
+        intervalsCB.getItems().addAll(Arrays.asList(DateInterval.values()));
+        intervalsCB.setVisibleRowCount(intervalsCB.getItems().size());
+        HBox cmdPanel = new HBox();
+        cmdPanel.setAlignment(Pos.CENTER);
+        cmdPanel.setPadding(new Insets(10.0, 10.0, 10.0, 10.0));
+        cmdPanel.setSpacing(5.0);
 
-        cmdPanel.add(intervalsCB);
-        cmdPanel.add(new JLabel("Start:"));
-        cmdPanel.add(startDateTF);
-        cmdPanel.add(new JLabel("End:"));
-        cmdPanel.add(endDateTF);
-        cmdPanel.add(goButton);
+        cmdPanel.getChildren().add(intervalsCB);
+        cmdPanel.getChildren().add(new Label("Start:"));
+        cmdPanel.getChildren().add(startDatePicker);
+        cmdPanel.getChildren().add(new Label("End:"));
+        cmdPanel.getChildren().add(endDatePicker);
+        cmdPanel.getChildren().add(goButton);
 
-        component.add(cmdPanel, BorderLayout.NORTH);
+        setTop(cmdPanel);
 
         startDate = start;
         endDate = end;
 
-        startDateTF.setText(dateFormat.format(startDate));
-        endDateTF.setText(dateFormat.format(endDate));
+        startDatePicker.setValue(startDate);
+        endDatePicker.setValue(endDate);
         
         if (interval != DateInterval.CUSTOM) {
-            startDateTF.setEditable(false);
-            endDateTF.setEditable(false);
+            startDatePicker.setEditable(false);
+            endDatePicker.setEditable(false);
+            startDatePicker.setDisable(true);
+            endDatePicker.setDisable(true);
         }
         
-        intervalsCB.setSelectedItem(interval);
-        intervalsCB.setMaximumRowCount(intervalsCB.getItemCount());
-        intervalsCB.addActionListener(this);
+        intervalsCB.getSelectionModel().select(interval);
+        intervalsCB.setOnAction(this);
         
-        goButton.addActionListener((ae)-> {
-            try {
-                startDate = LocalDate.from(dateFormat.parse(startDateTF.getText()));
-                endDate = LocalDate.from(dateFormat.parse(endDateTF.getText()));
-                loadData(startDate, endDate);
-            }
-            catch (DateTimeParseException e) {
-                // TODO Add dialog that indicates a bad date was entered.
-            }
+        goButton.setOnAction((ae)-> {
+            startDate = startDatePicker.getValue();
+            endDate = endDatePicker.getValue();
+            loadData(startDate, endDate);
         });
 
-        goButton.setEnabled(false);
+        goButton.setDisable(true);
 
-        loadData(startDate, endDate);
+        Platform.runLater(() -> loadData(startDate, endDate));
     }
     
-    @Override
-    public JComponent getComponent() {
-        return component;
-    }
-
-    @SuppressWarnings("empty-statement")
-    private Component getParentFrame() {
-        Component c;
-
-        for (c = component.getParent();
-             c != null && !(c instanceof JFrame) && !(c instanceof JInternalFrame);
-             c = c.getParent());
-        
-        return c;
-    }
-    
-    public void setWindowTitle() {
-        Component c = getParentFrame();
-
-        if (c != null) {
-            DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-            String dateString = df.format(startDate) + " - " + df.format(endDate);
-
-            if (c instanceof JFrame)
-                ((JFrame)c).setTitle(dateString);
-            else 
-                ((JInternalFrame)c).setTitle(dateString);
-        }
-    }
-
     private void loadData(LocalDate startDate, LocalDate endDate) {
         temperatureBinMgr.refresh();
         List<SummaryRecord> summaryRecords = dailySummaryTable.retrieveRange(startDate, endDate, ws.getWindParameters(), temperatureBinMgr);
@@ -172,18 +148,17 @@ public final class DailySummariesPanel implements ComponentContainer, ActionList
         WeatherAverage seasonalAverages = dailyAveragesTable.retrieveCustomAverages(startDate.getMonth(), startDate.getDayOfMonth(),
                                                                                     endDate.getMonth(), endDate.getDayOfMonth());
                                                 
-        if (summaryRecords.isEmpty())
-            SwingUtilities.invokeLater(() -> {
-                JOptionPane.showMessageDialog(getParentFrame(), "No data available for date range", "No Data", JOptionPane.INFORMATION_MESSAGE);
-            });
+        if (summaryRecords.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "No data available for date range", ButtonType.OK);
+            alert.showAndWait();
             // TODO put combobox back to original value, probably the same for the text fields when in custom mode.
+        }
         else {
             WeatherAverages dailyAverages = dailyAveragesTable.retrieveDailyAverages();
 
             if (dailyAverages == null) {
-                SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(getParentFrame(), "No weather average data", "No Averages", JOptionPane.INFORMATION_MESSAGE);
-                });
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "No weather average data", ButtonType.OK);
+                alert.showAndWait();
                 return;
             }
 
@@ -197,32 +172,9 @@ public final class DailySummariesPanel implements ComponentContainer, ActionList
             List<Extreme<Temperature,TemperatureRecordType>> records = temperatureRecordTable.retrieveRecordsForDateRange(startDate, endDate);
             textPanel.loadData(totalSummary, seasonalAverages, records);
 
-            setWindowTitle();
-        }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent evt) {
-        Object source = evt.getSource();
-
-        if (source == intervalsCB) {
-            DateInterval interval = (DateInterval)intervalsCB.getSelectedItem();
-
-            DateRange range = interval.range();
-
-            boolean editable = interval == DateInterval.CUSTOM;
-
-            startDateTF.setEditable(editable);
-            endDateTF.setEditable(editable);
-            goButton.setEnabled(editable);
-            startDateTF.setText(dateFormat.format(range.getStart()));
-            endDateTF.setText(dateFormat.format(range.getEnd()));
-            
-            if (!editable) {
-                startDate = range.getStart().toLocalDate();
-                endDate = range.getEnd().toLocalDate();
-                loadData(startDate, endDate);
-            }
+            DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+            String dateString = df.format(startDate) + " - " + df.format(endDate);
+            StageUtilities.setStageTitle(this, dateString);
         }
     }
 
@@ -244,6 +196,32 @@ public final class DailySummariesPanel implements ComponentContainer, ActionList
     @Override
     public void launchView(ViewLauncher launcher, LocalDate date) {
         launcher.launchDaySummaryView(date);
-        
+    }
+
+    @Override
+    public void handle(Event event) {
+        Object source = event.getSource();
+
+        if (source == intervalsCB) {
+            DateInterval interval = (DateInterval)intervalsCB.getSelectionModel().getSelectedItem();
+
+            DateRange range = interval.range();
+
+            boolean editable = interval == DateInterval.CUSTOM;
+
+            startDatePicker.setEditable(editable);
+            startDatePicker.setDisable(!editable);
+            endDatePicker.setEditable(editable);
+            endDatePicker.setDisable(!editable);
+            goButton.setDisable(!editable);
+            startDatePicker.setValue(range.getStart().toLocalDate());
+            endDatePicker.setValue(range.getEnd().toLocalDate());
+            
+            if (!editable) {
+                startDate = range.getStart().toLocalDate();
+                endDate = range.getEnd().toLocalDate();
+                loadData(startDate, endDate);
+            }
+        }
     }
 }

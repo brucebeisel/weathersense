@@ -35,6 +35,9 @@ import com.bdb.weather.display.axis.UvIndexAxis;
 public enum MeasurementType {
     NONE(null),
     TEMPERATURE(new TemperatureRangeAxis()),
+    DEW_POINT(new TemperatureRangeAxis()),
+    HEAT_INDEX(new TemperatureRangeAxis()),
+    WIND_CHILL(new TemperatureRangeAxis()),
     HUMIDITY (new HumidityRangeAxis()),
     RAINFALL(new RainRangeAxis()),
     PRESSURE(new PressureRangeAxis()),

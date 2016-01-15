@@ -16,17 +16,19 @@
  */
 package com.bdb.weather.display.day;
 
-import java.awt.Color;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import javafx.scene.paint.Color;
+
 import com.bdb.util.measurement.Measurement;
 import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.Sensor;
-import com.bdb.weather.display.preferences.UserPreferences;
+import com.bdb.weather.display.StageUtilities;
+import com.bdb.weather.display.preferences.ColorPreferences;
 
 /**
  *
@@ -53,25 +55,25 @@ public class HistoricalSeriesInfo {
     public static final String AVG_WIND_DIRECTION_SERIES = "Avg Wind Direction";
     public static final String WIND_GUST_SPEED_SERIES = "Wind Gust Speed";
     public static final String WIND_GUST_DIRECTION_SERIES = "Wind Gust Direction";
-    private static final HistoricalSeriesInfo AVG_OUTDOOR_TEMPERATURE = new HistoricalSeriesInfo(AVG_OUTDOOR_TEMPERATURE_SERIES, HistoricalRecord::getAvgOutdoorTemperature, UserPreferences.OUTDOOR_TEMP_COLOR_PREF);
-    private static final HistoricalSeriesInfo HIGH_OUTDOOR_TEMPERATURE = new HistoricalSeriesInfo(HIGH_OUTDOOR_TEMPERATURE_SERIES, HistoricalRecord::getHighOutdoorTemperature, UserPreferences.HIGH_OUTDOOR_TEMP_COLOR_PREF);
-    private static final HistoricalSeriesInfo LOW_OUTDOOR_TEMPERATURE = new HistoricalSeriesInfo(LOW_OUTDOOR_TEMPERATURE_SERIES, HistoricalRecord::getLowOutdoorTemperature, UserPreferences.LOW_OUTDOOR_TEMP_COLOR_PREF);
-    private static final HistoricalSeriesInfo INDOOR_TEMPERATURE = new HistoricalSeriesInfo(INDOOR_TEMPERATURE_SERIES, HistoricalRecord::getIndoorTemperature, UserPreferences.INDOOR_TEMP_COLOR_PREF);
-    private static final HistoricalSeriesInfo INDOOR_HUMIDITY = new HistoricalSeriesInfo(INDOOR_HUMIDITY_SERIES, HistoricalRecord::getIndoorHumidity, UserPreferences.INDOOR_HUMIDITY_COLOR_PREF);
-    private static final HistoricalSeriesInfo OUTDOOR_HUMIDITY = new HistoricalSeriesInfo(OUTDOOR_HUMIDITY_SERIES, HistoricalRecord::getOutdoorHumidity, UserPreferences.OUTDOOR_HUMIDITY_COLOR_PREF);
-    private static final HistoricalSeriesInfo DEW_POINT = new HistoricalSeriesInfo(DEW_POINT_SERIES, HistoricalRecord::getDewPoint, UserPreferences.DEW_POINT_COLOR_PREF);
-    private static final HistoricalSeriesInfo HEAT_INDEX = new HistoricalSeriesInfo(HEAT_INDEX_SERIES, HistoricalRecord::getHeatIndex, UserPreferences.HEAT_INDEX_COLOR_PREF);
-    private static final HistoricalSeriesInfo WIND_CHILL = new HistoricalSeriesInfo(WIND_CHILL_SERIES, HistoricalRecord::getWindChill, UserPreferences.WIND_CHILL_COLOR_PREF);
-    private static final HistoricalSeriesInfo BAROMETER = new HistoricalSeriesInfo(BAROMETER_SERIES, HistoricalRecord::getBaroPressure, UserPreferences.BARO_PRESSURE_COLOR_PREF);
-    private static final HistoricalSeriesInfo AVG_SOLAR_RADIATION = new HistoricalSeriesInfo(AVG_SOLAR_RADIATION_SERIES, HistoricalRecord::getAvgSolarRadiation, UserPreferences.RAIN_COLOR_PREF);
-    private static final HistoricalSeriesInfo HIGH_SOLAR_RADIATION = new HistoricalSeriesInfo(HIGH_SOLAR_RADIATION_SERIES, HistoricalRecord::getHighSolarRadiation, UserPreferences.RAIN_COLOR_PREF);
-    //private static final HistoricalSeriesInfo AVG_UV_INDEX = new HistoricalSeriesInfo(AVG_UV_INDEX_SERIES, HistoricalRecord::getAvgUvIndex, UserPreferences.RAIN_COLOR_PREF);
-    private static final HistoricalSeriesInfo HIGH_WIND_SPEED = new HistoricalSeriesInfo(HIGH_WIND_SPEED_SERIES, HistoricalRecord::getHighWindSpeed, UserPreferences.WIND_SPEED_COLOR_PREF);
-    private static final HistoricalSeriesInfo HIGH_WIND_DIRECTION = new HistoricalSeriesInfo(HIGH_WIND_DIRECTION_SERIES, HistoricalRecord::getHighWindDirection, UserPreferences.WIND_SPEED_COLOR_PREF);
-    private static final HistoricalSeriesInfo AVG_WIND_SPEED = new HistoricalSeriesInfo(AVG_WIND_SPEED_SERIES, HistoricalRecord::getAvgWindSpeed, UserPreferences.WIND_SPEED_COLOR_PREF);
-    private static final HistoricalSeriesInfo AVG_WIND_DIRECTION = new HistoricalSeriesInfo(AVG_WIND_DIRECTION_SERIES, HistoricalRecord::getAvgWindDirection, UserPreferences.WIND_SPEED_COLOR_PREF);
-    private static final HistoricalSeriesInfo WIND_GUST_SPEED = new HistoricalSeriesInfo(WIND_GUST_SPEED_SERIES, HistoricalRecord::getWindGustSpeed, UserPreferences.WIND_SPEED_COLOR_PREF);
-    private static final HistoricalSeriesInfo WIND_GUST_DIRECTION = new HistoricalSeriesInfo(WIND_GUST_DIRECTION_SERIES, HistoricalRecord::getWindGustDirection, UserPreferences.WIND_SPEED_COLOR_PREF);
+    private static final HistoricalSeriesInfo AVG_OUTDOOR_TEMPERATURE = new HistoricalSeriesInfo(AVG_OUTDOOR_TEMPERATURE_SERIES, HistoricalRecord::getAvgOutdoorTemperature, ColorPreferences.OUTDOOR_TEMP);
+    private static final HistoricalSeriesInfo HIGH_OUTDOOR_TEMPERATURE = new HistoricalSeriesInfo(HIGH_OUTDOOR_TEMPERATURE_SERIES, HistoricalRecord::getHighOutdoorTemperature, ColorPreferences.HIGH_OUTDOOR_TEMP);
+    private static final HistoricalSeriesInfo LOW_OUTDOOR_TEMPERATURE = new HistoricalSeriesInfo(LOW_OUTDOOR_TEMPERATURE_SERIES, HistoricalRecord::getLowOutdoorTemperature, ColorPreferences.LOW_OUTDOOR_TEMP);
+    private static final HistoricalSeriesInfo INDOOR_TEMPERATURE = new HistoricalSeriesInfo(INDOOR_TEMPERATURE_SERIES, HistoricalRecord::getIndoorTemperature, ColorPreferences.INDOOR_TEMP);
+    private static final HistoricalSeriesInfo INDOOR_HUMIDITY = new HistoricalSeriesInfo(INDOOR_HUMIDITY_SERIES, HistoricalRecord::getIndoorHumidity, ColorPreferences.INDOOR_HUMIDITY);
+    private static final HistoricalSeriesInfo OUTDOOR_HUMIDITY = new HistoricalSeriesInfo(OUTDOOR_HUMIDITY_SERIES, HistoricalRecord::getOutdoorHumidity, ColorPreferences.OUTDOOR_HUMIDITY);
+    private static final HistoricalSeriesInfo DEW_POINT = new HistoricalSeriesInfo(DEW_POINT_SERIES, HistoricalRecord::getDewPoint, ColorPreferences.DEW_POINT);
+    private static final HistoricalSeriesInfo HEAT_INDEX = new HistoricalSeriesInfo(HEAT_INDEX_SERIES, HistoricalRecord::getHeatIndex, ColorPreferences.HEAT_INDEX);
+    private static final HistoricalSeriesInfo WIND_CHILL = new HistoricalSeriesInfo(WIND_CHILL_SERIES, HistoricalRecord::getWindChill, ColorPreferences.WIND_CHILL);
+    private static final HistoricalSeriesInfo BAROMETER = new HistoricalSeriesInfo(BAROMETER_SERIES, HistoricalRecord::getBaroPressure, ColorPreferences.BARO_PRESSURE);
+    private static final HistoricalSeriesInfo AVG_SOLAR_RADIATION = new HistoricalSeriesInfo(AVG_SOLAR_RADIATION_SERIES, HistoricalRecord::getAvgSolarRadiation, ColorPreferences.RAIN);
+    private static final HistoricalSeriesInfo HIGH_SOLAR_RADIATION = new HistoricalSeriesInfo(HIGH_SOLAR_RADIATION_SERIES, HistoricalRecord::getHighSolarRadiation, ColorPreferences.RAIN);
+    //private static final HistoricalSeriesInfo AVG_UV_INDEX = new HistoricalSeriesInfo(AVG_UV_INDEX_SERIES, HistoricalRecord::getAvgUvIndex, ColorPreferences.RAIN);
+    private static final HistoricalSeriesInfo HIGH_WIND_SPEED = new HistoricalSeriesInfo(HIGH_WIND_SPEED_SERIES, HistoricalRecord::getHighWindSpeed, ColorPreferences.WIND_SPEED);
+    private static final HistoricalSeriesInfo HIGH_WIND_DIRECTION = new HistoricalSeriesInfo(HIGH_WIND_DIRECTION_SERIES, HistoricalRecord::getHighWindDirection, ColorPreferences.WIND_SPEED);
+    private static final HistoricalSeriesInfo AVG_WIND_SPEED = new HistoricalSeriesInfo(AVG_WIND_SPEED_SERIES, HistoricalRecord::getAvgWindSpeed, ColorPreferences.WIND_SPEED);
+    private static final HistoricalSeriesInfo AVG_WIND_DIRECTION = new HistoricalSeriesInfo(AVG_WIND_DIRECTION_SERIES, HistoricalRecord::getAvgWindDirection, ColorPreferences.WIND_SPEED);
+    private static final HistoricalSeriesInfo WIND_GUST_SPEED = new HistoricalSeriesInfo(WIND_GUST_SPEED_SERIES, HistoricalRecord::getWindGustSpeed, ColorPreferences.WIND_SPEED);
+    private static final HistoricalSeriesInfo WIND_GUST_DIRECTION = new HistoricalSeriesInfo(WIND_GUST_DIRECTION_SERIES, HistoricalRecord::getWindGustDirection, ColorPreferences.WIND_SPEED);
     private static final Map<String,HistoricalSeriesInfo> seriesInfo = new HashMap<>();
     private final String seriesName;
     private final int sensorId;
@@ -107,7 +109,7 @@ public class HistoricalSeriesInfo {
 
     public static void setColorsFromPreferences() {
         seriesInfo.values().stream().forEach((info) -> {
-            info.paint = UserPreferences.getInstance().getColorPref(info.colorPreferenceName);
+            info.paint = ColorPreferences.getInstance().getColorPref(info.colorPreferenceName);
         });
     }
 
@@ -118,19 +120,19 @@ public class HistoricalSeriesInfo {
                 case THERMOMETER:
                 case SOIL_TEMPERATURE:
                 case LEAF_TEMPERATURE:
-                    info = new HistoricalSeriesInfo(sensor.getName(), sensor.getSensorId(), HistoricalRecord::getTemperatureForSensor, UserPreferences.OUTDOOR_TEMP_COLOR_PREF);
+                    info = new HistoricalSeriesInfo(sensor.getName(), sensor.getSensorId(), HistoricalRecord::getTemperatureForSensor, ColorPreferences.OUTDOOR_TEMP);
                     break;
 
                 case HYGROMETER:
-                    info = new HistoricalSeriesInfo(sensor.getName(), sensor.getSensorId(), HistoricalRecord::getHumidityForSensor, UserPreferences.OUTDOOR_TEMP_COLOR_PREF);
+                    info = new HistoricalSeriesInfo(sensor.getName(), sensor.getSensorId(), HistoricalRecord::getHumidityForSensor, ColorPreferences.OUTDOOR_TEMP);
                     break;
 
                 case LEAF_WETNESS:
-                    info = new HistoricalSeriesInfo(sensor.getName(), sensor.getSensorId(), HistoricalRecord::getLeafWetnessForSensor, UserPreferences.OUTDOOR_TEMP_COLOR_PREF);
+                    info = new HistoricalSeriesInfo(sensor.getName(), sensor.getSensorId(), HistoricalRecord::getLeafWetnessForSensor, ColorPreferences.OUTDOOR_TEMP);
                     break;
 
                 case SOIL_MOISTURE:
-                    info = new HistoricalSeriesInfo(sensor.getName(), sensor.getSensorId(), HistoricalRecord::getSoilMoistureForSensor, UserPreferences.OUTDOOR_TEMP_COLOR_PREF);
+                    info = new HistoricalSeriesInfo(sensor.getName(), sensor.getSensorId(), HistoricalRecord::getSoilMoistureForSensor, ColorPreferences.OUTDOOR_TEMP);
                     break;
             }
 
@@ -147,7 +149,7 @@ public class HistoricalSeriesInfo {
         this.accessor = accessor;
         sensorAccessor = null;
         colorPreferenceName = colorPreference;
-        paint = UserPreferences.getInstance().getColorPref(colorPreference);
+        paint = ColorPreferences.getInstance().getColorPref(colorPreference);
         sensorId = 0;
     }
 
@@ -158,7 +160,7 @@ public class HistoricalSeriesInfo {
         this.accessor = null;
         this.sensorAccessor = accessor;
         colorPreferenceName = colorPreference;
-        paint = UserPreferences.getInstance().getColorPref(colorPreference);
+        paint = ColorPreferences.getInstance().getColorPref(colorPreference);
         this.sensorId = sensorId;
     }
 
@@ -173,7 +175,7 @@ public class HistoricalSeriesInfo {
             return sensorAccessor.apply(record, sensorId);
     }
 
-    public Color getPaint() {
-        return paint;
+    public java.awt.Color getPaint() {
+        return StageUtilities.toAwtColor(paint);
     }
 }

@@ -16,8 +16,6 @@
  */
 package com.bdb.weather.display.summary;
 
-import java.awt.BorderLayout;
-import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -26,28 +24,24 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.util.Callback;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartMouseEvent;
-import org.jfree.chart.ChartMouseListener;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.DateTickMarkPosition;
-import org.jfree.chart.axis.DateTickUnit;
-import org.jfree.chart.axis.DateTickUnitType;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.XYItemEntity;
+import org.jfree.chart.fx.ChartViewer;
+import org.jfree.chart.fx.interaction.ChartMouseEventFX;
+import org.jfree.chart.fx.interaction.ChartMouseListenerFX;
 import org.jfree.chart.labels.HighLowItemLabelGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.HighLowRenderer;
@@ -63,12 +57,16 @@ import org.jfree.ui.RectangleEdge;
 import com.bdb.util.measurement.Measurement;
 
 import com.bdb.weather.common.SummaryRecord;
+import com.bdb.weather.display.ChartDataPane;
 import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.ViewLauncher;
 
-public abstract class HighLowPanel<T extends Measurement> implements ChartMouseListener {
+public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane implements ChartMouseListenerFX {
+    private static final String HIGH_COL_HEADING = "High";
+    private static final String LOW_COL_HEADING = "Low";
+    private static final String AVG_COL_HEADING = "Avg";
 
-    public static class SeriesInfo<T extends Measurement> {
+    public static class SeriesInfo<T extends Measurement> implements Callback<TableColumn.CellDataFeatures<SummaryRecord,String>,ObservableValue<String>> {
         private final String seriesName;
         private final Function<SummaryRecord,T>  maxMethod;
         private final Function<SummaryRecord,T>  minMethod;
@@ -96,30 +94,50 @@ public abstract class HighLowPanel<T extends Measurement> implements ChartMouseL
         public T getAvgValue(SummaryRecord record) {
             return avgMethod.apply(record);
         }
+
+	@Override
+	public ObservableValue<String> call(TableColumn.CellDataFeatures<SummaryRecord,String> cdf) {
+	    SummaryRecord r = cdf.getValue();
+            Measurement m = null;
+            switch ((String)cdf.getTableColumn().getUserData()) {
+                case HIGH_COL_HEADING:
+                    m = getMaxValue(r);
+                    break;
+                case LOW_COL_HEADING:
+                    m = getMinValue(r);
+                    break;
+                case AVG_COL_HEADING:
+                    m = getAvgValue(r);
+                    break;
+            }
+
+	    String value = DisplayConstants.UNKNOWN_VALUE_STRING;
+	    if (m != null)
+		value = m.toString();
+
+            return new ReadOnlyStringWrapper(value);
+	}
     }
-    private final JTabbedPane          component = new JTabbedPane();
-    private final OHLCSeriesCollection seriesCollection = new OHLCSeriesCollection();
-    private final XYPlot               plot;
-    private final JFreeChart           chart;
-    private final HighLowRenderer      renderer;
-    private final DateAxis             dateAxis;
-    private final SeriesInfo<T>[]      seriesInfo;
-    private final OHLCSeries[]         series;
-    private final JTable               dataTable = new JTable();
-    private final DefaultTableModel    tableModel = new DefaultTableModel();
-    private final SummaryInterval      interval;
-    private final ViewLauncher         launcher;
-    private final SummarySupporter     supporter;
-    private final static Logger        logger = Logger.getLogger(HighLowPanel.class.getName());
+
+    private final OHLCSeriesCollection     seriesCollection = new OHLCSeriesCollection();
+    private final XYPlot                   plot;
+    private final JFreeChart               chart;
+    private final HighLowRenderer          renderer;
+    private final DateAxis                 dateAxis;
+    private final SeriesInfo<T>[]          seriesInfo;
+    private final OHLCSeries[]             series;
+    private final TableView<SummaryRecord> dataTable = new TableView<>();
+    private final SummaryInterval          interval;
+    private final ViewLauncher             launcher;
+    private final SummarySupporter         supporter;
+    private final static Logger            logger = Logger.getLogger(HighLowPanel.class.getName());
     
     @SuppressWarnings("LeakingThisInConstructor")
     public HighLowPanel(String title, SummaryInterval interval, ViewLauncher launcher, SummarySupporter supporter, ValueAxis rangeAxis, String domainAxisLabel, SeriesInfo<T>[] seriesList, NumberFormat format) {
-        super();
+        this.setPrefSize(500, 300);
         this.interval = interval;
         this.launcher = launcher;
         this.supporter = supporter;
-        JPanel graphPanel = new JPanel(new BorderLayout());
-        component.addTab(DisplayConstants.GRAPH_TAB_NAME, graphPanel);
         
         chart = ChartFactory.createHighLowChart(title, domainAxisLabel, "", seriesCollection, true);
         chart.getLegend().setPosition(RectangleEdge.RIGHT);
@@ -138,9 +156,9 @@ public abstract class HighLowPanel<T extends Measurement> implements ChartMouseL
         //dateAxis.setTickUnit(new DateTickUnit(DateTickUnitType.MONTH, 2));
         
  
-        ChartPanel panel = new ChartPanel(chart);
-        panel.addChartMouseListener(this);
-        graphPanel.add(panel, BorderLayout.CENTER);
+        ChartViewer chartViewer = new ChartViewer(chart);
+        chartViewer.addChartMouseListener(this);
+        chartViewer.setPrefSize(500, 300);
         
         series = new OHLCSeries[seriesList.length];
         
@@ -151,59 +169,33 @@ public abstract class HighLowPanel<T extends Measurement> implements ChartMouseL
         
         seriesInfo = Arrays.copyOf(seriesList, seriesList.length);
         
-        dataTable.setModel(tableModel);
-       
-        DefaultTableColumnModel colModel = new DefaultTableColumnModel();      
-        dataTable.setColumnModel(colModel);
-        dataTable.setAutoCreateColumnsFromModel(false);
-        
-        int columnCount = 0;
-        addColumn(colModel, "Date", columnCount++);
-        
-        String headingPrefix[] = {"High", "Low", "Avg"};
-        
-        for (SeriesInfo<T> seriesList1 : seriesList)
-            for (String prefix : headingPrefix)
-                addColumn(colModel, prefix + " - " + seriesList1.getSeriesName(), columnCount++);
+        TableColumn<SummaryRecord,String> column = new TableColumn<>("Date");
+        column.setCellValueFactory((rec)->new ReadOnlyStringWrapper(DisplayConstants.formatDate(rec.getValue().getDate())));
 
-        tableModel.setColumnCount(columnCount);
+        dataTable.getColumns().add(column);
+
+        String headingPrefix[] = {HIGH_COL_HEADING, LOW_COL_HEADING, AVG_COL_HEADING};
         
-        //
-        // Insert the JTable component into a scroll pane so that we have scroll bars
-        //
-        JScrollPane sp = new JScrollPane(dataTable);
+        for (SeriesInfo<T> seriesColumn : seriesList) {
+            for (String heading : headingPrefix) {
+                column = new TableColumn<>(heading + " - " + seriesColumn.getSeriesName());
+                column.setCellValueFactory(seriesColumn);
+                column.setUserData(heading);
+                dataTable.getColumns().add(column);
+            }
+        }
 
-        JPanel p = new JPanel(new BorderLayout());
-
-        p.add(sp, BorderLayout.CENTER);
-
-        component.addTab(DisplayConstants.DATA_TAB_NAME, p);
+        this.setTabContents(chartViewer, dataTable);
 
         HighLowItemLabelGenerator ttg = new HiLoItemLabelGenerator(interval.getLegacyFormat(), format);
         plot.getRenderer().setBaseToolTipGenerator(ttg);
     }
     
-    public JComponent getComponent() {
-        return component;
-    }
-    
-    private void addColumn(TableColumnModel model, String heading, int index) {
-        TableColumn col = new TableColumn();
-        col.setHeaderValue(heading);
-        col.setModelIndex(index);
-        model.addColumn(col);
-    }
-
     protected XYPlot getPlot() {
         return plot;
     }
 
     public void loadData(List<SummaryRecord> records) {   
-        tableModel.setRowCount(records.size());
-        
-        for (int i = 0; i < records.size(); i++)
-            tableModel.setValueAt(interval.getFormat().format(records.get(i).getDate()), i, 0);
-
         for (int i = 0; i < seriesInfo.length; i++) {
             series[i].clear();
             loadData(series[i], seriesInfo[i], records, i);
@@ -211,7 +203,8 @@ public abstract class HighLowPanel<T extends Measurement> implements ChartMouseL
     }
     
     private void loadData(OHLCSeries series, SeriesInfo<T> info, List<SummaryRecord> records, int seriesIndex) {
-        int row = 0;
+	ObservableList<SummaryRecord> dataModel = FXCollections.observableList(records);
+	dataTable.setItems(dataModel);
         for (SummaryRecord record : records) {
             T avg = info.getAvgValue(record);
             T min = info.getMinValue(record);
@@ -219,21 +212,24 @@ public abstract class HighLowPanel<T extends Measurement> implements ChartMouseL
 
             LocalDate date = record.getDate();
             // TODO: Figure out how to create a time period based on the specified interval
-            RegularTimePeriod period;
-            if (interval == SummaryInterval.DAY_INTERVAL)
-                period = new Hour(seriesIndex * 4, date.getDayOfMonth(), date.getMonth().getValue(), date.getYear());
-            else if (interval == SummaryInterval.MONTH_INTERVAL)
-                period = new Day(seriesIndex * 4 + 1,  date.getMonth().getValue(), date.getYear());
-            else if (interval == SummaryInterval.YEAR_INTERVAL)
-                period = new Year(date.getYear());
-            else
-                period = null;
+            RegularTimePeriod period = null;
+            switch (interval) {
+                case DAY_INTERVAL:
+                    period = new Hour(seriesIndex * 4, date.getDayOfMonth(), date.getMonth().getValue(), date.getYear());
+                    break;
+                case MONTH_INTERVAL:
+                    period = new Day(seriesIndex * 4 + 1,  date.getMonth().getValue(), date.getYear());
+                    break;
+                case YEAR_INTERVAL:
+                    period = new Year(date.getYear());
+                    break;
+                default:
+                    period = null;
+                    break;
+            }
 
             if (avg != null && min != null && max != null) {
                 series.add(period, avg.get(), max.get(), min.get(), min.get());
-                tableModel.setValueAt(max, row, seriesIndex * 3 + 1);
-                tableModel.setValueAt(min, row, seriesIndex * 3 + 2);
-                tableModel.setValueAt(avg, row++, seriesIndex * 3 + 3);
             }
         }
     }
@@ -242,7 +238,7 @@ public abstract class HighLowPanel<T extends Measurement> implements ChartMouseL
      * @see org.jfree.chart.ChartMouseListener#chartMouseClicked(org.jfree.chart.ChartMouseEvent)
      */
     @Override
-    public void chartMouseClicked(ChartMouseEvent event) {
+    public void chartMouseClicked(ChartMouseEventFX event) {
         ChartEntity entity = event.getEntity();
         //
         // Was a point on the plot selected?
@@ -263,7 +259,7 @@ public abstract class HighLowPanel<T extends Measurement> implements ChartMouseL
      * @see org.jfree.chart.ChartMouseListener#chartMouseMoved(org.jfree.chart.ChartMouseEvent)
      */
     @Override
-    public void chartMouseMoved(ChartMouseEvent event) {
+    public void chartMouseMoved(ChartMouseEventFX event) {
         // Ignore mouse movement
     }
 

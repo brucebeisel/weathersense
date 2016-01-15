@@ -16,64 +16,42 @@
  */
 package com.bdb.weather.display;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.SwingConstants;
-import javax.swing.border.LineBorder;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.TilePane;
 
 import com.bdb.weather.common.BeaufortScale;
 
-public class BeaufortScaleBar {
-    private static final long serialVersionUID = -9165453619473180539L;
+public class BeaufortScaleBar extends TilePane {
     
     //private JProgressBar bar = new JProgressBar(0, BeaufortScale.MAX_FORCE);
-    private final JSlider bar = new JSlider(0, 12);
-    private final JPanel outerPanel = new JPanel(new GridLayout(2,0));
+    private final Slider bar = new Slider(0, 12, 5);
 
     public BeaufortScaleBar() {
+        super(2, 0);
  
-        //BoundedRangeModel model = bar.getModel();
-        //model.setValue(2);
-        //bar.setStringPainted(true);
-        //bar.setString("5");
-        //bar.setExtent(0);
-        bar.setPaintTicks(true);
-        bar.setPaintLabels(true);
-        bar.setMajorTickSpacing(1);
+        bar.setShowTickMarks(true);
+        bar.setShowTickLabels(true);
+        bar.setMajorTickUnit(1);
         bar.setSnapToTicks(true);
-        bar.setValue(5);
-        //bar.setEnabled(false);
-//        BasicSliderUI ui = new javax.swing.plaf.synth.SynthSliderUI() {
-//            public void paintThumb(Graphics g) {
-//                super.paintThumb(g);
-//                return;
-//            }
-//        };
-//        bar.setUI(ui);
         
-        outerPanel.add(bar);
+        this.getChildren().add(bar);
         
-        JPanel scalePanel = new JPanel(new BorderLayout());
-        scalePanel.add(new JLabel("0"), BorderLayout.WEST);
-        scalePanel.add(new JLabel("12"), BorderLayout.EAST);
-        JPanel innerPanel = new JPanel(new GridLayout(1,0));
+        BorderPane scalePanel = new BorderPane();
+        scalePanel.setLeft(new Label("0"));
+        scalePanel.setRight(new Label("12"));
+        TilePane innerPanel = new TilePane();
+        innerPanel.setPrefRows(1);
         for (int i = 1; i < BeaufortScale.MAX_FORCE; i++) {
-            JLabel label = new JLabel("" + i);
-            label.setBorder(LineBorder.createBlackLineBorder());
-            label.setHorizontalAlignment(SwingConstants.CENTER);
-            innerPanel.add(label);
+            Label label = new Label("" + i);
+            //label.setBorder(LineBorder.createBlackLineBorder());
+            label.setAlignment(Pos.CENTER);
+            innerPanel.getChildren().add(label);
         }
-        scalePanel.add(innerPanel, BorderLayout.CENTER);
+        scalePanel.setCenter(innerPanel);
         
-        outerPanel.add(scalePanel);
-    }
-    
-    public JComponent getComponent() {
-        return outerPanel;
+        this.getChildren().add(scalePanel);
     }
 }

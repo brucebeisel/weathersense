@@ -28,7 +28,6 @@ import com.bdb.weather.common.measurement.Speed;
  *
  */
 public final class WindSpeedRangeAxis extends NumberAxis {
-    private static final long serialVersionUID = -8023810246249463147L;
     private static final String AXIS_LABEL = "Wind Speed";
 
     /**

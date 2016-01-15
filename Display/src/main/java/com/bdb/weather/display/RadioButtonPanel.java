@@ -16,18 +16,18 @@
  */
 package com.bdb.weather.display;
 
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.FlowPane;
 
-public final class RadioButtonPanel extends JPanel {
-    private static final long serialVersionUID = 8497892000154190832L;
-    private final List<JRadioButton> buttons = new ArrayList<>();
-    private final ButtonGroup        group = new ButtonGroup();
+public final class RadioButtonPanel extends FlowPane {
+    private final List<RadioButton> buttons = new ArrayList<>();
+    private final ToggleGroup       group = new ToggleGroup();
     
     public RadioButtonPanel() {
     }
@@ -38,16 +38,16 @@ public final class RadioButtonPanel extends JPanel {
     }
     
     public void addRadioButton(String text) {
-        JRadioButton button = new JRadioButton(text);
+        RadioButton button = new RadioButton(text);
         buttons.add(button);
-        this.add(button);
-        group.add(button);
+        this.getChildren().add(button);
+        group.getToggles().add(button);
         if (buttons.size() == 1)
             button.setSelected(true);
     }
     
     public String selectedButton() {
-        for (JRadioButton button : buttons) {
+        for (RadioButton button : buttons) {
             if (button.isSelected())
                 return button.getText();
         }
@@ -56,15 +56,13 @@ public final class RadioButtonPanel extends JPanel {
     }
     
     public void setSelection(String text) {
-        for (JRadioButton button : buttons) {
+        for (RadioButton button : buttons) {
             if (button.getText().equals(text))
                 button.setSelected(true);
         }
     }
     
-    public void addActionListener(ActionListener listener) {
-        for (JRadioButton button : buttons) {
-            button.addActionListener(listener);
-        }
+    public void addEventHandler(EventHandler<ActionEvent> listener) {
+        buttons.forEach((button) -> button.setOnAction(listener));
     }
 }

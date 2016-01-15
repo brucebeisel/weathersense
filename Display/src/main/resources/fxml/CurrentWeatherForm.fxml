@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root type="javafx.scene.layout.GridPane" xmlns:fx="http://javafx.com/fxml">
+    <fx:define>
+        <Double fx:id="FORM_SPACING" fx:value="5"/>
+    </fx:define>
+    <TitledPane text="Temperatures" collapsible="false"  GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.rowSpan="2" GridPane.valignment="TOP" >
+        <GridPane fx:id="temperaturePane" hgap="5" vgap="$FORM_SPACING">
+            <Label text="Outdoor:" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.halignment="RIGHT" styleClass="value-label" />
+            <TextField fx:id="outdoorTemperature" prefColumnCount="5" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <Label text="Dew Point:" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="dewPoint" prefColumnCount="5" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <Label text="Heat Index:" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="heatIndex" prefColumnCount="5" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <Label text="Wind Chill:" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="windChill" prefColumnCount="5" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+            <Label text="THSW:" GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="thsw" prefColumnCount="5" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+            <Label text="Indoor:" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="indoorTemperature" prefColumnCount="5" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+	</GridPane>
+    </TitledPane>
+    <TitledPane text="Humidities" collapsible="false"  GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.rowSpan="1">
+        <GridPane fx:id="humidityPane" hgap="5" vgap="$FORM_SPACING">
+            <Label text="Outdoor:" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="outdoorHumidity" prefColumnCount="5" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <Label text="Indoor:" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="indoorHumidity" prefColumnCount="5" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+	</GridPane>
+    </TitledPane>
+    <TitledPane text="Sun" collapsible="false"  GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.rowSpan="1">
+        <GridPane hgap="5" vgap="$FORM_SPACING">
+            <Label text="UV Index:" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="uvIndex" prefColumnCount="5" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <Label text="Solar Radiation:" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="solarRadiation" prefColumnCount="5" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <Label text="Day ET:" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="dayET" prefColumnCount="5" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <Label text="Month ET:" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="monthET" prefColumnCount="5" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+            <Label text="Year ET:" GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="yearET" prefColumnCount="5" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+	</GridPane>
+    </TitledPane>
+    <TitledPane text="Wind" collapsible="false"  GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.rowSpan="1">
+        <GridPane hgap="5" vgap="$FORM_SPACING">
+            <Label text="Speed:" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="windSpeed" prefColumnCount="5" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <Label text="Direction:" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="windDirection" prefColumnCount="5" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <Label text="Gust:" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="windGust" prefColumnCount="5" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <Label text="Gust Dir:" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="windGustDirection" prefColumnCount="5" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+            <Label text="Dir 2:" GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="windDirection2" prefColumnCount="5" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+            <Label text="Dir 3:" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="windDirection3" prefColumnCount="5" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+            <Label text="Dir 4:" GridPane.rowIndex="6" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="windDirection4" prefColumnCount="5" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+            <Label text="Dir 5:" GridPane.rowIndex="7" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="windDirection5" prefColumnCount="5" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+            <Label text="2 Minute Avg:" GridPane.rowIndex="8" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="windAvg2Minute" prefColumnCount="5" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+            <Label text="10 Minute Avg:" GridPane.rowIndex="9" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="windAvg10Minute" prefColumnCount="5" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+	</GridPane>
+    </TitledPane>
+    <TitledPane text="Rain" collapsible="false"  GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.rowSpan="1">
+        <GridPane hgap="5" vgap="$FORM_SPACING">
+            <Label text="Rain Rate:" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="rainRate" prefColumnCount="5" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <Label text="15 Minute Rain:" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="rain15Minute" prefColumnCount="5" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <Label text="Hour Rain:" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="rainHour" prefColumnCount="5" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <Label text="24 Hour Rain:" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="rain24Hour" prefColumnCount="5" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+            <Label text="Today Rain:" GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="rainToday" prefColumnCount="5" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+            <Label text="Month Rain:" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="rainMonth" prefColumnCount="5" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+            <Label text="Weather Year Rain:" GridPane.rowIndex="6" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="rainWeatherYear" prefColumnCount="5" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+            <Label text="Calendar Year Rain:" GridPane.rowIndex="7" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="rainCalendarYear" prefColumnCount="5" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+            <Label text="Storm Start:" GridPane.rowIndex="8" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="stormStart" prefColumnCount="5" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+            <Label text="Storm Rain:" GridPane.rowIndex="9" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="stormRain" prefColumnCount="5" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+	</GridPane>
+    </TitledPane>
+    <TitledPane text="Conditions" collapsible="false"  GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="3">
+        <GridPane hgap="5" vgap="$FORM_SPACING" >
+            <Label text="Barometer:" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="barometer" prefColumnCount="5" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+            <Label text="BarometerTrend:" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="barometerTrend" prefColumnCount="5" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            <Label text="Forecast:" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="forecast" prefColumnCount="20" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+            <Label text="Forecast Rule:" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.halignment="RIGHT" />
+            <TextField fx:id="forecastRule" prefColumnCount="50" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="3" />
+	</GridPane>
+    </TitledPane>
+</fx:root>

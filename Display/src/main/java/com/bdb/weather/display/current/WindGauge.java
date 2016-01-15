@@ -22,12 +22,17 @@ import java.awt.GradientPaint;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import javax.swing.JComponent;
-import javax.swing.Timer;
-import javax.swing.border.BevelBorder;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.util.Duration;
 
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.plot.dial.DialBackground;
 import org.jfree.chart.plot.dial.DialCap;
 import org.jfree.chart.plot.dial.DialPlot;
@@ -50,7 +55,7 @@ import com.bdb.weather.display.DisplayConstants;
  * @author Bruce
  * 
  */
-public class WindGauge {
+public class WindGauge extends BorderPane {
     private static final int WIND_SPEED_DATASET_INDEX = 0;
     private static final int WIND_GUST_DATASET_INDEX = 1;
     private static final int MAX_WIND_SPEED_DATASET_INDEX = 2;
@@ -75,20 +80,22 @@ public class WindGauge {
     private final DefaultValueDataset maxGustDataset = new DefaultValueDataset(0.0);
     private final DialTextAnnotation speedAnnotation = new DialTextAnnotation("");
     private final DialTextAnnotation avgAnnotation = new DialTextAnnotation("");
-    private final ChartPanel chartPanel;
+    private final ChartViewer chartViewer;
     private double lastHeading;
     private double currentHeading;
     private double headingInterval;
     private double lastSpeed;
     private double currentSpeed;
     private double speedInterval;
-    private int timerCount;
-    private Timer timer;
+    private final Label title = new Label();
+    private final Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), (actionEvent) -> nextFrame()));
+    private final StringProperty titleProperty = new SimpleStringProperty();
 
     /**
      * Constructor.
      */
     public WindGauge() {
+	this.setPrefSize(250.0, 250.0);
         lastHeading = 0.0;
         lastSpeed = 0.0;
         plot = new DialPlot();
@@ -190,25 +197,41 @@ public class WindGauge {
         plot.addLayer(range);
 
         JFreeChart chart = new JFreeChart(plot);
-        chart.setTitle("Wind");
         chart.setBackgroundPaint(Color.GRAY);
 
-        chartPanel = new ChartPanel(chart);
-        chartPanel.setMinimumDrawHeight(300);
-        chartPanel.setMinimumDrawWidth(300);
-        chartPanel.setMaximumDrawHeight(300);
-        chartPanel.setMaximumDrawWidth(300);
-        chartPanel.setBackground(Color.GRAY);
-        chartPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
+        chartViewer = new ChartViewer(chart);
+        chartViewer.setMinHeight(250);
+        chartViewer.setMinWidth(250);
+        chartViewer.setMaxHeight(250);
+        chartViewer.setMaxWidth(250);
+        //chartViewer.setBackground(Color.GRAY);
+        //chartViewer.setBorder(new BevelBorder(BevelBorder.RAISED));
+
+	this.setCenter(chartViewer);
+	this.setTop(title);
+	BorderPane.setAlignment(title, Pos.CENTER);
+	title.textProperty().bind(titleProperty);
+	setTitle("Wind");
+
+	timeline.setCycleCount(9);
+        timeline.setOnFinished((event) -> {
+            datasets[0].setValue(currentHeading);
+            speedDataset.setValue(currentSpeed);
+            lastHeading = currentHeading;
+            lastSpeed = currentSpeed;
+        });
     }
 
-    /**
-     * Get the swing component that contains the gauge
-     * 
-     * @return The swing container
-     */
-    public JComponent getComponent() {
-        return chartPanel;
+    public final void setTitle(final String title) {
+	titleProperty.setValue(title);
+    }
+
+    public String getTitle() {
+	return titleProperty.getValue();
+    }
+
+    public StringProperty titleProperty() {
+	return titleProperty;
     }
 
     /**
@@ -222,9 +245,6 @@ public class WindGauge {
      * @param windDirs The extra wind directions
      */
     public void loadData(Wind wind, Wind gust, Speed maxWindSpeed, Speed maxWindGust, Speed avgWindSpeed, List<Heading> windDirs) {
-        if (timer != null && timer.isRunning())
-            timer.stop();
-
         if (wind == null)
             return;
 
@@ -283,22 +303,14 @@ public class WindGauge {
         else
             avgAnnotation.setLabel("");
 
-        timerCount = 0;
-        timer = new Timer(100, evt -> {
-            lastHeading += headingInterval;
-            datasets[0].setValue(lastHeading);
-            lastSpeed += speedInterval;
-            speedDataset.setValue(lastSpeed);
-            timerCount++;
-            if (timerCount > 9) {
-                timer.stop();
-                datasets[0].setValue(currentHeading);
-                lastHeading = currentHeading;
-                speedDataset.setValue(currentSpeed);
-                lastSpeed = currentSpeed;
-            }
-        });
-        timer.start();
+	timeline.jumpTo(Duration.ZERO);
+	timeline.play();
+    }
 
+    private void nextFrame() {
+        lastHeading += headingInterval;
+        datasets[0].setValue(lastHeading);
+        lastSpeed += speedInterval;
+        speedDataset.setValue(lastSpeed);
     }
 }

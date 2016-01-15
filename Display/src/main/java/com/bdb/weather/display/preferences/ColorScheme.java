@@ -16,11 +16,12 @@
  */
 package com.bdb.weather.display.preferences;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import javafx.scene.paint.Color;
 
 public final class ColorScheme implements Comparable<ColorScheme> {
     private final String           name;

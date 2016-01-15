@@ -23,7 +23,6 @@ import com.bdb.weather.common.measurement.Humidity;
 import com.bdb.weather.display.ViewLauncher;
 import com.bdb.weather.display.axis.HumidityRangeAxis;
 
-@SuppressWarnings("unchecked")
 public class HighLowHumidityPanel extends HighLowPanel<Humidity> {   
     private static final SeriesInfo<Humidity>[] seriesInfo;
     
