@@ -16,8 +16,6 @@
  */
 package com.bdb.weather.collector;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.PixelGrabber;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -30,7 +28,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
 
 import com.bdb.weather.common.DopplerRadarImage;
 
@@ -117,20 +116,17 @@ public class DopplerRadarManager {
      * @throws SQLException See JDBC documentation
      */
     void checkForNewRadarImage() {
-        logger.log(Level.FINE, "Checking for new Doppler Radar image");
-        if (imageUrl == null)
-            return;
-
-        DopplerRadarImage dri;
-
         try {
+            logger.log(Level.FINE, "Checking for new Doppler Radar image");
+            if (imageUrl == null)
+                return;
+
+            DopplerRadarImage dri;
+
             //
             // Get the image from the Internet
             //
-            BufferedImage image = ImageIO.read(imageUrl);
-
-            if (image == null)
-                return;
+            Image image = new Image(imageUrl.openStream());
 
             //
             // If the image has changed then add the image to the database, else ignore it
@@ -154,6 +150,13 @@ public class DopplerRadarManager {
             logger.log(Level.WARNING, "Caught exception", e);
             logger.log(Level.WARNING, "Failed to read doppler image from internet or write to database. URL = {}", imageUrl);
         }
+        catch (Exception e2) {
+            //
+            // If the callback from a executor lets an exception escape, the executor will
+            // stop, so catch a generic exception.
+            //
+            logger.log(Level.WARNING, "Caught exception", e2);
+        }
     }
     
     /**
@@ -165,7 +168,7 @@ public class DopplerRadarManager {
      * 
      * @return True if this is a new image, else false
      */
-    private boolean checkForImageChange(BufferedImage image) {
+    private boolean checkForImageChange(Image image) {
         //
         // If the list is empty then just add the image to the list
         //
@@ -173,20 +176,14 @@ public class DopplerRadarManager {
             return true;
         
         boolean changed = false;
-        int width = image.getWidth();
-        int height = image.getHeight();
-        int currentImagePixels[] = new int[width * height];
-        PixelGrabber currentGrabber = new PixelGrabber(image, 0, 0, width, height, currentImagePixels, 0, width);
+        double width = image.getWidth();
+        double height = image.getHeight();
+        int currentImagePixels[] = new int[(int)width * (int)height];
+        PixelReader currentGrabber = image.getPixelReader();
         
-        try {
-            currentGrabber.grabPixels();
-        }
-        catch (InterruptedException e) {
-            logger.log(Level.WARNING, "Caught exception", e);
-            return false;
-        }
+        currentGrabber.getPixels(0, 0, (int)width, (int)height, null, currentImagePixels, 0, 0);
         
-        int latestImagePixels[] = new int[width * height];
+        int latestImagePixels[] = new int[(int)width * (int)height];
 
         //
         // Compare each image in the cache against the passed in image. The comparison is done
@@ -202,25 +199,20 @@ public class DopplerRadarManager {
                 continue;
             }
             
-            PixelGrabber latestGrabber = new PixelGrabber(latestImage.getImage(), 0, 0, width, height, latestImagePixels, 0, width);
+            PixelReader latestGrabber = latestImage.getImage().getPixelReader();
 
-            try {
-                latestGrabber.grabPixels();
-                
-                //
-                // Compare the pixels
-                //
-                for (int i = 0; i < latestImagePixels.length; i++) {
-                    if (latestImagePixels[i] != currentImagePixels[i])
-                        changed = true;
-                }
-                
-                if (!changed)
-                    break;
+            latestGrabber.getPixels(0, 0, (int)width, (int)height, null, latestImagePixels, 0, 0);
+            
+            //
+            // Compare the pixels
+            //
+            for (int i = 0; i < latestImagePixels.length; i++) {
+                if (latestImagePixels[i] != currentImagePixels[i])
+                    changed = true;
             }
-            catch (InterruptedException e) {
-                logger.log(Level.WARNING, "Caught exception", e);
-            }
+            
+            if (!changed)
+                break;
         }
         
         return changed;

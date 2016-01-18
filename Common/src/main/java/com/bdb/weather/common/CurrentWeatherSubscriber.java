@@ -25,7 +25,6 @@ import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,12 +41,12 @@ public class CurrentWeatherSubscriber implements Runnable {
         void handleCurrentWeather(CurrentWeather cw);
     }
     public class CurrentWeatherStatistics implements Serializable {
-        private LocalDateTime collectionStartTime;
+        private final LocalDateTime collectionStartTime;
         private LocalDateTime lastValidPacketTime;
         private int validPacketsReceived;
         private int invalidPacketsReceived;
         private int packetsReceivedThisHour;
-        private DateTimeFormatter dtf;
+        private final DateTimeFormatter dtf;
 
         public CurrentWeatherStatistics() {
             collectionStartTime = LocalDateTime.now();
@@ -84,8 +83,8 @@ public class CurrentWeatherSubscriber implements Runnable {
         }
     }
     
-    private static final String DEFAULT_ADDRESS = "224.0.0.120";
-    private static final int DEFAULT_PORT = 11461;
+    public static final String DEFAULT_ADDRESS = "224.0.0.120";
+    public static final int DEFAULT_PORT = 11461;
     private static final int RECEIVE_TIMEOUT_MILLIS = 2000;
     private final MulticastSocket socket;
     private final CurrentWeatherHandler handler;
@@ -144,7 +143,7 @@ public class CurrentWeatherSubscriber implements Runnable {
             try {
                 socket.receive(packet);
                 String s = new String(b, 0, packet.getLength());
-                logger.finer("UDP Packet: '" + s + "'");
+                logger.log(Level.FINER, "UDP Packet: {0}", s);
                 Object msg = unmarshaller.unmarshal(new StringReader(s));
                 if (msg instanceof CurrentWeather) {
                     CurrentWeather cw = (CurrentWeather)msg;

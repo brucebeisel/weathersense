@@ -74,7 +74,7 @@ import com.bdb.weather.common.messages.WsParametersMessage;
  * @author Bruce
  */
 public class CollectorDbWriter implements WeatherDataWriter, Runnable {
-    private static final int MAX_MISSING_DATA_ERRORS_ALLOWED = 3;
+    //private static final int MAX_MISSING_DATA_ERRORS_ALLOWED = 3;
     private static final int CONNECTION_RETRY_INTERVAL_MILLIS = 10000;
     private static final int SUMMARIZER_DELAY = 10000;
     private final DBConnection connection;
@@ -91,10 +91,10 @@ public class CollectorDbWriter implements WeatherDataWriter, Runnable {
     private final StormTable stormTable;
     private final DailySummaryTable dailySummaryTable;
     private LocalDateTime lastSavedHistoricalRecordTime = null;
-    private LocalDateTime lastBadHistoricalTime = null;
-    private int missingDataCount = 0;
+    //private LocalDateTime lastBadHistoricalTime = null;
+    //private int missingDataCount = 0;
     private final Summarizer summarizer;
-    private SocketReaderThread socketReader;
+    //private SocketReaderThread socketReader;
     private final CurrentWeatherPublisher cwPublisher;
     private final List<SummarizeTimerTask> timerTasks = new ArrayList<>();
     private final Timer timer = new Timer();
@@ -143,7 +143,7 @@ public class CollectorDbWriter implements WeatherDataWriter, Runnable {
     public void init(SocketReaderThread socketReader, boolean runMissingDataFinder) throws SQLException {
         Jmx.registerMBean(this);
         Runtime.getRuntime().addShutdownHook(new Thread(this));
-        this.socketReader = socketReader;
+        //this.socketReader = socketReader;
 
         connection.connect();
         connection.getConnection().setAutoCommit(true);
@@ -178,9 +178,10 @@ public class CollectorDbWriter implements WeatherDataWriter, Runnable {
         if (records.isEmpty())
             return;
 
-        logger.info("Received " + records.size() + " records with time range " +
-                    CollectorConstants.dateTimeFormatter().format(records.get(0).getTime()) +
-                    " to " + CollectorConstants.dateTimeFormatter().format(records.get(records.size() - 1).getTime()));
+        logger.log(Level.INFO, "Received {0} records with time range {1} to {2}", new Object[] {
+                               records.size(),
+                               CollectorConstants.dateTimeFormatter().format(records.get(0).getTime()),
+                               CollectorConstants.dateTimeFormatter().format(records.get(records.size() - 1).getTime())});
         
         List<HistoricalRecord> localList = new ArrayList<>(records);
         executor.execute(() -> handleAddHistoricalRecords(localList));
@@ -194,12 +195,13 @@ public class CollectorDbWriter implements WeatherDataWriter, Runnable {
      */
     public void handleAddHistoricalRecords(List<HistoricalRecord> records) {
         boolean missingRecord = false;
-        logger.info("Checking for gaps in " + records.size() + " records with time range " +
-                    CollectorConstants.dateTimeFormatter().format(records.get(0).getTime()) +
-                    " to " + CollectorConstants.dateTimeFormatter().format(records.get(records.size() - 1).getTime()));
+        logger.log(Level.INFO, "Checking for gaps in {0} records with time range {1} to {2}", new Object[] {
+                               records.size(),
+                               CollectorConstants.dateTimeFormatter().format(records.get(0).getTime()),
+                               CollectorConstants.dateTimeFormatter().format(records.get(records.size() - 1).getTime())});
 
         for (HistoricalRecord record : records) {
-            logger.fine(String.format("Checking historical record at time %s", DBTable.dateTimeFormatter().format(record.getTime())));
+            logger.log(Level.FINE, "Checking historical record at time {0}", DBTable.dateTimeFormatter().format(record.getTime()));
 
             //
             // Make sure there are no gaps in the historical record table. If a gap is detected
@@ -274,9 +276,10 @@ public class CollectorDbWriter implements WeatherDataWriter, Runnable {
      */
     private void performAddHistoricalRecords(List<HistoricalRecord> records) {
         if (historyTable.addHistoricalRecords(records)) {
-            logger.info("Added historical " + records.size() + " records with time range " +
-                        CollectorConstants.dateTimeFormatter().format(records.get(0).getTime()) +
-                        " to " + CollectorConstants.dateTimeFormatter().format(records.get(records.size() - 1).getTime()));
+            logger.log(Level.INFO, "Added historical {0} records with time range {1} to {2}", new Object[] {
+                                   records.size(),
+                                   CollectorConstants.dateTimeFormatter().format(records.get(0).getTime()),
+                                   CollectorConstants.dateTimeFormatter().format(records.get(records.size() - 1).getTime())});
 
             for (HistoricalRecord record : records) {
                 //
@@ -298,8 +301,8 @@ public class CollectorDbWriter implements WeatherDataWriter, Runnable {
             }
 
             lastSavedHistoricalRecordTime = records.get(records.size() - 1).getTime();
-            missingDataCount = 0;
-            lastBadHistoricalTime = null;
+            //missingDataCount = 0;
+            //lastBadHistoricalTime = null;
             statistics.currentWeatherRecordCount++;
             statistics.lastCurrentWeatherTime = lastSavedHistoricalRecordTime;
         }
@@ -490,7 +493,7 @@ public class CollectorDbWriter implements WeatherDataWriter, Runnable {
      * @param xml The XML string received from the console driver
      */
     public void handleUpdateCurrentWeather(CurrentWeather weather, String xml) {
-        logger.info("Received current weather at time " + CollectorConstants.dateTimeFormatter().format(weather.getTime()));
+        logger.log(Level.INFO, "Received current weather at time {0}", CollectorConstants.dateTimeFormatter().format(weather.getTime()));
         cwPublisher.sendCurrentWeather(xml);
 
         updateStorm(weather.getStormStart(), weather.getStormRain());

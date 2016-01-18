@@ -24,6 +24,8 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.bdb.weather.common.CurrentWeatherSubscriber;
+
 /**
  * Publishes the current weather on a multicast socket. This means that the database is not needed to
  * communicate the current weather to any running user interfaces.
@@ -31,8 +33,6 @@ import java.util.logging.Logger;
  * @author Bruce
  */
 public class CurrentWeatherPublisher {
-    private static final String DEFAULT_ADDRESS = "224.0.0.120";
-    private static final int DEFAULT_PORT = 11461;
     private MulticastSocket socket;
     private int port;
     private InetAddress group;
@@ -45,7 +45,7 @@ public class CurrentWeatherPublisher {
      * @throws IOException Could not open the port
      */
     public CurrentWeatherPublisher() throws UnknownHostException, IOException {
-        this(DEFAULT_ADDRESS, DEFAULT_PORT);
+        this(CurrentWeatherSubscriber.DEFAULT_ADDRESS, CurrentWeatherSubscriber.DEFAULT_PORT);
     }
     
     /**

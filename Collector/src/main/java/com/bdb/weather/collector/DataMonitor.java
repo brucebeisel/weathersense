@@ -105,20 +105,25 @@ public class DataMonitor {
      * Check if any changes have occurred.
      */
     private void checkForDatabaseChanges() {
-        logger.log(Level.FINE, "Checking for changes to weather station record");
-        connection.connect();
-        WeatherStation ws = wsTable.getWeatherStation();
+        try {
+            logger.log(Level.FINE, "Checking for changes to weather station record");
+            connection.connect();
+            WeatherStation ws = wsTable.getWeatherStation();
 
-        if (ws == null) {
-            logger.log(Level.INFO, "Weather station record does not exist");
+            if (ws == null) {
+                logger.log(Level.INFO, "Weather station record does not exist");
+            }
+            else {
+                checkForDopplerUrlChanges(ws.getDopplerRadarUrl());
+                if (!ws.getWeatherUndergroundStationId().isEmpty())
+                    weatherUnderground.setStationParameters(ws.getWeatherUndergroundStationId(), ws.getWeatherUndergroundPassword());
+                checkForCollectorCommands();
+            }
+            connection.close();
         }
-        else {
-            checkForDopplerUrlChanges(ws.getDopplerRadarUrl());
-            if (!ws.getWeatherUndergroundStationId().isEmpty())
-                weatherUnderground.setStationParameters(ws.getWeatherUndergroundStationId(), ws.getWeatherUndergroundPassword());
-            checkForCollectorCommands();
+        catch (Exception e) {
+            logger.log(Level.WARNING, "Caught exception", e);
         }
-        connection.close();
     }
 
     /**
@@ -142,7 +147,7 @@ public class DataMonitor {
     private void checkForCollectorCommands() {
         List<CollectorCommand> commands = collectorCommandsTable.retrieveNewCommands();
 
-        logger.fine("There are " + commands.size() + " collector commands to process");
+        logger.log(Level.FINE, "There are {0} collector commands to process", commands.size());
 
         //
         // Process each command
@@ -165,7 +170,7 @@ public class DataMonitor {
                     break;
 
                 default:
-                    logger.info("Deleting invalid collector command in database: " + tokens[0]);
+                    logger.log(Level.INFO, "Deleting invalid collector command in database: {0}", tokens[0]);
                     collectorCommandsTable.deleteRow(command);
                     break;
             }

@@ -39,6 +39,13 @@ import com.bdb.weather.common.db.DatabaseConstants;
  *
  */
 public final class WeatherSenseCollector {
+    private static final String DEFAULT_DATABASE_HOST = "localhost";
+    private static final String LOGGING_PROPERTY_FILE = "collector_logging.properties";
+    private static final String COLLECTOR_PROPERTY_FILE = "com/bdb/weathersense/weathersense_collector.properties";
+    private static final String DATABASE_HOST_PROPERTY = "weathersense.database-host";
+    private static final String DATABASE_PORT_PROPERTY = "weathersense.database-port";
+    private static final String HELP_ARG = "-h";
+
     /**
      * The main program for the WeatherSense Collector
      *
@@ -47,35 +54,51 @@ public final class WeatherSenseCollector {
     public static void main(String args[]) {
         Logger logger = Logger.getLogger(WeatherSenseCollector.class.getName());
 
-        String dbHost = "localhost";
-
-        if (args.length > 0)
-            dbHost = args[0];
-
-        int dbPort = Integer.parseInt(DatabaseConstants.DATABASE_PORT);
-
-        if (args.length > 1)
-            dbPort = Integer.parseInt(args[1]);
-
         try {
-            InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("collector_logging.properties");
+            //
+            // Load the resources first. The configuration precedence is:
+            //    1. Property file
+            //    2. Command line argument 
+            //    3. Defaults
+            //
+            InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(LOGGING_PROPERTY_FILE);
 
             if (is != null)
                 LogManager.getLogManager().readConfiguration(is);
 
             Properties properties = new Properties();
-            is = ClassLoader.getSystemClassLoader().getResourceAsStream("com/bdb/weathersense/weathersense_collector.properties");
+            is = ClassLoader.getSystemClassLoader().getResourceAsStream(COLLECTOR_PROPERTY_FILE);
 
             if (is != null)
                 properties.load(is);
 
+
+            String dbHost = DEFAULT_DATABASE_HOST;
+            String dbName = DatabaseConstants.DATABASE_NAME;
+            int dbPort = Integer.parseInt(DatabaseConstants.DATABASE_PORT);
+
+            if (args.length > 0 && args[0].equals(HELP_ARG)) {
+                System.out.println("Usage: java WeatherSenseCollector [database host [database port]]");
+                System.exit(0);
+            }
+               
+            if (args.length > 0)
+                dbHost = args[0];
+
+            if (args.length > 1)
+                dbPort = Integer.parseInt(args[1]);
+
+            dbHost = properties.getProperty(DATABASE_HOST_PROPERTY, dbHost);
+
+            String prop = properties.getProperty(DATABASE_PORT_PROPERTY);
+            if (prop != null)
+                dbPort = Integer.parseInt(prop);
+
+            String dbUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, dbHost, dbPort, dbName);
+
             String findMissingDataProp = properties.getProperty("weathersense.find_missing_data", "false");
 
             boolean findMissingData = findMissingDataProp.equals("true");
-
-            String dbName = properties.getProperty("weathersense.dbname", DatabaseConstants.DATABASE_NAME);
-
-            String dbUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, dbHost, dbPort, dbName);
 
             CollectorDbWriter writer = new CollectorDbWriter(dbUrl, DatabaseConstants.DATABASE_USER, DatabaseConstants.DATABASE_PASSWORD);
             WeatherUnderground weatherUnderground = new WeatherUnderground();
@@ -85,7 +108,7 @@ public final class WeatherSenseCollector {
             DataMonitor dataMonitor = new DataMonitor(dbUrl, DatabaseConstants.DATABASE_USER, DatabaseConstants.DATABASE_PASSWORD, doppler, weatherUnderground, writer);
 
             //
-            // Start the socket reader for the name/value interface
+            // Start the socket reader for the XML interface
             //
             writer.init(socketReaderThread, findMissingData);
             dataMonitor.init();

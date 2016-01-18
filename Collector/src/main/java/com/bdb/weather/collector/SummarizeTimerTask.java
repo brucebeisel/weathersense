@@ -36,7 +36,6 @@ public class SummarizeTimerTask extends TimerTask {
     /**
      * Constructor.
      *
-     * @param name Name of the timer task (for debug purposes)
      * @param day The day that will be summarized
      * @param executor The receiver of the command that gets sent when the timer expires
      * @param command The timer expiration command that will trigger a daily summary calculation
@@ -94,6 +93,4 @@ public class SummarizeTimerTask extends TimerTask {
         hash = 13 * hash + Objects.hashCode(this.day);
         return hash;
     }
-
-    
 }

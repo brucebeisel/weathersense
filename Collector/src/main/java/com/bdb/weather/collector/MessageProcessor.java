@@ -50,6 +50,7 @@ import com.bdb.weather.collector.socket.SocketDataProcessor;
 public class MessageProcessor implements SocketDataProcessor {
     private final char MESSAGE_TERMINATOR = '\n';
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(CollectorConstants.NEWEST_RECORD_DATE_FORMAT);
+    private final DateTimeFormatter dateTimeFormatter = CollectorConstants.dateTimeFormatter();
     private final Unmarshaller unmarshaller;
     private final WeatherDataWriter writer;
     private final DBConnection connection;
@@ -96,7 +97,7 @@ public class MessageProcessor implements SocketDataProcessor {
         List<HistoricalRecord> historicalRecords = new ArrayList<>();
         String response = null;
         for (String s : messages) {
-            logger.log(Level.FINER, "Processing command: '" + s + "'");
+            logger.log(Level.FINER, "Processing command: {0}", s);
             
             if (s.startsWith("<?xml"))
                 processXmlMessage(s, historicalRecords);
@@ -106,10 +107,10 @@ public class MessageProcessor implements SocketDataProcessor {
         }
 
         if (!historicalRecords.isEmpty()) {
-            logger.fine("++++++++++++++ Received Historical " + historicalRecords.size() + " Record(s) (" +
-                        CollectorConstants.dateTimeFormatter().format(historicalRecords.get(0).getTime()) +
-                        " to " + CollectorConstants.dateTimeFormatter().format(historicalRecords.get(historicalRecords.size() - 1).getTime()) +
-                        " +++++++++++++");
+            logger.log(Level.FINE, "++++++++++++++ Received {0} Historical Record(s) {1} to {2} +++++++++++++",
+                    new Object[]{historicalRecords.size(),
+                                 dateTimeFormatter.format(historicalRecords.get(0).getTime()),
+                                 dateTimeFormatter.format(historicalRecords.get(historicalRecords.size() - 1).getTime())});
             try {
                 writer.addHistoricalRecords(historicalRecords);
             }
@@ -142,7 +143,7 @@ public class MessageProcessor implements SocketDataProcessor {
         WeatherSenseMessage message = WeatherSenseMessage.parseMessage(s);
 
         if (message == null) {
-            logger.warning("Received invalid message: '" + s + "'");
+            logger.log(Level.WARNING, "Received invalid message: {0}", s);
             return null;
         }
 
@@ -176,7 +177,7 @@ public class MessageProcessor implements SocketDataProcessor {
     private void processXmlMessage(String s, List<HistoricalRecord> historicalRecords) {
         try {
             logger.fine("Received XML message");
-            logger.finer("XML message '" + s.substring(0, 10));
+            logger.log(Level.FINER, "XML message {0}", s.substring(0, 10));
             Object msg = unmarshaller.unmarshal(new StringReader(s));
             if (msg instanceof SensorMessage) {
                 logger.fine("&&&&&&&&&&&&& Sensor Message &&&&&&&&&&&&&&&&&");
@@ -205,7 +206,7 @@ public class MessageProcessor implements SocketDataProcessor {
                 writer.updateSensorStationStatus(((SensorStationStatusMessage)msg).getSensorStationStatusList());
             }
             else
-                logger.severe("Received unknown message type " + msg.getClass().getName());
+                logger.log(Level.SEVERE, "Received unknown message type {0}", msg.getClass().getName());
         }
         catch (JAXBException ex) {
             logger.log(Level.SEVERE, "Failed to unmarshal XML message", ex);
