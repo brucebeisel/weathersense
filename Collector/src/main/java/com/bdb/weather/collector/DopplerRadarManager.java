@@ -40,7 +40,7 @@ import com.bdb.weather.common.DopplerRadarImage;
  * @author Bruce
  * @since 1.0
  */
-public class DopplerRadarManager {
+final class DopplerRadarManager {
     private static final int IMAGE_CACHE_SIZE = 5;
     private static final int DOPPLER_RADAR_UPDATE_INTERVAL = 300000;
     

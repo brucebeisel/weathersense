@@ -73,7 +73,7 @@ import com.bdb.weather.common.messages.WsParametersMessage;
  * 
  * @author Bruce
  */
-public class CollectorDbWriter implements WeatherDataWriter, Runnable {
+final class CollectorDbWriter implements WeatherDataWriter, Runnable {
     //private static final int MAX_MISSING_DATA_ERRORS_ALLOWED = 3;
     private static final int CONNECTION_RETRY_INTERVAL_MILLIS = 10000;
     private static final int SUMMARIZER_DELAY = 10000;

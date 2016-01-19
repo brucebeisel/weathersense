@@ -18,6 +18,7 @@ package com.bdb.weather.display.current;
 
 import java.awt.Color;
 import java.awt.GradientPaint;
+import java.awt.Paint;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -42,6 +43,8 @@ import org.jfree.data.general.DefaultValueDataset;
 
 import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.common.WeatherTrend;
+import com.bdb.weather.display.StageUtilities;
+import com.bdb.weather.display.preferences.ColorPreferences;
 
 /**
  * A gauge for displaying barometric pressure
@@ -59,6 +62,7 @@ public class Barometer extends BorderPane {
     private final StringProperty      titleProperty = new SimpleStringProperty();
     private final DoubleProperty      minValue = new SimpleDoubleProperty();
     private final DoubleProperty      maxValue = new SimpleDoubleProperty();
+    private final ColorPreferences    colorPrefs = ColorPreferences.getInstance();
 
     public Barometer() {
 	this("", new Pressure(900.0, Pressure.Unit.MILLIBAR), new Pressure(1100.0, Pressure.Unit.MILLIBAR));
@@ -81,7 +85,10 @@ public class Barometer extends BorderPane {
     }
 
     private ChartViewer createChartElements(Pressure min, Pressure max) {
-        plot.addLayer(new DialBackground(new GradientPaint(0.0f, 0.0f, Color.LIGHT_GRAY, 100.0f, 0.0f, Color.blue)));
+        Color backgroundDialColor = StageUtilities.toAwtColor(colorPrefs.getColorPref(ColorPreferences.GUAGE_DIAL_COLOR));
+        Paint backgroundPaint = new GradientPaint(0.0f, 0.0f, Color.LIGHT_GRAY, 100.0f, 0.0f, backgroundDialColor);
+        DialBackground background = new DialBackground(backgroundPaint);
+        plot.addLayer(background);
         double dialTickIncrements = .2;
         switch (Pressure.getDefaultUnit()) {
             case IN_HG:
@@ -97,20 +104,25 @@ public class Barometer extends BorderPane {
         scale.setTickRadius(.9);
         scale.setTickLabelFormatter(Pressure.getDefaultFormatter());
         scale.setTickLabelOffset(.25);
-        scale.setTickLabelPaint(Color.BLACK);
+        scale.setTickLabelPaint(StageUtilities.toAwtColor(colorPrefs.getColorPref(ColorPreferences.GUAGE_SCALE_TEXT)));
+        scale.setMajorTickPaint(StageUtilities.toAwtColor(colorPrefs.getColorPref(ColorPreferences.GUAGE_SCALE_TICK)));
+        scale.setMinorTickPaint(StageUtilities.toAwtColor(colorPrefs.getColorPref(ColorPreferences.GUAGE_SCALE_TICK)));
         plot.addScale(0, scale);
         plot.setDialFrame(new StandardDialFrame());
         DialValueIndicator valueInd = new DialValueIndicator(0);
+        //
+        // Set background and outline paint to be completely transparent so they do not show at all
+        //
         valueInd.setBackgroundPaint(new Color(255, 255, 255, 0));
         valueInd.setOutlinePaint(new Color(255, 255, 255, 0));
-        valueInd.setPaint(Color.cyan);
+        valueInd.setPaint(StageUtilities.toAwtColor(colorPrefs.getColorPref(ColorPreferences.GUAGE_VALUE)));
         valueInd.setNumberFormat(Pressure.getDefaultUnit().getFormatterWithUnit());
         plot.addLayer(valueInd);
         
         double angle = valueInd.getAngle();
         double radius = valueInd.getRadius();
         
-        trendAnnotation.setPaint(Color.cyan);
+        trendAnnotation.setPaint(StageUtilities.toAwtColor(colorPrefs.getColorPref(ColorPreferences.GUAGE_VALUE)));
         trendAnnotation.setAngle(angle);
         trendAnnotation.setRadius(radius + .1);
         plot.addLayer(trendAnnotation);
@@ -122,14 +134,14 @@ public class Barometer extends BorderPane {
         cap.setRadius(cap.getRadius() * 1.5);
         plot.setCap(cap);
 
-        range = new StandardDialRange(0.0, 360.0, Color.BLACK);
+        range = new StandardDialRange(0.0, 360.0, StageUtilities.toAwtColor(colorPrefs.getColorPref(ColorPreferences.GUAGE_VALUE_RANGE)));
         range.setInnerRadius(.40);
         range.setOuterRadius(.45);
         range.setScaleIndex(0);
         plot.addLayer(range);
 
         JFreeChart chart = new JFreeChart(plot);
-        chart.setBackgroundPaint(Color.GRAY);
+        chart.setBackgroundPaint(StageUtilities.toAwtColor(colorPrefs.getColorPref(ColorPreferences.GUAGE_BACKGROUND)));
 
         ChartViewer chartViewer = new ChartViewer(chart);
         chartViewer.setMinHeight(250);

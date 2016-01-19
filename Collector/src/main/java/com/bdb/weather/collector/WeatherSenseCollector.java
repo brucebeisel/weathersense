@@ -38,7 +38,7 @@ import com.bdb.weather.common.db.DatabaseConstants;
  * @since 1.0
  *
  */
-public final class WeatherSenseCollector {
+final class WeatherSenseCollector {
     private static final String DEFAULT_DATABASE_HOST = "localhost";
     private static final String LOGGING_PROPERTY_FILE = "collector_logging.properties";
     private static final String COLLECTOR_PROPERTY_FILE = "com/bdb/weathersense/weathersense_collector.properties";

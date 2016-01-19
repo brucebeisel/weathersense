@@ -43,7 +43,7 @@ import com.bdb.weather.common.db.WeatherStationTable;
  *
  * @author Bruce
  */
-public class DataMonitor {
+final class DataMonitor {
     private static final int INTERVAL_MILLIS = 60000;
     private final DBConnection connection;
     private final ScheduledExecutorService executor;

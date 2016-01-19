@@ -125,6 +125,7 @@ public class WindGauge extends BorderPane {
         scale.setTickRadius(.4);
         scale.setTickLabelFormatter(new DecimalFormat("##"));
         scale.setTickLabelOffset(.15);
+        scale.setTickLabelPaint(Color.BLACK);
         plot.addScale(WIND_SPEED_SCALE, scale);
 
         DialPointer.Pointer pointer;

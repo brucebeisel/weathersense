@@ -32,7 +32,7 @@ import com.bdb.weather.common.messages.WsParametersMessage;
  * 
  * @author Bruce
  */
-public interface WeatherDataWriter {
+interface WeatherDataWriter {
     /**
      * Add a historical record to the database.
      * 

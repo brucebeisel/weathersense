@@ -16,6 +16,8 @@
  */
 package com.bdb.weather.display.preferences;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -30,23 +32,37 @@ import com.bdb.weather.display.WeatherSense;
  * @author bruce
  */
 public class ColorPreferences {
+    private class ColorPreference {
+        public String name;
+        public Color defaultValue;
+        public ColorPreference(String preferenceName, Color defaultValue) {
+            this.name = preferenceName;
+            this.defaultValue = defaultValue;
+        }
+    }
     private static final String COLOR_NODE = "Color";
-    private static final String MISC_COLOR_NODE = "Misc Color";
-    public static final String GUAGE_BACKGROUND= "Guage Background Color";
+    public static final String GUAGE_BACKGROUND = "Guage Background Color";
+    public static final Color  GUAGE_BACKGROUND_DEFAULT = Color.GRAY;
+    public static final String GUAGE_DIAL_COLOR = "Guage Dial Color";
+    public static final Color  GUAGE_DIAL_COLOR_DEFAULT = Color.BLUE;
     public static final String GUAGE_VALUE = "Guage Value Color";
+    public static final Color  GUAGE_VALUE_DEFAULT = Color.CYAN;
     public static final String GUAGE_SCALE_TEXT = "Guage Scale Text Color";
+    public static final Color  GUAGE_SCALE_TEXT_DEFAULT = Color.BLACK;
+    public static final String GUAGE_SCALE_TICK = "Guage Scale Tick Color";
+    public static final Color  GUAGE_SCALE_TICK_DEFAULT = Color.BLACK;
+    public static final String GUAGE_VALUE_RANGE = "Guage Value Range Color";
+    public static final Color  GUAGE_VALUE_RANGE_DEFAULT = Color.BLACK;
     public static final String WIND_GUAGE_DIRECTION_POINTER = "Wind Guage Direction Pointer Color";
     public static final String WIND_GUAGE_SPEED_POINTER = "Wind Guage Speed Pointer Color";
     public static final String WIND_GUAGE_GUST_POINTER = "Wind Guage Gust Pointer Color";
-    public static final String WIND_GUAGE_DOMINANT_DIR_POINTER= "Wind Guage Dominant Direction Pointer Color";
+    public static final String WIND_GUAGE_DOMINANT_DIR_POINTER = "Wind Guage Dominant Direction Pointer Color";
     public static final String THERMOMETER_MERCURY = "Thermometer Mercury Color";
     public static final String THERMOMETER_HIGH_TEMPERAURE = "Thermometer High Temperature Color";
     public static final String THERMOMETER_LOW_TEMPERAURE = "Thermometer Low Temperature Color";
     public static final String RAIN_GUAGE_WATER = "Rain Guage Water Color";
     public static final String RAIN_GUAGE_BEAKER = "Rain Guage Beaker Color";
 
-    private static final String PLOT_NODE = "Plot Color";
-    
     public static final String OUTDOOR_TEMP = "Outdoor Temp Color";
     public static final String HIGH_OUTDOOR_TEMP = "High Outdoor Temp Color";
     public static final String LOW_OUTDOOR_TEMP = "Low Outdoor Temp Color";
@@ -94,8 +110,18 @@ public class ColorPreferences {
     public static final String MAX_WIND_GUST = "Max Wind Gust Color";
     
     private final Preferences rootPref = Preferences.userNodeForPackage(WeatherSense.class);
-    private final Preferences plotColorNode = rootPref.node(PLOT_NODE);
+    private final Preferences colorNode = rootPref.node(COLOR_NODE);
     private final static ColorPreferences instance;
+
+    private final Map<String,Color> preferenceMap = new HashMap<>();
+    private final ColorPreference preferences[] = {
+        new ColorPreference(GUAGE_BACKGROUND, GUAGE_BACKGROUND_DEFAULT),
+        new ColorPreference(GUAGE_DIAL_COLOR, GUAGE_DIAL_COLOR_DEFAULT),
+        new ColorPreference(GUAGE_VALUE, GUAGE_VALUE_DEFAULT),
+        new ColorPreference(GUAGE_SCALE_TEXT, GUAGE_SCALE_TEXT_DEFAULT),
+        new ColorPreference(GUAGE_SCALE_TICK, GUAGE_SCALE_TICK_DEFAULT),
+        new ColorPreference(GUAGE_VALUE_RANGE, GUAGE_VALUE_RANGE_DEFAULT),
+    };
 
     private static final Logger logger = Logger.getLogger(ColorPreferences.class.getName());
 
@@ -104,6 +130,9 @@ public class ColorPreferences {
     }
 
     private ColorPreferences() {
+        for (ColorPreference pref : preferences) {
+            preferenceMap.put(pref.name, pref.defaultValue);
+        }
     }
 
     public static ColorPreferences getInstance() {
@@ -112,7 +141,7 @@ public class ColorPreferences {
 
     public void sync() {
         try {
-            plotColorNode.sync();
+            colorNode.sync();
         }
         catch (BackingStoreException e) {
             ErrorDisplayer.getInstance().displayError("User preference storage error. Please contact support");
@@ -124,12 +153,12 @@ public class ColorPreferences {
     }
 
     public void putColorPref(String preferenceName, Color color) {
-        plotColorNode.put(preferenceName, colorToString(color));
+        colorNode.put(preferenceName, colorToString(color));
     }
     
     private Color getColorPref(String preferenceName, Color defaultColor) {
         try {
-            String value = plotColorNode.get(preferenceName, null);
+            String value = colorNode.get(preferenceName, null);
             if (value != null)
                 return Color.web(value);
             else
@@ -141,11 +170,15 @@ public class ColorPreferences {
     }
 
     public Color getColorPref(String preferenceName) {
-        return getColorPref(preferenceName, Color.RED);
+        Color defaultColor = preferenceMap.get(preferenceName);
+        if (defaultColor == null)
+            defaultColor = Color.RED;
+
+        return getColorPref(preferenceName, defaultColor);
     }
     
     public void putHighOutdoorTempColorPref(Color color) {
-        plotColorNode.put(HIGH_OUTDOOR_TEMP, colorToString(color));
+        colorNode.put(HIGH_OUTDOOR_TEMP, colorToString(color));
     }
 
     public Color getHighOutdoorTempColorPref() {
@@ -153,7 +186,7 @@ public class ColorPreferences {
     }
 
     public void putLowOutdoorTempColorPref(Color color) {
-        plotColorNode.put(LOW_OUTDOOR_TEMP, colorToString(color));
+        colorNode.put(LOW_OUTDOOR_TEMP, colorToString(color));
     }
 
     public Color getLowOutdoorTempColorPref() {
@@ -161,7 +194,7 @@ public class ColorPreferences {
     }
 
     public void putIndoorTempColorPref(Color color) {
-        plotColorNode.put(INDOOR_TEMP, colorToString(color));
+        colorNode.put(INDOOR_TEMP, colorToString(color));
     }
 
     public Color getIndoorTempColorPref() {
@@ -169,7 +202,7 @@ public class ColorPreferences {
     }
 
     public void putOutdoorTempColorPref(Color color) {
-        plotColorNode.put(OUTDOOR_TEMP, colorToString(color));
+        colorNode.put(OUTDOOR_TEMP, colorToString(color));
     }
 
     public Color getOutdoorTempColorPref() {

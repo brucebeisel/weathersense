@@ -32,7 +32,7 @@ import com.bdb.weather.common.CurrentWeatherSubscriber;
  * 
  * @author Bruce
  */
-public class CurrentWeatherPublisher {
+final class CurrentWeatherPublisher {
     private MulticastSocket socket;
     private int port;
     private InetAddress group;

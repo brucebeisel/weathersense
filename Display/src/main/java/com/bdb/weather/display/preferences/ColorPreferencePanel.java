@@ -28,6 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -107,8 +108,27 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
         new ColorPreferenceEntry(ColorPreferences.RAIN, 11, 1)
     };
 
+    private ColorPreferenceEntry entries2[] = {
+        new ColorPreferenceEntry(ColorPreferences.GUAGE_BACKGROUND, 0, 0),
+        new ColorPreferenceEntry(ColorPreferences.GUAGE_DIAL_COLOR, 1, 0),
+        new ColorPreferenceEntry(ColorPreferences.GUAGE_VALUE, 2, 0),
+        new ColorPreferenceEntry(ColorPreferences.GUAGE_SCALE_TEXT, 3, 0),
+        new ColorPreferenceEntry(ColorPreferences.GUAGE_SCALE_TICK, 4, 0),
+        new ColorPreferenceEntry(ColorPreferences.GUAGE_VALUE_RANGE, 5, 0),
+    };
+
     public ColorPreferencePanel() {
+        VBox vbox = new VBox();
         GridPane colorPanel = new GridPane();
+
+        for (ColorPreferenceEntry entry : entries2) {
+            ColorPicker colorPicker = new ColorPicker(preferences.getColorPref(entry.preferenceName));
+            entry.button = colorPicker;
+            colorPanel.add(new Label(entry.preferenceName), 0, entry.row);
+            colorPanel.add(colorPicker, 1, entry.row);
+        }
+
+        GridPane plotColorPanel = new GridPane();
 
         int gridx = 0;
         int gridy = 0;
@@ -118,7 +138,7 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
         //
         for (int i = 0; i < COLOR_COL_HEADERS.length; i++) {
             gridx = i;
-            colorPanel.add(new Label(COLOR_COL_HEADERS[i]), gridx, gridy);
+            plotColorPanel.add(new Label(COLOR_COL_HEADERS[i]), gridx, gridy);
         }
 
         //
@@ -128,7 +148,7 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
         for (String header : COLOR_ROW_HEADERS) {
             gridx = 0;
             gridy++;
-            colorPanel.add(new Label(header), gridx, gridy);
+            plotColorPanel.add(new Label(header), gridx, gridy);
 
             gridx = 5;
             
@@ -136,7 +156,7 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
             ComboBox<String> scheme = new ComboBox<>();
             scheme.getItems().addAll(names);
             scheme.setUserData(gridy);
-            colorPanel.add(scheme, gridx, gridy);
+            plotColorPanel.add(scheme, gridx, gridy);
             scheme.setOnAction((ActionEvent e) -> {
                 ComboBox<String> cb = (ComboBox<String>)e.getSource();
                 applyColorScheme((Integer)cb.getUserData(), cb.getSelectionModel().getSelectedItem());
@@ -144,7 +164,7 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
             gridx = 6;
             CheckBox showSeries = new CheckBox();
             showSeries.setUserData(gridy);
-            colorPanel.add(showSeries, gridx, gridy);
+            plotColorPanel.add(showSeries, gridx, gridy);
             showSeries.setOnAction((ActionEvent e) -> {
                 CheckBox cb = (CheckBox)e.getSource();
                 int row = (Integer)cb.getUserData();
@@ -166,7 +186,7 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
             button.setValue(preferences.getColorPref(entry.preferenceName));
             //button.setPrefSize(10, 10);
             button.setUserData(entry);
-            colorPanel.add(button, gridx, gridy);
+            plotColorPanel.add(button, gridx, gridy);
             entry.button = button;
         }
 
@@ -176,13 +196,13 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
 
         ChartViewer graphExamplePanel = new ChartViewer(chart);
 
-        setTop(colorPanel);
+        vbox.getChildren().addAll(colorPanel, plotColorPanel);
+        setTop(vbox);
         setCenter(graphExamplePanel);
         FlowPane buttonPanel = new FlowPane();
         Button button = new Button("OK");
         button.setOnAction((ActionEvent e) -> {
-            if (dirty)
-                saveData();
+            saveData();
         });
         buttonPanel.getChildren().add(button);
         setBottom(buttonPanel);
@@ -269,6 +289,9 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
     @Override
     public boolean saveData() {
         for (ColorPreferenceEntry entry : entries) {
+            preferences.putColorPref(entry.preferenceName, entry.button.getValue());
+        }
+        for (ColorPreferenceEntry entry : entries2) {
             preferences.putColorPref(entry.preferenceName, entry.button.getValue());
         }
         preferences.sync();

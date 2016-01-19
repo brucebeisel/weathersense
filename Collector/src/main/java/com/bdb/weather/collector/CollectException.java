@@ -22,7 +22,7 @@ package com.bdb.weather.collector;
  * @author Bruce
  *
  */
-public class CollectException extends Exception {
+class CollectException extends Exception {
 
     private static final long serialVersionUID = 9002402240543109078L;
 

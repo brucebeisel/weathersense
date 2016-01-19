@@ -47,7 +47,7 @@ import com.bdb.weather.collector.socket.SocketDataProcessor;
  * 
  * @author Bruce
  */
-public class MessageProcessor implements SocketDataProcessor {
+final class MessageProcessor implements SocketDataProcessor {
     private final char MESSAGE_TERMINATOR = '\n';
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(CollectorConstants.NEWEST_RECORD_DATE_FORMAT);
     private final DateTimeFormatter dateTimeFormatter = CollectorConstants.dateTimeFormatter();

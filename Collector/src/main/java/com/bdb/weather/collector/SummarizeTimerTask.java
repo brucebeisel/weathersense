@@ -28,7 +28,7 @@ import java.util.concurrent.Executor;
  * @author Bruce
  * @since 1.0
  */
-public class SummarizeTimerTask extends TimerTask {
+class SummarizeTimerTask extends TimerTask {
     private final LocalDate day;
     private final Executor executor;
     private final Runnable command;

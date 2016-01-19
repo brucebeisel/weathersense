@@ -48,7 +48,7 @@ import com.bdb.weather.common.measurement.Temperature;
  * @author Bruce
  * @since 1.0
  */
-public class Summarizer
+final class Summarizer
 {
     private final HistoryTable           historyTable;
     private final DailySummaryTable      dailySummaryTable;
