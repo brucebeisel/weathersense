@@ -91,7 +91,7 @@ public class SocketReader {
                         endToken = SocketDataProcessor.NO_TOKEN_FOUND;
                     }
                     else {
-                        logger.finer("Token ends at index " + endToken + ". Character = '" + stringBuilder.charAt(endToken) + "'");
+                        logger.log(Level.FINER, "Token ends at index {0}. Character = ''{1}''", new Object[]{endToken, stringBuilder.charAt(endToken)});
                         //
                         // StringBuilder functions operate exclusively so we must say the end is the character after the token
                         // separator
@@ -107,7 +107,7 @@ public class SocketReader {
             if (!messages.isEmpty()) {
                 String response = processor.consumeMessages(messages);
                 if (response != null) {
-                    logger.finer(String.format("Responding with '%s'", response));
+                    logger.log(Level.FINER, "Responding with '{0}'", response);
                     ByteBuffer responseBuffer = charset.encode(response);
                     socket.getOutputStream().write(responseBuffer.array());
                 }

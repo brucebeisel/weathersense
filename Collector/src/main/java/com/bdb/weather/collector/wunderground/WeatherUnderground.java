@@ -84,8 +84,8 @@ import com.bdb.weather.common.measurement.Temperature;
  */
 public class WeatherUnderground implements WeatherUploader {
     private static final String WEATHER_SENSE_PRODUCT_STRING = WeatherSenseConstants.PRODUCT_NAME + "-" + WeatherSenseConstants.PRODUCT_VERSION;
-    private static final String WEATHER_UNDERGROUND_BASE_URL = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php?";
-    private static final String WEATHER_UNDERGROUND_RAPIDFIRE_BASE_URL = "http://rtupdate.wunderground.com/weatherstation/updateweatherstation.php?";
+    private static final String WUNDERGROUND_BASE_URL = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php?";
+    private static final String WUNDERGROUND_RAPIDFIRE_BASE_URL = "http://rtupdate.wunderground.com/weatherstation/updateweatherstation.php?";
     private static final String WUNDERGROUND_RAPIDFIRE_FREQ = "&realtime=1&rtfreq=5";
     private static final String URL_SPACE = "%20";
     private static final String URL_COLON = "%3A";
@@ -160,7 +160,7 @@ public class WeatherUnderground implements WeatherUploader {
      * @param password The password for the user account that has the specified ID
      */
     public WeatherUnderground(String wuStationId, String password) {
-        this(WEATHER_UNDERGROUND_RAPIDFIRE_BASE_URL, wuStationId, password);
+        this(WUNDERGROUND_RAPIDFIRE_BASE_URL, wuStationId, password);
     }
 
     /**
@@ -385,6 +385,13 @@ public class WeatherUnderground implements WeatherUploader {
         catch (IOException e) {
             statistics.numFailures++;
             logger.log(Level.WARNING, "IOException while reading response from Weather Underground", e);
+        }
+        catch (Exception e2) {
+            //
+            // Catch generic exeception so the executor does not terminate if an unexpected exception occurs
+            //
+            statistics.numFailures++;
+            logger.log(Level.WARNING, "Unexpected exception caught while reading response from Weather Underground", e2);
         }
     }
 }

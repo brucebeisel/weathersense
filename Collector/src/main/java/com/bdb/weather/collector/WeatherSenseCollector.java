@@ -32,7 +32,7 @@ import javax.xml.bind.JAXBException;
 import com.bdb.weather.common.db.DatabaseConstants;
 
 /**
- * Both the main() and the Remote Object
+ * The class containing main for the WeatherSense collector.
  *
  * @author Bruce
  * @since 1.0

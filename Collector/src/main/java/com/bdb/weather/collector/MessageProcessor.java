@@ -122,6 +122,12 @@ final class MessageProcessor implements SocketDataProcessor {
         return response;
     }
 
+    /**
+     * Find a message termination token and return its position if found.
+     * 
+     * @param s The string in which to look for a token
+     * @return The location of the token
+     */
     @Override
     public int findToken(String s) {
         int index = s.indexOf(MESSAGE_TERMINATOR);

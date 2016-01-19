@@ -56,6 +56,9 @@ class SummarizeTimerTask extends TimerTask {
         return day.equals(other);
     }
     
+    /**
+     * Entry point for the TimerTask Runnable.
+     */
     @Override
     public void run() {
         executor.execute(command);
@@ -84,6 +87,7 @@ class SummarizeTimerTask extends TimerTask {
     }
 
     /**
+     * Calculate the hash code.
      *
      * @return The hash code
      */

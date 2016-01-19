@@ -51,7 +51,7 @@ public class SocketReaderThread extends BBThread {
      */
     public SocketReaderThread(int port, SocketDataProcessor consumer) {
         super("Socket Reader");
-        logger.log(Level.FINE, "Creating socket reader on port " + port);
+        logger.log(Level.FINE, "Creating socket reader on port {0}", port);
         this.port = port;
         this.consumer = consumer;
         socket = null;
@@ -65,7 +65,7 @@ public class SocketReaderThread extends BBThread {
         try {
             serverSocket = new ServerSocket(port);
             serverSocket.setReuseAddress(true);
-            logger.fine("Wating for connection on port " + port);
+            logger.log(Level.FINE, "Wating for connection on port {0}", port);
             socket = serverSocket.accept();
             logger.fine("Socket connection accepted");
             serverSocket.close();

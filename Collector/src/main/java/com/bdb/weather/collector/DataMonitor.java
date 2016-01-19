@@ -87,10 +87,16 @@ final class DataMonitor {
 
     }
 
+    /**
+     * Initialize the executor thread with a default interval.
+     */
     public void init() {
         this.init(INTERVAL_MILLIS);
     }
 
+    /**
+     * Shutdown the executor.
+     */
     public void shutdown() {
         try {
             executor.shutdownNow();

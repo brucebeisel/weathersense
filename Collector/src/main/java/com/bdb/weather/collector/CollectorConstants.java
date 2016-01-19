@@ -20,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 
 /**
+ * Constants used by the WeatherSense collector.
  *
  * @author Bruce
  */

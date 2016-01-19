@@ -19,6 +19,7 @@ package com.bdb.weather.collector.socket;
 import java.util.List;
 
 /**
+ * Interface that defines the operations needed to read from a stream socket.
  *
  * @author Bruce
  */

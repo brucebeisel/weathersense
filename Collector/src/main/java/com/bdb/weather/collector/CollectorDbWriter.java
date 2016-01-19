@@ -477,6 +477,12 @@ final class CollectorDbWriter implements WeatherDataWriter, Runnable {
 
     }
 
+    /**
+     * Figure out when a storm started by looking for the first archive record that has rain.
+     * 
+     * @param startDay The day in which to look for rain
+     * @return The time the first rain occurred or the start of the day if rain cannot be found
+     */
     private LocalDateTime findStormStartTime(LocalDate startDay) {
         LocalDateTime startOfStormDay = startDay.atStartOfDay();
         List<HistoricalRecord> records = historyTable.retrieveRainRecords(startOfStormDay, LocalDateTime.now());
@@ -500,8 +506,7 @@ final class CollectorDbWriter implements WeatherDataWriter, Runnable {
     }
 
     /**
-     * 
-     * Request that the database be closed and reopened
+     * Request that the database be closed and reopened.
      */
     @Override
     public void requestDbConnection() {
@@ -561,6 +566,7 @@ final class CollectorDbWriter implements WeatherDataWriter, Runnable {
             requestDbConnection();
         }
     }
+
     /**
      * Handle the database connection command.
      */
@@ -593,12 +599,12 @@ final class CollectorDbWriter implements WeatherDataWriter, Runnable {
      */
     public void handleSummarizeDay(LocalDate day) {
         try {
-        if (day == null) {
-            dailySummaryTable.deleteAllRows();
-            summarizer.catchup();
-        }
-        else
-            summarizer.updateSummary(day);
+            if (day == null) {
+                dailySummaryTable.deleteAllRows();
+                summarizer.catchup();
+            }
+            else
+                summarizer.updateSummary(day);
         }
         catch (SQLException e) {
             logger.log(Level.SEVERE, "Caught SQL exception while summarizing", e);
