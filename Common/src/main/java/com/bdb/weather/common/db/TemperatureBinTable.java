@@ -95,7 +95,7 @@ public class TemperatureBinTable extends DBTable<TemperatureBin> {
     @Override
     public boolean addRow(TemperatureBin row) {
         boolean success = false;
-        logger.fine("Adding row to TemperatureBin table: " + row);
+        logger.log(Level.FINE, "Adding row to TemperatureBin table: {0}", row);
         
 	String stmtString = "insert into " + TABLE_NAME + " values(?,?,?)";
         try (PreparedStatement stmt = getConnection().getConnection().prepareStatement(stmtString)) {

@@ -26,7 +26,6 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import com.bdb.weather.common.DayHourRain;
-import com.bdb.weather.common.Statistics;
 import com.bdb.weather.display.axis.RainRangeAxis;
 
 /**

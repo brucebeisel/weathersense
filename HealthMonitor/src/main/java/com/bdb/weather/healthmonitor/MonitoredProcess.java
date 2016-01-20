@@ -87,7 +87,7 @@ public class MonitoredProcess implements Runnable {
 
     private void processDied() {
         try {
-            logger.log(Level.INFO, "Process " + name + " died. Restart count = " + restartCount + "  Exit Code: " + process.exitValue());
+            logger.log(Level.INFO, "Process {0} died. Restart count = {1}  Exit Code: {2}", new Object[]{name, restartCount, process.exitValue()});
             running = false;
             monitor.join(1000);
             if (!killing && restartCount < 5)
@@ -175,7 +175,7 @@ public class MonitoredProcess implements Runnable {
                     executor.execute(()->processDied());
                 }
                 else {
-                    logger.fine("Resetting restart count for process " + name);
+                    logger.log(Level.FINE, "Resetting restart count for process {0}", name);
                     restartCount = 0;
                 }
             }

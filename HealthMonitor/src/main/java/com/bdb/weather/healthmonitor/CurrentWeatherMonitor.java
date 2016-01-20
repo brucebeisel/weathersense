@@ -17,16 +17,15 @@
 package com.bdb.weather.healthmonitor;
 
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import com.bdb.piglow4j.PiGlow;
-import com.bdb.piglow4j.PiGlowColor;
 import com.bdb.piglow4j.PiGlowLED;
 import com.bdb.weather.common.CurrentWeather;
 import com.bdb.weather.common.CurrentWeatherSubscriber;
+
 import java.util.ArrayList;
 
 /**

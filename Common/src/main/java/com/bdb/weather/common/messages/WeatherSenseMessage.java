@@ -96,8 +96,8 @@ public class WeatherSenseMessage {
     }
     
     public static int extractIndex(String token) throws ParseException {
-        int leftBracketIndex = token.indexOf("[");
-        int rightBracketIndex = token.indexOf("]");
+        int leftBracketIndex = token.indexOf('[');
+        int rightBracketIndex = token.indexOf(']');
         if (leftBracketIndex == -1 || rightBracketIndex == -1)
             throw new ParseException("Malformed index token in historical record (" + token + ")", -1);
                     

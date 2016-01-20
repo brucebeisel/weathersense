@@ -37,11 +37,11 @@ public class StripChartLayoutManager {
     private static StripChartLayoutManager instance = null;
     private static final Logger logger = Logger.getLogger(StripChartLayoutManager.class.getName());
 
-    public static StripChartLayoutManager getInstance() {
-        if (instance == null) {
-            instance = new StripChartLayoutManager();
-        }
+    static {
+        instance = new StripChartLayoutManager();
+    }
 
+    public static StripChartLayoutManager getInstance() {
         return instance;
     }
 

@@ -57,7 +57,6 @@ import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.DateInterval;
 import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.ViewLauncher;
-import com.bdb.weather.display.WeatherSense;
 
 public final class DailySummariesPanel extends BorderPane implements EventHandler, SummarySupporter
 {

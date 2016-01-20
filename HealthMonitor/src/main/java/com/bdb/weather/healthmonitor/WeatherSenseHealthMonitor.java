@@ -174,13 +174,13 @@ public class WeatherSenseHealthMonitor implements Runnable {
 	    logger.info("Checking health");
 	    boolean healthy = true;
 	    for (HealthMonitor monitor : monitors) {
-		logger.info("Checking health of " + monitor.getMonitorName());
+		logger.log(Level.INFO, "Checking health of {0}", monitor.getMonitorName());
 		healthy = healthy && monitor.isHealthy();
-		logger.info(monitor.getMonitorName() + " is " + (monitor.isHealthy() ? "Healthy" : "Unhealthy"));
+		logger.log(Level.INFO, "{0} is {1}", new Object[]{monitor.getMonitorName(), monitor.isHealthy() ? "Healthy" : "Unhealthy"});
 	    }
 
-	    logger.info("WeatherSense health: " + (healthy ? "Healthy" : "Unhealthy"));
-	    logger.info("" + cwMonitor);
+	    logger.log(Level.INFO, "WeatherSense health: {0}", (healthy ? "Healthy" : "Unhealthy"));
+	    logger.log(Level.INFO, "{0}", cwMonitor);
 	    cwUnhealthyAnimation.setEnabled(!cwMonitor.isHealthy());
 	    //processMonitor.dumpStatus();
 	    /*

@@ -913,7 +913,7 @@ public class DailySummaryTable extends DBTable<SummaryRecord> {
                     break;
                     
                 default:
-                    logger.log(Level.SEVERE, "Invalid SensorType " + sensorType);
+                    logger.log(Level.SEVERE, "Invalid SensorType {0}", sensorType);
                     entry = null;
                     break;
             }

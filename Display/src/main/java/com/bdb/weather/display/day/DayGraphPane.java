@@ -16,7 +16,6 @@
  */
 package com.bdb.weather.display.day;
 
-import java.awt.GridBagConstraints;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -30,7 +29,6 @@ import com.bdb.weather.common.GeographicLocation;
 import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.WeatherAverage;
-import com.bdb.weather.common.WeatherStation;
 import com.bdb.weather.display.windrose.WindRosePane;
 
 /**

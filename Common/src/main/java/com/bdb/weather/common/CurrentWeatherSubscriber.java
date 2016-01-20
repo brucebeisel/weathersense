@@ -76,7 +76,7 @@ public class CurrentWeatherSubscriber implements Runnable {
 	    else
 		sb.append("N/A\n");
 
-            sb.append(String.format("Valid Packets Received: %d, Invalid Packets Received %d\n", validPacketsReceived, invalidPacketsReceived));
+            sb.append(String.format("Valid Packets Received: %d, Invalid Packets Received %d%n", validPacketsReceived, invalidPacketsReceived));
             sb.append(String.format("Packets Received this Hour: %d", packetsReceivedThisHour));
 
             return sb.toString();

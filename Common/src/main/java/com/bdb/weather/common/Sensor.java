@@ -47,7 +47,7 @@ public class Sensor {
     private String name;
     @XmlElement
     private SensorType type;
-    public static final String SENSOR_NAMES[] = {
+    static final String SENSOR_NAMES[] = {
         "",
         "Barometer",
         "Wind",

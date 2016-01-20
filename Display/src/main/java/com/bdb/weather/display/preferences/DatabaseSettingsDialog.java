@@ -36,7 +36,7 @@ public class DatabaseSettingsDialog extends GridPane {
     @SuppressWarnings("LeakingThisInConstructor")
     public DatabaseSettingsDialog() {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/DatabaseSettingsPane.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(DatabaseSettingsDialog.class.getResource("/fxml/DatabaseSettingsPane.fxml"));
             fxmlLoader.setRoot(this);
             fxmlLoader.setController(this);
             fxmlLoader.load();

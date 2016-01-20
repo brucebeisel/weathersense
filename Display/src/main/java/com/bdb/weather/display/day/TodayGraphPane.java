@@ -16,12 +16,9 @@
  */
 package com.bdb.weather.display.day;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.logging.Logger;
-
-import javafx.fxml.FXMLLoader;
 
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.weather.common.DailyRecords;

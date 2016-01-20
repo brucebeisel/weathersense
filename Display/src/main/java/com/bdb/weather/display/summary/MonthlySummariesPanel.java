@@ -48,7 +48,6 @@ import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.display.DateInterval;
 import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.ViewLauncher;
-import com.bdb.weather.display.WeatherSense;
 
 public class MonthlySummariesPanel extends BorderPane implements EventHandler<ActionEvent>, SummarySupporter {
     private final SummariesGraphPanel    graphPanel;
@@ -58,7 +57,6 @@ public class MonthlySummariesPanel extends BorderPane implements EventHandler<Ac
     private final WeatherStation         ws;
     private LocalDate                    startDate;
     private LocalDate                    endDate;
-    private final DateTimeFormatter      dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
     private final DatePicker             startDateTF = new DatePicker();
     private final DatePicker             endDateTF = new DatePicker();
     private final ComboBox<DateInterval> intervalsCB = new ComboBox<>();

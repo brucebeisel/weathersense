@@ -19,8 +19,6 @@ package com.bdb.weather.display;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +44,7 @@ public class DataRangeSelectionPanel extends TilePane implements EventHandler<Ac
     private final DatePicker              endDateTF = new DatePicker();
     private final ComboBox<DateInterval>  intervalsCB = new ComboBox<>();
     private final CheckBox                compareCB = new CheckBox("Compare");
-    private final ComboBox<DateDelta>     offsetCB = new ComboBox<DateDelta>();
+    private final ComboBox<DateDelta>     offsetCB = new ComboBox<>();
     private final DatePicker              compareStartDateTF = new DatePicker();
     private DateRange                     dataRange;
     private final List<LocalDate>         comparisonStartDates = new ArrayList<>();

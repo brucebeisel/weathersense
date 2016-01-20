@@ -176,7 +176,7 @@ public class DailyRecordsTable extends DBTable<DailyRecords> {
     private boolean saveNewRecord(Extreme<? extends Measurement, ?> extreme, String valueColumn, String yearColumn, Unit unit) {
         boolean success;
 	LocalDate c = extreme.getDate();
-	String sql = "update " + TABLE_NAME + " set " + valueColumn + "=?, " + yearColumn + "=?" + " where " +
+	final String sql = "update " + TABLE_NAME + " set " + valueColumn + "=?, " + yearColumn + "=?" + " where " +
 		     MONTH_COLUMN + "=" + c.getMonth().getValue() + " and " + DAY_COLUMN + "=" + c.getDayOfMonth();
 
         try (PreparedStatement stmt = getConnection().getConnection().prepareStatement(sql)) {

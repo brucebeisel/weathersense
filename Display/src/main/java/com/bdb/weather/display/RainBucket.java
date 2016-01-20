@@ -48,9 +48,9 @@ public final class RainBucket extends Canvas {
     private final ObjectProperty<Color>   waterColorProperty = new SimpleObjectProperty<>(Color.LIGHTSKYBLUE);
     private final ObjectProperty<Color>   surfaceColorProperty = new SimpleObjectProperty<>(Color.LIGHTSKYBLUE.darker());
     private static final Stop       WHITE_STOP = new Stop(1, Color.WHITE);
-    private Stop[]                  waterStops  = {new Stop(0, waterColorProperty.getValue()), WHITE_STOP};
+    private final Stop[]            waterStops  = {new Stop(0, waterColorProperty.getValue()), WHITE_STOP};
     private Paint                   waterPaint  = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, waterStops);
-    private Stop[]                  surfaceStops = {new Stop(0, surfaceColorProperty.getValue()), WHITE_STOP};
+    private final Stop[]            surfaceStops = {new Stop(0, surfaceColorProperty.getValue()), WHITE_STOP};
     private Paint                   surfacePaint = new LinearGradient(0, 0, .5, 0, true, CycleMethod.REFLECT, surfaceStops);
 
     private static final double      INSET               = 5;

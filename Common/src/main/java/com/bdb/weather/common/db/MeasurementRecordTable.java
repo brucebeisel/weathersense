@@ -78,12 +78,13 @@ public class MeasurementRecordTable<MEASUREMENT extends Measurement,RECORD exten
                 success = addRow(extreme, unit);
             else {
                 String sql = "update " + getTableName() + " set " + RECORD_VALUE_COLUMN + "=? " + buildClause(extreme);
-                PreparedStatement stmt = getConnection().getConnection().prepareStatement(sql);
-                stmt.setDouble(1, extreme.getValue().get(unit));
-                int affectedRecords = getConnection().executeUpdate(stmt);
-                if (affectedRecords != 1) {
-                    logger.severe("saveExtreme() did not update exactly 1 record. It updated " + affectedRecords + " records");
-                    getConnection().rollback();
+                try (PreparedStatement stmt = getConnection().getConnection().prepareStatement(sql)) {
+                    stmt.setDouble(1, extreme.getValue().get(unit));
+                    int affectedRecords = getConnection().executeUpdate(stmt);
+                    if (affectedRecords != 1) {
+                        logger.log(Level.SEVERE, "saveExtreme() did not update exactly 1 record. It updated {0} records", affectedRecords);
+                        getConnection().rollback();
+                    }
                 }
             }
         }
@@ -159,28 +160,29 @@ public class MeasurementRecordTable<MEASUREMENT extends Measurement,RECORD exten
             Measurement previousValue = row.getPreviousValue();
   
             String sql = "insert into " + getTableName() + " values (?,?,?,?,?)";
-            PreparedStatement stmt = getConnection().getConnection().prepareStatement(sql);
-            stmt.setDate(1, java.sql.Date.valueOf(row.getDate()));
-            stmt.setString(2, row.getType().toString());
-            stmt.setDouble(3, row.getValue().get(unit));
-            
-            if (previousValue != null) {
-                stmt.setDouble(5, row.getPreviousValue().get(unit));
-                stmt.setDate(4, java.sql.Date.valueOf(row.getPreviousDate()));
-            }
-            else {
-                stmt.setNull(4, Types.DATE);
-                stmt.setNull(5, Types.DOUBLE);
-            }
-            
-            int affectedRecords = getConnection().executeUpdate(stmt);
-            
-            if (affectedRecords != 1) {
-                logger.severe("addRow() did not add exactly 1 record. It added " + affectedRecords + " records");
-                getConnection().rollback();
-            }
-            else {
-                success = getConnection().endTransaction();
+            try (PreparedStatement stmt = getConnection().getConnection().prepareStatement(sql)) {
+                stmt.setDate(1, java.sql.Date.valueOf(row.getDate()));
+                stmt.setString(2, row.getType().toString());
+                stmt.setDouble(3, row.getValue().get(unit));
+                
+                if (previousValue != null) {
+                    stmt.setDouble(5, row.getPreviousValue().get(unit));
+                    stmt.setDate(4, java.sql.Date.valueOf(row.getPreviousDate()));
+                }
+                else {
+                    stmt.setNull(4, Types.DATE);
+                    stmt.setNull(5, Types.DOUBLE);
+                }
+                
+                int affectedRecords = getConnection().executeUpdate(stmt);
+                
+                if (affectedRecords != 1) {
+                    logger.log(Level.SEVERE, "addRow() did not add exactly 1 record. It added {0} records", affectedRecords);
+                    getConnection().rollback();
+                }
+                else {
+                    success = getConnection().endTransaction();
+                }
             }
         }
         catch (SQLException e) {
@@ -229,7 +231,7 @@ public class MeasurementRecordTable<MEASUREMENT extends Measurement,RECORD exten
         // More than 3 records were returned. That should not happen.
         //
         if (list.size() > 3) {
-            logger.severe("deleteExtreme() query returned more than 3 records (" + list.size() + ")");
+            logger.log(Level.SEVERE, "deleteExtreme() query returned more than 3 records ({0})", list.size());
             return false;
         }
         

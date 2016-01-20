@@ -29,9 +29,9 @@ public class WindRoseItem {
     public static final String AVG_SPEED_KEY = "Avg Speed";
     public static final String MAX_SPEED_KEY = "Max Speed";
     private DoubleProperty heading;
-    private DoubleProperty percentOfWind;
-    private DoubleProperty avgWindSpeed;
-    private DoubleProperty maxWindSpeed;
+    private DoubleProperty percentOfWind = new SimpleDoubleProperty();
+    private DoubleProperty avgWindSpeed = new SimpleDoubleProperty();
+    private DoubleProperty maxWindSpeed = new SimpleDoubleProperty();
 
     public DoubleProperty headingProperty() {
         if (heading == null)
