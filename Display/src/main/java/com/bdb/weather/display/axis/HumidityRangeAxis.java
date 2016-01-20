@@ -16,6 +16,8 @@
  */
 package com.bdb.weather.display.axis;
 
+import java.text.NumberFormat;
+
 import org.jfree.chart.axis.NumberAxis;
 
 import com.bdb.weather.common.measurement.Humidity;
@@ -28,13 +30,23 @@ import com.bdb.weather.common.measurement.Humidity;
  */
 public final class HumidityRangeAxis extends NumberAxis {
     private static final String AXIS_LABEL = "Humidity (%)";
+
+    /**
+     * Creation factory method.
+     * 
+     * @return The created axis
+     */
+    public static HumidityRangeAxis create() {
+        HumidityRangeAxis axis = new HumidityRangeAxis();
+        axis.setRange(Humidity.MIN_HUMIDITY.get(), Humidity.MAX_HUMIDITY.get());
+        axis.setNumberFormatOverride(Humidity.Unit.RELATIVE_HUMIDITY.getFormatter());
+        return axis;
+    }
     
     /**
      * Constructor.
      */
-    public HumidityRangeAxis() {
+    private HumidityRangeAxis() {
         super(AXIS_LABEL);
-        setRange(Humidity.MIN_HUMIDITY.get(), Humidity.MAX_HUMIDITY.get());
-        setNumberFormatOverride(Humidity.Unit.RELATIVE_HUMIDITY.getFormatter());
     }
 }

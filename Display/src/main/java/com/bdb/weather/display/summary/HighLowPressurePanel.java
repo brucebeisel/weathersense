@@ -33,6 +33,6 @@ public class HighLowPressurePanel extends HighLowPanel<Pressure> {
     }
     
     public HighLowPressurePanel(SummaryInterval interval, ViewLauncher launcher, SummarySupporter supporter) {
-        super("Pressure", interval, launcher, supporter, new PressureRangeAxis(), "Date", seriesInfo, Pressure.getDefaultFormatter());
+        super("Pressure", interval, launcher, supporter, PressureRangeAxis.create(), "Date", seriesInfo, Pressure.getDefaultFormatter());
     }
 }

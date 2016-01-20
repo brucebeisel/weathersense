@@ -47,7 +47,7 @@ public class DayPressurePane extends DayXYPlotPane {
      * Constructor.
      */
     public DayPressurePane() {
-        super(new PressureRangeAxis(), new SolarRadiationAxis());
+        super(PressureRangeAxis.create(), SolarRadiationAxis.create());
         createElements();
     }
     

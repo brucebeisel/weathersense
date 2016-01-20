@@ -23,9 +23,16 @@ import org.jfree.chart.axis.NumberAxis;
  * @author Bruce
  */
 public class UvIndexAxis extends NumberAxis {
-    public UvIndexAxis() {
-        super("UV Index");
-        setAutoRangeIncludesZero(false);
-        setRange(0F, 12F);
+    private static final String AXIS_LABEL = "UV Index";
+
+    public static UvIndexAxis create() {
+        UvIndexAxis axis = new UvIndexAxis();
+        axis.setAutoRangeIncludesZero(false);
+        axis.setRange(0F, 12F);
+        return axis;
+    }
+
+    private UvIndexAxis() {
+        super(AXIS_LABEL);
     }
 }

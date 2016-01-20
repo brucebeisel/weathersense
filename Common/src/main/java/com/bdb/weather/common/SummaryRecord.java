@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.bdb.util.measurement.Measurement;
@@ -656,7 +657,7 @@ public class SummaryRecord {
                 break;
                 
             default:
-                logger.warning("Trying to summarize unsupported measurement type: " + sensorType);
+                logger.log(Level.WARNING, "Trying to summarize unsupported measurement type: {0}", sensorType);
                 break;
         }
     }
@@ -693,7 +694,7 @@ public class SummaryRecord {
                 break;
 
             default:
-                logger.warning("Trying to summarize unsupported measurement type: " + sensorType);
+                logger.log(Level.WARNING, "Trying to summarize unsupported measurement type: {0}", sensorType);
                 break;
         }
     }

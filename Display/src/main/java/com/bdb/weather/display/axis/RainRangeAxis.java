@@ -31,16 +31,20 @@ public final class RainRangeAxis extends NumberAxis {
     private static final String AXIS_LABEL = "Rainfall";
     private static final double UPPER_MARGIN = .2;
 
+    public static RainRangeAxis create() {
+        RainRangeAxis axis = new RainRangeAxis();
+        axis.setUpperMargin(UPPER_MARGIN);
+        axis.setRangeType(RangeType.POSITIVE);
+        axis.setNumberFormatOverride(Depth.getDefaultFormatter());
+        axis.resetLabel();
+        axis.setStandardTickUnits(RainTickUnitSource.create());
+        return axis;
+    }
+
     /**
      * Constructor.
      */ 
-    public RainRangeAxis() {
-        super();
-        setUpperMargin(UPPER_MARGIN);
-        setRangeType(RangeType.POSITIVE);
-        setNumberFormatOverride(Depth.getDefaultFormatter());
-        resetLabel();
-        setStandardTickUnits(new RainTickUnitSource());
+    private RainRangeAxis() {
     }
     
     /**

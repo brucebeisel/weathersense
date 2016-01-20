@@ -54,7 +54,7 @@ public class RainSummary extends ChartDataPane implements ChartMouseListenerFX {
     private XYPlot            rainPlot;
     private JFreeChart        chart;
     private final TableView         dataTable;
-    private final ValueAxis         valueAxis = new RainRangeAxis();
+    private final ValueAxis         valueAxis = RainRangeAxis.create();
     //private DefaultTableModel tableModel = new DefaultTableModel();
     private final SummaryInterval   interval;
     private final SummarySupporter  supporter;

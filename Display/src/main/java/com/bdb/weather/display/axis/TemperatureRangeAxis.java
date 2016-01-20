@@ -31,15 +31,19 @@ public final class TemperatureRangeAxis extends NumberAxis {
     private static final double INITIAL_UPPER_MARGIN = .2;
     private static final double INITIAL_LOWER_MARGIN = .2;
 
+    public static TemperatureRangeAxis create() {
+        TemperatureRangeAxis axis = new TemperatureRangeAxis();
+        axis.setUpperMargin(INITIAL_UPPER_MARGIN);
+        axis.setLowerMargin(INITIAL_LOWER_MARGIN);
+        axis.setAutoRangeIncludesZero(false);
+        axis.setNumberFormatOverride(Temperature.getDefaultUnit().getFormatter());
+        return axis;
+    }
+
     /**
      * Constructor.
      */
-    public TemperatureRangeAxis() {
+    private TemperatureRangeAxis() {
         super(AXIS_LABEL + " (" + Temperature.getDefaultUnit() + ")");
-        
-        setUpperMargin(INITIAL_UPPER_MARGIN);
-        setLowerMargin(INITIAL_LOWER_MARGIN);
-        setAutoRangeIncludesZero(false);
-        setNumberFormatOverride(Temperature.getDefaultUnit().getFormatter());
     }
 }

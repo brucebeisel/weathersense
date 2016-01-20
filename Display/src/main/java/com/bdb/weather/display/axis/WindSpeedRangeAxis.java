@@ -30,13 +30,18 @@ import com.bdb.weather.common.measurement.Speed;
 public final class WindSpeedRangeAxis extends NumberAxis {
     private static final String AXIS_LABEL = "Wind Speed";
 
+    public static WindSpeedRangeAxis create() {
+        WindSpeedRangeAxis axis = new WindSpeedRangeAxis();
+        axis.setNumberFormatOverride(Speed.getDefaultFormatter());
+        axis.setAutoRangeIncludesZero(true);
+        axis.setRangeType(RangeType.POSITIVE);
+        return axis;
+    }
+
     /**
      * Constructor.
      */
-    public WindSpeedRangeAxis() {
+    private WindSpeedRangeAxis() {
         super(AXIS_LABEL + " (" + Speed.getDefaultUnit() + ")");
-        setNumberFormatOverride(Speed.getDefaultFormatter());
-        setAutoRangeIncludesZero(true);
-        setRangeType(RangeType.POSITIVE);
     }
 }

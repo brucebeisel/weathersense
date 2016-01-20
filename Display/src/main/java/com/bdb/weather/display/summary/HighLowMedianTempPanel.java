@@ -80,7 +80,7 @@ public class HighLowMedianTempPanel extends ChartDataPane implements ChartMouseL
     private final ChartViewer          chartViewer;
     private final TableView            dataTable;
     private final DateAxis             dateAxis;
-    private final NumberAxis           valueAxis = new TemperatureRangeAxis();
+    private final NumberAxis           valueAxis = TemperatureRangeAxis.create();
     //private final DefaultTableModel    tableModel = new DefaultTableModel();
     protected DateTimeFormatter        dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
     private final String               tableHeadings[];

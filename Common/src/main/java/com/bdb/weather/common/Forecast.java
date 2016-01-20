@@ -16,10 +16,12 @@
  */
 package com.bdb.weather.common;
 
+import java.io.IOException;
 import java.net.URL;
 
-import javax.swing.ImageIcon;
 import javax.xml.bind.annotation.XmlEnum;
+
+import javafx.scene.image.Image;
 
 @XmlEnum
 public enum Forecast {
@@ -34,31 +36,33 @@ public enum Forecast {
     PARTLY_CLOUDY_WITH_RAIN_OR_SNOW_LATER("Clouds with Rain or Snow Later", "snow_day.jpg", "snow_night.jpg");
 
     private final String string;
-    private final ImageIcon dayImage;
-    private final ImageIcon nightImage;
+    private Image dayImage;
+    private Image nightImage;
 
     Forecast(String s, String dayIconFilename, String nightIconFilename) {
-	string = s;
-	URL url = Forecast.class.getResource("/com/bdb/weathersense/" + dayIconFilename);
-
-        if (url != null)
-            dayImage = new ImageIcon(url);
-        else
+        string = s;
+        try {
+            URL url = Forecast.class.getResource("/com/bdb/weathersense/" + dayIconFilename);
             dayImage = null;
-        
-        url = Forecast.class.getResource("/com/bdb/weathersense/" + nightIconFilename);
-
-        if (url != null)
-            nightImage = new ImageIcon(url);
-        else
             nightImage = null;
+
+            if (url != null)
+                dayImage = new Image(url.openStream());
+            
+            url = Forecast.class.getResource("/com/bdb/weathersense/" + nightIconFilename);
+
+            if (url != null)
+                nightImage = new Image(url.openStream());
+        }
+        catch (IOException e) {
+        }
     }
     
-    public ImageIcon getDayImage() {
+    public Image getDayImage() {
         return dayImage;
     }
     
-    public ImageIcon getNightImage() {
+    public Image getNightImage() {
         return nightImage;
     }
     

@@ -29,25 +29,28 @@ import com.bdb.weather.common.measurement.Pressure;
 public final class PressureRangeAxis extends NumberAxis {
     private static final String AXIS_LABEL = "Pressure";
 
+    public static PressureRangeAxis create(Pressure min, Pressure max) {
+        PressureRangeAxis axis = new PressureRangeAxis(min, max);
+        axis.setRange(min.get(), max.get());
+        axis.setNumberFormatOverride(Pressure.getDefaultFormatter());
+        return axis;
+    }
+
+    public static PressureRangeAxis create() {
+        PressureRangeAxis axis = create(new Pressure(0.0), new Pressure(1.0));
+        axis.setAutoRange(true);
+        axis.setAutoRangeIncludesZero(false);
+        return axis;
+    }
+
     /**
      * Constructor the sets the axis range.
      * 
      * @param min The minimum value of the axis
      * @param max The maximum value of the axis
      */
-    public PressureRangeAxis(Pressure min, Pressure max) {
+    private PressureRangeAxis(Pressure min, Pressure max) {
         super(AXIS_LABEL + " (" + Pressure.getDefaultUnit() + ")");
         
-        setRange(min.get(), max.get());
-        setNumberFormatOverride(Pressure.getDefaultFormatter());
-    }
-    
-    /**
-     * Constructor that uses automatic range.
-     */
-    public PressureRangeAxis() {
-        this(new Pressure(0.0), new Pressure(1.0));
-        setAutoRange(true);
-        setAutoRangeIncludesZero(false);
     }
 }

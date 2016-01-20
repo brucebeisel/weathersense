@@ -159,9 +159,9 @@ private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:m
         String unitString = Depth.getDefaultUnit().toString();
         rateDomain = String.format(RAIN_RATE_DOMAIN_PREFIX, unitString);
         rainPlot = new XYPlot();
-        rainPlot.setRangeAxis(new RainRangeAxis());
+        rainPlot.setRangeAxis(RainRangeAxis.create());
         rainRatePlot = new XYPlot();
-        rainRatePlot.setRangeAxis(new RainRangeAxis());
+        rainRatePlot.setRangeAxis(RainRangeAxis.create());
 
         plot = new CombinedDomainXYPlot();
         plot.setDomainAxis(new DateAxis("Time"));

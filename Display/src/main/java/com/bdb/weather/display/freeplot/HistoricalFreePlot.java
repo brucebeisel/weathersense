@@ -128,7 +128,7 @@ public class HistoricalFreePlot implements SeriesFactory, SeriesCollectionFactor
     public Map<String,SeriesGroupControl> createSeriesGroupControls(EventHandler<ActionEvent> listener) {
         Map<String,SeriesGroupControl> list = new TreeMap<>();
         
-        SeriesGroupControl groupControl = new SeriesGroupControl(TEMPERATURE_COLLECTION_NAME, new TemperatureRangeAxis(), listener);
+        SeriesGroupControl groupControl = new SeriesGroupControl(TEMPERATURE_COLLECTION_NAME, TemperatureRangeAxis.create(), listener);
         groupControl.addSeriesControl(new SeriesControl(OUTDOOR_TEMPERATURE_SERIES_NAME, listener));
         groupControl.addSeriesControl(new SeriesControl(INDOOR_TEMPERATURE_SERIES_NAME, listener));
         groupControl.addSeriesControl(new SeriesControl(DEW_POINT_SERIES_NAME, listener));
@@ -139,31 +139,31 @@ public class HistoricalFreePlot implements SeriesFactory, SeriesCollectionFactor
         }
         list.put(groupControl.getGroupName(), groupControl);
         
-        groupControl = new SeriesGroupControl(HUMIDITY_COLLECTION_NAME, new HumidityRangeAxis(), listener);
+        groupControl = new SeriesGroupControl(HUMIDITY_COLLECTION_NAME, HumidityRangeAxis.create(), listener);
         groupControl.addSeriesControl(new SeriesControl(OUTDOOR_HUMIDITY_SERIES_NAME, listener));
         groupControl.addSeriesControl(new SeriesControl(INDOOR_HUMIDITY_SERIES_NAME, listener));
         list.put(groupControl.getGroupName(), groupControl);
         
-        groupControl = new SeriesGroupControl(PRESSURE_COLLECTION_NAME, new PressureRangeAxis(), listener);
+        groupControl = new SeriesGroupControl(PRESSURE_COLLECTION_NAME, PressureRangeAxis.create(), listener);
         groupControl.addSeriesControl(new SeriesControl(BAROMETRIC_PRESSURE_SERIES_NAME, listener));
         list.put(groupControl.getGroupName(), groupControl);
         
-        groupControl = new SeriesGroupControl(WIND_COLLECTION_NAME, new WindSpeedRangeAxis(), listener);
+        groupControl = new SeriesGroupControl(WIND_COLLECTION_NAME, WindSpeedRangeAxis.create(), listener);
         groupControl.addSeriesControl(new SeriesControl(SUSTAINED_WIND_SERIES_NAME, listener));
         groupControl.addSeriesControl(new SeriesControl(HIGH_WIND_SERIES_NAME, listener));
         groupControl.addSeriesControl(new SeriesControl(WIND_GUST_SERIES_NAME, listener));
         list.put(groupControl.getGroupName(), groupControl);
         
-        groupControl = new SeriesGroupControl(RAIN_COLLECTION_NAME, new RainRangeAxis(), listener);
+        groupControl = new SeriesGroupControl(RAIN_COLLECTION_NAME, RainRangeAxis.create(), listener);
         groupControl.addSeriesControl(new SeriesControl(RAIN_SERIES_NAME, listener));
         groupControl.addSeriesControl(new SeriesControl(HIGH_RAIN_RATE_SERIES_NAME, listener));
         list.put(groupControl.getGroupName(), groupControl);
         
-        groupControl = new SeriesGroupControl(SOLAR_RADIATION_COLLECTION_NAME, new SolarRadiationAxis(), listener);
+        groupControl = new SeriesGroupControl(SOLAR_RADIATION_COLLECTION_NAME, SolarRadiationAxis.create(), listener);
         groupControl.addSeriesControl(new SeriesControl(SOLAR_RADIATION_SERIES_NAME, listener));
         list.put(groupControl.getGroupName(), groupControl);
         
-        groupControl = new SeriesGroupControl(UV_INDEX_COLLECTION_NAME, new UvIndexAxis(), listener);
+        groupControl = new SeriesGroupControl(UV_INDEX_COLLECTION_NAME, UvIndexAxis.create(), listener);
         groupControl.addSeriesControl(new SeriesControl(UV_INDEX_SERIES_NAME, listener));
         list.put(groupControl.getGroupName(), groupControl);
         

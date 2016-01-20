@@ -34,7 +34,7 @@ public class DewPointPlotPane extends DayXYPlotPane {
      * Constructor.
      */
     public DewPointPlotPane() {
-        super(new TemperatureRangeAxis(), new HumidityRangeAxis());
+        super(TemperatureRangeAxis.create(), HumidityRangeAxis.create());
     }
 
     @Override

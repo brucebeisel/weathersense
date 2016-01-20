@@ -39,6 +39,6 @@ public class HighLowHumidityPanel extends HighLowPanel<Humidity> {
     }
     
     public HighLowHumidityPanel(SummaryInterval interval, ViewLauncher launcher, SummarySupporter supporter) {
-        super("Humidity", interval, launcher, supporter, new HumidityRangeAxis(), "Date", seriesInfo, new DecimalFormat("0.0"));
+        super("Humidity", interval, launcher, supporter, HumidityRangeAxis.create(), "Date", seriesInfo, new DecimalFormat("0.0"));
     }
 }

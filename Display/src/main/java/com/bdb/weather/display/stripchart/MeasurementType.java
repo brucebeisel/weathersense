@@ -34,16 +34,16 @@ import com.bdb.weather.display.axis.UvIndexAxis;
  */
 public enum MeasurementType {
     NONE(null),
-    TEMPERATURE(new TemperatureRangeAxis()),
-    DEW_POINT(new TemperatureRangeAxis()),
-    HEAT_INDEX(new TemperatureRangeAxis()),
-    WIND_CHILL(new TemperatureRangeAxis()),
-    HUMIDITY (new HumidityRangeAxis()),
-    RAINFALL(new RainRangeAxis()),
-    PRESSURE(new PressureRangeAxis()),
-    WIND(new WindSpeedRangeAxis()),
-    SOLAR_RADIATION(new SolarRadiationAxis()),
-    UV_INDEX(new UvIndexAxis());
+    TEMPERATURE(TemperatureRangeAxis.create()),
+    DEW_POINT(TemperatureRangeAxis.create()),
+    HEAT_INDEX(TemperatureRangeAxis.create()),
+    WIND_CHILL(TemperatureRangeAxis.create()),
+    HUMIDITY (HumidityRangeAxis.create()),
+    RAINFALL(RainRangeAxis.create()),
+    PRESSURE(PressureRangeAxis.create()),
+    WIND(WindSpeedRangeAxis.create()),
+    SOLAR_RADIATION(SolarRadiationAxis.create()),
+    UV_INDEX(UvIndexAxis.create());
     
     private final NumberAxis axis;
     

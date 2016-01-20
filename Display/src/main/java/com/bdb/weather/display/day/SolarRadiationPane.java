@@ -33,7 +33,7 @@ public class SolarRadiationPane extends DayXYPlotPane {
      * Constructor.
      */
     public SolarRadiationPane() {
-        super(new SolarRadiationAxis(), new UvIndexAxis());
+        super(SolarRadiationAxis.create(), UvIndexAxis.create());
     }
 
     @Override

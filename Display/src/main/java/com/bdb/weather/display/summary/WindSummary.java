@@ -106,7 +106,7 @@ public class WindSummary extends ChartDataPane implements ChartMouseListenerFX {
         dateAxis.setVerticalTickLabels(true);
         plot.setDomainAxis(dateAxis);
         
-        valueAxis = new WindSpeedRangeAxis();
+        valueAxis = WindSpeedRangeAxis.create();
         plot.setRangeAxis(valueAxis);
         
         //

@@ -48,7 +48,7 @@ public class RainHourChart extends HBox {
         rainChartViewer.setMaxWidth(10000);
         rainChartViewer.setPrefSize(800, 200);
         plot = (CategoryPlot)rainChart.getPlot();
-        plot.setRangeAxis(new RainRangeAxis());
+        plot.setRangeAxis(RainRangeAxis.create());
         this.getChildren().add(rainChartViewer);
     }
 

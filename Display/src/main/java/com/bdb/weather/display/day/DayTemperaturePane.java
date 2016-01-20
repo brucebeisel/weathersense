@@ -64,7 +64,7 @@ public class DayTemperaturePane extends DayXYPlotPane implements EventHandler<Ac
      * Constructor.
      */
     public DayTemperaturePane() {
-	super(new TemperatureRangeAxis(), null);
+	super(TemperatureRangeAxis.create(), null);
         createElements();
         minMaxLabelsItem.setSelected(true);
     }

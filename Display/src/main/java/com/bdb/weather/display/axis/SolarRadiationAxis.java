@@ -30,15 +30,19 @@ public class SolarRadiationAxis extends NumberAxis {
     private static final double INITIAL_UPPER_MARGIN = .2;
     private static final double INITIAL_LOWER_MARGIN = .2;
 
+    public static SolarRadiationAxis create() {
+        SolarRadiationAxis axis = new SolarRadiationAxis();
+        axis.setUpperMargin(INITIAL_UPPER_MARGIN);
+        axis.setLowerMargin(INITIAL_LOWER_MARGIN);
+        axis.setAutoRangeIncludesZero(true);
+        axis.setNumberFormatOverride(SolarRadiation.getDefaultUnit().getFormatter());
+        return axis;
+    }
+
     /**
      * Constructor.
      */
-    public SolarRadiationAxis() {
+    private SolarRadiationAxis() {
         super(AXIS_LABEL + " (" + SolarRadiation.getDefaultUnit() + ")");
-        
-        setUpperMargin(INITIAL_UPPER_MARGIN);
-        setLowerMargin(INITIAL_LOWER_MARGIN);
-        setAutoRangeIncludesZero(true);
-        setNumberFormatOverride(SolarRadiation.getDefaultUnit().getFormatter());
     }
 }

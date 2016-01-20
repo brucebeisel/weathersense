@@ -76,7 +76,7 @@ public class DayWindPane extends DayXYPlotPane {
      * @param ws The weather station for which the data is being plotted
      */
     public DayWindPane(WeatherStation ws) {
-        super(new WindSpeedRangeAxis(), null);
+        super(WindSpeedRangeAxis.create(), null);
         createElements();
     }
 

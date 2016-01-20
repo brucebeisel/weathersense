@@ -43,7 +43,7 @@ public class DayHumidityPane extends DayXYPlotPane {
      * Constructor.
      */
     public DayHumidityPane() {
-        super(new HumidityRangeAxis(), null);
+        super(HumidityRangeAxis.create(), null);
         createElements();
     }
     

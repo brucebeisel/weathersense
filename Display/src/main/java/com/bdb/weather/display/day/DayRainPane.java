@@ -30,7 +30,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -70,7 +69,7 @@ public class DayRainPane extends ChartDataPane {
     private final JFreeChart          chart;
     private final ChartViewer         chartViewer;
     private final TableView           dataTable;
-    private final NumberAxis          valueAxis = new RainRangeAxis();
+    private final NumberAxis          valueAxis = RainRangeAxis.create();
     private final DateTimeFormatter   hourFormatter = DateTimeFormatter.ofPattern("h a");
     private LocalDateTime             timeCache = LocalDate.now().atStartOfDay();
 
