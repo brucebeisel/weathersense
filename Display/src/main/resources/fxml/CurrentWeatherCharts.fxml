@@ -21,7 +21,7 @@
 		</VBox>
 		<TilePane prefRows="2"  prefColumns="2" >
 		    <Hygrometer fx:id="outdoorHumidity" title="Outdoor Humidity" />
-		    <Barometer fx:id="barometer" title="Barometer" />
+		    <Barometer fx:factory="create" fx:id="barometer" title="Barometer" prefWidth="250" prefHeight="250" />
 		    <Hygrometer fx:id="indoorHumidity" title="Indoor Humidity" />
 		    <WindGauge fx:id="windGauge" title="Windy" />
 		</TilePane>

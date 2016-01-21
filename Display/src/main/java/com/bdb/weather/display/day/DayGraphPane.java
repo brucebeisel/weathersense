@@ -76,8 +76,10 @@ public class DayGraphPane extends GridPane {
         //
         // Right after midnight the summary record might be null
         //
-        if (summaryRecord != null)
+        if (summaryRecord != null) {
             windRose.loadData(summaryRecord.getWindRoseData());
+            rainPlot.loadData(summaryRecord.getHourlyRainfall(), list);
+        }
         else
             windRose.loadData(null);
         
@@ -85,7 +87,6 @@ public class DayGraphPane extends GridPane {
         pressurePlot.loadData(date, list, summaryRecord, records, averages, location);
         windPlot.loadData(date, list, summaryRecord, records, averages, location);
         humidityPlot.loadData(date, list, summaryRecord, records, averages, location);
-        rainPlot.loadData(summaryRecord.getHourlyRainfall(), list);
         windDirectionPlot.loadData(list);
     }
 }

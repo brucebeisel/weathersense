@@ -27,17 +27,18 @@ import com.bdb.weather.common.measurement.Pressure;
  *
  */
 public final class PressureRangeAxis extends NumberAxis {
+    private static final long serialVersionUID = -1387042642087553885L;
     private static final String AXIS_LABEL = "Pressure";
 
     public static PressureRangeAxis create(Pressure min, Pressure max) {
-        PressureRangeAxis axis = new PressureRangeAxis(min, max);
+        PressureRangeAxis axis = new PressureRangeAxis();
         axis.setRange(min.get(), max.get());
         axis.setNumberFormatOverride(Pressure.getDefaultFormatter());
         return axis;
     }
 
     public static PressureRangeAxis create() {
-        PressureRangeAxis axis = create(new Pressure(0.0), new Pressure(1.0));
+        PressureRangeAxis axis = new PressureRangeAxis();
         axis.setAutoRange(true);
         axis.setAutoRangeIncludesZero(false);
         return axis;
@@ -49,7 +50,7 @@ public final class PressureRangeAxis extends NumberAxis {
      * @param min The minimum value of the axis
      * @param max The maximum value of the axis
      */
-    private PressureRangeAxis(Pressure min, Pressure max) {
+    private PressureRangeAxis() {
         super(AXIS_LABEL + " (" + Pressure.getDefaultUnit() + ")");
         
     }

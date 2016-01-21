@@ -27,6 +27,7 @@ import com.bdb.weather.common.measurement.Temperature;
  *
  */
 public final class TemperatureRangeAxis extends NumberAxis {
+    private static final long serialVersionUID = 3854613599038865368L;
     private static final String AXIS_LABEL = "Temperature";
     private static final double INITIAL_UPPER_MARGIN = .2;
     private static final double INITIAL_LOWER_MARGIN = .2;

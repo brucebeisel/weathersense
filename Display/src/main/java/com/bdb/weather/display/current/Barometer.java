@@ -64,7 +64,13 @@ public class Barometer extends BorderPane {
     private final DoubleProperty      maxValue = new SimpleDoubleProperty();
     private final ColorPreferences    colorPrefs = ColorPreferences.getInstance();
 
-    public Barometer() {
+    public static Barometer create() {
+        Barometer b = new Barometer();
+        //b.setPrefSize(250, 250);
+        return b;
+    }
+
+    private Barometer() {
 	this("", new Pressure(900.0, Pressure.Unit.MILLIBAR), new Pressure(1100.0, Pressure.Unit.MILLIBAR));
     }
     /**
@@ -74,8 +80,7 @@ public class Barometer extends BorderPane {
      * @param min The minimum of the dial's scale
      * @param max The maximum of the dial's scale
      */
-    public Barometer(String titleString, Pressure min, Pressure max) {
-	this.setPrefSize(250.0, 250.0);
+    private Barometer(String titleString, Pressure min, Pressure max) {
 	title.setText(titleString);
 
 	ChartViewer chartViewer = createChartElements(min, max);

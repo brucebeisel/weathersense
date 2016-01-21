@@ -23,6 +23,7 @@ import org.jfree.chart.axis.NumberAxis;
  * @author Bruce
  */
 public class UvIndexAxis extends NumberAxis {
+    private static final long serialVersionUID = -9000606094616067096L;
     private static final String AXIS_LABEL = "UV Index";
 
     public static UvIndexAxis create() {

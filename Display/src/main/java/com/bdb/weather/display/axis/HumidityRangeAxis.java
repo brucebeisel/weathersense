@@ -16,8 +16,6 @@
  */
 package com.bdb.weather.display.axis;
 
-import java.text.NumberFormat;
-
 import org.jfree.chart.axis.NumberAxis;
 
 import com.bdb.weather.common.measurement.Humidity;
@@ -29,6 +27,7 @@ import com.bdb.weather.common.measurement.Humidity;
  *
  */
 public final class HumidityRangeAxis extends NumberAxis {
+    private static final long serialVersionUID = 7061651298970635197L;
     private static final String AXIS_LABEL = "Humidity (%)";
 
     /**

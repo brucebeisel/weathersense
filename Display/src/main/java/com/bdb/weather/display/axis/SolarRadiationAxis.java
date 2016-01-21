@@ -19,21 +19,17 @@ package com.bdb.weather.display.axis;
 import org.jfree.chart.axis.NumberAxis;
 
 import com.bdb.weather.common.measurement.SolarRadiation;
-import com.bdb.weather.common.measurement.Temperature;
 
 /**
  *
  * @author Bruce
  */
 public class SolarRadiationAxis extends NumberAxis {
+    private static final long serialVersionUID = 6214282588197865707L;
     private static final String AXIS_LABEL = "Solar Radiation";
-    private static final double INITIAL_UPPER_MARGIN = .2;
-    private static final double INITIAL_LOWER_MARGIN = .2;
 
     public static SolarRadiationAxis create() {
         SolarRadiationAxis axis = new SolarRadiationAxis();
-        axis.setUpperMargin(INITIAL_UPPER_MARGIN);
-        axis.setLowerMargin(INITIAL_LOWER_MARGIN);
         axis.setAutoRangeIncludesZero(true);
         axis.setNumberFormatOverride(SolarRadiation.getDefaultUnit().getFormatter());
         return axis;
