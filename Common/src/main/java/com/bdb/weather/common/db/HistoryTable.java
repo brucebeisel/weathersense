@@ -54,7 +54,10 @@ import com.bdb.weather.common.measurement.UvIndex;
  *
  */
 public class HistoryTable extends DBTable<HistoricalRecord> {
-    protected static final String	TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".history";
+    /**
+     * The database name of the history table
+     */
+    protected static final String TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".history";
     private static final String DATE_COLUMN = "date";
     private static final String DURATION_COLUMN = "duration";
     private static final String LOW_OUTDOOR_TEMP_COLUMN = "low_outdoor_temperature";
@@ -79,6 +82,9 @@ public class HistoryTable extends DBTable<HistoricalRecord> {
     private static final String EVAPOTRANSPIRATION_COLUMN = "evapotranspiration";
     private static final int NUM_COLUMNS = 22;
     
+    /**
+     * The database name of the measurement history table
+     */
     protected static final String MEASUREMENT_HISTORY_TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".sensor_value_history";
     private static final String SENSOR_ID_COLUMN = "sensor_id";
     private static final String SENSOR_TYPE_COLUMN = "sensor_type";
@@ -405,6 +411,12 @@ public class HistoryTable extends DBTable<HistoricalRecord> {
         return addHistoricalRecords(list);
     }
 
+    /**
+     * Add historical records to the database table in a single transaction.
+     * 
+     * @param list The list of historical records to add
+     * @return True if all the records were added
+     */
     public boolean addHistoricalRecords(List<HistoricalRecord> list) {
         boolean success = true;
 

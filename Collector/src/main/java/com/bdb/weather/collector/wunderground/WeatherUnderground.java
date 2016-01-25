@@ -125,7 +125,10 @@ public class WeatherUnderground implements WeatherUploader {
     private final Statistics statistics;
     private static final Logger logger = Logger.getLogger(WeatherUnderground.class.getName());
 
-    public class Statistics {
+    /**
+     * Class to hold the statistics about the communications with Weather Underground.
+     */
+    public static class Statistics {
         int numAttempts;
         int numSuccesses;
         int numFailures;
@@ -255,8 +258,8 @@ public class WeatherUnderground implements WeatherUploader {
         StringBuffer sb = new StringBuffer(urlString);
 
         sb.append(ACTION_URL_TAG).append(UPDATE_RAW_VALUE).append(URL_FIELD_SEPARATOR);
-        sb.append(ID_URL_TAG).append(wuStationId).append(URL_FIELD_SEPARATOR);
-        sb.append(PASSWORD_URL_TAG).append(password).append(URL_FIELD_SEPARATOR);
+        sb.append(ID_URL_TAG).append(record.stationId).append(URL_FIELD_SEPARATOR);
+        sb.append(PASSWORD_URL_TAG).append(record.password).append(URL_FIELD_SEPARATOR);
         sb.append(UTC_URL_TAG).append(time).append(URL_FIELD_SEPARATOR);
         if (record.outdoorTemp != null)
             sb.append(OUTDOOR_TEMPERATURE_URL_TAG).append(Temperature.Unit.FAHRENHEIT.getFormatter().format(record.outdoorTemp.get(Temperature.Unit.FAHRENHEIT))).append(URL_FIELD_SEPARATOR);

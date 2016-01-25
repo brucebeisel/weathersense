@@ -31,9 +31,21 @@ public class Speed extends Measurement {
     private static final long serialVersionUID = 3905322365691227024L;
 
     public enum Unit implements com.bdb.util.measurement.Unit {
+        /**
+         * Speed unit of kilometers per hour
+         */
         KM_PER_HOUR("KPH", 3.6, "0.0"),
+        /**
+         * Speed unit of meters per second
+         */
         METERS_PER_SEC("MPS", 1.0, "0.00"), // Internal Storage Unit
+        /**
+         * Speed unit of miles per hour
+         */
         MILES_PER_HOUR("MPH", 2.23693, "0.0"),
+        /**
+         * Speed unit of knots
+         */
         KNOTS("KTS", 1.94384, "0.0");
 
         private final String label;
@@ -106,14 +118,29 @@ public class Speed extends Measurement {
         this(0.0);
     }
 
+    /**
+     * Get the current default unit for speed
+     * 
+     * @return The default unit for speed
+     */
     public static Unit getDefaultUnit() {
-        return (Unit) getDefaultUnit(Speed.class);
+        return (Unit)getDefaultUnit(Speed.class);
     }
 
+    /**
+     * Set the default unit for speed.
+     * 
+     * @param unit The new default unit for speed
+     */
     public static void setDefaultUnit(Unit unit) {
         setDefaultUnit(Speed.class, unit);
     }
 
+    /**
+     * Get the number formatter for the default unit for speed.
+     * 
+     * @return The number formatter
+     */
     public static NumberFormat getDefaultFormatter() {
         return getDefaultUnit().getFormatter();
     }

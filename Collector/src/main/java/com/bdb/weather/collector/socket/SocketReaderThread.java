@@ -90,7 +90,7 @@ public class SocketReaderThread extends BBThread {
     /**
      * Request that the socket be closed.
      */
-    public void closeSocketRequest() {
+    public synchronized void closeSocketRequest() {
         closeSocketRequested = true;
     }
 
@@ -115,12 +115,14 @@ public class SocketReaderThread extends BBThread {
     @Override
     public void threadStep() {
         logger.entering(SocketReaderThread.class.getName(), "threadStep");
+        boolean doClose = false;
         if (socket == null)
             waitForConnection();
         else
-            closeSocket = !reader.readSocket();
+            doClose = !reader.readSocket();
 
         synchronized(this) {
+            closeSocket = doClose;
             if (closeSocket || closeSocketRequested)
                 closeSocket();
 

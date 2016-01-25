@@ -25,20 +25,55 @@ import javafx.scene.image.Image;
 
 @XmlEnum
 public enum Forecast {
+    /**
+     * Sunny forecast
+     */
     SUNNY("Sunny", "clear_day.jpg", "clear_night.jpg"),
+    /**
+     * Partly cloudy forecast
+     */
     PARTLY_CLOUDY("Partly Cloudy", "partly_cloudy_day.jpg", "partly_cloudy_night.jpg"),
+    /**
+     * Mostly cloudy forecast
+     */
     MOSTLY_CLOUDY("Mostly Cloudy", "cloudy_day.jpg", "cloudy_night.jpg"),
+    /**
+     * Mostly cloudy with rain later forecast
+     */
     MOSTLY_CLOUDY_WITH_RAIN("Mostly Cloudy with Rain", "rain_day.jpg", "rain_night.jpg"),
+    /**
+     * Mostly cloudy with snow later forecast
+     */
     MOSTLY_CLOUDY_WITH_SNOW("Mostly Cloudy with Rain", "snow_day.jpg", "snow_night.jpg"),
+    /**
+     * Mostly cloudy with rain or snow later forecast
+     */
     MOSTLY_CLOUDY_WITH_RAIN_OR_SNOW("Rain/Snow Mix", "snow_day.jpg", "snow_night.jpg"),
+    /**
+     * Partly cloudy with rain later forecast
+     */
     PARTLY_CLOUDY_WITH_RAIN_LATER("Clouds with Rain Later", "rain_day.jpg", "rain_night.jpg"),
+    /**
+     * Partly cloudy with snow later forecast
+     */
     PARTLY_CLOUDY_WITH_SNOW_LATER("Clouds with Snow Later", "snow_day.jpg", "snow_night.jpg"),
+    /**
+     * Partly cloudy with rain or snow later forecast
+     */
     PARTLY_CLOUDY_WITH_RAIN_OR_SNOW_LATER("Clouds with Rain or Snow Later", "snow_day.jpg", "snow_night.jpg");
 
     private final String string;
     private Image dayImage;
     private Image nightImage;
 
+    /**
+     * Constructor.
+     * 
+     * @param s The name of the forcast.
+     * 
+     * @param dayIconFilename The icon for the forecast during the day
+     * @param nightIconFilename  The icon for the forecast during at night
+     */
     Forecast(String s, String dayIconFilename, String nightIconFilename) {
         string = s;
         try {
@@ -58,10 +93,20 @@ public enum Forecast {
         }
     }
     
+    /**
+     * Get the day image.
+     * 
+     * @return The image
+     */
     public Image getDayImage() {
         return dayImage;
     }
     
+    /**
+     * Get the night image.
+     * 
+     * @return The night image
+     */
     public Image getNightImage() {
         return nightImage;
     }

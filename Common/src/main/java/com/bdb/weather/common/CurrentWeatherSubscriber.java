@@ -33,54 +33,21 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 /**
+ * A class to subscribe to the current weather multicast UDP current weather packet and process the data in a separate thread.
  *
  * @author Bruce
  */
 public class CurrentWeatherSubscriber implements Runnable {
+    /**
+     * Interface for classes to implement to receive the current weather.
+     */
     public interface CurrentWeatherHandler {
+        /**
+         * Handle the current weather.
+         * 
+         * @param cw The current weather
+         */
         void handleCurrentWeather(CurrentWeather cw);
-    }
-    public class CurrentWeatherStatistics implements Serializable {
-        private final LocalDateTime collectionStartTime;
-        private LocalDateTime lastValidPacketTime;
-        private int validPacketsReceived;
-        private int invalidPacketsReceived;
-        private int packetsReceivedThisHour;
-        private final DateTimeFormatter dtf;
-
-        public CurrentWeatherStatistics() {
-            collectionStartTime = LocalDateTime.now();
-            validPacketsReceived = 0;
-            invalidPacketsReceived = 0;
-            packetsReceivedThisHour = 0;
-            dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        }
-
-        public void receivedInvalidPacket() {
-            invalidPacketsReceived++;
-        }
-
-        public void receivedValidPacket() {
-            validPacketsReceived++;
-            lastValidPacketTime = LocalDateTime.now();
-            packetsReceivedThisHour++;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Start Time: ").append(dtf.format(collectionStartTime)).append("\n");
-            sb.append("Time of Last Current Weather: ");
-	    if (lastValidPacketTime != null)
-		sb.append(dtf.format(lastValidPacketTime)).append("\n");
-	    else
-		sb.append("N/A\n");
-
-            sb.append(String.format("Valid Packets Received: %d, Invalid Packets Received %d%n", validPacketsReceived, invalidPacketsReceived));
-            sb.append(String.format("Packets Received this Hour: %d", packetsReceivedThisHour));
-
-            return sb.toString();
-        }
     }
     
     public static final String DEFAULT_ADDRESS = "224.0.0.120";
@@ -95,6 +62,13 @@ public class CurrentWeatherSubscriber implements Runnable {
     private final CurrentWeatherStatistics stats;
     private static final Logger logger = Logger.getLogger(CurrentWeatherSubscriber.class.getName());
     
+    /**
+     * Factory method for creating a current weather subscriber.
+     * 
+     * @param handler The handler that will process the current weather
+     * 
+     * @return The created subscriber
+     */
     public static CurrentWeatherSubscriber createSubscriber(CurrentWeatherHandler handler) {
         try {
             CurrentWeatherSubscriber subscriber = new CurrentWeatherSubscriber(handler);
@@ -107,6 +81,13 @@ public class CurrentWeatherSubscriber implements Runnable {
         }
     }
     
+    /**
+     * Private constructor.
+     * 
+     * @param handler The handler to process the current weather
+     * @throws IOException The multicast socket could not be created
+     * @throws JAXBException The JAXB context could not be created
+     */
     private CurrentWeatherSubscriber(CurrentWeatherHandler handler) throws IOException, JAXBException {
         stats = new CurrentWeatherStatistics();
         socket = new MulticastSocket(DEFAULT_PORT);
@@ -119,6 +100,9 @@ public class CurrentWeatherSubscriber implements Runnable {
         socket.setSoTimeout(RECEIVE_TIMEOUT_MILLIS);
     }
     
+    /**
+     * Initialize the subscriber.
+     */
     private void init() {
         exit = false;
         thread = new Thread(this);
@@ -126,14 +110,25 @@ public class CurrentWeatherSubscriber implements Runnable {
         thread.start();
     }
     
+    /**
+     * Request that the current weather subscriber thread exits.
+     */
     public void requestExit() {
         exit = true;
     }
 
+    /**
+     * Get the statistics about the current weather data.
+     * 
+     * @return The statistics
+     */
     public CurrentWeatherStatistics getStatistics() {
         return stats;
     }
 
+    /**
+     * Thread entry point.
+     */
     @Override
     public void run() {
         byte[] b = new byte[10240];
@@ -161,6 +156,62 @@ public class CurrentWeatherSubscriber implements Runnable {
                 logger.log(Level.WARNING, "Caught exception while reading current weather UDP packet", e);
                 stats.receivedInvalidPacket();
             }
+        }
+    }
+
+    /**
+     * The statistics collected about the current weather processing.
+     */
+    public static class CurrentWeatherStatistics implements Serializable {
+        private final LocalDateTime collectionStartTime;
+        private LocalDateTime lastValidPacketTime;
+        private int validPacketsReceived;
+        private int invalidPacketsReceived;
+        private int packetsReceivedThisHour;
+        private final DateTimeFormatter dtf;
+
+        /**
+         * Constructor.
+         */
+        public CurrentWeatherStatistics() {
+            collectionStartTime = LocalDateTime.now();
+            validPacketsReceived = 0;
+            invalidPacketsReceived = 0;
+            packetsReceivedThisHour = 0;
+            dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        }
+
+        /**
+         * Increment the invalid packet count.
+         */
+        public void receivedInvalidPacket() {
+            invalidPacketsReceived++;
+            packetsReceivedThisHour++;
+        }
+
+        /**
+         * Increments the valid packet count.
+         */
+        public void receivedValidPacket() {
+            validPacketsReceived++;
+            lastValidPacketTime = LocalDateTime.now();
+            packetsReceivedThisHour++;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Start Time: ").append(dtf.format(collectionStartTime)).append("\n");
+            sb.append("Time of Last Current Weather: ");
+	    if (lastValidPacketTime != null)
+		sb.append(dtf.format(lastValidPacketTime)).append("\n");
+	    else
+		sb.append("N/A\n");
+
+            sb.append(String.format("Valid Packets Received: %d, Invalid Packets Received %d%n", validPacketsReceived, invalidPacketsReceived));
+            sb.append(String.format("Packets Received this Hour: %d", packetsReceivedThisHour));
+
+            return sb.toString();
         }
     }
 }

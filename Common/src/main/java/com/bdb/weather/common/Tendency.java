@@ -17,20 +17,46 @@
 package com.bdb.weather.common;
 
 public enum Tendency {
+    /**
+     * The measurement is rising rapidly
+     */
     RISING_RAPIDLY("Rising Rapidly", 2),
+    /**
+     * The measurement is rising slowly
+     */
     RISING_SLOWLY("Rising Slowly", 1),
+    /**
+     * The measurement is steady
+     */
     STEADY("Steady", 0),
+    /**
+     * The measurement is falling slowly
+     */
     FALLING_SLOWLY("Falling Slowly", -1),
+    /**
+     * The measurement is falling rapidly
+     */
     FALLING_RAPIDLY("Falling Rapidly", -2);
 
     private final String string;
     private final int    value;
 
+    /**
+     * Constructor.
+     * 
+     * @param s The string that represents this tendency
+     * @param value The integer representation of this tendency
+     */
     Tendency(String s, int value) {
 	this.string = s;
         this.value = value;
     }
     
+    /**
+     * Get the integer representation of this tendency.
+     * 
+     * @return The integer
+     */
     public int getValue() {
         return value;
     }

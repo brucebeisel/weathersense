@@ -41,8 +41,10 @@ import com.bdb.weather.common.measurement.Speed;
  * 4 - 6 MPH. What happens from wind > 3 and wind < 4. I made the slight adjustment to the bands such that the range for
  * force 1 is <code>1 >= speed < 4</code> and for force 2 the range is <code>4 >= speed < 7</code>.
  */
-public class BeaufortScale
-{
+public class BeaufortScale {
+    /**
+     * The maximum number of Beaufort forces
+     */
     public static final int MAX_FORCE = 12;
     private static final BeaufortForce forces[] = {
             new BeaufortForce( 0, new Speed( 0.0, Speed.Unit.MILES_PER_HOUR), new Speed( 1.0, Speed.Unit.MILES_PER_HOUR), "Calm",            "Sea surface smooth and mirror-like", "Calm, smoke rises vertically"),
@@ -60,8 +62,7 @@ public class BeaufortScale
             new BeaufortForce(12, new Speed(64.0, Speed.Unit.MILES_PER_HOUR), new Speed(200.0, Speed.Unit.MILES_PER_HOUR), "Hurricane",      "Sea surface smooth and mirror-like", "Calm, smoke rises vertically")
     };
     
-    private BeaufortScale()
-    {
+    private BeaufortScale() {
     }
     
     /**
@@ -72,13 +73,11 @@ public class BeaufortScale
      * 
      * @throws IllegalArgumentException If the speed is less than 0 or greater than 200 MPH
      */
-    public static BeaufortForce lookupForce(Speed speed) throws IllegalArgumentException
-    {
+    public static BeaufortForce lookupForce(Speed speed) throws IllegalArgumentException {
         for (BeaufortForce force : forces)
             if (force.isInForceBand(speed))
                 return force;
         
         throw new IllegalArgumentException("Speed of " + speed + Speed.getDefaultUnit() + " is not within valid range");
-            
     }
 }

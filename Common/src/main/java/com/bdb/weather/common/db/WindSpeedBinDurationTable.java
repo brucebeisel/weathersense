@@ -38,12 +38,15 @@ import com.bdb.weather.common.SpeedBinDuration;
  *
  */
 public class WindSpeedBinDurationTable extends DBTable<SpeedBinDuration> {
+    /**
+     * Name of the wind speed bin duration table
+     */
     protected static final String TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".wind_speed_bin_durations";
     private static final String DATE_COLUMN = "date";
     private static final String WIND_HEADING_INDEX_COLUMN = "wind_heading_index";
     private static final String WIND_SPEED_BIN_INDEX_COLUMN = "wind_speed_bin_index";
     private static final String DURATION_COLUMN = "duration";
-    private static final Logger logger = Logger.getLogger("Dummy");
+    private static final Logger logger = Logger.getLogger(WindSpeedBinDurationTable.class.getName());
     
     /**
      * Constructor.

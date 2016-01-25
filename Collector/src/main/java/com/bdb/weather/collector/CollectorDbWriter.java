@@ -194,79 +194,7 @@ final class CollectorDbWriter implements WeatherDataWriter, Runnable {
      *
      */
     public void handleAddHistoricalRecords(List<HistoricalRecord> records) {
-        boolean missingRecord = false;
-        logger.log(Level.INFO, "Checking for gaps in {0} records with time range {1} to {2}", new Object[] {
-                               records.size(),
-                               CollectorConstants.dateTimeFormatter().format(records.get(0).getTime()),
-                               CollectorConstants.dateTimeFormatter().format(records.get(records.size() - 1).getTime())});
-
-        for (HistoricalRecord record : records) {
-            logger.log(Level.FINE, "Checking historical record at time {0}", DBTable.dateTimeFormatter().format(record.getTime()));
-
-            //
-            // Make sure there are no gaps in the historical record table. If a gap is detected
-            // close down the connection with the reader. This will cause the reader to reconnect
-            // and hopefully get the collection back on track.
-            //
-            if (lastSavedHistoricalRecordTime == null)
-                lastSavedHistoricalRecordTime = historyTable.timeOfRecordBefore(record.getTime());
-            
-            Duration delta;
-            if (lastSavedHistoricalRecordTime != null)
-                delta = Duration.between(record.getTime(), lastSavedHistoricalRecordTime);
-            else
-                delta = record.getDuration();
-
-            //
-            // If there is a gap in the data then don't save the record right now. If after a number of errors
-            // we must assume that there is a problem with the data being sent from the weather station and just save the data.
-            // A gap is defined as being greater than a twice the duration. This allows for minor glitches in the historical record
-            // times.
-            //
-            /*
-            if (delta.getSeconds() >= 2 * record.getDuration().getSeconds()) {
-                missingRecord = true;
-                logger.log(Level.WARNING, "Records seem to be missing. Missing Data Count = {0}", missingDataCount);
-                logger.warning(String.format("DB Time = %s New record time = %s Delta (seconds) = %d New record duration = %d",
-                                    CollectorConstants.dateTimeFormatter().format(lastSavedHistoricalRecordTime),
-                                    CollectorConstants.dateTimeFormatter().format(record.getTime()),
-                                    delta.getSeconds(),
-                                    record.getDuration().getSeconds()));
-
-                if (lastBadHistoricalTime == null)
-                    lastBadHistoricalTime = record.getTime();
-
-                if (lastBadHistoricalTime.equals(record.getTime())) { 
-                    logger.info("Incrementing missing data counter^^^^^^^^^^^^^^^");
-                    missingDataCount++;
-                }
-                else {
-                    missingDataCount = 0;
-                    lastBadHistoricalTime = record.getTime();
-                }
-
-                if (missingDataCount < MAX_MISSING_DATA_ERRORS_ALLOWED) {
-                    //
-                    // This will cause the socket to close and force a reconnect from the driver. Flushing the queue will clean out
-                    // any other historical records that were read with the record being processed. This will cause a clean start with
-                    // the driver.
-                    //
-                    logger.info("Closing socket due to missing data");
-//                    socketReader.closeSocketRequest();
-    //                executor.clear(); TODO how do we clear the executors queue?
-                }
-                else
-                    missingRecord = false;
-            }
-            else
-                lastSavedHistoricalRecordTime = record.getTime();
-            */
-        }
-
-        if (!missingRecord)
-            performAddHistoricalRecords(records);
-        else
-            logger.severe("Skipping adding historical records due to gap int records");
+        performAddHistoricalRecords(records);
     }
 
     /**
@@ -644,7 +572,7 @@ final class CollectorDbWriter implements WeatherDataWriter, Runnable {
                         logger.warning(String.format("Found missing data - Record 1: %s Record 2: %s Delta of %d != to duration of %d",
                                                     DBTable.dateTimeFormatter().format(rec.getTime()),
                                                     DBTable.dateTimeFormatter().format(older),
-                                                    delta, rec.getDuration()));
+                                                    delta, rec.getDuration().getSeconds()));
                         missingDataFound = true;
                     }
                 }
@@ -670,8 +598,7 @@ final class CollectorDbWriter implements WeatherDataWriter, Runnable {
         return statistics;
     }
 
-    @SuppressWarnings("serial")
-    public class Statistics implements Serializable {
+    public static class Statistics implements Serializable {
         int currentWeatherRecordCount;
         LocalDateTime lastCurrentWeatherTime;
         int historicalRecordCount;

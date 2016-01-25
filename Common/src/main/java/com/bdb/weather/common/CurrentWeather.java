@@ -112,119 +112,264 @@ public class CurrentWeather implements Serializable {
     public CurrentWeather() {
     }
 
+    /**
+     * Set the time of this current weather measurement.
+     * 
+     * @param time The local time
+     */
     @XmlJavaTypeAdapter(type=java.time.LocalDateTime.class, value=LocalDateTimeAdapter.class)
     public void setTime(LocalDateTime time) {
         this.time = time;
     }
 
+    /**
+     * Get the time of the current weather observation.
+     * 
+     * @return The observation time
+     */
     public LocalDateTime getTime() {
         return time;
     }
 
-    public void setIndoorTemperature(Temperature temp) {
-        this.indoorTemp = temp;
+    /**
+     * Set the indoor temperature.
+     * 
+     * @param temperature The indoor temperature
+     */
+    public void setIndoorTemperature(Temperature temperature) {
+        this.indoorTemp = temperature;
     }
 
+    /**
+     * Get the indoor temperature.
+     * 
+     * @return The indoor temperature
+     */
     public Temperature getIndoorTemperature() {
         return indoorTemp;
     }
 
-    public void setOutdoorTemperature(Temperature temp) {
-        this.outdoorTemp = temp;
+    /**
+     * Set the outdoor temperature.
+     * 
+     * @param temperature The outdoor temperature 
+     */
+    public void setOutdoorTemperature(Temperature temperature) {
+        this.outdoorTemp = temperature;
     }
 
+    /**
+     * Get the outdoor temperature.
+     * 
+     * @return The outdoor temperature
+     */
     public Temperature getOutdoorTemperature() {
         return outdoorTemp;
     }
 
-    public void setWindChill(Temperature temp) {
-        this.windChill = temp;
+    /**
+     * Set the wind chill.
+     * 
+     * @param temperature  The wind chill
+     */
+    public void setWindChill(Temperature temperature) {
+        this.windChill = temperature;
     }
 
+    /**
+     * Get the wind chill.
+     * 
+     * @return The wind chill
+     */
     public Temperature getWindChill() {
         return windChill;
     }
 
-    public void setHeatIndex(Temperature temp) {
-        this.heatIndex = temp;
+    /**
+     * Set heat index.
+     * 
+     * @param temperature The heat index
+     */
+    public void setHeatIndex(Temperature temperature) {
+        this.heatIndex = temperature;
     }
 
+    /**
+     * Get the heat index.
+     * 
+     * @return The heat index
+     */
     public Temperature getHeatIndex() {
         return heatIndex;
     }
 
-    public void setDewPoint(Temperature temp) {
-        this.dewPoint = temp;
+    /**
+     * Set the dew point.
+     * 
+     * @param temperature The dew point
+     */
+    public void setDewPoint(Temperature temperature) {
+        this.dewPoint = temperature;
     }
 
+    /**
+     * Get the dew point.
+     * 
+     * @return The dew point
+     */
     public Temperature getDewPoint() {
         return dewPoint;
     }
 
-    public void setThsw(Temperature t) {
-        this.thsw = t;
+    /**
+     * Set the THSW.
+     * 
+     * @param temperature The THSW
+     */
+    public void setThsw(Temperature temperature) {
+        this.thsw = temperature;
     }
 
+    /**
+     * Get the THSW.
+     * 
+     * @return The THSW
+     */
     public Temperature getThsw() {
         return thsw;
     }
 
+    /**
+     * Set the wind speed and direction.
+     * 
+     * @param wind The wind
+     */
     public void setWind(Wind wind) {
         this.wind = wind;
     }
 
+    /**
+     * Get the wind speed and direction.
+     * 
+     * @return The wind
+     */
     public Wind getWind() {
         return wind;
     }
 
+    /**
+     * Get the average wind speed over the last 2 minutes.
+     * 
+     * @return The average wind speed over the last 2 minutes
+     */
     public Speed getWindSpeed2MinAvg() {
         return windSpeed2MinAvg;
     }
 
+    /**
+     * Set the average wind speed over the last 2 minutes.
+     * 
+     * @param windSpeed2MinAvg The average wind speed over the last 2 minutes
+     */
     public void setWindSpeed2MinAvg(Speed windSpeed2MinAvg) {
         this.windSpeed2MinAvg = windSpeed2MinAvg;
     }
 
+    /**
+     * Get the average wind speed over the last 10 minutes.
+     * 
+     * @return The average wind speed over the last 10 minutes
+     */
     public Speed getWindSpeed10MinAvg() {
         return windSpeed10MinAvg;
     }
 
+    /**
+     * Set the average wind speed over the last 10 minutes.
+     * 
+     * @param windSpeed10MinAvg The average wind speed over the last 10 minutes
+     */
     public void setWindSpeed10MinAvg(Speed windSpeed10MinAvg) {
         this.windSpeed10MinAvg = windSpeed10MinAvg;
     }
 
-    public void setWindDir2(Heading h) {
-        windDir2 = h;
+    /**
+     * Set the second most wind direction tendency.
+     * 
+     * @param heading The heading
+     */
+    public void setWindDir2(Heading heading) {
+        windDir2 = heading;
     }
 
+    /**
+     * Get the second most wind direction tendency.
+     * 
+     * @return The heading
+     */
     public Heading getWindDir2() {
         return windDir2;
     }
 
-    public void setWindDir3(Heading h) {
-        windDir3 = h;
+    /**
+     * Set the third most wind direction tendency.
+     * 
+     * @param heading The heading
+     */
+    public void setWindDir3(Heading heading) {
+        windDir3 = heading;
     }
 
+    /**
+     * Get the third most wind direction tendency.
+     * 
+     * @return The heading
+     */
     public Heading getWindDir3() {
         return windDir3;
     }
 
+    /**
+     * Set the fourth most wind direction tendency.
+     * 
+     * @param heading The heading
+     */
     public void setWindDir4(Heading h) {
         windDir4 = h;
     }
 
+    /**
+     * Get the fourth most wind direction tendency.
+     * 
+     * @return The heading
+     */
     public Heading getWindDir4() {
         return windDir4;
     }
 
+    /**
+     * Set the fifth most wind direction tendency.
+     * 
+     * @param heading The heading
+     */
     public void setWindDir5(Heading h) {
         windDir5 = h;
     }
 
+    /**
+     * Get the fifth most wind direction tendency.
+     * 
+     * @return The heading
+     */
     public Heading getWindDir5() {
         return windDir5;
     }
     
+    /**
+     * Get the wind speed.
+     * 
+     * @return The wind speed or null if no reading
+     */
     public Speed getWindSpeed() {
         if (wind != null)
             return wind.getSpeed();
@@ -232,6 +377,11 @@ public class CurrentWeather implements Serializable {
             return null;
     }
     
+    /**
+     * Get the wind direction.
+     * 
+     * @return The wind direction of null if no reading
+     */
     public Heading getWindDirection() {
         if (wind != null)
             return wind.getDirection();
@@ -239,14 +389,29 @@ public class CurrentWeather implements Serializable {
             return null;
     }
     
+    /**
+     * Set the wind gust
+     * 
+     * @param gust The wind gust
+     */
     public void setWindGust(Wind gust) {
         this.gust = gust;
     }
     
+    /**
+     * Get the wind gust.
+     * 
+     * @return The wind gust speed and direction
+     */
     public Wind getWindGust() {
         return gust;
     }
 
+    /**
+     * Get the wind gust speed.
+     * 
+     * @return The wind gust speed or null
+     */
     public Speed getWindGustSpeed() {
         if (gust != null)
             return gust.getSpeed();
@@ -254,6 +419,11 @@ public class CurrentWeather implements Serializable {
             return null;
     }
     
+    /**
+     * Get the wind gust direction.
+     * 
+     * @return The wind gust direction of null
+     */
     public Heading getWindGustDirection() {
         if (gust != null)
             return gust.getDirection();
@@ -261,10 +431,20 @@ public class CurrentWeather implements Serializable {
             return null;
     }
 
+    /**
+     * Set the barometric pressure.
+     * 
+     * @param pressure The barometric pressure
+     */
     public void setBaroPressure(Pressure pressure) {
         baroPressure = pressure;
     }
 
+    /**
+     * Get the barometric pressure.
+     * 
+     * @return The barometric pressure
+     */
     public Pressure getBaroPressure() {
         return baroPressure;
     }

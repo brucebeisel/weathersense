@@ -157,6 +157,12 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
          return addRadarImage(dri);
     }
     
+    /**
+     * Add a Doppler radar image to the table.
+     * 
+     * @param image The image to add
+     * @return true if the image was added successfully
+     */
     public boolean addRadarImage(DopplerRadarImage image) {
         boolean success;
 	String stmtString = "insert into " + TABLE_NAME + " values(?,?,?)";
@@ -191,6 +197,11 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
     	return success;
     }
     
+    /**
+     * Get all of the Doppler radar images in the table.
+     * 
+     * @return The list of images
+     */
     public List<DopplerRadarImage> getRadarImages() {
         return getNewerRadarImages(Integer.MAX_VALUE);
     }
@@ -246,8 +257,13 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
         return images;
     }
     
-    public Image getNewestRadarImage() throws SQLException, IOException
-    {
+    /**
+     * Get the newest Doppler radar image from the table.
+     * 
+     * @return The newest image
+     * @throws IOException A database error occurred
+     */
+    public Image getNewestRadarImage() throws IOException {
         int maxSequence = getNewestSequence();
         
         if (maxSequence == -1)
@@ -261,6 +277,14 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
             return images.get(images.size() - 1).getImage();
     }
     
+    /**
+     * Convert a database BLOB to an image.
+     * 
+     * @param blob The BLOB to convert to an image
+     * @return The image
+     * @throws SQLException The BLOB input stream could not be opened
+     * @throws IOException The image could not be created from an input stream
+     */
     public static Image blobToImage(Blob blob) throws SQLException, IOException {
         Image image;
         try (InputStream is = blob.getBinaryStream()) {
@@ -269,6 +293,14 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
         return image;
     }
     
+    /**
+     * Convert an image to a database BLOB.
+     * 
+     * @param image The image to convert to a BLOB
+     * @return The created BLOB
+     * @throws SQLException The BLOB could not be created
+     * @throws IOException The output stream to write the BLOB could not be created
+     */
     public static Blob imageToBlob(Image image) throws SQLException, IOException {
         byte[] bytesOut;
 

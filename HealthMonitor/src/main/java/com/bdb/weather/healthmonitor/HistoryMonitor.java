@@ -87,7 +87,7 @@ public class HistoryMonitor implements HealthMonitor {
 
             Timestamp ts = rs.getTimestamp(1);
             LocalDateTime time = ts.toLocalDateTime();
-            logger.fine("History table time: " + DBTable.dateTimeFormatter().format(time));
+            logger.log(Level.FINE, "History table time: {0}", DBTable.dateTimeFormatter().format(time));
             LocalDateTime now = LocalDateTime.now();
             Duration delta = Duration.between(time, now);
 	    long minutes = delta.toMinutes();
@@ -117,10 +117,10 @@ public class HistoryMonitor implements HealthMonitor {
         String select = "select sensor_station_id,battery_ok from " + DatabaseConstants.DATABASE_NAME + ".sensor_station_status" +
                         " where time='" + DBTable.dateTimeFormatter().format(time) + "'";
 
-        PreparedStatement selectStatement = connection.prepareStatement(select);
 
         boolean batteriesOK = true;
-        try (ResultSet rs = selectStatement.executeQuery()) {
+        try (PreparedStatement selectStatement = connection.prepareStatement(select);
+             ResultSet rs = selectStatement.executeQuery()) {
             if (!rs.first()) {
                 logger.warning("Failed to query sensor station status table");
                 throw new SQLException("Unexpected empty sensor station status table");
@@ -132,13 +132,11 @@ public class HistoryMonitor implements HealthMonitor {
                 batteriesOK = batteriesOK && batteryOK;
 
                 if (!batteryOK) 
-                    logger.info("Battery for sensor station " + sensorStationId + " is going bad");
+                    logger.log(Level.INFO, "Battery for sensor station {0} is going bad", sensorStationId);
                 else
-                    logger.fine("Battery for sensor station " + sensorStationId + " is good");
+                    logger.log(Level.FINE, "Battery for sensor station {0} is good", sensorStationId);
             } while (rs.next());
         }
-
-	selectStatement.close();
 
         return batteriesOK;
     }

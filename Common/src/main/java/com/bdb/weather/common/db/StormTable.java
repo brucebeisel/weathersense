@@ -38,6 +38,9 @@ import com.bdb.weather.common.measurement.Depth;
  * @author Bruce
  */
 public class StormTable extends DBTable<Storm> {
+    /**
+     * Database table name for the storm table
+     */
     protected static final String TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".storms";
     private static final String STORM_START_COLUMN = "storm_start";
     private static final String STORM_END_COLUMN = "storm_end";
@@ -135,6 +138,12 @@ public class StormTable extends DBTable<Storm> {
         }
     }
 
+    /**
+     * Save a storm to the database table.
+     * 
+     * @param storm The storm to save
+     * @return true if saved successfully
+     */
     public boolean saveStorm(Storm storm) {
         if (!recordExists(storm.getStartTime()))
             return addRow(storm);

@@ -24,27 +24,50 @@ import javax.xml.bind.annotation.XmlElement;
 import com.bdb.weather.common.measurement.Heading;
 import com.bdb.weather.common.measurement.Speed;
 
+/**
+ * Class that holds both the speed of the wind and its direction.
+ * 
+ * @author bruce
+ */
 public class Wind implements Serializable {
-
     private static final long serialVersionUID = -8433403188400671214L;
     @XmlElement
     private final Speed speed;
     @XmlElement
     private final Heading direction;
 
+    /**
+     * Constructor.
+     * 
+     * @param speed The speed of the wind
+     * @param direction The direction of the wind
+     */
     public Wind(Speed speed, Heading direction) {
         this.speed = speed;
         this.direction = direction;
     }
     
+    /**
+     * Constructor.
+     */
     private Wind() {
         this(new Speed(0.0), new Heading(0.0F));
     }
 
+    /**
+     * Get the wind speed.
+     * 
+     * @return The wind speed
+     */
     public Speed getSpeed() {
         return speed;
     }
 
+    /**
+     * Get the wind direction.
+     * 
+     * @return The wind direction
+     */
     public Heading getDirection() {
         return direction;
     }

@@ -45,6 +45,9 @@ import com.bdb.weather.common.measurement.Temperature;
  *
  */
 public class WeatherStationTable extends DBTable<WeatherStation> {
+    /**
+     * Name of the weather station table in the database
+     */
     protected static final String TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".weather_station";
     private static final int SINGLETON_VALUE = 1;
     private static final int INSERT_COLUMN_COUNT = 25;
@@ -72,8 +75,8 @@ public class WeatherStationTable extends DBTable<WeatherStation> {
     private static final String MONTHLY_RAIN_MAX_COLUMN = "monthly_rain_max";
     private static final String YEARLY_RAIN_MAX_COLUMN = "yearly_rain_max";
     private static final String DOPPLER_RADAR_URL_COLUMN = "doppler_radar_url";
-    private static final String WEATHER_UNDERGROUND_STATION_ID_COLUMN = "weather_underground_station_id";
-    private static final String WEATHER_UNDERGROUND_PASSWORD_COLUMN = "weather_underground_password";
+    private static final String WUNDERGROUND_STATION_ID_COLUMN = "weather_underground_station_id";
+    private static final String WUNDERGROUND_PASSWORD_COLUMN = "weather_underground_password";
     private static final String INSERT_SQL = "insert into " + TABLE_NAME + " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private static final String UPDATE_SQL = "update " + TABLE_NAME + " set " +
             MANUFACTURER_COLUMN + "=?," +
@@ -97,8 +100,8 @@ public class WeatherStationTable extends DBTable<WeatherStation> {
             MONTHLY_RAIN_MAX_COLUMN + "=?," +
             YEARLY_RAIN_MAX_COLUMN + "=?," +
             DOPPLER_RADAR_URL_COLUMN + "=?," +
-            WEATHER_UNDERGROUND_STATION_ID_COLUMN + "=?," +
-            WEATHER_UNDERGROUND_PASSWORD_COLUMN + "=?" +
+            WUNDERGROUND_STATION_ID_COLUMN + "=?," +
+            WUNDERGROUND_PASSWORD_COLUMN + "=?" +
             WHERE_CLAUSE;
     private static final Logger logger = Logger.getLogger(WeatherStationTable.class.getName());
     private final SensorTable   sensorTable;
@@ -152,8 +155,8 @@ public class WeatherStationTable extends DBTable<WeatherStation> {
             Speed windSpeedInterval = new Speed(rs.getDouble(WIND_SPEED_BIN_INTERVAL_COLUMN), DatabaseUnits.SPEED);
             int numBins = rs.getInt(NUM_WIND_SPEED_BINS_COLUMN);
             ws.setWindParameters(new WindParameters(windSpeedInterval, numBins, windSlices));
-            ws.setWeatherUndergroundStationId(rs.getString(WEATHER_UNDERGROUND_STATION_ID_COLUMN));
-            ws.setWeatherUndergroundPassword(rs.getString(WEATHER_UNDERGROUND_PASSWORD_COLUMN));
+            ws.setWeatherUndergroundStationId(rs.getString(WUNDERGROUND_STATION_ID_COLUMN));
+            ws.setWeatherUndergroundPassword(rs.getString(WUNDERGROUND_PASSWORD_COLUMN));
             ws.setDailyRainMax(new Depth(rs.getDouble(DAILY_RAIN_MAX_COLUMN), DatabaseUnits.DEPTH));
             ws.setMonthlyRainMax(new Depth(rs.getDouble(MONTHLY_RAIN_MAX_COLUMN), DatabaseUnits.DEPTH));
             ws.setYearlyRainMax(new Depth(rs.getDouble(YEARLY_RAIN_MAX_COLUMN), DatabaseUnits.DEPTH));
@@ -181,7 +184,7 @@ public class WeatherStationTable extends DBTable<WeatherStation> {
      * @return Two strings, one being the weather underground station ID, the other the password
      */
     public Pair<String,String> weatherUndergroundParameters() {
-        String sql = "select " + WEATHER_UNDERGROUND_STATION_ID_COLUMN + "," + WEATHER_UNDERGROUND_PASSWORD_COLUMN +
+        String sql = "select " + WUNDERGROUND_STATION_ID_COLUMN + "," + WUNDERGROUND_PASSWORD_COLUMN +
                      " from " + TABLE_NAME;
         
         List<Pair<String,String>> list = executeQuery(sql, (ResultSet rs, Object... args) -> {

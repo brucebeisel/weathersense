@@ -39,7 +39,7 @@ public class CurrentWeatherMonitor implements HealthMonitor, CurrentWeatherSubsc
     private final int toleranceSeconds;
     private final PiGlow piGlow;
     private int counter = 0;
-    private List<PiGlowLED> leds;
+    private final List<PiGlowLED> leds;
 
     public static CurrentWeatherMonitor createCurrentWeatherMonitor(PiGlow piGlow, List<PiGlowLED> leds, int toleranceMinutes) {
         List<PiGlowLED> list = new ArrayList<>(leds);

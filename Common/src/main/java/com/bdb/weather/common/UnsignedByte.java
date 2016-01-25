@@ -16,22 +16,49 @@
  */
 package com.bdb.weather.common;
 
+/**
+ * Class that provides an unsigned byte that Java does not.
+ * 
+ * @author bruce
+ */
 public final class UnsignedByte {
     private int value = 0;
 
+    /**
+     * Constructor.
+     * 
+     * @param value The initial value
+     */
     public UnsignedByte(int value) {
         put(value);
     }
 
+    /**
+     * Get the value.
+     * 
+     * @return The value
+     */
     int get() {
         return value;
     }
 
+    /**
+     * Set the value.
+     * 
+     * @param value The value
+     */
     void put(int value) {
         this.value = value;
         this.value &= 0xFF;
     }
 
+    /**
+     * Checks if the specified bit is set.
+     * 
+     * @param bit The bit (0 based index)
+     * @return true if the bit is set
+     * @throws IllegalArgumentException The bit argument is invalid
+     */
     boolean isBitSet(int bit) throws IllegalArgumentException {
         if (bit < 0 || bit > 7)
             throw new IllegalArgumentException("Out of range bit");
@@ -39,6 +66,13 @@ public final class UnsignedByte {
         return ((1 << bit) & value) != 0;
     }
 
+    /**
+     * Shift the bit to the left.
+     * 
+     * @param bits The number of bits to shift.
+     * 
+     * @throws IllegalArgumentException The number of bits to shift is invalid
+     */
     void shiftLeft(int bits) throws IllegalArgumentException {
         if (bits < 0 || bits > 7)
             throw new IllegalArgumentException("Out of range bit");
@@ -49,6 +83,13 @@ public final class UnsignedByte {
 
     }
 
+    /**
+     * Shift the bit to the right.
+     * 
+     * @param bits The number of bits to shift.
+     * 
+     * @throws IllegalArgumentException The number of bits to shift is invalid
+     */
     void shiftRight(int bits) throws IllegalArgumentException {
         if (bits < 0 || bits > 7)
             throw new IllegalArgumentException("Out of range bit");

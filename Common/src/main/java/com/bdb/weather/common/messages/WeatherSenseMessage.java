@@ -75,14 +75,14 @@ public class WeatherSenseMessage {
         for (String token : stringTokens) {
             int equalsIndex = token.indexOf('=');
             if (equalsIndex == -1) {
-                logger.log(Level.SEVERE, "Name/Value pair missing '=' sign. (" + message + ")");
+                logger.log(Level.SEVERE, "Name/Value pair missing ''='' sign. ({0})", message);
                 return null;
             }
             String name = token.substring(0, equalsIndex);
             String value = token.substring(equalsIndex + 1);
             if (message == null) {
                 if (!name.equals(MESSAGE_TYPE_NAME)) {
-                    logger.log(Level.SEVERE, "First token (" + name + ") of message is not " + MESSAGE_TYPE_NAME);
+                    logger.log(Level.SEVERE, "First token ({0}) of message is not {1}", new Object[]{MESSAGE_TYPE_NAME, name});
                     return null;
                 }
                 else

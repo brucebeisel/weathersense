@@ -21,6 +21,10 @@ import java.util.Objects;
 
 import com.bdb.weather.common.measurement.Depth;
 
+/**
+ * Class that contains information about a storm.
+ * @author bruce
+ */
 public class Storm {
     private final LocalDateTime startTime;
     private final LocalDateTime endTime;
@@ -49,14 +53,29 @@ public class Storm {
         this(startTime, null, rainfall);
     }
 
+    /**
+     * Get the start time of the storm.
+     * 
+     * @return The start time of the storm
+     */
     public LocalDateTime getStartTime() {
         return startTime;
     }
 
+    /**
+     * Get the end time of the storm.
+     * 
+     * @return The time the storm ended or null if the storm is still in progress
+     */
     public LocalDateTime getEndTime() {
         return endTime;
     }
     
+    /**
+     * Get the amount of rain for this storm.
+     * 
+     * @return The rainfall amount
+     */
     public Depth getStormRainfall() {
         return stormRainfall;
     }
@@ -96,5 +115,4 @@ public class Storm {
 
         return Objects.equals(this.stormRainfall, other.stormRainfall);
     }
-
 }

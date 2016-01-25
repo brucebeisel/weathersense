@@ -24,10 +24,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.Dialog;
 import javafx.scene.layout.BorderPane;
 
-import com.bdb.util.DateButton;
 import com.bdb.util.jdbc.DBConnection;
 
 import com.bdb.weather.common.DailyRecords;
@@ -42,7 +40,6 @@ import com.bdb.weather.common.db.DailySummaryTable;
 import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.StageUtilities;
-import com.bdb.weather.display.WeatherSense;
 
 /**
  * Panel that displays a day's worth of data and handles the panel for advancing through the days or

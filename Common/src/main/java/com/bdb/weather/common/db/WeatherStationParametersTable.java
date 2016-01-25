@@ -31,6 +31,7 @@ import com.bdb.weather.common.messages.WsParametersMessage;
 
 
 /**
+ * Database table class for the weather station parameters.
  *
  * @author Bruce
  */
@@ -39,6 +40,11 @@ public class WeatherStationParametersTable extends DBTable<Pair<String,String>> 
     private static final String INSERT_SQL = "insert into " + TABLE_NAME + " values(?,?)";
     private static final Logger logger = Logger.getLogger(WeatherStationParametersTable.class.getName());
     
+    /**
+     * Constructor.
+     * 
+     * @param connection The connection to the database
+     */
     public WeatherStationParametersTable(DBConnection connection) {
         super(TABLE_NAME,  connection);
     }
@@ -70,6 +76,11 @@ public class WeatherStationParametersTable extends DBTable<Pair<String,String>> 
         }
     }
 
+    /**
+     * Extract the weather station parameters from the database into the parameters.
+     * 
+     * @param parameters The message in which to store the parameters
+     */
     public void getParameters(WsParametersMessage parameters) {
         List<Pair<String,String>> list = query(null);
 
@@ -78,6 +89,11 @@ public class WeatherStationParametersTable extends DBTable<Pair<String,String>> 
         });
     }
 
+    /**
+     * Write the weather station parameters.
+     * 
+     * @param parameters The message from which to store the parameters
+     */
     public void setParameters(WsParametersMessage parameters) {
         this.getConnection().startTransaction();
         deleteAllRows();

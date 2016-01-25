@@ -23,6 +23,11 @@ import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
+/**
+ * Log formatter that is used for all log entries.
+ * 
+ * @author bruce
+ */
 public class LogFormatter extends Formatter {
 
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");

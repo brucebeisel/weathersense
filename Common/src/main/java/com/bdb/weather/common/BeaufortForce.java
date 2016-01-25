@@ -51,26 +51,56 @@ public class BeaufortForce {
         this.seaDescription = seaDescription;
     }
 
+    /**
+     * Get the classification of this force.
+     * 
+     * @return The classification of this force
+     */
     public String getClassification() {
         return classification;
     }
 
+    /**
+     * Get the description of this force as applied to land observation.
+     * 
+     * @return The description of the force over land
+     */
     public String getLandDescription() {
         return landDescription;
     }
 
+    /**
+     * Get the maximum speed of this force.
+     * 
+     * @return The maximum speed
+     */
     public Speed getMaxSpeed() {
         return maxSpeed;
     }
 
+    /**
+     * Get the minimum speed of this force.
+     * 
+     * @return The minimum speed
+     */
     public Speed getMinSpeed() {
         return minSpeed;
     }
 
+    /**
+     * Get the scale index for this force.
+     * 
+     * @return The scale index
+     */
     public int getForce() {
         return force;
     }
 
+    /**
+     * Get the description of this force as applied to sea observation.
+     * 
+     * @return The description of the force over sea
+     */
     public String getSeaDescription() {
         return seaDescription;
     }

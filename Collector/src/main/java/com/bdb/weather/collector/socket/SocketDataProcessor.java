@@ -24,6 +24,9 @@ import java.util.List;
  * @author Bruce
  */
 public interface SocketDataProcessor {
+    /**
+     * Returned by the findToken method if not tokens are found in the stream
+     */
     public static final int NO_TOKEN_FOUND = -1;
     /**
      * Consume the messages and provide a possible response

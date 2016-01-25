@@ -20,7 +20,12 @@ import java.time.LocalDate;
 
 import com.bdb.util.measurement.Measurement;
 
-
+/**
+ * Class that contains an extreme (also called a record)
+ * @author bruce
+ * @param <MEASUREMENT> The type of measurement for which this is an extreme
+ * @param <RECORDTYPE> The type of record as maximum or minimum
+ */
 public class Extreme<MEASUREMENT extends Measurement, RECORDTYPE extends RecordType> {    
     private final LocalDate     date;
     private final MEASUREMENT   value;
@@ -28,6 +33,15 @@ public class Extreme<MEASUREMENT extends Measurement, RECORDTYPE extends RecordT
     private final LocalDate     previousDate;
     private final MEASUREMENT   previousValue;
 
+    /**
+     * Constructor.
+     * 
+     * @param date The date of the extreme
+     * @param type The type of the extreme
+     * @param value The value of the extreme measurement
+     * @param previousYear The year of the previous extreme that this one exceeded
+     * @param previousValue The previous value that this one exceeded
+     */
     public Extreme(LocalDate date, RECORDTYPE type, MEASUREMENT value, int previousYear, MEASUREMENT previousValue) {
         this.date = date;
         this.type = type;
@@ -37,29 +51,45 @@ public class Extreme<MEASUREMENT extends Measurement, RECORDTYPE extends RecordT
     }
     
     /**
-     * @return the date
+     * Get the date of the extreme.
+     * 
+     * @return the date of the extreme
      */
     public LocalDate getDate() {
         return date;
     }
     
+    /**
+     * Get the date of the previous extreme value.
+     * 
+     * @return The date of the previous extreme
+     */
     public LocalDate getPreviousDate() {
         return previousDate;
     }
 
     /**
-     * @return the value
+     * Get the value of the extreme.
+     * 
+     * @return The extreme value
      */
     public MEASUREMENT getValue() {
         return value;
     }
     
+    /**
+     * Get the value of the previous extreme.
+     * 
+     * @return The previous extreme value
+     */
     public MEASUREMENT getPreviousValue() {
         return previousValue;
     }
     
     /**
-     * @return the type
+     * Get the type of extreme.
+     * 
+     * @return The extreme type
      */
     public RECORDTYPE getType() {
         return type;

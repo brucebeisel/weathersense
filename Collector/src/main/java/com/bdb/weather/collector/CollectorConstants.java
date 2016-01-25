@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2015 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,10 +25,22 @@ import java.time.format.FormatStyle;
  * @author Bruce
  */
 public final class CollectorConstants {
+    /**
+     * The port on which the collector listens for a connection from a driver.
+     */
     public static final int COLLECTOR_PORT = 11461;
     
+    /**
+     * The message type token used in the non-XML protocol with the collector.
+     */
     public static final String MESSAGE_TYPE_TOKEN = "message_type";
+    /**
+     * The initialize command
+     */
     public static final String INITIALIZE_TOKEN = "initialize";
+    /**
+     * The format to be used to format the date of the newest archive record in the database
+     */
     public static final String NEWEST_RECORD_DATE_FORMAT = "yyyyMMdd HHmm";
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);

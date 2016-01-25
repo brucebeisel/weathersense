@@ -27,6 +27,11 @@ import java.util.Objects;
 
 import com.bdb.weather.common.measurement.Depth;
 
+/**
+ * Class that holds the averages for the months.
+ * 
+ * @author bruce
+ */
 public class MonthWeatherAverages implements WeatherAverages {
     private static final int MONTHS_PER_YEAR = Month.values().length;
     private final Map<Month,WeatherAverage> averages = new HashMap<>();
@@ -46,27 +51,17 @@ public class MonthWeatherAverages implements WeatherAverages {
             averages.put(avg.getMonth(), avg);
     }
     
-    /* (non-Javadoc)
-     * @see com.bdb.weather.common.WeatherAverages#getAverage(java.time.LocalDate)
-     */
     @Override
     public WeatherAverage getAverage(LocalDate date) {
         return averages.get(date.getMonth());
     }
 
-    /* (non-Javadoc)
-     * @see com.bdb.weather.common.WeatherAverages#putAverage(com.bdb.weather.common.WeatherAverage, java.time.LocalDate)
-     */
     @Override
     public void putAverage(WeatherAverage avg, LocalDate date) {
         Month month = date.getMonth();
         averages.put(month, avg);
     }
     
-    /*
-     * (non-Javadoc)
-     * @see com.bdb.weather.common.WeatherAverages#getAllAverages()
-     */
     @Override
     public Collection<WeatherAverage> getAllAverages() {
         return Collections.unmodifiableCollection(averages.values());

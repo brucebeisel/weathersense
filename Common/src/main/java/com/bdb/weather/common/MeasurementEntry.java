@@ -35,23 +35,48 @@ public class MeasurementEntry<T extends Measurement> {
     @XmlElement
     private T measurement;
 
+    /**
+     * Constructor.
+     * 
+     * @param sensorId The ID of the sensor from which this measurement was obtained
+     * @param sensorType The type of sensor from which this measurement was obtained
+     * @param measurement The measurement
+     */
     public MeasurementEntry(int sensorId, SensorType sensorType, T measurement) {
         this.sensorId = sensorId;
         this.sensorType = sensorType;
         this.measurement = measurement;
     }
     
+    /**
+     * Constructor.
+     */
     private MeasurementEntry() {
     }
     
+    /**
+     * Get the sensor ID.
+     * 
+     * @return The sensor ID
+     */
     public int getSensorId() {
         return sensorId;
     }
     
+    /**
+     * Get the sensor type.
+     * 
+     * @return The sensor type
+     */
     public SensorType getSensorType() {
         return sensorType;
     }
 
+    /**
+     * Get the measurement.
+     * 
+     * @return The measurement
+     */
     public T getMeasurement() {
         return measurement;
     }

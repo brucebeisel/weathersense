@@ -20,26 +20,52 @@ import java.time.LocalDate;
 
 import com.bdb.weather.common.measurement.Depth;
 
+/**
+ * A class to hold the amount of rainfall for an hour.
+ * 
+ * @author bruce
+ */
 public class RainRecord {
-
     private final LocalDate date;
     private final int hour;
     private final Depth rainfall;
 
-    public RainRecord(LocalDate startTime, int hour, Depth rainfall) {
-        this.date = startTime;
+    /**
+     * Constructor.
+     * 
+     * @param date The date this rain fell
+     * @param hour The hour this rain fell
+     * @param rainfall The amount of rain for the hour
+     */
+    public RainRecord(LocalDate date, int hour, Depth rainfall) {
+        this.date = date;
         this.hour = hour;
         this.rainfall = rainfall;
     }
 
-    public LocalDate getTime() {
+    /**
+     * Get the date of the rain.
+     * 
+     * @return The date
+     */
+    public LocalDate getDate() {
         return date;
     }
 
+    /**
+     * Get the hour of the rainfall.
+     * 
+     * @return The hour
+     */
     public int getHour() {
         return hour;
     }
 
+    /**
+     * Get the amount of rainfall.
+     * 
+     * @return The rainfall amount
+     */
     public Depth getRainfall() {
         return rainfall;
     }

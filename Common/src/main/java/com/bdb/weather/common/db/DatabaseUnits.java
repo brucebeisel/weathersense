@@ -34,19 +34,49 @@ import com.bdb.weather.common.measurement.Temperature;
  *
  */
 public final class DatabaseUnits {
+    /**
+     * Speed unit for database storage
+     */
     public static final Speed.Unit SPEED = Speed.Unit.METERS_PER_SEC;
+    /**
+     * Depth unit for database storage
+     */
     public static final Depth.Unit DEPTH = Depth.Unit.MILLIMETERS;
+    /**
+     * Pressure unit for database storage
+     */
     public static final Pressure.Unit PRESSURE = Pressure.Unit.MILLIBAR;
+    /**
+     * Temperature unit for database storage
+     */
     public static final Temperature.Unit TEMPERATURE = Temperature.Unit.CELSIUS;
+    /**
+     * Altitude unit for database storage
+     */
     public static final Depth.Unit ALTITUDE = Depth.Unit.METERS;
+    /**
+     * Latitude/Longitude unit for database storage
+     */
     public static final AngularMeasurement.Unit LAT_LON = AngularMeasurement.Unit.DEGREES;
+    /**
+     * Soil Moisture unit for database storage
+     */
     public static final SoilMoisture.Unit SOIL_MOISTURE = SoilMoisture.Unit.CENTIBAR;
+    /**
+     * Leaf Wetness unit for database storage
+     */
     public static final LeafWetness.Unit LEAF_WETNESS = LeafWetness.Unit.WETNESS;
 
     private DatabaseUnits() {
         // Only static methods
     }
 
+    /**
+     * Get the database storage unit for the provided value.
+     * 
+     * @param measurement The measure to use to lookup the database storage unit
+     * @return The storage unit for the database
+     */
     public static Unit getDatabaseUnit(Measurement measurement) {
         if (measurement instanceof Temperature)
             return TEMPERATURE;

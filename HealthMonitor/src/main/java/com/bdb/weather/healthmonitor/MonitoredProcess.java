@@ -129,17 +129,15 @@ public class MonitoredProcess implements Runnable {
             restartCount++;
             running = true;
             killing = false;
-            if (process != null) {
-                processStarted();
-                monitor.start();
-                lastStartTime = LocalDateTime.now();
-                return true;
-            }
+            processStarted();
+            monitor.start();
+            lastStartTime = LocalDateTime.now();
+            return true;
         }
         catch (IOException e) {
             processFailed();
+            return false;
         }
-        return false;
     }
 
     public boolean kill() {

@@ -16,11 +16,23 @@
  */
 package com.bdb.weather.common;
 
+/**
+ * Class that provides static methods for manipulating Binary Coded Decimals
+ * @author bruce
+ */
 public final class BinaryCodedDecimal {
 
     private BinaryCodedDecimal() {
     }
 
+    /**
+     * Decode a BCD into an integer.
+     * 
+     * @param data The BCD data
+     * @param index The index into the data to start decoding
+     * @param digits The number of digits to be decoded
+     * @return The decoded integer
+     */
     public static int decode(int data[], int index, int digits) {
         int value = 0;
 

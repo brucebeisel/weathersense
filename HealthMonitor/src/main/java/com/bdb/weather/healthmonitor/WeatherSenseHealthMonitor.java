@@ -122,7 +122,7 @@ public class WeatherSenseHealthMonitor implements Runnable {
 	    healthyAnimator.addAnimation(badBatteryAnimation);
 	    initialized = true;
 	}
-	catch (Exception e) {
+	catch (RuntimeException e) {
 	    PiGlowAnimator animator = new PiGlowAnimator(PiGlow.getInstance());
 	    animator.addAnimation(new PiGlowBlinker(0, 250, 0, 100, Integer.MAX_VALUE, PiGlowLED.allLEDs()));
 	    animator.start();

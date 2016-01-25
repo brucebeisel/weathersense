@@ -16,13 +16,15 @@
  */
 package com.bdb.weather.common.measurement;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlValue;
 
 /**
  *
  * @author Bruce
  */
-public class UvIndex {
+public class UvIndex implements Serializable {
     public static final int MIN_UV_INDEX = 0;
     public static final int MAX_UV_INDEX = 15;
     

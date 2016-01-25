@@ -41,10 +41,18 @@ import com.bdb.weather.common.measurement.Speed;
  * @author Bruce
  *
  */
-public class WindSliceTable extends DBTable<WindSlice>
-{
+public class WindSliceTable extends DBTable<WindSlice> {
+    /**
+     * The name of the wind slice table
+     */
     protected static final String TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".wind_slices";
+    /**
+     * The name of the date column
+     */
     protected static final String DATE_COLUMN = "date";
+    /**
+     * The name of the wind heading index column
+     */
     protected static final String HEADING_COLUMN = "wind_heading_index";
     private static final String   SLICE_DURATION_COLUMN = "slice_duration";
     private static final String   TOTAL_WINDY_DURATION_COLUMN = "windy_duration";
@@ -55,6 +63,9 @@ public class WindSliceTable extends DBTable<WindSlice>
     private static final String   TOTAL_PERCENTAGE_COLUMN = "total_percentage";
     private static final String   INSERT_WIND_SLICE_SQL = "insert into " + TABLE_NAME + " values(?,?,?,?,?,?,?,?,?)";
 
+    /**
+     * The name of the wind speed bin duration table
+     */
     protected static final String BIN_TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".wind_speed_bin_durations";
     private static final String   BIN_DATE_COLUMN = "date";
     private static final String   BIN_WIND_HEADING_INDEX_COLUMN = "wind_heading_index";
@@ -153,6 +164,12 @@ public class WindSliceTable extends DBTable<WindSlice>
         return addWindSlices(list);
     }
 
+    /**
+     * Add the wind slices to the database.
+     * 
+     * @param list The list of wind slices to add to the database
+     * @return True of all of the wind slices were added to the database
+     */
     public boolean addWindSlices(List<WindSlice> list) {
         try {
 	    try (PreparedStatement stmt = getConnection().getConnection().prepareStatement(INSERT_WIND_SLICE_SQL);

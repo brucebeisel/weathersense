@@ -134,7 +134,7 @@ public class RainHourTable extends DBTable<RainRecord> {
             String stmtString = "insert into " + TABLE_NAME + " values(?,?,?)";
             try (PreparedStatement stmt = getConnection().getConnection().prepareStatement(stmtString)) {
                 for (RainRecord record : list) {
-                    LocalDate date = record.getTime();
+                    LocalDate date = record.getDate();
                     int hour = record.getHour();
                     stmt.setDate(1, java.sql.Date.valueOf(date));
                     stmt.setInt(2, hour);
