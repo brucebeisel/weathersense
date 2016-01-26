@@ -41,10 +41,19 @@ public class WsCollectorClient {
     private Socket socket;
     private static final Logger logger = Logger.getLogger(WsCollectorClient.class.getName());
     
+    /**
+     *
+     * @param port
+     * @throws IOException
+     */
     public WsCollectorClient(int port) throws IOException {
         this.port = port;
     }
     
+    /**
+     *
+     * @return
+     */
     public Pair<Boolean,LocalDateTime> connect() {
         if (socket != null) {
             logger.info("Ignoring connect request, already connected");
@@ -71,6 +80,10 @@ public class WsCollectorClient {
         }
     }
     
+    /**
+     *
+     * @return
+     */
     public boolean isConnected() {
         return socket != null;
     }
@@ -111,6 +124,11 @@ public class WsCollectorClient {
         }
     }
     
+    /**
+     *
+     * @param s
+     * @return
+     */
     public boolean sendMessage(String s) {
         if (socket == null)
             return false;

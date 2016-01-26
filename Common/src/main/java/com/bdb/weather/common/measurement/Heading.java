@@ -21,10 +21,21 @@ import java.text.NumberFormat;
 
 import com.bdb.util.measurement.Measurement;
 
+/**
+ * Class that stores a heading measurement.
+ * 
+ * @author bruce
+ */
 public class Heading extends Measurement {
     private static final long serialVersionUID = 2223252001788004134L;
 
+    /**
+     * Units of a heading
+     */
     public enum Unit implements com.bdb.util.measurement.Unit {
+        /**
+         * Only unit supported is degrees
+         */
         DEGREES;
         private static final DecimalFormat formatter = new DecimalFormat("000");
         private static final DecimalFormat formatterWithUnit = new DecimalFormat("000");
@@ -55,15 +66,34 @@ public class Heading extends Measurement {
         }
     };
 
+    /**
+     * A compass point (e.g. N, NW, SW, etc).
+     */
     public static class CompassPoint {
+        /**
+         * The minimum heading of the compass point
+         */
         public Heading min;
+        /**
+         * The maximum heading of the compass point
+         */
         public Heading max;
+        /**
+         * The label of the compass point
+         */
         public String label;
 
-        public CompassPoint(Heading _min, Heading _max, String _label) {
-            min = _min;
-            max = _max;
-            label = _label;
+        /**
+         * Constructor.
+         * 
+         * @param min The minimum heading of the compass point
+         * @param max The maximum heading of the compass point
+         * @param label The label for this compass point
+         */
+        public CompassPoint(Heading min, Heading max, String label) {
+            this.min = min;
+            this.max = max;
+            this.label = label;
         }
     };
     private final static int NUM_COMPASS_PTS = 16;
@@ -77,15 +107,28 @@ public class Heading extends Measurement {
         for (int i = 1; i < NUM_COMPASS_PTS; i++)
             COMPASS_LABEL[i] = new CompassPoint(new Heading((COMPASS_PT_INT * i) - (COMPASS_PT_INT / 2f)),
                                                 new Heading((COMPASS_PT_INT * i) + (COMPASS_PT_INT / 2f)), LABELS[i]);
-    }
+    };
 
-    ;
-
+    /**
+     * The mode of the comparison
+     */
     public enum CompareMode {
-        INCLUSIVE, // >= low and <= high
-        NON_INCLUSIVE, // >  low and <  high
-        INCLUSIVE_NON_INCLUSIVE, // >= low and <  high
-        NON_INCLUSIVE_INCLUSIVE    	// >  low and <= high
+        /**
+         *  >= low and <= high
+         */
+        INCLUSIVE,
+        /**
+         *  >  low and <  high
+         */
+        NON_INCLUSIVE,
+        /**
+         *  >= low and <  high
+         */
+        INCLUSIVE_NON_INCLUSIVE,
+        /**
+         *  >  low and <= high
+         */
+        NON_INCLUSIVE_INCLUSIVE 
     };
 
     static {
@@ -94,6 +137,11 @@ public class Heading extends Measurement {
 
     private static final int COMPARE_PRECISION = 1;
 
+    /**
+     * Constructor.
+     * 
+     * @param value The heading value
+     */
     public Heading(double value) {
         super(value, Unit.DEGREES, COMPARE_PRECISION, Heading::new);
 
@@ -108,6 +156,12 @@ public class Heading extends Measurement {
         this(0.0);
     }
 
+    /**
+     * Add two headings.
+     * 
+     * @param value The value to add to this heading
+     * @return The sum of the two headings
+     */
     public Heading add(double value) {
         double heading = this.get() + value;
 
@@ -120,6 +174,13 @@ public class Heading extends Measurement {
         return new Heading(heading);
     }
 
+    /**
+     * Calculate the center of a wind direction slice.
+     * 
+     * @param sliceIndex The heading index
+     * @param numSlices The number of slices
+     * @return The centerline of the slice
+     */
     public static Heading headingForSlice(int sliceIndex, int numSlices) {
         float degreesPerSlice = 360.0F / numSlices;
         Heading heading = new Heading(degreesPerSlice * (double)sliceIndex);
@@ -145,22 +206,56 @@ public class Heading extends Measurement {
         return Math.round(this.get() * 10.0) == Math.round(other.get() * 10.0);
     }
 
+    /**
+     * Add two headings.
+     * 
+     * @param heading The heading to add to this heading
+     * @return The resulting sum
+     */
     public Heading add(Heading heading) {
         return add(heading.get());
     }
 
+    /**
+     * Subtract two headings.
+     * 
+     * @param value The heading to subtract from this heading
+     * @return The resulting difference
+     */
     public Heading subtract(double value) {
         return add(-(value));
     }
 
+    /**
+     * Subtract two headings.
+     * 
+     * @param heading The heading to subtract from this heading
+     * @return The resulting difference
+     */
     public Heading subtract(Heading heading) {
         return subtract(heading.get());
     }
 
+    /**
+     * Whether this heading is between two headings.
+     * 
+     * @param low The lower bounds of the comparison
+     * @param high The higher bounds of the comparison
+     * @param mode The type of comparison
+     * @return True of this heading is between the two headings
+     */
     public boolean isBetween(Heading low, Heading high, CompareMode mode) {
         return isBetween(low.get(), high.get(), mode);
     }
 
+    /**
+     * Whether this heading is within an arc.
+     * 
+     * @param center The center of the arc
+     * @param arcLength The length of the arc
+     * @param mode The type of comparison
+     * @return True of this heading is within this arc
+     */
     public boolean isBetween(Heading center, double arcLength, CompareMode mode) {
         double low = center.get() - (arcLength / 2);
 
@@ -176,6 +271,14 @@ public class Heading extends Measurement {
 
     }
 
+    /**
+     * Whether this heading is between two headings.
+     * 
+     * @param low The lower bounds of the comparison
+     * @param high The higher bounds of the comparison
+     * @param mode The type of comparison
+     * @return True of this heading is between the two headings
+     */
     public boolean isBetween(double low, double high, CompareMode mode) {
         if (low < 0f || low >= 360f || high < 0f || high >= 360f)
             throw new IllegalArgumentException("Heading value out of range (" + low + "," + high + "). Valid range 0.0 to 360.0 (360 is not valid)");
@@ -216,6 +319,11 @@ public class Heading extends Measurement {
         return result;
     }
 
+    /**
+     * Get the label for a compass point.
+     * 
+     * @return The compass point label
+     */
     public String getCompassLabel() {
         String label = "UNK";
 

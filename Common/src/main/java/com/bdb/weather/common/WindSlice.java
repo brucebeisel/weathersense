@@ -29,6 +29,10 @@ import com.bdb.weather.common.db.DatabaseUnits;
 import com.bdb.weather.common.measurement.Heading;
 import com.bdb.weather.common.measurement.Speed;
 
+/**
+ *
+ * @author bruce
+ */
 public class WindSlice {
     private final LocalDate date;
     private final int headingIndex;
@@ -43,6 +47,13 @@ public class WindSlice {
     private final WindParameters windParams;
     private MeasurementAverage<Speed> avgSpeed = new MeasurementAverage<>(new Speed(0.0), Duration.ZERO);
 
+    /**
+     *
+     * @param date
+     * @param headingIndex
+     * @param speedBins
+     * @param windParams
+     */
     public WindSlice(LocalDate date, int headingIndex, List<SpeedBin> speedBins, WindParameters windParams) {
         this.date = date;
         this.headingIndex = headingIndex;
@@ -53,6 +64,10 @@ public class WindSlice {
             binData.add(new SpeedBinDuration(i, headingIndex, date));
     }
 
+    /**
+     *
+     * @param durations
+     */
     public void setBinDurations(List<SpeedBinDuration> durations) {
         if (durations.size() != speedBins.size())
             throw new IllegalArgumentException("SpeedBinDuration list size mismatch. Received " + durations.size()
@@ -62,20 +77,38 @@ public class WindSlice {
         binData.addAll(durations);
     }
 
+    /**
+     *
+     * @param duration
+     */
     public void addBinDuration(SpeedBinDuration duration) {
         binData.add(duration);
         if (binData.size() > speedBins.size())
             binData.remove(0);
     }
 
+    /**
+     *
+     * @return
+     */
     public List<SpeedBinDuration> getBinDurations() {
         return Collections.unmodifiableList(binData);
     }
 
+    /**
+     *
+     * @param headingIndex
+     * @return
+     */
     public boolean inSlice(int headingIndex) {
         return headingIndex == this.headingIndex;
     }
 
+    /**
+     *
+     * @param heading
+     * @return
+     */
     public boolean inSlice(Heading heading) {
         double headingVal = heading.get();
         //
@@ -102,6 +135,10 @@ public class WindSlice {
         return inSlice(index);
     }
 
+    /**
+     *
+     * @param windSlice
+     */
     public void applyWindSlice(WindSlice windSlice) {
         if (windSlice.sliceDuration.isZero())
             return;
@@ -118,6 +155,11 @@ public class WindSlice {
 
     }
 
+    /**
+     *
+     * @param sampleDuration
+     * @param sample
+     */
     public void applyWindSample(Duration sampleDuration, Wind sample) {
         double speed = sample.getSpeed().get(DatabaseUnits.SPEED);
 
@@ -152,34 +194,67 @@ public class WindSlice {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDate getDate() {
         return date;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getHeadingIndex() {
         return headingIndex;
     }
 
+    /**
+     *
+     * @return
+     */
     public Speed getAvgSpeed() {
         return avgSpeed.getAverage();
     }
 
+    /**
+     *
+     * @param duration
+     * @param avg
+     */
     public void setAvgSpeed(Duration duration, Speed avg) {
         avgSpeed = new MeasurementAverage<>(avg, duration);
     }
 
+    /**
+     *
+     * @return
+     */
     public Speed getMaxSpeed() {
         return maxSpeed;
     }
 
+    /**
+     *
+     * @param maxSpeed
+     */
     public void setMaxSpeed(Speed maxSpeed) {
         this.maxSpeed = maxSpeed;
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getWindyDuration() {
         return windyDuration;
     }
 
+    /**
+     *
+     * @param duration
+     */
     public void setWindyDuration(Duration duration) {
         windyDuration = duration;
 
@@ -189,39 +264,75 @@ public class WindSlice {
             percentageOfWind = 0.0f;
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getTotalDuration() {
         return totalDuration;
     }
 
+    /**
+     *
+     * @param duration
+     */
     public void setTotalDuration(Duration duration) {
         totalDuration = duration;
         percentageOfTotal = (float)sliceDuration.getSeconds() / (float)totalDuration.getSeconds() * 100.0f;
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getSliceDuration() {
         return sliceDuration;
     }
 
+    /**
+     *
+     * @param duration
+     */
     public void setSliceDuration(Duration duration) {
         sliceDuration = duration;
     }
 
+    /**
+     *
+     * @return
+     */
     public float getPercentageOfWind() {
         return percentageOfWind;
     }
 
+    /**
+     *
+     * @param percentage
+     */
     public void setPercentageOfWind(float percentage) {
         percentageOfWind = percentage;
     }
 
+    /**
+     *
+     * @return
+     */
     public float getPercentageOfTotal() {
         return percentageOfTotal;
     }
 
+    /**
+     *
+     * @param percentage
+     */
     public void setPercentageOfTotal(float percentage) {
         percentageOfTotal = percentage;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumSpeedBins() {
         return binData.size();
     }
@@ -230,6 +341,12 @@ public class WindSlice {
     // TODO The fact that the index of the bin is passed as an argument is not good. I am not sure what the right
     // argument would be.
     //
+
+    /**
+     *
+     * @param bin
+     * @return
+     */
     public float speedBinPercentage(int bin) {
         Duration duration = binData.get(bin).getDuration();
 
@@ -239,6 +356,11 @@ public class WindSlice {
             return ((float)duration.getSeconds() / (float)sliceDuration.getSeconds()) * 100.0F;
     }
 
+    /**
+     *
+     * @param speed
+     * @return
+     */
     public SpeedBinDuration getSpeedBinDuration(Speed speed) {
         for (SpeedBin bin : speedBins)
             if (bin.inSpeedBin(speed))

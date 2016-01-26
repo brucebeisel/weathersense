@@ -34,9 +34,14 @@ public class AngularMeasurement extends Measurement {
      * Units Enum of the AngularMeasurement class
      * 
      */
-    public enum Unit implements com.bdb.util.measurement.Unit
-    {
+    public enum Unit implements com.bdb.util.measurement.Unit {
+        /**
+         * Angular measurement in degrees
+         */
         DEGREES("Degrees", 1.0, "#.0000"),
+        /**
+         * Angular measurement in radians
+         */
         RADIANS("Radians", 360.0 / (2 * Math.PI), "#.0000");
 
         private final String              label;

@@ -63,31 +63,50 @@ public class MessageProcessorTest implements WeatherDataWriter, WeatherUploader 
     private boolean receivedSensorMessage;
     private boolean receivedSensorStationMessage;
 
-
+    /**
+     *
+     */
     public MessageProcessorTest() {
     }
     
+    /**
+     *
+     */
     @BeforeClass
     public static void setUpClass() {
         dbcon = DatabaseUtilities.connectToDerby();
         utils = new DatabaseUtilities(dbcon);
     }
     
+    /**
+     *
+     */
     @AfterClass
     public static void tearDownClass() {
         dbcon.close();
     }
     
+    /**
+     *
+     * @throws SQLException
+     */
     @Before
     public void setUp() throws SQLException {
         utils.createHistoryTables();
     }
     
+    /**
+     *
+     */
     @After
     public void tearDown() {
         utils.dropHistoryTables();
     }
 
+    /**
+     *
+     * @throws JAXBException
+     */
     @Test
     public void testConsumeDataString() throws JAXBException {
         System.out.println("consumeDataString");
@@ -101,6 +120,10 @@ public class MessageProcessorTest implements WeatherDataWriter, WeatherUploader 
         assertNull(result);
     }
 
+    /**
+     *
+     * @throws JAXBException
+     */
     @Test
     public void testConsumeDataXML() throws JAXBException {
         System.out.println("consumeDataXML");
@@ -140,6 +163,10 @@ public class MessageProcessorTest implements WeatherDataWriter, WeatherUploader 
         assertTrue(receivedSensorStationMessage);
     }
 
+    /**
+     *
+     * @throws JAXBException
+     */
     @Test
     public void testFindToken() throws JAXBException {
         System.out.println("findToken");

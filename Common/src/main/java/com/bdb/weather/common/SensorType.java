@@ -16,17 +16,65 @@
  */
 package com.bdb.weather.common;
 
+/**
+ *
+ * @author bruce
+ */
 public enum SensorType {
+
+    /**
+     *
+     */
     THERMOMETER("TH"),
+
+    /**
+     *
+     */
     ULTRAVIOLET("UV"),
+
+    /**
+     *
+     */
     ANEMOMETER("AN"),
+
+    /**
+     *
+     */
     LEAF_WETNESS("LW"),
+
+    /**
+     *
+     */
     LEAF_TEMPERATURE("LT"),
+
+    /**
+     *
+     */
     SOLAR_RADIATION("SR"),
+
+    /**
+     *
+     */
     SOIL_MOISTURE("SM"),
+
+    /**
+     *
+     */
     SOIL_TEMPERATURE("ST"),
+
+    /**
+     *
+     */
     HYGROMETER("HY"),
+
+    /**
+     *
+     */
     RAIN_COLLECTOR("RC"),
+
+    /**
+     *
+     */
     BAROMETER("BO");
     
     private final String code;
@@ -35,10 +83,19 @@ public enum SensorType {
         this.code = code;
     }
     
+    /**
+     *
+     * @return
+     */
     public String getCode() {
         return code;
     }
     
+    /**
+     *
+     * @param code
+     * @return
+     */
     public static SensorType fromCode(String code) {
         for (SensorType type : SensorType.values()) {
             if (type.code.equals(code))

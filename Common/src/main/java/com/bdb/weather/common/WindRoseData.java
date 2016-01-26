@@ -26,6 +26,10 @@ import java.util.Objects;
 import com.bdb.weather.common.measurement.Heading;
 import com.bdb.weather.common.measurement.Speed;
 
+/**
+ *
+ * @author bruce
+ */
 public class WindRoseData {
     LocalDate	    date;
     WindSlice	    slices[];
@@ -33,6 +37,11 @@ public class WindRoseData {
     Duration	    calmSeconds = Duration.ZERO;  // Seconds the wind is calm
     List<SpeedBin>  speedBins;
 
+    /**
+     *
+     * @param date
+     * @param windParameters
+     */
     public WindRoseData(LocalDate date, WindParameters windParameters) {
         speedBins = windParameters.getSpeedBinList();
         this.date = date;
@@ -43,6 +52,11 @@ public class WindRoseData {
         }
     }
 
+    /**
+     *
+     * @param duration
+     * @param wind
+     */
     public void measurement(Duration duration, Wind wind) {
         Speed speed = wind.getSpeed();
         Heading heading = wind.getDirection();
@@ -62,6 +76,10 @@ public class WindRoseData {
         }
     }
 
+    /**
+     *
+     * @param wrd
+     */
     public void addWindRoseData(WindRoseData wrd) {
         if (wrd.speedBins.size() != speedBins.size() || wrd.slices.length != slices.length)
             throw new IllegalArgumentException("WindRoseData structure does not match structure of data to be added");
@@ -76,38 +94,75 @@ public class WindRoseData {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDate getTime() {
         return date;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumSlices() {
         return slices.length;
     }
 
+    /**
+     *
+     * @param index
+     * @return
+     */
     public WindSlice getSlice(int index) {
         return slices[index];
     }
 
+    /**
+     *
+     * @return
+     */
     public List<WindSlice> getSlices() {
         return Collections.unmodifiableList(Arrays.asList(slices));
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getCalmDuration() {
         return calmSeconds;
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getTotalDuration() {
         return totalSeconds;
     }
 
+    /**
+     *
+     * @param duration
+     */
     public void setTotalDuration(Duration duration) {
         totalSeconds = duration;
     }
 
+    /**
+     *
+     * @param duration
+     */
     public void setCalmDuration(Duration duration) {
         calmSeconds = duration;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<SpeedBin> getSpeedBins() {
         return Collections.unmodifiableList(speedBins);
     }

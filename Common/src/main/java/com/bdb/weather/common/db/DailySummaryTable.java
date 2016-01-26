@@ -63,6 +63,9 @@ public class DailySummaryTable extends DBTable<SummaryRecord> {
     private final TemperatureBinDurationTable temperatureBinDurationTable;
     private static final Logger         logger = Logger.getLogger(DailySummaryTable.class.getName());;
 
+    /**
+     * Name of the daily summary table
+     */
     protected static final String TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".daily_summary";
     static final String         DATE_COLUMN = "date";
     private static final String TOTAL_DURATION_COLUMN = "total_duration";
@@ -123,6 +126,9 @@ public class DailySummaryTable extends DBTable<SummaryRecord> {
     private static final String MAX_UV_INDEX_COLUMN = "max_uv_index";
     private static final String MAX_UV_INDEX_TIME_COLUMN = "max_uv_index_time";
 
+    /**
+     * Name of the sensor value summary table
+     */
     protected static final String SENSOR_SUMMARY_TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".sensor_value_summary";
     private static final String SENSOR_DATE_COLUMN = "date";
     private static final String SENSOR_ID_COLUMN = "sensor_id";
@@ -233,14 +239,22 @@ public class DailySummaryTable extends DBTable<SummaryRecord> {
     /**
      * Retrieve the summary record for today.
      * 
-     * @param windParameters 
-     * @param temperatureBinMgr The list of the temperature bins
+     * @param windParameters The winds parameters used to create the wind rose data
+     * @param temperatureBinMgr The temperature bin manager used in the creation of the temperature bin summaries
      * @return Today's summary record or null if it does not exist or an error occurred
      */
     public SummaryRecord retrieveTodaysSummary(WindParameters windParameters, TemperatureBinMgr temperatureBinMgr) {
         return retrieveSummaryForDate(LocalDate.now(), windParameters, temperatureBinMgr);
     }
 
+    /**
+     * Retrieve the summary record for specified date.
+     * 
+     * @param date The date whose summary will be retrieved
+     * @param windParameters The winds parameters used to create the wind rose data
+     * @param temperatureBinMgr The temperature bin manager used in the creation of the temperature bin summaries
+     * @return The summary record
+     */
     public SummaryRecord retrieveSummaryForDate(LocalDate date, WindParameters windParameters, TemperatureBinMgr temperatureBinMgr) {
         String sql = " where " + DATE_COLUMN + "='" + DBTable.dateFormatter().format(date) + "'";
 
@@ -257,9 +271,9 @@ public class DailySummaryTable extends DBTable<SummaryRecord> {
      * 
      * @param start The start of the interval
      * @param end The end of the interval
-     * @param windParameters 
-     * @param temperatureBinMgr The temperature bins
-     * @return
+     * @param windParameters The winds parameters used to create the wind rose data
+     * @param temperatureBinMgr The temperature bin manager used in the creation of the temperature bin summaries
+     * @return A list of summary records for the period of days specified
      */
     public List<SummaryRecord> retrieveRange(LocalDate start, LocalDate end, WindParameters windParameters, TemperatureBinMgr temperatureBinMgr) {
 
@@ -275,9 +289,8 @@ public class DailySummaryTable extends DBTable<SummaryRecord> {
      * Convenience method to retrieve the summary records for a weather station using an arbitrary SQL "where" clause
      * 
      * @param clause The SQL clause to restrict the query
-     * @param numWindSlices The number of wind slices this weather station's wind vane supports
-     * @param speedBins The speed bins
-     * @param temperatureBins The temperature bins
+     * @param windParameters The winds parameters used to create the wind rose data
+     * @param temperatureBinMgr The temperature bin manager used in the creation of the temperature bin summaries
      * @return
      */
     private List<SummaryRecord> retrieveSummaries(String clause, WindParameters windParameters, TemperatureBinMgr temperatureBinMgr) {

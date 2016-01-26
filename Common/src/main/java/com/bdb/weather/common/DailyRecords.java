@@ -21,6 +21,10 @@ import java.time.Month;
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Temperature;
 
+/**
+ *
+ * @author bruce
+ */
 public class DailyRecords implements Cloneable, Comparable<DailyRecords> {
     private final Month month;
     private final int   day;
@@ -35,80 +39,158 @@ public class DailyRecords implements Cloneable, Comparable<DailyRecords> {
     private Depth       rainfall;
     private int         rainfallYear;
 
+    /**
+     *
+     * @param month
+     * @param day
+     */
     public DailyRecords(Month month, int day) {
         this.month = month;
         this.day = day;
     }
 
+    /**
+     *
+     * @return
+     */
     public Month getMonth() {
         return month;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getDay() {
         return day;
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getMaxHighTemperature() {
         return maxHighTemperature;
     }
 
+    /**
+     *
+     * @param t
+     * @param year
+     */
     public void setMaxHighTemperature(Temperature t, int year) {
         maxHighTemperature = t;
         maxHighTemperatureYear = year;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMaxHighTemperatureYear() {
         return maxHighTemperatureYear;
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getMinHighTemperature() {
         return minHighTemperature;
     }
 
+    /**
+     *
+     * @param t
+     * @param year
+     */
     public void setMinHighTemperature(Temperature t, int year) {
         minHighTemperature = t;
         minHighTemperatureYear = year;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMinHighTemperatureYear() {
         return minHighTemperatureYear;
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getMaxLowTemperature() {
         return maxLowTemperature;
     }
 
+    /**
+     *
+     * @param t
+     * @param year
+     */
     public void setMaxLowTemperature(Temperature t, int year) {
         maxLowTemperature = t;
         maxLowTemperatureYear = year;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMaxLowTemperatureYear() {
         return maxLowTemperatureYear;
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getMinLowTemperature() {
         return minLowTemperature;
     }
 
+    /**
+     *
+     * @param t
+     * @param year
+     */
     public void setMinLowTemperature(Temperature t, int year) {
         minLowTemperature = t;
         minLowTemperatureYear = year;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMinLowTemperatureYear() {
         return minLowTemperatureYear;
     }
 
+    /**
+     *
+     * @return
+     */
     public Depth getRainfall() {
         return rainfall;
     }
 
+    /**
+     *
+     * @param d
+     * @param year
+     */
     public void setRainfall(Depth d, int year) {
         rainfall = d;
         rainfallYear = year;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getRainfallYear() {
         return rainfallYear;
     }

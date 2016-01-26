@@ -35,6 +35,9 @@ public class SolarRadiation extends Measurement {
      * @since 1.0
      */
     public enum Unit implements com.bdb.util.measurement.Unit {
+        /**
+         * Solar radiation only support the unit of Watts per meter squared (W/m2)
+         */
         WATTS_PER_METER_SQUARED;
         private static final String FORMAT_STRING = "#";
         private static final String UNIT_LABEL = "W/m2";
@@ -98,14 +101,28 @@ public class SolarRadiation extends Measurement {
         this(0.0);
     }
 
+    /**
+     * Get the current default unit for solar radiation.
+     * 
+     * @return The default unit
+     */
     public static Unit getDefaultUnit() {
         return (Unit)getDefaultUnit(SolarRadiation.class);
     }
 
+    /**
+     * Set the default unit for solar radiation.
+     * @param unit The default unit
+     */
     public static void setDefaultUnit(Unit unit) {
         setDefaultUnit(SolarRadiation.class, unit);
     }
 
+    /**
+     * Get the number formatter for the default unit.
+     * 
+     * @return The number formatter
+     */
     public static NumberFormat getDefaultFormatter() {
         return getDefaultUnit().getFormatter();
     }

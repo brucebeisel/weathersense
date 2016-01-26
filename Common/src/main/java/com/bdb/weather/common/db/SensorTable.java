@@ -29,13 +29,26 @@ import com.bdb.util.jdbc.DBTable;
 import com.bdb.weather.common.Sensor;
 import com.bdb.weather.common.SensorType;
 
+/**
+ * Class that provides access to the sensor table in the database.
+ * 
+ * @author bruce
+ */
 public class SensorTable extends DBTable<Sensor> {
+    /**
+     * The name of the sensors table
+     */
     protected static final String TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".sensors";
     private static final String SENSOR_ID_COLUMN = "sensor_id";
     private static final String NAME_COLUMN = "name";
     private static final String TYPE_COLUMN = "type";
     private static final Logger logger = Logger.getLogger(SensorTable.class.getName());
     
+    /**
+     * Constructor.
+     * 
+     * @param connection The connection to the database
+     */
     public SensorTable(DBConnection connection) {
         super(TABLE_NAME, connection);
     }

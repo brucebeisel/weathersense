@@ -28,6 +28,10 @@ import javax.xml.bind.annotation.XmlElement;
  * @author Bruce
  */
 public class Sensor {
+
+    /**
+     *
+     */
     public static final int LAST_STANDARD_SENSOR_ID = 99;
     /**
      * The base ID of extra thermometer sensors

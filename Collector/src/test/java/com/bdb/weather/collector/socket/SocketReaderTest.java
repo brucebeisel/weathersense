@@ -40,6 +40,10 @@ public class SocketReaderTest implements SocketDataProcessor {
     private Socket socket;
     private int tokenCount;
     
+    /**
+     *
+     * @throws IOException
+     */
     public SocketReaderTest() throws IOException {
         InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("collector_logging.properties");
         
@@ -47,25 +51,45 @@ public class SocketReaderTest implements SocketDataProcessor {
             LogManager.getLogManager().readConfiguration(is);
     }
     
+    /**
+     *
+     */
     @BeforeClass
     public static void setUpClass() {
     }
     
+    /**
+     *
+     */
     @AfterClass
     public static void tearDownClass() {
     }
     
+    /**
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     */
     @Before
     public void setUp() throws IOException, InterruptedException {
         tokenCount = 0;
     }
     
+    /**
+     *
+     * @throws IOException
+     */
     @After
     public void tearDown() throws IOException {
         socket.close();
         server.close();
     }
 
+    /**
+     *
+     * @param testNumber
+     * @throws IOException
+     */
     public void init(int testNumber) throws IOException {
         server = new ServerSocket(1961);
         createClient(testNumber);
@@ -74,6 +98,10 @@ public class SocketReaderTest implements SocketDataProcessor {
         socket.setSoTimeout(1000);
     }
 
+    /**
+     *
+     * @throws IOException
+     */
     @Test
     public void testReadSocket() throws IOException {
         System.out.println("readSocket");
@@ -85,6 +113,10 @@ public class SocketReaderTest implements SocketDataProcessor {
         assertEquals(1, tokenCount);
     }
 
+    /**
+     *
+     * @throws IOException
+     */
     @Test
     public void testMultipleTokenReadSocket() throws IOException {
         System.out.println("multipleTokenReadSocket");
@@ -96,6 +128,10 @@ public class SocketReaderTest implements SocketDataProcessor {
         assertEquals(6, tokenCount);
     }
 
+    /**
+     *
+     * @throws IOException
+     */
     @Test
     public void testMultipleWrites() throws IOException {
         System.out.println("multipleTokenReadSocket");

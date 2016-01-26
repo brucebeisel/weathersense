@@ -45,6 +45,10 @@ import static org.junit.Assert.*;
 public class DopplerRadarManagerTest implements WeatherDataWriter {
     private int radarImageCount;
     
+    /**
+     *
+     * @throws IOException
+     */
     public DopplerRadarManagerTest() throws IOException {
         InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("collector_logging.properties");
         
@@ -52,18 +56,30 @@ public class DopplerRadarManagerTest implements WeatherDataWriter {
             LogManager.getLogManager().readConfiguration(is);
     }
     
+    /**
+     *
+     */
     @BeforeClass
     public static void setUpClass() {
     }
     
+    /**
+     *
+     */
     @AfterClass
     public static void tearDownClass() {
     }
     
+    /**
+     *
+     */
     @Before
     public void setUp() {
     }
     
+    /**
+     *
+     */
     @After
     public void tearDown() {
     }

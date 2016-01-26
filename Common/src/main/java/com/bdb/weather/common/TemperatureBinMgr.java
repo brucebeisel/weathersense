@@ -34,14 +34,29 @@ public final class TemperatureBinMgr {
     private final Map<Integer,TemperatureBin> bins = new TreeMap<>();
     private final TemperatureBinTable table;
 
+    /**
+     *
+     * @param connection
+     */
     public TemperatureBinMgr(DBConnection connection) {
         table = new TemperatureBinTable(connection);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     public TemperatureBin getBin(int id) {
         return bins.get(id);
     }
 
+    /**
+     *
+     * @param id
+     * @param t
+     * @return
+     */
     public boolean isTemperatureInBin(int id, Temperature t) {
         TemperatureBin bin = getBin(id);
         if (bin == null)
@@ -50,6 +65,12 @@ public final class TemperatureBinMgr {
         return bin.isInBin(t);
     }
 
+    /**
+     *
+     * @param threshold
+     * @param type
+     * @return
+     */
     public int getBinId(Temperature threshold, ThresholdType type) {
         for (TemperatureBin bin : bins.values()) {
             if (bin.getThresholdType() == type && bin.getThreshold().equals(threshold))
@@ -59,10 +80,18 @@ public final class TemperatureBinMgr {
         return -1;
     }
 
+    /**
+     *
+     * @return
+     */
     public Collection<TemperatureBin> getAllBins() {
         return Collections.unmodifiableCollection(bins.values());
     }
 
+    /**
+     *
+     * @param binList
+     */
     public void replaceBins(List<TemperatureBin> binList) {
         replaceBins(binList, true);
     }
@@ -77,12 +106,18 @@ public final class TemperatureBinMgr {
             sync();
     }
 
-
+    /**
+     *
+     */
     public void refresh() {
         List<TemperatureBin> binList = table.retrieveBins();
         replaceBins(binList, false);
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean sync() {
         boolean rv = true;
         //

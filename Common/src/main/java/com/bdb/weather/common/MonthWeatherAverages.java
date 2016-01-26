@@ -51,17 +51,31 @@ public class MonthWeatherAverages implements WeatherAverages {
             averages.put(avg.getMonth(), avg);
     }
     
+    /**
+     *
+     * @param date
+     * @return
+     */
     @Override
     public WeatherAverage getAverage(LocalDate date) {
         return averages.get(date.getMonth());
     }
 
+    /**
+     *
+     * @param avg
+     * @param date
+     */
     @Override
     public void putAverage(WeatherAverage avg, LocalDate date) {
         Month month = date.getMonth();
         averages.put(month, avg);
     }
     
+    /**
+     *
+     * @return
+     */
     @Override
     public Collection<WeatherAverage> getAllAverages() {
         return Collections.unmodifiableCollection(averages.values());

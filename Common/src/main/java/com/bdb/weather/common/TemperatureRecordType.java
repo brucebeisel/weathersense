@@ -16,16 +16,57 @@
  */
 package com.bdb.weather.common;
 
+/**
+ *
+ * @author bruce
+ */
 public enum TemperatureRecordType implements RecordType {
+
+    /**
+     *
+     */
     MAX_HIGH,
+
+    /**
+     *
+     */
     MAX_HIGH_TIE,
+
+    /**
+     *
+     */
     MIN_HIGH,
+
+    /**
+     *
+     */
     MIN_HIGH_TIE,
+
+    /**
+     *
+     */
     MAX_LOW,
+
+    /**
+     *
+     */
     MAX_LOW_TIE,
+
+    /**
+     *
+     */
     MIN_LOW,
+
+    /**
+     *
+     */
     MIN_LOW_TIE;
     
+    /**
+     *
+     * @param value
+     * @return
+     */
     @Override
     public RecordType fromString(String value) {
         return TemperatureRecordType.valueOf(value);

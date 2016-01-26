@@ -20,16 +20,33 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Objects;
 
+/**
+ *
+ * @author bruce
+ */
 public class SpeedBinDuration {
     private final int speedBinIndex;
     private final LocalDate date;
     private final int  headingIndex;
     private Duration duration;
     
+    /**
+     *
+     * @param speedBinIndex
+     * @param headingIndex
+     * @param date
+     */
     public SpeedBinDuration(int speedBinIndex, int headingIndex, LocalDate date) {
         this(speedBinIndex, headingIndex, date, Duration.ZERO);
     }
     
+    /**
+     *
+     * @param speedBinIndex
+     * @param headingIndex
+     * @param date
+     * @param duration
+     */
     public SpeedBinDuration(int speedBinIndex, int headingIndex, LocalDate date, Duration duration) {
         this.speedBinIndex = speedBinIndex;
         this.headingIndex = headingIndex;
@@ -37,22 +54,42 @@ public class SpeedBinDuration {
         this.duration = duration;
     }
     
+    /**
+     *
+     * @return
+     */
     public int getWindSpeedBinIndex() {
         return speedBinIndex;
     }
     
+    /**
+     *
+     * @return
+     */
     public LocalDate getDate() {
         return date;
     }
     
+    /**
+     *
+     * @return
+     */
     public int getHeadingIndex() {
         return headingIndex;
     }
     
+    /**
+     *
+     * @return
+     */
     public Duration getDuration() {
         return duration;
     }
     
+    /**
+     *
+     * @param duration
+     */
     public void addDuration(Duration duration) {
         this.duration = this.duration.plus(duration);
     }

@@ -25,18 +25,28 @@ import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Temperature;
 
 /**
+ * Collection that stores the weather seasonal averages for each day of the year.
+ * 
  * @author Bruce
  *
  */
 public class DayWeatherAverages implements WeatherAverages, Cloneable {
     private final DayOfYearCollection<WeatherAverage> averages = new DayOfYearCollection<>();
-    private static final Logger s_logger = Logger.getLogger(DayWeatherAverages.class.getName());
+    private static final Logger logger = Logger.getLogger(DayWeatherAverages.class.getName());
     
+    /**
+     * Constructor.
+     * 
+     * @param averages A collection of weather averages
+     */
     public DayWeatherAverages(DayOfYearCollection<WeatherAverage> averages) {
         for (WeatherAverage avg : averages.getAverages())
             this.averages.putItem(avg.getMonth(), avg.getDay(), avg);
     }
     
+    /**
+     * Constructor.
+     */
     public DayWeatherAverages() {
         //
         // 2001 chosen because it is not a leap year
@@ -59,35 +69,40 @@ public class DayWeatherAverages implements WeatherAverages, Cloneable {
             return super.clone();
         }
         catch (CloneNotSupportedException e) {
-            s_logger.info("Clone not supported");
+            logger.info("Clone not supported");
             return null;
         }
     }
     
-    /*
-     * (non-Javadoc)
-     * @see com.bdb.weather.common.WeatherAverages#putAverage(com.bdb.weather.common.WeatherAverage, java.util.LocalDate)
+    /**
+     * Put a weather average into the collection.
+     *
+     * @param avg The item to add
+     * @param date The key
      */
     @Override
     public void putAverage(WeatherAverage avg, LocalDate date) {
         averages.addItem(date, avg);
     }
     
-    /* (non-Javadoc)
-     * @see com.bdb.weather.common.WeatherAverages#getAveragesFor(java.util.LocalDate)
+    /**
+     * Get an average based on the date key.
+     *
+     * @param date The key
+     * @return The item or null if it does not exist
      */
     @Override
     public WeatherAverage getAverage(LocalDate date) {
         return averages.item(date);
     }
     
-    /*
-     * (non-Javadoc)
-     * @see com.bdb.weather.common.WeatherAverages#getAllAverages()
+    /**
+     * Get the list of the averages.
+     *
+     * @return The averages in a list
      */
     @Override
     public List<WeatherAverage> getAllAverages() {
         return averages.getAverages();
     }
-
 }

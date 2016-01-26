@@ -26,7 +26,15 @@ import com.bdb.weather.common.measurement.Speed;
  *
  */
 public class SpeedBin {
+
+    /**
+     *
+     */
     public static final Speed MIN_SPEED = new Speed(0.0);
+
+    /**
+     *
+     */
     public static final Speed MAX_SPEED = new Speed(1000.0, Speed.Unit.MILES_PER_HOUR);
     private final int index;
     private final Speed min;
@@ -35,6 +43,7 @@ public class SpeedBin {
     /**
      * Constructor
      *
+     * @param index
      * @param min The minimum speed of this bin (exclusive)
      * @param max The maximum speed of this bin (inclusive)
      */
@@ -103,6 +112,10 @@ public class SpeedBin {
         return other.index == index;
     }
 
+    /**
+     *
+     * @return
+     */
     public String speedString() {
         String s;
 

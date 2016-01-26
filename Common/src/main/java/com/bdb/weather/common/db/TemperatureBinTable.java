@@ -40,6 +40,9 @@ import com.bdb.weather.common.measurement.Temperature;
  *
  */
 public class TemperatureBinTable extends DBTable<TemperatureBin> {
+    /**
+     * Name of the temperature bin database table
+     */
     protected static final String TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".temperature_bins";
     
     private static final String BIN_ID_COLUMN = "bin_id";

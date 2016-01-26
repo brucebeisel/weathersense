@@ -23,34 +23,59 @@ import junit.framework.TestCase;
 
 import com.bdb.util.ThreadUtils;
 
+/**
+ *
+ * @author bruce
+ */
 public class SocketReaderThreadTest extends TestCase
 {
 
+    /**
+     *
+     * @param arg0
+     */
     public SocketReaderThreadTest(String arg0)
     {
         super(arg0);
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     protected void setUp() throws Exception
     {
         super.setUp();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     protected void tearDown() throws Exception
     {
         super.tearDown();
     }
 
+    /**
+     *
+     */
     public void testSendEvent()
     {
         //fail("Not yet implemented");
     }
 
+    /**
+     *
+     */
     public void testWaitForEvent()
     {
         //fail("Not yet implemented");
     }
 
+    /**
+     *
+     */
     public void testThreadStep()
     {
         //fail("Not yet implemented");

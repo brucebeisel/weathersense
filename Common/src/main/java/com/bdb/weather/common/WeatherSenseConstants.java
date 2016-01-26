@@ -21,6 +21,14 @@ package com.bdb.weather.common;
  * @author Bruce
  */
 public interface WeatherSenseConstants {
+
+    /**
+     *
+     */
     public static final String PRODUCT_NAME = "WeatherSense";
+
+    /**
+     *
+     */
     public static final String PRODUCT_VERSION = "2.4";
 }

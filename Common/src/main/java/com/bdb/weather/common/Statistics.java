@@ -34,24 +34,52 @@ import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
 
+/**
+ *
+ * @author bruce
+ */
 public class Statistics {
 
+    /**
+     *
+     */
     public class TemperatureBinData {
+
+        /**
+         *
+         */
         public int dayCount;
+
+        /**
+         *
+         */
         public Duration duration;
 
+        /**
+         *
+         */
         public TemperatureBinData() {
             dayCount = 0;
             duration = Duration.ZERO;
         }
     };
 
+    /**
+     *
+     */
     public class RangeTime {
         Measurement min;
         Measurement max;
         Measurement range;
         LocalDate date;
 
+        /**
+         *
+         * @param r
+         * @param minarg
+         * @param maxarg
+         * @param date
+         */
         public RangeTime(Measurement r, Measurement minarg, Measurement maxarg, LocalDate date) {
             range = r;
             min = minarg;
@@ -59,6 +87,10 @@ public class Statistics {
             this.date = date;
         }
 
+        /**
+         *
+         * @return
+         */
         public Measurement getRange() {
             return range;
         }
@@ -110,6 +142,13 @@ public class Statistics {
     private RangeTime largestHumidityRange;
     private final Map<TemperatureBin, TemperatureBinData> temperatureBinData = new TreeMap<>();
 
+    /**
+     *
+     * @param ws
+     * @param averagesCollection
+     * @param speedBins
+     * @param temperatureBinMgr
+     */
     public Statistics(WeatherStation ws, WeatherAverages averagesCollection, List<SpeedBin> speedBins, TemperatureBinMgr temperatureBinMgr) {
         this.averagesCollection = averagesCollection;
         summary = new SummaryRecord(ws.getWindParameters(), temperatureBinMgr, LocalDate.now());
@@ -250,6 +289,10 @@ public class Statistics {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumberOfDays() {
         return numberOfDays;
     }
@@ -394,26 +437,50 @@ public class Statistics {
         return smallestHumidityRange;
     }
 
+    /**
+     *
+     * @return
+     */
     public Depth getMaxDayRainDepth() {
         return maxDayRainDepth;
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDate getMaxDayRainDate() {
         return maxDayRainDate;
     }
 
+    /**
+     *
+     * @return
+     */
     public Depth getAvgRainPerDay() {
         return new Depth(getTotalRainfall().get() / (double)numberOfDays);
     }
 
+    /**
+     *
+     * @return
+     */
     public MeasurementValueTime<Speed> getMaxAvgWindSpeed() {
         return maxAvgWind;
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<TemperatureBin, TemperatureBinData> getTemperatureBinData() {
         return Collections.unmodifiableMap(temperatureBinData);
     }
 
+    /**
+     *
+     * @return
+     */
     public List<TemperatureBinDuration> getTemperatureBinDurations() {
         return summary.getTemperatureBinDurations();
     }

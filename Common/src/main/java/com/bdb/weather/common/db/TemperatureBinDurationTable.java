@@ -42,6 +42,9 @@ import com.bdb.weather.common.measurement.Temperature;
  *
  */
 public class TemperatureBinDurationTable extends DBTable<TemperatureBinDuration> {
+    /**
+     * Name of the temperature bin duration table
+     */
     protected static final String TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".temperature_bin_durations";
     private static final String TEMPERATURE_BIN_TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".temperature_bins";
     private static final String DATE_COLUMN = "date";
@@ -94,6 +97,12 @@ public class TemperatureBinDurationTable extends DBTable<TemperatureBinDuration>
         return addTemperatureBinDurations(list);
     }
 
+    /**
+     * Add a list of temperature bin durations to the database.
+     * 
+     * @param list The list of durations
+     * @return True if the durations were added sucessfully
+     */
     public boolean addTemperatureBinDurations(List<TemperatureBinDuration> list) {
        String sql = "insert into " + TABLE_NAME + " values(?,?,?)";
 

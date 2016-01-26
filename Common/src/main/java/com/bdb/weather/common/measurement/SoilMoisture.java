@@ -36,6 +36,9 @@ public class SoilMoisture extends Measurement {
      * @since 1.0
      */
     public enum Unit implements com.bdb.util.measurement.Unit {
+        /**
+         * Soil moisture only support the unit of centibar
+         */
         CENTIBAR;
         private static final String FORMAT_STRING = "0";
         private static final String UNIT_LABEL = "cb";

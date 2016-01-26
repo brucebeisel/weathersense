@@ -16,6 +16,16 @@
  */
 package com.bdb.weather.common;
 
+/**
+ *
+ * @author bruce
+ */
 public interface RecordType {
+
+    /**
+     *
+     * @param value
+     * @return
+     */
     public RecordType fromString(String value);
 }

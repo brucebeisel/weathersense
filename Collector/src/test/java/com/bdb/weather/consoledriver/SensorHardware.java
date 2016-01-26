@@ -26,16 +26,28 @@ public class SensorHardware {
     private final SensorType sensorType;
     private final int valueIndex;
 
- 
+    /**
+     *
+     * @param type
+     * @param index
+     */
     public SensorHardware(SensorType type, int index) {
         sensorType = type;
         valueIndex = index;
     }
     
+    /**
+     *
+     * @return
+     */
     public SensorType getSensorType() {
         return sensorType;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getValueIndex() {
         return valueIndex;
     }

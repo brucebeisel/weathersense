@@ -47,6 +47,10 @@ import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.common.measurement.UvIndex;
 
+/**
+ *
+ * @author bruce
+ */
 @XmlRootElement
 public class HistoricalRecord {
     private static final long serialVersionUID = -3464537243885145413L;
@@ -84,31 +88,64 @@ public class HistoricalRecord {
 
     private static final Logger logger = Logger.getLogger(HistoricalRecord.class.getName());
 
+    /**
+     * Constructor.
+     */
     public HistoricalRecord() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param time The time of this historical record
+     */
     public HistoricalRecord(LocalDateTime time) {
         this.time = time;
     }
 
+    /**
+     * Get the time of the historical record.
+     *
+     * @return The time
+     */
     public LocalDateTime getTime() {
         return time;
     }
 
+    /**
+     * Set the time of the historical record.
+     *
+     * @param time The time
+     */
     @XmlJavaTypeAdapter(type=java.time.LocalDateTime.class, value=LocalDateTimeAdapter.class)
     public void setTime(LocalDateTime time) {
         this.time = time;
     }
 
+    /**
+     * Set the duration over which this historical record was measured.
+     *
+     * @param duration The duration
+     */
     @XmlJavaTypeAdapter(type=java.time.Duration.class, value=DurationAdapter.class)
     public void setDuration(Duration duration) {
         this.duration = duration;
     }
 
+    /**
+     * Get the duration over which this historical record was measured.
+     *
+     * @return The duration
+     */
     public Duration getDuration() {
         return duration;
     }
     
+    /**
+     * Get a collection of the measurements from the non-standard sensors.
+     *
+     * @return The collection of measurements
+     */
     public Collection<MeasurementEntry<? extends Measurement>> getMeasurementEntries() {
         List<MeasurementEntry<? extends Measurement>> entries = new ArrayList<>();
         entries.addAll(temperatureSensorEntries.values());
@@ -118,6 +155,12 @@ public class HistoricalRecord {
         return entries;
     }
     
+    /**
+     * Get the temperature for a given sensor.
+     *
+     * @param sensorId The sensor ID
+     * @return The temperature or null if the sensor ID does not exist
+     */
     public Temperature getTemperatureForSensor(int sensorId) {
         MeasurementEntry<Temperature> entry = temperatureSensorEntries.get(sensorId);
 		
@@ -127,11 +170,23 @@ public class HistoricalRecord {
             return null;
     }
     
-    public void setTemperatureForSensor(int sensorId, Temperature t) {
-        MeasurementEntry<Temperature> entry = new MeasurementEntry<>(sensorId, SensorType.THERMOMETER, t);
+    /**
+     * Set the temperature for a given sensor.
+     *
+     * @param sensorId The sensor ID
+     * @param temperature
+     */
+    public void setTemperatureForSensor(int sensorId, Temperature temperature) {
+        MeasurementEntry<Temperature> entry = new MeasurementEntry<>(sensorId, SensorType.THERMOMETER, temperature);
         temperatureSensorEntries.put(sensorId, entry);
     }
     
+    /**
+     * Get the humidity for a given sensor.
+     *
+     * @param sensorId The sensor ID
+     * @return The humidity or null if the sensor does not exist
+     */
     public Humidity getHumidityForSensor(int sensorId) {
         MeasurementEntry<Humidity> entry = humiditySensorEntries.get(sensorId);
         
@@ -141,11 +196,23 @@ public class HistoricalRecord {
             return null;
     }
     
-    public void setLeafWetnessForSensor(int sensorId, LeafWetness lw) {
-        MeasurementEntry<LeafWetness> entry = new MeasurementEntry<>(sensorId, SensorType.LEAF_WETNESS, lw);
+    /**
+     * Set the leaf wetness for a given sensor.
+     *
+     * @param sensorId The sensor ID
+     * @param leafWetness The leaf wetness
+     */
+    public void setLeafWetnessForSensor(int sensorId, LeafWetness leafWetness) {
+        MeasurementEntry<LeafWetness> entry = new MeasurementEntry<>(sensorId, SensorType.LEAF_WETNESS, leafWetness);
         leafWetnessSensorEntries.put(sensorId, entry);
     }
     
+    /**
+     * Get the leaf wetness for a given sensor.
+     *
+     * @param sensorId The sensor ID
+     * @return The leaf wetness or null if the sensor does not exist
+     */
     public LeafWetness getLeafWetnessForSensor(int sensorId) {
         MeasurementEntry<LeafWetness> entry = leafWetnessSensorEntries.get(sensorId);
         
@@ -155,11 +222,23 @@ public class HistoricalRecord {
             return null;
     }
     
-    public void setSoilMoistureForSensor(int sensorId, SoilMoisture sm) {
-        MeasurementEntry<SoilMoisture> entry = new MeasurementEntry<>(sensorId, SensorType.SOIL_MOISTURE, sm);
+    /**
+     * Set the soil moisture of a given sensor.
+     *
+     * @param sensorId The sensor ID
+     * @param soilMoisture The soil moisture
+     */
+    public void setSoilMoistureForSensor(int sensorId, SoilMoisture soilMoisture) {
+        MeasurementEntry<SoilMoisture> entry = new MeasurementEntry<>(sensorId, SensorType.SOIL_MOISTURE, soilMoisture);
         soilMoistureSensorEntries.put(sensorId, entry);
     }
     
+    /**
+     * Get the soil moisture for a given sensor.
+     *
+     * @param sensorId The sensor ID
+     * @return The soil moisture or null if the sensor does not exist
+     */
     public SoilMoisture getSoilMoistureForSensor(int sensorId) {
         MeasurementEntry<SoilMoisture> entry = soilMoistureSensorEntries.get(sensorId);
         
@@ -169,147 +248,330 @@ public class HistoricalRecord {
             return null;
     }
     
-    public void setHumidityForSensor(int sensorId, Humidity h) {
-        MeasurementEntry<Humidity> entry = new MeasurementEntry<>(sensorId, SensorType.HYGROMETER, h);
+    /**
+     * Set the humidity for a given sensor.
+     *
+     * @param sensorId The sensor ID
+     * @param humidity The humidity
+     */
+    public void setHumidityForSensor(int sensorId, Humidity humidity) {
+        MeasurementEntry<Humidity> entry = new MeasurementEntry<>(sensorId, SensorType.HYGROMETER, humidity);
         humiditySensorEntries.put(sensorId, entry);
     }
     
+    /**
+     * Get the average of the outdoor temperature over the duration.
+     *
+     * @return The temperature
+     */
     public Temperature getAvgOutdoorTemperature() {
         return avgOutdoorTemperature;
     }
     
+    /**
+     *
+     * Get the low outdoor temperature over the duration.
+     *
+     * @return The temperature
+     */
     public Temperature getLowOutdoorTemperature() {
         return lowOutdoorTemperature;
     }
     
+    /**
+     *
+     * Get the high outdoor temperature over the duration.
+     *
+     * @return The temperature
+     */
     public Temperature getHighOutdoorTemperature() {
         return highOutdoorTemperature;
     }
     
-    public void setAvgOutdoorTemperature(Temperature t) {
-         this.avgOutdoorTemperature = t;
+    /**
+     * Set the average of the outdoor temperature over the duration.
+     *
+     * @param temperature The average temperature
+     */
+    public void setAvgOutdoorTemperature(Temperature temperature) {
+         this.avgOutdoorTemperature = temperature;
     }
     
-    public void setHighOutdoorTemperature(Temperature t) {
-        this.highOutdoorTemperature = t;
+    /**
+     * Set the high outdoor temperature over the duration.
+     *
+     * @param temperature The high temperature
+     */
+    public void setHighOutdoorTemperature(Temperature temperature) {
+        this.highOutdoorTemperature = temperature;
     }
     
-    public void setLowOutdoorTemperature(Temperature t) {
-        this.lowOutdoorTemperature = t;
+    /**
+     * Set the low outdoor temperature over the duration.
+     *
+     * @param temperature
+     */
+    public void setLowOutdoorTemperature(Temperature temperature) {
+        this.lowOutdoorTemperature = temperature;
     }
     
+    /**
+     * Get the outdoor humidity
+     *
+     * @return The humidity
+     */
     public Humidity getOutdoorHumidity() {
         return outdoorHumidity;
     }
     
-    public void setOutdoorHumidity(Humidity h) {
-        this.outdoorHumidity = h;
+    /**
+     * Set the outdoor humidity.
+     *
+     * @param humidity
+     */
+    public void setOutdoorHumidity(Humidity humidity) {
+        this.outdoorHumidity = humidity;
     }
 
+    /**
+     * Get the indoor temperature.
+     *
+     * @return The temperature
+     */
     public Temperature getIndoorTemperature() {
         return indoorTemperature;
     }
     
-    public void setIndoorTemperature(Temperature t) {
-        this.indoorTemperature = t;
+    /**
+     * Set the indoor temperature.
+     *
+     * @param temperature
+     */
+    public void setIndoorTemperature(Temperature temperature) {
+        this.indoorTemperature = temperature;
     }
     
+    /**
+     * Get the indoor humidity.
+     *
+     * @return The humidity
+     */
     public Humidity getIndoorHumidity() {
         return indoorHumidity;
     }
     
-    public void setIndoorHumidity(Humidity h) {
-        this.indoorHumidity = h;
+    /**
+     * Set the indoor humidity.
+     *
+     * @param humidity The humidity
+     */
+    public void setIndoorHumidity(Humidity humidity) {
+        this.indoorHumidity = humidity;
     }
 
+    /**
+     * Set the average of the wind over the duration.
+     *
+     * @param wind The wind
+     */
     public void setAvgWind(Wind wind) {
         this.avgWind = wind;
     }
 
+    /**
+     * Get the average of the wind over the duration.
+     *
+     * @return The wind
+     */
     public Wind getAvgWind() {
         return avgWind;
     }
 
+    /**
+     * Set the high wind over the duration.
+     *
+     * @param wind The wind
+     */
     public void setHighWind(Wind wind) {
         this.highWind = wind;
     }
     
+    /**
+     * Get the high wind over the duration.
+     *
+     * @return The wind
+     */
     public Wind getHighWind() {
         return highWind;
     }
     
+    /**
+     * Set the highest gust over the duration.
+     *
+     * @param gust The wind gust
+     */
     public void setWindGust(Wind gust) {
         this.gust = gust;
     }
     
+    /**
+     * Get the highest gust over the duration.
+     *
+     * @return The wind gust
+     */
     public Wind getWindGust() {
         return gust;
     }
 
+    /**
+     * Set the barometric pressure.
+     *
+     * @param pressure The barometric pressure
+     */
     public void setBaroPressure(Pressure pressure) {
         this.baroPressure = pressure;
     }
 
+    /**
+     * Get the barometric pressure.
+     *
+     * @return The barometric pressure
+     */
     public Pressure getBaroPressure() {
         return baroPressure;
     }
 
+    /**
+     * Set the rainfall over the duration.
+     *
+     * @param rain The rainfall amount
+     */
     public void setRainfall(Depth rain) {
         this.rainfall = rain;
     }
 
+    /**
+     * Get the rainfall over the duration.
+     *
+     * @return The rainfall amount
+     */
     public Depth getRainfall() {
         return rainfall;
     }
     
+    /**
+     * Set the highest rainfall rate over the duration.
+     *
+     * @param rate The highest rainfall rate
+     */
     public void setHighRainfallRate(Depth rate) {
         this.highRainfallRate = rate;
     }
     
+    /**
+     * Get the highest rainfall rate over the duration.
+     *
+     * @return The highest rainfall rate
+     */
     public Depth getHighRainfallRate() {
         return highRainfallRate;
     }
 
+    /**
+     * Set the average UV index over the duration.
+     *
+     * @param uvIndex The average UV index
+     */
     public void setAvgUvIndex(Float uvIndex) {
         this.avgUvIndex = uvIndex;
     }
     
+    /**
+     * Get the average UV index over the duration.
+     *
+     * @return The average UV index
+     */
     public Float getAvgUvIndex() {
         return avgUvIndex;
     }
 
+    /**
+     * Set the highest UV index over the duration.
+     *
+     * @param uvIndex The highest UV index
+     */
     public void setHighUvIndex(UvIndex uvIndex) {
         this.highUvIndex = uvIndex;
     }
     
+    /**
+     * Get the highest UV index over the duration.
+     *
+     * @return The highest UV index
+     */
     public UvIndex getHighUvIndex() {
         return highUvIndex;
     }
 
+    /**
+     * Set the average solar radiation over the duration.
+     *
+     * @param solarRadiation The average solar radiation
+     */
     public void setAvgSolarRadiation(SolarRadiation solarRadiation) {
         this.avgSolarRadiation = solarRadiation;
     }
     
+    /**
+     * Get the average solar radiation over the duration.
+     *
+     * @return The average solar radiation
+     */
     public SolarRadiation getAvgSolarRadiation() {
         return avgSolarRadiation;
     }
 
+    /**
+     * Set the high solar radiation over the duration.
+     *
+     * @param solarRadiation The high solar radiation
+     */
     public void setHighSolarRadiation(SolarRadiation solarRadiation) {
         this.highSolarRadiation = solarRadiation;
     }
     
+    /**
+     * Get the high solar radiation over the duration.
+     *
+     * @return the high solar radiation
+     */
     public SolarRadiation getHighSolarRadiation() {
         return highSolarRadiation;
     }
 
+    /**
+     * Set the evapotranspiration over the duration.
+     *
+     * @param evapotranspiration The ET
+     */
     public void setEvapotranspiration(Depth evapotranspiration) {
         this.evapotranspiration = evapotranspiration;
     }
     
+    /**
+     * Get the evapotranspiration over the duration.
+     *
+     * @return The ET
+     */
     public Depth getEvapotranspiration() {
         return evapotranspiration;
     }
 
+    /**
+     * Get the wind chill.
+     *
+     * @return The wind chill or null if the wind chill is missing
+     */
     public Temperature getWindChill() {
         if (avgOutdoorTemperature != null && avgWind != null)
             return WeatherUtils.windChill(avgOutdoorTemperature, avgWind.getSpeed(), true);
@@ -317,6 +579,11 @@ public class HistoricalRecord {
             return null;
     }
 
+    /**
+     * Get the dew point.
+     *
+     * @return The dew point or null if the dew point is missing
+     */
     public Temperature getDewPoint() {
         if (avgOutdoorTemperature != null && outdoorHumidity != null)
             return WeatherUtils.dewPoint(avgOutdoorTemperature, outdoorHumidity);
@@ -324,6 +591,11 @@ public class HistoricalRecord {
             return null;
     }
 
+    /**
+     * Get the heat index.
+     *
+     * @return The heat index or null if the heat index is missing
+     */
     public Temperature getHeatIndex() {
         if (avgOutdoorTemperature != null && outdoorHumidity != null)
             return WeatherUtils.heatIndex(avgOutdoorTemperature, outdoorHumidity);
@@ -331,6 +603,11 @@ public class HistoricalRecord {
             return null;
     }
 
+    /**
+     * Get the average of the wind speed over the duration.
+     *
+     * @return The average wind speed
+     */
     public Speed getAvgWindSpeed() {
         if (avgWind != null)
             return avgWind.getSpeed();
@@ -338,6 +615,11 @@ public class HistoricalRecord {
             return null;
     }
     
+    /**
+     * Get the average wind direction over the duration.
+     *
+     * @return The average wind direction
+     */
     public Heading getAvgWindDirection() {
         if (avgWind != null)
             return avgWind.getDirection();
@@ -345,6 +627,11 @@ public class HistoricalRecord {
             return null;
     }
     
+    /**
+     * Get the highest wind speed over the duration.
+     *
+     * @return The wind speed
+     */
     public Speed getHighWindSpeed() {
         if (highWind != null)
             return highWind.getSpeed();
@@ -352,6 +639,11 @@ public class HistoricalRecord {
             return null;
     }
     
+    /**
+     * Get the direction of the wind when the wind speed is highest over the duration.
+     *
+     * @return the direction of the highest wind speed or null
+     */
     public Heading getHighWindDirection() {
         if (highWind != null)
             return highWind.getDirection();
@@ -359,6 +651,11 @@ public class HistoricalRecord {
             return null;
     }
 
+    /**
+     * Get the speed of the highest wind gust over the duration.
+     *
+     * @return The highest wind gust or null if there was no gusts
+     */
     public Speed getWindGustSpeed() {
         if (gust != null)
             return gust.getSpeed();
@@ -366,6 +663,11 @@ public class HistoricalRecord {
             return null;
     }
     
+    /**
+     * Get the direction of the highest wind gust over the duration.
+     *
+     * @return The direction of the highest wind gust or null if there were no gusts
+     */
     public Heading getWindGustDirection() {
         if (gust != null)
             return gust.getDirection();

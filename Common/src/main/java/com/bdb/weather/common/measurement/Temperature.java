@@ -21,16 +21,36 @@ import java.text.NumberFormat;
 
 import com.bdb.util.measurement.Measurement;
 
+/**
+ * Class that represents a temperature measurement.
+ * 
+ * @author bruce
+ */
 public class Temperature extends Measurement {
     private static final long serialVersionUID = 7511549339349527355L;
+    /**
+     * The hex representation of the degree symbol
+     */
     public static final char DEGREE_SYMBOL = 0xB0;
     private static final double KELVIN_OFFSET = 273.0;
     private static final double FAHRENHEIT_SCALE = 1.8;
     private static final double FAHRENHEIT_OFFSET = 32.0;
 
+    /**
+     * The enumeration of possible temperature units
+     */
     public enum Unit implements com.bdb.util.measurement.Unit {
+        /**
+         * Temperature unit of Celsius
+         */
         CELSIUS("C", 1.0, 0.0, ".0"),
+        /**
+         * Temperature unit of Fahrenheit
+         */
         FAHRENHEIT("F", FAHRENHEIT_SCALE, FAHRENHEIT_OFFSET, ".0"),
+        /**
+         * Temperature unit of Kelvin
+         */
         KELVIN("K", 1.0, KELVIN_OFFSET, ".0");
         private final String label;
         private final double offset;
@@ -38,6 +58,14 @@ public class Temperature extends Measurement {
         private final NumberFormat formatter;
         private final NumberFormat formatterWithUnit;
 
+        /**
+         * Constructor.
+         * 
+         * @param s The label for this unit
+         * @param scale The scale from the internal unit
+         * @param offset The offset from the internal unit
+         * @param formatString The format string
+         */
         Unit(String s, double scale, double offset, String formatString) {
             label = s;
             this.scale = scale;
@@ -77,26 +105,52 @@ public class Temperature extends Measurement {
     }
     private static final int COMPARE_PRECISION = 1;
 
-    public Temperature(double temp) {
-        this(temp, getDefaultUnit());
+    /**
+     * Constructor.
+     * 
+     * @param temperature The initial value
+     */
+    public Temperature(double temperature) {
+        this(temperature, getDefaultUnit());
     }
 
-    public Temperature(double temp, Unit unit) {
-        super(temp, unit, COMPARE_PRECISION, Temperature::new);
+    /**
+     * Constructor.
+     * 
+     * @param temperature The initial value
+     * @param unit The unit of the initial value
+     */
+    public Temperature(double temperature, Unit unit) {
+        super(temperature, unit, COMPARE_PRECISION, Temperature::new);
     }
     
     private Temperature() {
         this(0.0);
     }
 
+    /**
+     * Get the default unit.
+     * 
+     * @return The unit
+     */
     public static Unit getDefaultUnit() {
         return (Unit)getDefaultUnit(Temperature.class);
     }
 
+    /**
+     * Set the default unit.
+     * 
+     * @param unit The unit
+     */
     public static void setDefaultUnit(Unit unit) {
         setDefaultUnit(Temperature.class, unit);
     }
 
+    /**
+     * Get the number formatter for the default unit.
+     * 
+     * @return The number formatter
+     */
     public static NumberFormat getDefaultFormatter() {
         return getDefaultUnit().getFormatter();
     }

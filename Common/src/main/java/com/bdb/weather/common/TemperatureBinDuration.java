@@ -22,25 +22,48 @@ import java.util.Objects;
 
 import com.bdb.weather.common.measurement.Temperature;
 
+/**
+ *
+ * @author bruce
+ */
 public class TemperatureBinDuration {
     private final TemperatureBin temperatureBin;
     private final LocalDate date;
     private Duration duration;
 
+    /**
+     *
+     * @param bin
+     * @param date
+     */
     public TemperatureBinDuration(TemperatureBin bin, LocalDate date) {
         this(bin, date, Duration.ZERO);
     }
 
+    /**
+     *
+     * @param bin
+     * @param date
+     * @param duration
+     */
     public TemperatureBinDuration(TemperatureBin bin, LocalDate date, Duration duration) {
         this.date = date;
         this.duration = duration;
         this.temperatureBin = bin;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBinId() {
         return temperatureBin.getBinId();
     }
 
+    /**
+     *
+     * @return
+     */
     public TemperatureBin getTemperatureBin() {
         return temperatureBin;
     }
@@ -59,6 +82,10 @@ public class TemperatureBinDuration {
         return duration;
     }
 
+    /**
+     *
+     * @param duration
+     */
     public void addDuration(Duration duration) {
         this.duration = this.duration.plus(duration);
     }
@@ -74,10 +101,20 @@ public class TemperatureBinDuration {
             addDuration(duration);
     }
 
+    /**
+     *
+     * @param t
+     * @return
+     */
     public boolean isInBin(Temperature t) {
         return temperatureBin.isInBin(t);
     }
 
+    /**
+     *
+     * @param other
+     * @return
+     */
     public boolean isSameBin(TemperatureBinDuration other) {
         return getBinId() == other.getBinId();
     }

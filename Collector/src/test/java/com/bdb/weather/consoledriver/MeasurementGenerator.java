@@ -30,25 +30,50 @@ public abstract class MeasurementGenerator<T extends Measurement> {
     private final Calendar time;
     private final int intervalSeconds;
     
+    /**
+     *
+     * @param initValue
+     * @param time
+     * @param intervalSeconds
+     */
     protected MeasurementGenerator(T initValue, Calendar time, int intervalSeconds) {
         measurement = initValue;
         this.time = (Calendar)time.clone();
         this.intervalSeconds = intervalSeconds;
     }
     
+    /**
+     *
+     * @param measurement
+     */
     protected void setMeasurement(T measurement) {
         this.measurement = measurement;
     }
     
+    /**
+     *
+     * @return
+     */
     public T getMeasurement() {
         return measurement;
     }
     
+    /**
+     *
+     * @return
+     */
     public T nextValue() {
         time.add(Calendar.SECOND, intervalSeconds);
         measurement = nextValue(measurement, time, intervalSeconds);
         return measurement;
     }
     
+    /**
+     *
+     * @param currentValue
+     * @param time
+     * @param intervalSeconds
+     * @return
+     */
     protected abstract T nextValue(T currentValue, Calendar time, int intervalSeconds);
 }

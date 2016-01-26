@@ -22,14 +22,50 @@ package com.bdb.weather.common;
  * @author Bruce
  */
 public enum SensorStationType {
+
+    /**
+     *
+     */
     INTEGRATED_SENSOR_STATION("ISS"),
+
+    /**
+     *
+     */
     TEMPERATURE_ONLY("TEMP"),
+
+    /**
+     *
+     */
     TEMPERATURE_HUMIDTY("TEMP/HUMID"),
+
+    /**
+     *
+     */
     HUMIDITY_ONLY("HUMID"),
+
+    /**
+     *
+     */
     LEAF("LEAF WETNESS"),
+
+    /**
+     *
+     */
     SOIL("SOIL_MOISTURE"),
+
+    /**
+     *
+     */
     SOIL_LEAF("LW/SM"),
+
+    /**
+     *
+     */
     ANEMOMETER("AN"),
+
+    /**
+     *
+     */
     RAIN("RAIN");
 
     private final String code;
@@ -38,10 +74,19 @@ public enum SensorStationType {
         this.code = code;
     }
     
+    /**
+     *
+     * @return
+     */
     public String getCode() {
         return code;
     }
     
+    /**
+     *
+     * @param code
+     * @return
+     */
     public static SensorStationType fromCode(String code) {
         for (SensorStationType type : SensorStationType.values()) {
             if (type.code.equals(code))

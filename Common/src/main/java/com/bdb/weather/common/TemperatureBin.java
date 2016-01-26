@@ -19,11 +19,21 @@ package com.bdb.weather.common;
 import com.bdb.weather.common.measurement.Temperature;
 import java.util.Objects;
 
+/**
+ *
+ * @author bruce
+ */
 public class TemperatureBin implements Comparable<TemperatureBin> {
     private final int           binId;
     private final ThresholdType thresholdType;
     private final Temperature   threshold;
     
+    /**
+     *
+     * @param binId
+     * @param thresholdType
+     * @param threshold
+     */
     public TemperatureBin(int binId, ThresholdType thresholdType, Temperature threshold) {
         this.binId = binId;
         this.thresholdType = thresholdType;
@@ -51,6 +61,11 @@ public class TemperatureBin implements Comparable<TemperatureBin> {
         return threshold;
     }
     
+    /**
+     *
+     * @param t
+     * @return
+     */
     public boolean isInBin(Temperature t) {
         if (thresholdType == ThresholdType.BELOW_THRESHOLD && t.compareTo(threshold) < 0)
             return true;
@@ -58,6 +73,11 @@ public class TemperatureBin implements Comparable<TemperatureBin> {
         return thresholdType == ThresholdType.ABOVE_THRESHOLD && t.compareTo(threshold) >= 0;
     }
 
+    /**
+     *
+     * @param other
+     * @return
+     */
     public boolean isSameBin(TemperatureBin other) {
         return thresholdType == other.thresholdType && threshold.equals(other.threshold);
     }

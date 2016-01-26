@@ -40,6 +40,14 @@ public class SensorStationStatus {
     @XmlElement
     private Integer linkQuality;
     
+    /**
+     *
+     * @param id
+     * @param time
+     * @param voltage
+     * @param battery
+     * @param link
+     */
     public SensorStationStatus(int id, LocalDateTime time, Float voltage, Boolean battery, Integer link) {
         sensorStationId = id;
         this.time = time;
@@ -52,22 +60,42 @@ public class SensorStationStatus {
         this(0, LocalDateTime.now(), null, null, null);
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSensorStationId() {
         return sensorStationId;
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getTime() {
         return time;
     }
 
+    /**
+     *
+     * @return
+     */
     public Float getBatteryVoltage() {
         return batteryVoltage;
     }
 
+    /**
+     *
+     * @return
+     */
     public Boolean isBatteryOk() {
         return batteryOk;
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getLinkQuality() {
         return linkQuality;
     }

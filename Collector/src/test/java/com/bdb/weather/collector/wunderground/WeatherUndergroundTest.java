@@ -50,6 +50,10 @@ public class WeatherUndergroundTest {
                                                    "Content-Length: 14\n\n" +
                                                    "NOT A SUCCESS\n";
     
+    /**
+     *
+     * @throws IOException
+     */
     public WeatherUndergroundTest() throws IOException {
         InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("collector_logging.properties");
         
@@ -57,14 +61,25 @@ public class WeatherUndergroundTest {
             LogManager.getLogManager().readConfiguration(is);
     }
     
+    /**
+     *
+     * @throws Exception
+     */
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
     
+    /**
+     *
+     */
     @AfterClass
     public static void tearDownClass() {
     }
     
+    /**
+     *
+     * @throws IOException
+     */
     @Before
     public void setUp() throws IOException {
         thread = new Thread(() -> {
@@ -112,10 +127,16 @@ public class WeatherUndergroundTest {
         thread.start();
     }
     
+    /**
+     *
+     */
     @After
     public void tearDown() {
     }
 
+    /**
+     *
+     */
     @Test
     public void testSuccessfulUpload() {
         System.out.println("successfulUpload");
@@ -132,6 +153,9 @@ public class WeatherUndergroundTest {
         ThreadUtils.sleep(1000);
     }
 
+    /**
+     *
+     */
     @Test
     public void testUnsuccessfulUpload() {
         System.out.println("UnsuccessfulUpload");
@@ -146,6 +170,9 @@ public class WeatherUndergroundTest {
         assertEquals(1, instance.getStatistics().numAttempts);
     }
 
+    /**
+     *
+     */
     @Test
     public void testUnsuccessfulConnection() {
         System.out.println("UnsuccessfulConnection");

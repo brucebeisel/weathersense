@@ -21,25 +21,51 @@ import java.text.NumberFormat;
 
 import com.bdb.util.measurement.Measurement;
 
+/**
+ * A class that represents a measurement of pressure.
+ * 
+ * @author bruce
+ */
 public class Pressure extends Measurement {
     private static final long serialVersionUID = 828793598435665033L;
 
+    /**
+     * The unit of pressure measurement
+     */
     public enum Unit implements com.bdb.util.measurement.Unit {
+        /**
+         * Pressure measured in KiloPascals
+         */
         KILO_PASCAL("kPa", 10.0, "#.0"),
+        /**
+         * Pressure measured in HectoPascals
+         */
         HECTO_PASCAL("hPa", 1.0, "#"),
+        /**
+         * Pressure measured in Millibars
+         */
         MILLIBAR("mb", 1.0, "#"), // Internal storage unit
+        /**
+         * Pressure measured in inches of mercury
+         */
         IN_HG("InHg", 33.86386, "#.00");
         private final String label;
         private final double scale;
         private final DecimalFormat formatter;
         private final DecimalFormat formatterWithUnit;
 
+        /**
+         * Constructor.
+         * 
+         * @param s The name of the unit
+         * @param scale The scale conversion
+         * @param format The number format for this unit
+         */
         Unit(String s, double scale, String format) {
             this.label = s;
             this.scale = scale;
             formatter = new DecimalFormat(format);
             formatterWithUnit = new DecimalFormat(format + " '" + label + "'");
-
         }
 
         @Override
@@ -74,10 +100,21 @@ public class Pressure extends Measurement {
     }
     private static final int COMPARE_PRECISION = 1;
 
+    /**
+     * Constructor.
+     * 
+     * @param pressure The initial value
+     */
     public Pressure(double pressure) {
         this(pressure, getDefaultUnit());
     }
 
+    /**
+     * Constructor.
+     * 
+     * @param pressure The initial value
+     * @param unit The unit that the value is in
+     */
     public Pressure(double pressure, Unit unit) {
         super(pressure, unit, COMPARE_PRECISION, Pressure::new);
     }
@@ -86,10 +123,23 @@ public class Pressure extends Measurement {
         this(0.0);
     }
 
+    /**
+     * Adjust the pressure for the altitude.
+     * 
+     * @param altitude The altitude to adjust for
+     * @return The adjusted pressure
+     */
     public Pressure adjustForAltitude(Distance altitude) {
         return adjustForAltitude(altitude, true);
     }
 
+    /**
+     * Adjust the pressure for the altitude.
+     * 
+     * @param altitude The altitude to adjust for
+     * @param add Whether to add or subtract the pressure
+     * @return The adjusted pressure
+     */
     public Pressure adjustForAltitude(Distance altitude, boolean add) {
         // 1.006 inHg per 1000 ft
         // 1 millibar per 8 meters
@@ -102,18 +152,39 @@ public class Pressure extends Measurement {
             return new Pressure(get(Pressure.Unit.MILLIBAR) - delta, Pressure.Unit.MILLIBAR);
     }
 
+    /**
+     * Get the default unit for Pressure.
+     * 
+     * @return The default unit
+     */
     public static Unit getDefaultUnit() {
         return (Unit)getDefaultUnit(Pressure.class);
     }
 
+    /**
+     * Set the default unit for Pressure.
+     * 
+     * @param unit The default unit
+     */
     public static void setDefaultUnit(Unit unit) {
         setDefaultUnit(Pressure.class, unit);
     }
 
+    /**
+     * Get the number formatter for the default unit.
+     * 
+     * @return The number formatter
+     */
     public static NumberFormat getDefaultFormatter() {
         return getDefaultUnit().getFormatter();
     }
 
+    /**
+     * Get the barometric offset for the given altitude.
+     * 
+     * @param altitude The altitude
+     * @return The barometric adjustment
+     */
     public static Pressure barometricOffset(Depth altitude) {
         return new Pressure(altitude.get(Depth.Unit.METERS) * ALT_METERS_PER_MILLIBAR);
     }

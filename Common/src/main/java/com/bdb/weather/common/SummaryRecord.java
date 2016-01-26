@@ -45,7 +45,10 @@ import com.bdb.weather.common.measurement.SolarRadiation;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
 
-
+/**
+ *
+ * @author bruce
+ */
 public class SummaryRecord {
     private final LocalDate date;
     private Duration        duration = Duration.ZERO;
@@ -84,6 +87,12 @@ public class SummaryRecord {
     private static final DateTimeFormatter sdf = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
     private static final Logger logger = Logger.getLogger(SummaryRecord.class.getName());
 
+    /**
+     *
+     * @param windParameters
+     * @param temperatureBinMgr
+     * @param date
+     */
     public SummaryRecord(WindParameters windParameters, TemperatureBinMgr temperatureBinMgr, LocalDate date) {
         this.date = date;
         windRoseData = new WindRoseData(date, windParameters);
@@ -94,54 +103,109 @@ public class SummaryRecord {
         });
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDate getDate() {
         return date;
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getDuration() {
         return duration;
     }
 
+    /**
+     *
+     * @param duration
+     */
     public void setDuration(Duration duration) {
         this.duration = duration;
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getOutdoorTempDuration() {
         return outdoorTemp.getAverageDuration();
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getMinOutdoorTemp() {
         return outdoorTemp.getMinimumValue();
     }
 
+    /**
+     *
+     * @param t
+     * @param time
+     */
     public void setMinOutdoorTemp(Temperature t, LocalDateTime time) {
         outdoorTemp.setMinimum(t, time);
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMinOutdoorTempTime() {
         return outdoorTemp.getMinimumTime();
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getMaxOutdoorTemp() {
         return outdoorTemp.getMaximumValue();
     }
 
+    /**
+     *
+     * @param t
+     * @param time
+     */
     public void setMaxOutdoorTemp(Temperature t, LocalDateTime time) {
         outdoorTemp.setMaximum(t, time);
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMaxOutdoorTempTime() {
         return outdoorTemp.getMaximumTime();
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getAvgOutdoorTemp() {
         return outdoorTemp.getAverage();
     }
 
+    /**
+     *
+     * @param t
+     * @param duration
+     */
     public void setAvgOutdoorTemp(Temperature t, Duration duration) {
         outdoorTemp.setAverage(t, duration);
     }
     
+    /**
+     *
+     * @return
+     */
     public Temperature getMaxHighOutdoorTemp() {
         Temperature max = outdoorHighTemp.getMaximumValue();
         if (max != null)
@@ -150,6 +214,10 @@ public class SummaryRecord {
             return outdoorTemp.getMaximumValue();
     }
     
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMaxHighOutdoorTempTime() {
         LocalDateTime t = outdoorHighTemp.getMaximumTime();
         if (t != null)
@@ -158,6 +226,10 @@ public class SummaryRecord {
             return outdoorTemp.getMaximumTime();
     }
     
+    /**
+     *
+     * @return
+     */
     public Temperature getMinHighOutdoorTemp() {
         Temperature min = outdoorHighTemp.getMinimumValue();
         if (min != null)
@@ -166,6 +238,10 @@ public class SummaryRecord {
             return outdoorTemp.getMaximumValue();
     }
     
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMinHighOutdoorTempTime() {
         LocalDateTime t = outdoorHighTemp.getMinimumTime();
         if (t != null)
@@ -174,6 +250,10 @@ public class SummaryRecord {
             return outdoorTemp.getMaximumTime();
     }
     
+    /**
+     *
+     * @return
+     */
     public Temperature getAvgHighOutdoorTemp() {
         Temperature avg = outdoorHighTemp.getAverage();
         if (avg != null)
@@ -182,6 +262,10 @@ public class SummaryRecord {
             return outdoorTemp.getAverage();
     }
     
+    /**
+     *
+     * @return
+     */
     public Temperature getMaxLowOutdoorTemp() {
         Temperature max = outdoorLowTemp.getMaximumValue();
         if (max != null)
@@ -190,6 +274,10 @@ public class SummaryRecord {
             return outdoorTemp.getMinimumValue();
     }
     
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMaxLowOutdoorTempTime() {
         LocalDateTime t = outdoorLowTemp.getMaximumTime();
         if (t != null)
@@ -198,6 +286,10 @@ public class SummaryRecord {
             return outdoorTemp.getMinimumTime();
     }
     
+    /**
+     *
+     * @return
+     */
     public Temperature getMinLowOutdoorTemp() {
         Temperature min = outdoorLowTemp.getMinimumValue();
         if (min != null)
@@ -206,6 +298,10 @@ public class SummaryRecord {
             return outdoorTemp.getMinimumValue();
     }
     
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMinLowOutdoorTempTime() {
         LocalDateTime t = outdoorLowTemp.getMinimumTime();
         if (t != null)
@@ -214,6 +310,10 @@ public class SummaryRecord {
             return outdoorTemp.getMinimumTime();
     }
     
+    /**
+     *
+     * @return
+     */
     public Temperature getAvgLowOutdoorTemp() {
         Temperature avg = outdoorLowTemp.getAverage();
         if (avg != null)
@@ -224,6 +324,11 @@ public class SummaryRecord {
     
     //
     //
+
+    /**
+     *
+     * @return
+     */
     
     public Temperature getMaxMeanOutdoorTemp() {
         Temperature max = outdoorMeanTemp.getMaximumValue();
@@ -233,6 +338,10 @@ public class SummaryRecord {
             return outdoorTemp.getAverage();
     }
     
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMaxMeanOutdoorTempTime() {
         LocalDateTime t = outdoorMeanTemp.getMaximumTime();
         if (t != null)
@@ -241,6 +350,10 @@ public class SummaryRecord {
             return outdoorTemp.getMinimumTime();
     }
     
+    /**
+     *
+     * @return
+     */
     public Temperature getMinMeanOutdoorTemp() {
         Temperature min = outdoorMeanTemp.getMinimumValue();
         if (min != null)
@@ -249,6 +362,10 @@ public class SummaryRecord {
             return outdoorTemp.getAverage();
     }
     
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMinMeanOutdoorTempTime() {
         LocalDateTime t = outdoorMeanTemp.getMinimumTime();
         if (t != null)
@@ -257,6 +374,10 @@ public class SummaryRecord {
             return outdoorTemp.getMinimumTime();
     }
     
+    /**
+     *
+     * @return
+     */
     public Temperature getAvgMeanOutdoorTemp() {
         Temperature avg = outdoorMeanTemp.getAverage();
         if (avg != null)
@@ -265,327 +386,678 @@ public class SummaryRecord {
             return outdoorTemp.getAverage();
     }
     
+    /**
+     *
+     * @return
+     */
     public Duration getIndoorTempDuration() {
         return indoorTemp.getAverageDuration();
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getMinIndoorTemp() {
         return indoorTemp.getMinimumValue();
     }
 
+    /**
+     *
+     * @param t
+     * @param c
+     */
     public void setMinIndoorTemp(Temperature t, LocalDateTime c) {
         indoorTemp.setMinimum(t, c);
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMinIndoorTempTime() {
         return indoorTemp.getMinimumTime();
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getMaxIndoorTemp() {
         return indoorTemp.getMaximumValue();
     }
 
+    /**
+     *
+     * @param t
+     * @param c
+     */
     public void setMaxIndoorTemp(Temperature t, LocalDateTime c) {
         indoorTemp.setMaximum(t, c);
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMaxIndoorTempTime() {
         return indoorTemp.getMaximumTime();
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getAvgIndoorTemp() {
         return indoorTemp.getAverage();
     }
 
+    /**
+     *
+     * @param t
+     * @param duration
+     */
     public void setAvgIndoorTemp(Temperature t, Duration duration)
     {
         indoorTemp.setAverage(t, duration);
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getDewPointDuration() {
         return dewpoint.getAverageDuration();
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getMinDewPoint() {
         return dewpoint.getMinimumValue();
     }
 
+    /**
+     *
+     * @param t
+     * @param c
+     */
     public void setMinDewPoint(Temperature t, LocalDateTime c) {
         dewpoint.setMinimum(t, c);
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMinDewPointTime() {
         return dewpoint.getMinimumTime();
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getMaxDewPoint() {
         return dewpoint.getMaximumValue();
     }
 
+    /**
+     *
+     * @param t
+     * @param c
+     */
     public void setMaxDewPoint(Temperature t, LocalDateTime c) {
         dewpoint.setMaximum(t, c);
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMaxDewPointTime() {
         return dewpoint.getMaximumTime();
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getAvgDewPoint() {
         return dewpoint.getAverage();
     }
 
+    /**
+     *
+     * @param t
+     * @param duration
+     */
     public void setAvgDewPoint(Temperature t, Duration duration) {
         dewpoint.setAverage(t, duration);
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getHeatIndexDuration() {
         return heatIndex.getAverageDuration();
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getMinHeatIndex() {
         return heatIndex.getMinimumValue();
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getMaxHeatIndex() {
         return heatIndex.getMaximumValue();
     }
 
+    /**
+     *
+     * @param t
+     * @param c
+     */
     public void setMaxHeatIndex(Temperature t, LocalDateTime c) {
         heatIndex.setMaximum(t, c);
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMaxHeatIndexTime() {
         return heatIndex.getMaximumTime();
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getAvgHeatIndex() {
         return heatIndex.getAverage();
     }
 
+    /**
+     *
+     * @param t
+     * @param duration
+     */
     public void setAvgHeatIndex(Temperature t, Duration duration) {
         heatIndex.setAverage(t, duration);
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getWindChillDuration() {
         return windChill.getAverageDuration();
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getMinWindChill() {
         return windChill.getMinimumValue();
     }
 
+    /**
+     *
+     * @param t
+     * @param c
+     */
     public void setMinWindChill(Temperature t, LocalDateTime c) {
         windChill.setMinimum(t, c);
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMinWindChillTime() {
         return windChill.getMinimumTime();
     }
 
+    /**
+     *
+     * @return
+     */
     public Temperature getAvgWindChill() {
         return windChill.getAverage();
     }
 
+    /**
+     *
+     * @param t
+     * @param duration
+     */
     public void setAvgWindChill(Temperature t, Duration duration) {
         windChill.setAverage(t, duration);
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getOutdoorHumidityDuration() {
         return outdoorHumidity.getAverageDuration();
     }
 
-     public Humidity getMinOutdoorHumidity() {
+    /**
+     *
+     * @return
+     */
+    public Humidity getMinOutdoorHumidity() {
         return outdoorHumidity.getMinimumValue();
     }
 
+    /**
+     *
+     * @param h
+     * @param c
+     */
     public void setMinOutdoorHumidity(Humidity h, LocalDateTime c) {
         outdoorHumidity.setMinimum(h, c);
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMinOutdoorHumidityTime() {
         return outdoorHumidity.getMinimumTime();
     }
 
+    /**
+     *
+     * @return
+     */
     public Humidity getMaxOutdoorHumidity() {
         return outdoorHumidity.getMaximumValue();
     }
     
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMaxOutdoorHumidityTime() {
         return outdoorHumidity.getMaximumTime();
     }
 
+    /**
+     *
+     * @param h
+     * @param c
+     */
     public void setMaxOutdoorHumidity(Humidity h, LocalDateTime c) {
         outdoorHumidity.setMaximum(h, c);
     }
 
+    /**
+     *
+     * @return
+     */
     public Humidity getAvgOutdoorHumidity() {
         return outdoorHumidity.getAverage();
     }
 
+    /**
+     *
+     * @param h
+     * @param duration
+     */
     public void setAvgOutdoorHumidity(Humidity h, Duration duration) {
         outdoorHumidity.setAverage(h, duration);
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getIndoorHumidityDuration() {
         return indoorHumidity.getAverageDuration();
     }
 
+    /**
+     *
+     * @return
+     */
     public Humidity getMinIndoorHumidity() {
         return indoorHumidity.getMinimumValue();
     }
 
+    /**
+     *
+     * @param h
+     * @param c
+     */
     public void setMinIndoorHumidity(Humidity h, LocalDateTime c) {
         indoorHumidity.setMinimum(h, c);
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMinIndoorHumidityTime() {
         return indoorHumidity.getMinimumTime();
     }
 
+    /**
+     *
+     * @return
+     */
     public Humidity getMaxIndoorHumidity() {
         return indoorHumidity.getMaximumValue();
     }
 
+    /**
+     *
+     * @param h
+     * @param c
+     */
     public void setMaxIndoorHumidity(Humidity h, LocalDateTime c) {
         indoorHumidity.setMaximum(h, c);
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMaxIndoorHumidityTime() {
         return indoorHumidity.getMaximumTime();
     }
 
+    /**
+     *
+     * @return
+     */
     public Humidity getAvgIndoorHumidity() {
         return indoorHumidity.getAverage();
     }
 
+    /**
+     *
+     * @param h
+     * @param duration
+     */
     public void setAvgIndoorHumidity(Humidity h, Duration duration) {
         indoorHumidity.setAverage(h, duration);
     }
 
+    /**
+     *
+     * @return
+     */
     public SolarRadiation getMaxSolarRadiation() {
         return solarRadiation.getMaximumValue();
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMaxSolarRadiationTime() {
         return solarRadiation.getMaximumTime();
     }
+
+    /**
+     *
+     * @param sr
+     * @param c
+     */
     public void setMaxSolarRadiation(SolarRadiation sr, LocalDateTime c) {
         solarRadiation.setMaximum(sr, c);
     }
 
+    /**
+     *
+     * @return
+     */
     public SolarRadiation getAvgSolarRadiation() {
         return solarRadiation.getAverage();
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getSolarRadiationDuration() {
         return solarRadiation.getAverageDuration();
     }
 
+    /**
+     *
+     * @param avg
+     * @param duration
+     */
     public void setAvgSolarRadiation(SolarRadiation avg, Duration duration) {
         solarRadiation.setAverage(avg, duration);
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getBaroPressureDuration() {
         return baroPressure.getAverageDuration();
     }
 
+    /**
+     *
+     * @return
+     */
     public Pressure getMinBaroPressure() {
         return baroPressure.getMinimumValue();
     }
 
+    /**
+     *
+     * @param baro
+     * @param c
+     */
     public void setMinBaroPressure(Pressure baro, LocalDateTime c) {
         baroPressure.setMinimum(baro, c);
     }
 
+    /**
+     *
+     * @return
+     */
     public Pressure getMaxBaroPressure() {
         return baroPressure.getMaximumValue();
     }
     
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMinBaroPressureTime() {
         return baroPressure.getMinimumTime();
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMaxBaroPressureTime() {
         return baroPressure.getMaximumTime();
     }
 
+    /**
+     *
+     * @param baro
+     * @param c
+     */
     public void setMaxBaroPressure(Pressure baro, LocalDateTime c) {
         baroPressure.setMaximum(baro, c);
     }
 
+    /**
+     *
+     * @return
+     */
     public Pressure getAvgBaroPressure() {
         return baroPressure.getAverage();
     }
 
+    /**
+     *
+     * @param baro
+     * @param duration
+     */
     public void setAvgBaroPressure(Pressure baro, Duration duration) {
         baroPressure.setAverage(baro, duration);
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getWindDuration() {
         return windSpeed.getAverageDuration();
     }
 
+    /**
+     *
+     * @return
+     */
     public Speed getMaxWindSpeed() {
         return windSpeed.getMaximumValue();
     }
 
+    /**
+     *
+     * @param s
+     * @param c
+     */
     public void setMaxWindSpeed(Speed s, LocalDateTime c) {
         windSpeed.setMaximum(s, c);
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMaxWindSpeedTime() {
         return windSpeed.getMaximumTime();
     }
 
+    /**
+     *
+     * @return
+     */
     public Speed getMaxWindGust() {
         return windGust.getMaximumValue();
     }
 
+    /**
+     *
+     * @param s
+     * @param c
+     */
     public void setMaxWindGust(Speed s, LocalDateTime c) {
         windGust.setMaximum(s, c);
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMaxWindGustTime() {
         return windGust.getMaximumTime();
     }
 
+    /**
+     *
+     * @return
+     */
     public Speed getAvgWindSpeed() {
         return windSpeed.getAverage();
     }
 
+    /**
+     *
+     * @param s
+     * @param duration
+     */
     public void setAvgWindSpeed(Speed s, Duration duration) {
         windSpeed.setAverage(s, duration);
     }
 
+    /**
+     *
+     * @return
+     */
     public WindRoseData getWindRoseData() {
         return windRoseData;
     }
 
+    /**
+     *
+     * @return
+     */
     public Depth getTotalRainfall() {
         return totalRainfall;
     }
 
+    /**
+     *
+     * @param d
+     */
     public void setTotalRainfall(Depth d) {
         totalRainfall = d;
     }
 
+    /**
+     *
+     * @return
+     */
     public Depth getMaxRainfallRate() {
         return maxRainfallRate;
     }
 
+    /**
+     *
+     * @param d
+     * @param c
+     */
     public void setMaxRainfallRate(Depth d, LocalDateTime c) {
         maxRainfallRate = d;
         maxRainfallRateTime = c;
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDateTime getMaxRainfallRateTime() {
         return maxRainfallRateTime;
     }
 
+    /**
+     *
+     * @return
+     */
     public DayHourRain getHourlyRainfall() {
         return hourlyRainfall;
     }
 
+    /**
+     *
+     * @param d
+     * @param hour
+     */
     public void setRainfallForHour(Depth d, int hour) {
         if (ChronoField.HOUR_OF_DAY.range().isValidValue(hour))
             throw new IllegalArgumentException("Illegal hour specified (" + hour + "). Must be 0 through 23");
@@ -593,22 +1065,42 @@ public class SummaryRecord {
         hourlyRainfall.putRain(hour, d);
     }
     
+    /**
+     *
+     * @param rain
+     */
     public void setRainfall(DayHourRain rain) {
         hourlyRainfall = rain;
     }
 
+    /**
+     *
+     * @return
+     */
     public Depth getTotalET() {
         return totalET;
     }
 
+    /**
+     *
+     * @param et
+     */
     public void setTotalET(Depth et) {
         totalET = et;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<TemperatureBinDuration> getTemperatureBinDurations() {
         return Collections.unmodifiableList(temperatureBinDurations);
     }
     
+    /**
+     *
+     * @param durations
+     */
     public void setTemperatureBinDurations(List<TemperatureBinDuration> durations) {
         temperatureBinDurations.clear();
         temperatureBinDurations.addAll(durations);
@@ -662,6 +1154,10 @@ public class SummaryRecord {
         }
     }
 
+    /**
+     *
+     * @param summary
+     */
     public void addSensorStatistics(MeasurementStatisticsEntry<? extends Measurement> summary) {
 	sensors.put(summary.getSensorId(), summary);
     }
@@ -699,6 +1195,10 @@ public class SummaryRecord {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public Collection<MeasurementStatisticsEntry<? extends Measurement>> getSensorValues() {
 	return Collections.unmodifiableCollection(sensors.values());
     }
@@ -748,6 +1248,10 @@ public class SummaryRecord {
             totalET = totalET.add(et);
     }
 
+    /**
+     *
+     * @param rec
+     */
     public void applyHistoricalRecord(HistoricalRecord rec) {
         duration = duration.plus(rec.getDuration());
         indoorTemp.applyValue(rec.getIndoorTemperature(), rec.getTime(), rec.getDuration());
@@ -785,6 +1289,10 @@ public class SummaryRecord {
         });
     }
 
+    /**
+     *
+     * @param rec
+     */
     public void applySummaryRecord(SummaryRecord rec) {
         duration = duration.plus(rec.duration);
         indoorTemp.applyStatistics(rec.indoorTemp);

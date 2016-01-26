@@ -27,12 +27,33 @@ import com.bdb.util.measurement.Measurement;
 public class Depth extends Measurement {
     private static final long serialVersionUID = 8677600886116392761L;
 
+    /**
+     * Enum for the depth units.
+     */
     public enum Unit implements com.bdb.util.measurement.Unit {
+        /**
+         * Depth in millimeters
+         */
         MILLIMETERS("mm", 1.0, ".0"), // Internal storage unit
+        /**
+         * Depth in centimeters
+         */
         CENTIMETERS("cm", .1, ".00"),
+        /**
+         * Depth in meters
+         */
         METERS("m", .001, ".000"),
+        /**
+         * Depth in kilometers
+         */
         KILOMETERS("km", .000001, ".0"),
+        /**
+         * Depth in inches
+         */
         INCHES("in", 1.0 / 25.4, ".00"),
+        /**
+         * Depth in feet
+         */
         FEET("ft", 1.0 / 25.4 / 12.0, ".000");
         private final String label;
         private final double scale;

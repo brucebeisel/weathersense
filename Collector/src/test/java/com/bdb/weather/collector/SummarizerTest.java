@@ -43,6 +43,10 @@ public class SummarizerTest {
     private final List<HistoricalRecord> historyList = new ArrayList<>();
     private static DatabaseUtilities utils;
 
+    /**
+     *
+     * @throws IOException
+     */
     public SummarizerTest() throws IOException {
         InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("collector_logging.properties");
         
@@ -50,6 +54,9 @@ public class SummarizerTest {
             LogManager.getLogManager().readConfiguration(is);
     }
     
+    /**
+     *
+     */
     @BeforeClass
     public static void setUpClass() {
         dbcon = DatabaseUtilities.connectToDerby();
@@ -57,21 +64,31 @@ public class SummarizerTest {
         utils = new DatabaseUtilities(dbcon);
     }
     
+    /**
+     *
+     */
     @AfterClass
     public static void tearDownClass() {
         dbcon.close();
     }
     
+    /**
+     *
+     */
     @Before
     public void setUp() {
     }
     
+    /**
+     *
+     */
     @After
     public void tearDown() {
     }
 
     /**
      * Test of refresh method, of class Summarizer.
+     * @throws java.lang.Exception
      */
     //@Test
     public void testRefresh() throws Exception {
@@ -84,6 +101,7 @@ public class SummarizerTest {
 
     /**
      * Test of updateSummary method, of class Summarizer.
+     * @throws java.lang.Exception
      */
     //@Test
     public void testUpdateSummary() throws Exception {
@@ -97,6 +115,7 @@ public class SummarizerTest {
 
     /**
      * Test of catchup method, of class Summarizer.
+     * @throws java.lang.Exception
      */
     //@Test
     public void testCatchup() throws Exception {

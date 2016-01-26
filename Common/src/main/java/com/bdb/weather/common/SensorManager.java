@@ -35,6 +35,10 @@ public class SensorManager {
         instance = new SensorManager();
     }
 
+    /**
+     *
+     * @return
+     */
     public static SensorManager getInstance() {
         return instance;
     }
@@ -43,14 +47,29 @@ public class SensorManager {
         sensors = new TreeMap<>();
     }
 
+    /**
+     *
+     * @param sensor
+     */
     public void addSensor(Sensor sensor) {
         sensors.put(sensor.getSensorId(), sensor);
     }
 
+    /**
+     *
+     * @return
+     */
     public Collection<Sensor> getAllSensors() {
         return Collections.unmodifiableCollection(sensors.values());
     }
 
+    /**
+     *
+     * @param type
+     * @param includeStandard
+     * @param includeExtra
+     * @return
+     */
     public List<Sensor> getSensors(SensorType type, boolean includeStandard, boolean includeExtra) {
         List<Sensor> list = new ArrayList<>();
         for (Sensor sensor : sensors.values()) {
@@ -69,18 +88,38 @@ public class SensorManager {
         return list;
     }
 
+    /**
+     *
+     * @param type
+     * @return
+     */
     public List<Sensor> getExtraSensors(SensorType type) {
         return getSensors(type, false, true);
     }
 
+    /**
+     *
+     * @param type
+     * @return
+     */
     public List<Sensor> getStandardSensors(SensorType type) {
         return getSensors(type, true, false);
     }
 
+    /**
+     *
+     * @param sensorId
+     * @return
+     */
     public boolean sensorInstalled(int sensorId) {
         return sensors.get(sensorId) != null;
     }
 
+    /**
+     *
+     * @param sensorId
+     * @return
+     */
     public Sensor getSensor(int sensorId) {
         return sensors.get(sensorId);
     }

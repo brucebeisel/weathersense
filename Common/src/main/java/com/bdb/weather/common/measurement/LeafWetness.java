@@ -29,7 +29,13 @@ import com.bdb.util.measurement.Measurement;
  */
 public class LeafWetness extends Measurement {
     private static final long serialVersionUID = 1;
+    /**
+     * The maximum leaf wetness
+     */
     public static final LeafWetness MAX_LEAF_WETNESS = new LeafWetness(15);
+    /**
+     * The minimum leaf wetness
+     */
     public static final LeafWetness MIN_LEAF_WETNESS = new LeafWetness(0);
 
     /**
@@ -39,6 +45,9 @@ public class LeafWetness extends Measurement {
      * @since 1.0
      */
     public enum Unit implements com.bdb.util.measurement.Unit {
+        /**
+         * The only unit that leaf wetness supports
+         */
         WETNESS;
         private static final String FORMAT_STRING = "0";
         private static final String UNIT_LABEL = "";
@@ -101,6 +110,11 @@ public class LeafWetness extends Measurement {
             throw new IllegalArgumentException("Out of range Leaf Wetness (" + value + "). Valid range 0 through 15");
     }
 
+    /**
+     * Constructor.
+     * 
+     * @param value The initial value
+     */
     public LeafWetness(double value) {
         this((int)value);
     }

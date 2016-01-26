@@ -32,12 +32,20 @@ import com.bdb.weather.common.DayHourRain;
 import com.bdb.weather.common.RainRecord;
 import com.bdb.weather.common.measurement.Depth;
 
+/**
+ * Class that provides access to the database table that contains the hourly rainfall amounts.
+ * 
+ * @author bruce
+ */
 public class RainHourTable extends DBTable<RainRecord> {
-    private static final Logger logger = Logger.getLogger(RainHourTable.class.getName());
+    /**
+     * The name of the rain hour table
+     */
     protected static final String TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".rain_hour";
     private static final String DATE_COLUMN = "date";
     private static final String HOUR_COLUMN = "day_hour";
     private static final String RAINFALL_COLUMN = "rainfall";
+    private static final Logger logger = Logger.getLogger(RainHourTable.class.getName());
 
     /**
      * Constructor.
@@ -128,6 +136,12 @@ public class RainHourTable extends DBTable<RainRecord> {
         return addRainRecords(list);
     }
 
+    /**
+     * Add a list of rain records to the database table.
+     * 
+     * @param list The list containing records to add to the database
+     * @return True if the records were added successfully
+     */
     public boolean addRainRecords(List<RainRecord> list) {
         boolean success = true;
         try {

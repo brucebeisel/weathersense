@@ -31,6 +31,7 @@ import com.bdb.util.jdbc.DBTable;
 import com.bdb.weather.common.SensorStationStatus;
 
 /**
+ * Class that provides access to the sensor station status table.
  *
  * @author Bruce
  */
@@ -43,6 +44,11 @@ public class SensorStationStatusTable extends DBTable<SensorStationStatus> {
     private static final String LINK_QUALITY_COLUMN = "link_quality_percentage";
     private static final Logger logger = Logger.getLogger(SensorStationStatusTable.class.getName());
     
+    /**
+     * Constructor.
+     * 
+     * @param connection The connection to the database server
+     */
     public SensorStationStatusTable(DBConnection connection) {
         super(TABLE_NAME, connection);
     }

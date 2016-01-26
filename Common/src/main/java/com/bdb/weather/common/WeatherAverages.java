@@ -19,8 +19,29 @@ package com.bdb.weather.common;
 import java.time.LocalDate;
 import java.util.Collection;
 
+/**
+ *
+ * @author bruce
+ */
 public interface WeatherAverages {
+
+    /**
+     *
+     * @param avg
+     * @param date
+     */
     public void putAverage(WeatherAverage avg, LocalDate date);
+
+    /**
+     *
+     * @param date
+     * @return
+     */
     public WeatherAverage getAverage(LocalDate date);
+
+    /**
+     *
+     * @return
+     */
     public Collection<WeatherAverage> getAllAverages();
 }

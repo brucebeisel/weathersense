@@ -18,6 +18,10 @@ package com.bdb.weather.common;
 
 import javax.xml.bind.annotation.XmlElement;
 
+/**
+ *
+ * @author bruce
+ */
 public class SensorStation {
     @XmlElement
     private String name;
@@ -26,10 +30,21 @@ public class SensorStation {
     @XmlElement
     private int sensorStationId;
     
+    /**
+     *
+     * @param sensorStationId
+     * @param type
+     */
     public SensorStation(int sensorStationId, SensorStationType type) {
         this(sensorStationId, type, "Sensor Station " + sensorStationId);
     }
 
+    /**
+     *
+     * @param sensorStationId
+     * @param type
+     * @param name
+     */
     public SensorStation(int sensorStationId, SensorStationType type, String name) {
         this.name = name;
         this.type = type;
@@ -40,14 +55,26 @@ public class SensorStation {
         this(1, SensorStationType.INTEGRATED_SENSOR_STATION, "");
     }
     
+    /**
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @return
+     */
     public SensorStationType getType() {
         return type;
     }
     
+    /**
+     *
+     * @return
+     */
     public int getSensorStationId() {
         return sensorStationId;
     }

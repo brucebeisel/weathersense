@@ -25,6 +25,7 @@ import com.bdb.util.measurement.MeasurementStatistics;
 /**
  *
  * @author beisbr
+ * @param <M>
  */
 public class MeasurementStatisticsEntry<M extends Measurement> {
     private final LocalDate date;
@@ -32,6 +33,13 @@ public class MeasurementStatisticsEntry<M extends Measurement> {
     private final SensorType sensorType;
     private final MeasurementStatistics<M> stats;
 
+    /**
+     *
+     * @param date
+     * @param sensorId
+     * @param sensorType
+     * @param stats
+     */
     public MeasurementStatisticsEntry(LocalDate date, int sensorId, SensorType sensorType, MeasurementStatistics<M> stats) {
         this.date = date;
         this.sensorId = sensorId;
@@ -39,18 +47,34 @@ public class MeasurementStatisticsEntry<M extends Measurement> {
         this.stats = stats;
     }
 
+    /**
+     *
+     * @return
+     */
     public LocalDate getDate() {
         return date;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSensorId() {
         return sensorId;
     }
 
+    /**
+     *
+     * @return
+     */
     public SensorType getSensorType() {
         return sensorType;
     }
 
+    /**
+     *
+     * @return
+     */
     public MeasurementStatistics<M> getStats() {
         return stats;
     }

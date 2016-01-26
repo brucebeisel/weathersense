@@ -29,10 +29,30 @@ import com.bdb.weather.common.measurement.Temperature;
  *
  */
 public class WeatherAverage implements Comparable<WeatherAverage> {
+
+    /**
+     *
+     */
     public enum Interval {
+
+        /**
+         *
+         */
         DAILY,
+
+        /**
+         *
+         */
         MONTHLY,
+
+        /**
+         *
+         */
         YEARLY,
+
+        /**
+         *
+         */
         CUSTOM
     };
     
@@ -64,18 +84,53 @@ public class WeatherAverage implements Comparable<WeatherAverage> {
         this.rainfall = rainfall;
     }
     
+    /**
+     *
+     * @param highTemperature
+     * @param lowTemperature
+     * @param meanTemperature
+     * @param rainfall
+     */
     public WeatherAverage(Temperature highTemperature, Temperature lowTemperature, Temperature meanTemperature, Depth rainfall) {
         this(Interval.YEARLY, Month.JANUARY, 0, Month.JANUARY, 0, highTemperature, lowTemperature, meanTemperature, rainfall);
     }
     
+    /**
+     *
+     * @param month
+     * @param highTemperature
+     * @param lowTemperature
+     * @param meanTemperature
+     * @param rainfall
+     */
     public WeatherAverage(Month month, Temperature highTemperature, Temperature lowTemperature, Temperature meanTemperature, Depth rainfall) {
         this(Interval.MONTHLY, month, 0, month, 0, highTemperature, lowTemperature, meanTemperature, rainfall);
     }
     
+    /**
+     *
+     * @param month
+     * @param day
+     * @param highTemperature
+     * @param lowTemperature
+     * @param meanTemperature
+     * @param rainfall
+     */
     public WeatherAverage(Month month, int day, Temperature highTemperature, Temperature lowTemperature, Temperature meanTemperature, Depth rainfall) {
         this(Interval.DAILY, month, day, month, 0, highTemperature, lowTemperature, meanTemperature, rainfall);
     }
     
+    /**
+     *
+     * @param month
+     * @param day
+     * @param endMonth
+     * @param endDay
+     * @param highTemperature
+     * @param lowTemperature
+     * @param meanTemperature
+     * @param rainfall
+     */
     public WeatherAverage(Month month, int day, Month endMonth, int endDay, Temperature highTemperature, Temperature lowTemperature, Temperature meanTemperature, Depth rainfall) {
         this(Interval.CUSTOM, month, day, endMonth, endDay, highTemperature, lowTemperature, meanTemperature, rainfall);
     }
@@ -113,6 +168,11 @@ public class WeatherAverage implements Comparable<WeatherAverage> {
         return day;
     }
     
+    /**
+     *
+     * @return
+     * @throws IllegalStateException
+     */
     public Month getEndMonth() throws IllegalStateException {
     	if (interval != Interval.CUSTOM)
     		throw new IllegalStateException("Cannot get end month for an average that is not a CUSTOM average");
@@ -120,6 +180,11 @@ public class WeatherAverage implements Comparable<WeatherAverage> {
     	return endMonth;
     }
     
+    /**
+     *
+     * @return
+     * @throws IllegalStateException
+     */
     public int getEndDay() throws IllegalStateException {
     	if (interval != Interval.CUSTOM)
     		throw new IllegalStateException("Cannot get end day for an average this is not a CUSTOM average");
@@ -136,6 +201,10 @@ public class WeatherAverage implements Comparable<WeatherAverage> {
         return highTemperature;
     }
     
+    /**
+     *
+     * @param value
+     */
     public void setHighTemperature(Temperature value) {
         highTemperature = value;
     }
@@ -149,6 +218,10 @@ public class WeatherAverage implements Comparable<WeatherAverage> {
         return lowTemperature;
     }
     
+    /**
+     *
+     * @param value
+     */
     public void setLowTemperature(Temperature value) {
         lowTemperature = value;
     }
@@ -163,6 +236,10 @@ public class WeatherAverage implements Comparable<WeatherAverage> {
         return meanTemperature;
     }
     
+    /**
+     *
+     * @param value
+     */
     public void setMeanTemperature(Temperature value) {
         meanTemperature = value;
     }
@@ -176,6 +253,10 @@ public class WeatherAverage implements Comparable<WeatherAverage> {
         return rainfall;
     }
 
+    /**
+     *
+     * @param value
+     */
     public void setRainfall(Depth value) {
         rainfall = value;
     }

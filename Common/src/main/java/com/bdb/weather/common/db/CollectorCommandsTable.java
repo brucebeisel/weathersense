@@ -30,16 +30,25 @@ import com.bdb.weather.common.CollectorCommand;
 import com.bdb.weather.common.CollectorCommand.CollectorCommandState;
 
 /**
+ * Class that provides access to the collector command database table.
  *
  * @author Bruce
  */
 public class CollectorCommandsTable extends DBTable<CollectorCommand> {
+    /**
+     * The table name
+     */
     protected static final String TABLE_NAME = DatabaseConstants.DATABASE_NAME + ".collector_commands";
     private static final String ID_COLUMN = "id";
     private static final String COMMAND_COLUMN = "command";
     private static final String STATE_COLUMN = "state";
     private static final Logger logger = Logger.getLogger(CollectorCommandsTable.class.getName());
 
+    /**
+     * Constructor.
+     * 
+     * @param connection The connection to the database server
+     */
     public CollectorCommandsTable(DBConnection connection) {
         super(TABLE_NAME, connection);
     }
@@ -66,6 +75,11 @@ public class CollectorCommandsTable extends DBTable<CollectorCommand> {
         return list;
     }
 
+    /**
+     * Retrieve all commands that have not been processed.
+     * 
+     * @return The list of commands
+     */
     public List<CollectorCommand> retrieveNewCommands() {
         return query("where " + STATE_COLUMN + "='" + CollectorCommandState.NEW + "'");
     }
@@ -93,12 +107,25 @@ public class CollectorCommandsTable extends DBTable<CollectorCommand> {
 
     }
 
+    /**
+     * Add a new command to the table.
+     * 
+     * @param command The command
+     * @return True of the command was added successfully
+     */
     public boolean addCommand(String command) {
         return addRow(new CollectorCommand(0, command, CollectorCommandState.NEW));
     }
 
+    /**
+     * Update the state of a command.
+     * 
+     * @param id The ID of the command
+     * @param state The new state of the command
+     * @return True if the command was updated successfully
+     */
     public boolean updateCommandState(int id, CollectorCommandState state) {
-        String sql = "update " + TABLE_NAME + " set " + STATE_COLUMN + "='" + state + "' where " + ID_COLUMN + "=" + id;
+        final String sql = "update " + TABLE_NAME + " set " + STATE_COLUMN + "='" + state + "' where " + ID_COLUMN + "=" + id;
 
         return getConnection().executeUpdate(sql) == 1;
     }

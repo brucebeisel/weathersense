@@ -80,6 +80,9 @@ public class DataGenerator {
         new Sensor(Sensor.SOIL_MOISTURE_BASE_SENSOR_ID, SensorType.SOIL_MOISTURE)
     };
     
+    /**
+     *
+     */
     public DataGenerator() {
         executor = Executors.newSingleThreadScheduledExecutor();
         cw.setOutdoorTemperature(new Temperature(25.0));
@@ -189,10 +192,19 @@ public class DataGenerator {
         }
     }
     
+    /**
+     *
+     * @param archiveInterval
+     * @param archiveStartDate
+     */
     public void init(int archiveInterval, LocalDateTime archiveStartDate) {
         this.archiveStartDate = archiveStartDate;
     }
 
+    /**
+     *
+     * @return
+     */
     public WsParametersMessage getWeatherStationParametersMessage() {
         GeographicLocation location = new GeographicLocation(new AngularMeasurement(32.0), new AngularMeasurement(-114.0), new Distance(500.0, Distance.Unit.FEET));
         WsParametersMessage msg = new WsParametersMessage("Davis Instruments", "Vantage Pro 2", "2013-12-10", "1.90", location, Calendar.JANUARY);
@@ -205,11 +217,20 @@ public class DataGenerator {
 
     }
 
+    /**
+     *
+     * @return
+     */
     public SensorMessage getSensorMessage() {
         SensorMessage msg = new SensorMessage(Arrays.asList(sensorArray));
         return msg;
     }
 
+    /**
+     *
+     * @param newestRecordTime
+     * @return
+     */
     public HistoricalRecord getNextHistoricalRecord(LocalDateTime newestRecordTime) {
         if (newestRecordTime == null)
             return null;
@@ -248,15 +269,25 @@ public class DataGenerator {
         archive.clear();
     }
     
+    /**
+     *
+     */
     public void start() {
         archive.clear();
         running = true;
     }
     
+    /**
+     *
+     */
     public void stop() {
         running = false;
     }
     
+    /**
+     *
+     * @return
+     */
     public CurrentWeather currentWeather() {
         cw.setTime(LocalDateTime.now());
         if (Math.random() < .5) {
@@ -271,9 +302,15 @@ public class DataGenerator {
         return cw;
     }
     
+    /**
+     *
+     */
     public void sendHistoricalData() {
     }
     
+    /**
+     *
+     */
     public void sendSensorStationData() {
     }
 }

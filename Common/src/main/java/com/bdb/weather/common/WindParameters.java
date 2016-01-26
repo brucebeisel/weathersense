@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Container class that holds various parameters regarding local wind conditions.
  *
  * @author Bruce
  */
@@ -31,10 +32,20 @@ public final class WindParameters {
     private final int            numWindDirectionSlices;
     private final List<SpeedBin> speedBinList;
     
+    /**
+     * Constructor.
+     */
     public WindParameters() {
         this(new Speed(5.0, Speed.Unit.MILES_PER_HOUR), 5, 16);
     }
     
+    /**
+     * Constructor.
+     *
+     * @param interval The interval of the speed bins
+     * @param binCount The number of speed bins
+     * @param windSliceCount The number of wind direction slices
+     */
     public WindParameters(Speed interval, int binCount, int windSliceCount) {
         windSpeedBinInterval = interval;
         numWindSpeedBins = binCount;
@@ -42,18 +53,38 @@ public final class WindParameters {
         speedBinList = createSpeedBinList();
     }
     
+    /**
+     * Get the wind speed bin interval.
+     *
+     * @return The interval
+     */
     public Speed getWindSpeedBinInterval() {
         return windSpeedBinInterval;
     }
     
+    /**
+     * Get the number of wind speed bins.
+     *
+     * @return The number of wind speed bins
+     */
     public int getNumWindSpeedBins() {
         return numWindSpeedBins;
     }
     
+    /**
+     * Get the number of wind direction slices.
+     *
+     * @return The number of wind direction slices
+     */
     public int getNumWindDirectionSlices() {
         return numWindDirectionSlices;
     }
     
+    /**
+     * Get the list of wind speed bins.
+     *
+     * @return The list of wind speed bins
+     */
     public List<SpeedBin> getSpeedBinList() {
         return Collections.unmodifiableList(speedBinList);
     }

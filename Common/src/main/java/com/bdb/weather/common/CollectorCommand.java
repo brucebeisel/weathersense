@@ -22,6 +22,10 @@ package com.bdb.weather.common;
  * @author Bruce
  */
 public final class CollectorCommand {
+
+    /**
+     * Enum for tracking the state of the collector commands.
+     */
     public enum CollectorCommandState {
         /**
          * The command is new

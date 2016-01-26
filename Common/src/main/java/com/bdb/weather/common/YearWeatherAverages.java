@@ -26,20 +26,38 @@ import java.util.List;
 public class YearWeatherAverages implements WeatherAverages {
     private final WeatherAverage yearAverages;
 
+    /**
+     *
+     * @param avg
+     */
     public YearWeatherAverages(WeatherAverage avg) {
         yearAverages = avg;
     }
 
+    /**
+     *
+     * @param avg
+     * @param c
+     */
     @Override
     public void putAverage(WeatherAverage avg, LocalDate c) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /**
+     *
+     * @param c
+     * @return
+     */
     @Override
     public WeatherAverage getAverage(LocalDate c) {
         return yearAverages;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public List<WeatherAverage> getAllAverages() {
         return null;

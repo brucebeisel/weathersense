@@ -59,6 +59,11 @@ public class ConsoleDriverSim {
     private final DataGenerator dataGen = new DataGenerator();
     private static final Logger logger = Logger.getLogger(ConsoleDriverSim.class.getName());
     
+    /**
+     *
+     * @param client
+     * @throws JAXBException
+     */
     public ConsoleDriverSim(WsCollectorClient client) throws JAXBException {
         this.client = client;
         JAXBContext jaxbContext = JAXBContext.newInstance(com.bdb.weather.common.CurrentWeather.class,
@@ -124,6 +129,9 @@ public class ConsoleDriverSim {
         }
     }
     
+    /**
+     *
+     */
     public void start() {
         thread = new Thread(new Runnable() {
             @Override
@@ -135,6 +143,9 @@ public class ConsoleDriverSim {
         thread.start();
     }
     
+    /**
+     *
+     */
     public void stop() {
         exit = true;
         try {
@@ -162,6 +173,10 @@ public class ConsoleDriverSim {
         }
     }
     
+    /**
+     *
+     * @param args
+     */
     public static void main(String args[]) {
         try {
             LogManager.getLogManager().readConfiguration(ClassLoader.getSystemClassLoader().getResourceAsStream("collector_logging.properties"));

@@ -30,6 +30,7 @@ import com.bdb.weather.common.SensorStation;
 import com.bdb.weather.common.SensorStationType;
 
 /**
+ * Class that provides access to the sensor station database table.
  *
  * @author Bruce
  */
@@ -40,6 +41,11 @@ public class SensorStationTable extends DBTable<SensorStation> {
     private static final String TYPE_COLUMN = "type";
     private static final Logger logger = Logger.getLogger(SensorStationTable.class.getName());
     
+    /**
+     * Constructor.
+     * 
+     * @param connection The connection to the database
+     */
     public SensorStationTable(DBConnection connection) {
         super(TABLE_NAME, connection);
     }
@@ -158,4 +164,3 @@ public class SensorStationTable extends DBTable<SensorStation> {
             return false;
     }
 }
-

@@ -16,7 +16,19 @@
  */
 package com.bdb.weather.common;
 
+/**
+ *
+ * @author bruce
+ */
 public enum ThresholdType {
+
+    /**
+     *
+     */
     ABOVE_THRESHOLD,
+
+    /**
+     *
+     */
     BELOW_THRESHOLD;
 };

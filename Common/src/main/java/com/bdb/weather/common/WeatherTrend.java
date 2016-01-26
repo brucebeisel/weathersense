@@ -18,12 +18,36 @@ package com.bdb.weather.common;
 
 import javax.xml.bind.annotation.XmlEnum;
 
+/**
+ *
+ * @author bruce
+ */
 @XmlEnum
 public enum WeatherTrend {
+
+    /**
+     *
+     */
     FALLING_RAPIDLY("Falling Rapidly", "--"),
+
+    /**
+     *
+     */
     FALLING_SLOWLY("Falling", "-"),
+
+    /**
+     *
+     */
     STEADY("Steady", "="),
+
+    /**
+     *
+     */
     RISING_SLOWLY("Rising", "+"),
+
+    /**
+     *
+     */
     RISING_RAPIDLY("Rising Rapidly", "++");
     
     private final String symbol;
@@ -34,6 +58,10 @@ public enum WeatherTrend {
         this.symbol = symbol;
     }
     
+    /**
+     *
+     * @return
+     */
     public String getSymbol() {
         return symbol;
     }

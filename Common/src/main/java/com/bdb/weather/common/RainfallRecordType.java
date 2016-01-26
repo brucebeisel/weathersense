@@ -16,11 +16,32 @@
  */
 package com.bdb.weather.common;
 
+/**
+ *
+ * @author bruce
+ */
 public enum RainfallRecordType implements RecordType {
+
+    /**
+     *
+     */
     DAILY_RAINFALL,
+
+    /**
+     *
+     */
     MONTHLY_RAINFALL,
+
+    /**
+     *
+     */
     YEARLY_RAINFALL;
     
+    /**
+     *
+     * @param value
+     * @return
+     */
     @Override
     public RecordType fromString(String value) {
         return RainfallRecordType.valueOf(value);

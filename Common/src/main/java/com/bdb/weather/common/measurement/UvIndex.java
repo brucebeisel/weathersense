@@ -21,11 +21,18 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlValue;
 
 /**
+ * Class the represents a UV index value.
  *
  * @author Bruce
  */
 public class UvIndex implements Serializable {
+    /**
+     * The minimum UV index value
+     */
     public static final int MIN_UV_INDEX = 0;
+    /**
+     * The maximum UV index value
+     */
     public static final int MAX_UV_INDEX = 15;
     
     private static final UvIndex UV_INDEX_VALUES[] = new UvIndex[MAX_UV_INDEX + 1];
@@ -37,6 +44,12 @@ public class UvIndex implements Serializable {
     @XmlValue
     private final int index;
     
+    /**
+     * Get a UvIndex from a integer value.
+     * 
+     * @param uvIndex The integer equivalent of a UV index
+     * @return The UV index
+     */
     public static UvIndex getUvIndex(int uvIndex) {
         if (uvIndex < MIN_UV_INDEX || uvIndex > MAX_UV_INDEX)
             throw new IllegalArgumentException(String.format("UV Index must be between %d and %d (inclusive)", MIN_UV_INDEX, MAX_UV_INDEX));
@@ -44,6 +57,11 @@ public class UvIndex implements Serializable {
         return UV_INDEX_VALUES[uvIndex];
     }
 
+    /**
+     * Constructor.
+     * 
+     * @param index The integer equivalent of a UV index
+     */
     private UvIndex(int index) {
         if (index < MIN_UV_INDEX || index > MAX_UV_INDEX)
             throw new IllegalArgumentException(String.format("UV Index must be between %d and %d (inclusive)", MIN_UV_INDEX, MAX_UV_INDEX));
@@ -55,6 +73,11 @@ public class UvIndex implements Serializable {
         this(MIN_UV_INDEX);
     }
     
+    /**
+     * Get the index value.
+     * 
+     * @return The index
+     */
     public int getIndex() {
         return index;
     }

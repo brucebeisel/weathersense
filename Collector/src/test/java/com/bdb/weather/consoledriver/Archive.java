@@ -49,14 +49,26 @@ public class Archive {
     private int interval;
     private LocalDateTime startTime;
 
+    /**
+     *
+     */
     public Archive() {
     }
     
+    /**
+     *
+     * @param interval
+     * @param start
+     */
     public void setArchiveConfiguration(int interval, LocalDateTime start) {
         this.interval = interval;
         this.startTime = start;
     }
     
+    /**
+     *
+     * @return
+     */
     public LocalDateTime newestRecordTime() {
         if (archive.isEmpty())
             return null;
@@ -64,6 +76,9 @@ public class Archive {
         return archive.get(archive.size() - 1).getTime();
     }
 
+    /**
+     *
+     */
     public static void testHumidity() {
         double MAX_DEGREES = 2.0 * Math.PI;
         double incrementDegrees = (double)300 / 86400.0 * MAX_DEGREES;
@@ -143,6 +158,10 @@ public class Archive {
         return next;
     }
     
+    /**
+     *
+     * @param currentTime
+     */
     public void initialize(LocalDateTime currentTime) {
         archive.clear();
         LocalDateTime recordTime = startTime;
@@ -153,6 +172,10 @@ public class Archive {
         }
     }
     
+    /**
+     *
+     * @param cw
+     */
     public void currentWeather(CurrentWeather cw) {
         LocalDateTime next = nextRecordTime();
         if (cw.getTime().isAfter(next)) {
@@ -168,6 +191,10 @@ public class Archive {
         return s;
     }
     
+    /**
+     *
+     * @param args
+     */
     public static void main(String args[]) {
         Archive archive = new Archive();
         LocalDateTime startTime = LocalDate.now().atStartOfDay();

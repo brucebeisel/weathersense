@@ -59,10 +59,15 @@ public class DataMonitorTest implements WeatherDataWriter {
     private boolean summarizeAllReceived;
     private boolean summarizeDateReceived;
     
-
+    /**
+     *
+     */
     public DataMonitorTest() {
     }
     
+    /**
+     *
+     */
     @BeforeClass
     public static void setUpClass() {
         try {
@@ -80,11 +85,18 @@ public class DataMonitorTest implements WeatherDataWriter {
         }
     }
     
+    /**
+     *
+     */
     @AfterClass
     public static void tearDownClass() {
         dbcon.close();
     }
     
+    /**
+     *
+     * @throws SQLException
+     */
     @Before
     public void setUp() throws SQLException {
         utils.createWeatherStationTable();
@@ -96,6 +108,9 @@ public class DataMonitorTest implements WeatherDataWriter {
         monitor.init(100);
     }
     
+    /**
+     *
+     */
     @After
     public void tearDown() {
         monitor.shutdown();
@@ -120,6 +135,9 @@ public class DataMonitorTest implements WeatherDataWriter {
         assertEquals(0, cctbl.query().size());
     }
 
+    /**
+     *
+     */
     @Test
     public void testCommand() {
         System.out.println("command");
@@ -133,6 +151,9 @@ public class DataMonitorTest implements WeatherDataWriter {
         assertEquals(1, list.size());
     }
 
+    /**
+     *
+     */
     @Test
     public void testMultipleCommands() {
         System.out.println("multipleCommands");

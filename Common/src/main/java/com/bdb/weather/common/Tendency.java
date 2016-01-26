@@ -16,6 +16,10 @@
  */
 package com.bdb.weather.common;
 
+/**
+ *
+ * @author bruce
+ */
 public enum Tendency {
     /**
      * The measurement is rising rapidly

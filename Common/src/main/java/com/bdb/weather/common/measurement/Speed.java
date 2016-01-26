@@ -30,6 +30,9 @@ import com.bdb.util.measurement.Measurement;
 public class Speed extends Measurement {
     private static final long serialVersionUID = 3905322365691227024L;
 
+    /**
+     * Enumeration of possible units for speed
+     */
     public enum Unit implements com.bdb.util.measurement.Unit {
         /**
          * Speed unit of kilometers per hour

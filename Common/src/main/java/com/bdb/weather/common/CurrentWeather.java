@@ -334,8 +334,8 @@ public class CurrentWeather implements Serializable {
      * 
      * @param heading The heading
      */
-    public void setWindDir4(Heading h) {
-        windDir4 = h;
+    public void setWindDir4(Heading heading) {
+        windDir4 = heading;
     }
 
     /**
@@ -352,8 +352,8 @@ public class CurrentWeather implements Serializable {
      * 
      * @param heading The heading
      */
-    public void setWindDir5(Heading h) {
-        windDir5 = h;
+    public void setWindDir5(Heading heading) {
+        windDir5 = heading;
     }
 
     /**
@@ -449,125 +449,281 @@ public class CurrentWeather implements Serializable {
         return baroPressure;
     }
 
+    /**
+     * Set the indoor humidity.
+     *
+     * @param humidity The indoor humidity
+     */
     public void setIndoorHumidity(Humidity humidity) {
         indoorHumidity = humidity;
     }
 
+    /**
+     * Get the indoor humidity.
+     *
+     * @return The indoor humidity
+     */
     public Humidity getIndoorHumidity() {
         return indoorHumidity;
     }
 
+    /**
+     * Set the outdoor humidity.
+     *
+     * @param humidity The outdoor humidity
+     */
     public void setOutdoorHumidity(Humidity humidity) {
         outdoorHumidity = humidity;
     }
 
+    /**
+     * Get the outdoor humidity. 
+     *
+     * @return The outdoor humidity
+     */
     public Humidity getOutdoorHumidity() {
         return outdoorHumidity;
     }
 
+    /**
+     * Get the barometric trend.
+     * 
+     * @return The barometric trend
+     */
     public WeatherTrend getBaroTrend() {
         return baroTrend;
     }
 
-    public void setBaroTrend(WeatherTrend t) {
-        baroTrend = t;
+    /**
+     * Set the barometric trend.
+     * 
+     * @param trend The barometric trend
+     */
+    public void setBaroTrend(WeatherTrend trend) {
+        baroTrend = trend;
     }
 
+    /**
+     * Get the forecast.
+     *
+     * @return The forecast
+     */
     public Forecast getForecast() {
         return forecast;
     }
 
-    public void setForecast(Forecast f) {
-        this.forecast = f;
+    /**
+     * Set the forecast.
+     *
+     * @param forecast The forecast
+     */
+    public void setForecast(Forecast forecast) {
+        this.forecast = forecast;
     }
     
+    /**
+     * Get the forecast rule.
+     *
+     * @return The forecast rule
+     */
     public String getForecastRule() {
         return forecastRule;
     }
     
+    /**
+     * Set the forecast rule.
+     *
+     * @param forecastRule The forecast rule
+     */
     public void setForecastRule(String forecastRule) {
         this.forecastRule = forecastRule;
     }
 
+    /**
+     * Set the UV index.
+     *
+     * @param uvIndex The UV index
+     */
     public void setUvIndex(UvIndex uvIndex) {
         this.uvIndex = uvIndex;
     }
     
+    /**
+     * Get the UV index.
+     *
+     * @return The UV index
+     */
     public UvIndex getUvIndex() {
         return uvIndex;
     }
 
+    /**
+     * Get the solar radiation.
+     *
+     * @return The solar radiation
+     */
     public SolarRadiation getSolarRadiation() {
         return solarRadiation;
     }
+
+    /**
+     * Set the solar radiation.
+     *
+     * @param solarRadiation The solar radiation
+     */
     public void setSolarRadiation(SolarRadiation solarRadiation) {
         this.solarRadiation = solarRadiation;
     }
     
+    /**
+     * Get the rain rate.
+     * 
+     * @return The rain rate
+     */
     public Depth getRainRate() {
         return rainRate;
     }
     
+    /**
+     * Set the rain rate.
+     *
+     * @param rate The rain rate
+     */
     public void setRainRate(Depth rate) {
         this.rainRate = rate;
     }
 
+    /**
+     * Get the amount of rain in the last 15 minutes.
+     *
+     * @return The rain amount
+     */
     public Depth getRain15Minute() {
         return rain15Minute;
     }
 
+    /**
+     * Set the amount of rain in the last 15 minutes.
+     *
+     * @param rain15Minute The rain amount
+     */
     public void setRain15Minute(Depth rain15Minute) {
         this.rain15Minute = rain15Minute;
     }
     
+    /**
+     * Get the amount of rain in the last hour.
+     *
+     * @return The rain amount
+     */
     public Depth getRainHour() {
         return rainHour;
     }
 
+    /**
+     * Set the amount of rain in the last hour.
+     *
+     * @param rainHour The rain amount
+     */
     public void setRainHour(Depth rainHour) {
         this.rainHour = rainHour;
     }
 
+    /**
+     * Get the amount of rain in the last 24 hours.
+     *
+     * @return The rain amount
+     */
     public Depth getRain24Hour() {
         return rain24Hour;
     }
 
+    /**
+     * Set the amount of rain in the last 24 hours.
+     *
+     * @param rain24Hour The rain amount
+     */
     public void setRain24Hour(Depth rain24Hour) {
         this.rain24Hour = rain24Hour;
     }
 
+    /**
+     * Get the amount of rain since midnight.
+     *
+     * @return The rain amount
+     */
     public Depth getRainToday() {
         return rainToday;
     }
 
+    /**
+     * Set the amount of rain since midnight.
+     *
+     * @param rainToday The rain amount
+     */
     public void setRainToday(Depth rainToday) {
         this.rainToday = rainToday;
     }
 
+    /**
+     * Get the amount of rain since the beginning of the month.
+     *
+     * @return The rain amount
+     */
     public Depth getRainMonth() {
         return rainMonth;
     }
 
+    /**
+     * Set the amount of rain since the beginning of the month.
+     *
+     * @param rainMonth The rain amount
+     */
     public void setRainMonth(Depth rainMonth) {
         this.rainMonth = rainMonth;
     }
 
+    /**
+     * Set the amount of rain since the beginning of the weather year.
+     *
+     * @return The rain amount
+     */
     public Depth getRainWeatherYear() {
         return rainWeatherYear;
     }
 
+    /**
+     * Get the amount of rain since the beginning of the weather year.
+     *
+     * @param rainWeatherYear The rain amount
+     */
     public void setRainWeatherYear(Depth rainWeatherYear) {
         this.rainWeatherYear = rainWeatherYear;
     }
 
+    /**
+     * Get the amount of rain since the beginning of the calendar year.
+     *
+     * @return The rain amount
+     */
     public Depth getRainCalendarYear() {
         return rainCalendarYear;
     }
 
+    /**
+     * Set the amount of rain since the beginning of the calendar year.
+     *
+     * @param rainCalendarYear The rain amount
+     */
     public void setRainCalendarYear(Depth rainCalendarYear) {
         this.rainCalendarYear = rainCalendarYear;
     }
 
+    /**
+     * Get the date that the current storm started.
+     *
+     * @return The storm start date or null if there is no active storm
+     */
     public LocalDate getStormStart() {
         if (stormStart != null)
             return stormStart;
@@ -575,55 +731,124 @@ public class CurrentWeather implements Serializable {
             return null;
     }
 
+    /**
+     * Set the start date of the current storm.
+     *
+     * @param stormStart The start date of the current storm or null if there is no storm
+     */
     @XmlJavaTypeAdapter(type=java.time.LocalDate.class, value=LocalDateAdapter.class)
     public void setStormStart(LocalDate stormStart) {
         this.stormStart = stormStart;
     }
 
+    /**
+     * Get the amount of rain in the current storm.
+     *
+     * @return The amount of rain in the current storm or 0 if there is not an active storm
+     */
     public Depth getStormRain() {
         return stormRain;
     }
 
+    /**
+     * Set the amount of rain in the current storm.
+     *
+     * @param stormRain The amount of rain in the current storm or 0 if there is not an active storm
+     */
     public void setStormRain(Depth stormRain) {
         this.stormRain = stormRain;
     }
     
+    /**
+     * Get the Evapotranspiration for today.
+     *
+     * @return The ET
+     */
     public Depth getDayET() {
         return dayET;
     }
     
+    /**
+     * Set the Evapotranspiration for today.
+     *
+     * @param et The ET
+     */
     public void setDayET(Depth et) {
         this.dayET = et;
     }
     
+    /**
+     * Get the Evapotranspiration for the month.
+     *
+     * @return The ET
+     */
     public Depth getMonthET() {
         return monthET;
     }
     
+    /**
+     * Set the Evapotranspiration for the month.
+     *
+     * @param et The ET
+     */
     public void setMonthET(Depth et) {
         this.monthET = et;
     }
     
+    /**
+     * Get the Evapotranspiration for the month.
+     *
+     * @return The ET
+     */
     public Depth getYearET() {
         return yearET;
     }
     
+    /**
+     * Set the Evapotranspiration for the month.
+     *
+     * @param et The ET
+     */
     public void setYearET(Depth et) {
         this.yearET = et;
     }
     
-    public void setTemperatureForSensor(int sensorId, Temperature t) {
-        temperatureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.THERMOMETER, t));
+    /**
+     * Set the temperature for a given sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @param temperature The temperature
+     */
+    public void setTemperatureForSensor(int sensorId, Temperature temperature) {
+        temperatureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.THERMOMETER, temperature));
     }
     
-    public void setSoilTemperatureForSensor(int sensorId, Temperature t) {
-        temperatureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.SOIL_TEMPERATURE, t));
+    /**
+     * Set the temperature for a soil temperature sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @param temperature The temperature
+     */
+    public void setSoilTemperatureForSensor(int sensorId, Temperature temperature) {
+        temperatureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.SOIL_TEMPERATURE, temperature));
     }
     
-    public void setLeafTemperatureForSensor(int sensorId, Temperature t) {
-        temperatureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.LEAF_TEMPERATURE, t));
+    /**
+     * Set the temperature for a leaf temperature sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @param temperature The temperature
+     */
+    public void setLeafTemperatureForSensor(int sensorId, Temperature temperature) {
+        temperatureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.LEAF_TEMPERATURE, temperature));
     }
     
+    /**
+     * Get the temperature for a sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @return The temperature or null if the sensor does not exist
+     */
     public Temperature getTemperatureForSensor(int sensorId) {
         MeasurementEntry<Temperature> entry = temperatureSensorEntries.get(sensorId);
         if (entry != null)
@@ -632,10 +857,22 @@ public class CurrentWeather implements Serializable {
             return null;
     }
     
-    public void setHumidityForSensor(int sensorId, Humidity h) {
-        humiditySensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.HYGROMETER, h));
+    /**
+     * Set the humidity for a given sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @param humidity The humidity
+     */
+    public void setHumidityForSensor(int sensorId, Humidity humidity) {
+        humiditySensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.HYGROMETER, humidity));
     }
     
+    /**
+     * Get the humidity for a sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @return The humidity or null if the sensor does not exist
+     */
     public Humidity getHumidityForSensor(int sensorId) {
         MeasurementEntry<Humidity> entry = humiditySensorEntries.get(sensorId);
         if (entry != null)
@@ -644,22 +881,50 @@ public class CurrentWeather implements Serializable {
             return null;
     }
     
-    public void setLeafWetnessForSensor(int sensorId, LeafWetness lw) {
-        leafWetnessSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.LEAF_WETNESS, lw));
+    /**
+     * Set the leaf wetness for a given sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @param leafWetness The leaf wetness
+     */
+    public void setLeafWetnessForSensor(int sensorId, LeafWetness leafWetness) {
+        leafWetnessSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.LEAF_WETNESS, leafWetness));
     }
     
+    /**
+     * Get the leaf wetness for a given sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @return The leaf wetness
+     */
     public LeafWetness getLeafWetnessForSensor(int sensorId) {
         return leafWetnessSensorEntries.get(sensorId).getMeasurement();
     }
     
-    public void setSoilMoistureForSensor(int sensorId, SoilMoisture sm) {
-        soilMoistureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.SOIL_MOISTURE, sm));
+    /**
+     * Set the soil moisture for a given sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @param soilMoisture The soil moisture
+     */
+    public void setSoilMoistureForSensor(int sensorId, SoilMoisture soilMoisture) {
+        soilMoistureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.SOIL_MOISTURE, soilMoisture));
     }
    
+    /**
+     * Get the soil moisture for a given sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @return The soil moisture
+     */
     public SoilMoisture getSoilMoistureForSensor(int sensorId) {
         return soilMoistureSensorEntries.get(sensorId).getMeasurement();
     }
     
+    /**
+     *
+     * @return
+     */
     public Collection<MeasurementEntry> getSensorValues() {
         List<MeasurementEntry> entries = new ArrayList<>();
         entries.addAll(temperatureSensorEntries.values());
@@ -892,5 +1157,4 @@ public class CurrentWeather implements Serializable {
 
         return Objects.equals(this.soilMoistureSensorEntries, other.soilMoistureSensorEntries);
     }
-
 }

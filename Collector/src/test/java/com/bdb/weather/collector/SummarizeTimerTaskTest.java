@@ -37,23 +37,38 @@ public class SummarizeTimerTaskTest {
     private Executor executor;
     private Runnable command;
     
+    /**
+     *
+     */
     public SummarizeTimerTaskTest() {
     }
     
+    /**
+     *
+     */
     @BeforeClass
     public static void setUpClass() {
     }
     
+    /**
+     *
+     */
     @AfterClass
     public static void tearDownClass() {
     }
     
+    /**
+     *
+     */
     @Before
     public void setUp() {
         executor = Executors.newSingleThreadExecutor();
         command = ()->{}; 
     }
     
+    /**
+     *
+     */
     @After
     public void tearDown() {
     }

@@ -23,6 +23,10 @@ import javax.xml.bind.annotation.XmlEnum;
 
 import javafx.scene.image.Image;
 
+/**
+ *
+ * @author bruce
+ */
 @XmlEnum
 public enum Forecast {
     /**

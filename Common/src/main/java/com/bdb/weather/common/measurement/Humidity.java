@@ -29,7 +29,13 @@ import com.bdb.util.measurement.Measurement;
  */
 public class Humidity extends Measurement {
     private static final long serialVersionUID = -7362997010379553157L;
+    /**
+     * The maximum humidity value
+     */
     public static final Humidity MAX_HUMIDITY = new Humidity(100.0);
+    /**
+     * The minimum humidity value
+     */
     public static final Humidity MIN_HUMIDITY = new Humidity(0.0);
 
     /**
@@ -39,6 +45,9 @@ public class Humidity extends Measurement {
      * @since 1.0
      */
     public enum Unit implements com.bdb.util.measurement.Unit {
+        /**
+         * Humidity only support a unit of relative humidity
+         */
         RELATIVE_HUMIDITY;
         private static final String FORMAT_STRING = "0.0";
         private static final String UNIT_LABEL = "%";

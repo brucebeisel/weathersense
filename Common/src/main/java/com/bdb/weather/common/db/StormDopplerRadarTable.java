@@ -35,7 +35,7 @@ import com.bdb.util.jdbc.DBTable;
 import com.bdb.weather.common.DopplerRadarImage;
 
 /**
- * Database table class for storing Doppler Radar images. The images are associated with a location code.
+ * Database table class for storing Doppler Radar images associated with a storm. The images are associated with a location code.
  * This allows multiple weather stations to use the same Doppler images.
  * 
  * @author Bruce
@@ -110,6 +110,13 @@ public class StormDopplerRadarTable extends DBTable<DopplerRadarImage> {
         return list;
     }
     
+    /**
+     * Add a Doppler radar image.
+     * 
+     * @param stormStart The start of the storm associated with this image
+     * @param image The Doppler radar image
+     * @return True if the image was added successfully
+     */
     public boolean addRadarImage(LocalDateTime stormStart, DopplerRadarImage image) {
         boolean success;
 	String stmtString = "insert into " + TABLE_NAME + " values(?,?,?)";
@@ -134,16 +141,29 @@ public class StormDopplerRadarTable extends DBTable<DopplerRadarImage> {
     	return success;
     }
     
+    /**
+     * Get the Doppler radar images for the specified storm.
+     * 
+     * @param stormStart The start of the storm
+     * @return The list of Doppler radar images
+     */
     public List<DopplerRadarImage> getRadarImagesForStorm(LocalDateTime stormStart) {
         List<DopplerRadarImage> images = query("where " + STORM_START_COLUMN + "=\"" + DBTable.dateTimeFormatter().format(stormStart) + "\"");
         return images;
     }
 
+    /**
+     * Trim the extra radar images that are stored after the last rainfall, but before the storm is declared as complete.
+     * 
+     * @param stormStart The start of the storm
+     * @param lastRainfall The time of the last rainfall
+     * @return The number of images deleted from the database
+     */
     public int trimStormRadarImages(LocalDateTime stormStart, LocalDateTime lastRainfall) {
-        String sql = "delete from " + TABLE_NAME +
-                     " where " + STORM_START_COLUMN + "='" +
-                     DBTable.dateTimeFormatter().format(stormStart) +
-                     "' and " + IMAGE_TIME_COLUMN + ">'" + DBTable.dateTimeFormatter().format(lastRainfall) + "'";
+        final String sql = "delete from " + TABLE_NAME +
+                           " where " + STORM_START_COLUMN + "='" +
+                           DBTable.dateTimeFormatter().format(stormStart) +
+                           "' and " + IMAGE_TIME_COLUMN + ">'" + DBTable.dateTimeFormatter().format(lastRainfall) + "'";
 
         int affectedRecords = getConnection().executeUpdate(sql);
 

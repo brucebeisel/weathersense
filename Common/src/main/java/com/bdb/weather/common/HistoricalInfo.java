@@ -19,6 +19,10 @@ package com.bdb.weather.common;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+/**
+ *
+ * @author bruce
+ */
 public class HistoricalInfo
 {
     private final LocalDateTime firstRecordTime;
@@ -28,6 +32,15 @@ public class HistoricalInfo
     private int recordIntervalSetting = 0;	// Current interval
     private final int lastRecordWritten;
 
+    /**
+     *
+     * @param firstRecordTime
+     * @param lastRecordTime
+     * @param minutesToNextReading
+     * @param numRecords
+     * @param recordIntervalSetting
+     * @param lastRecordWritten
+     */
     public HistoricalInfo(LocalDateTime firstRecordTime,
 			  LocalDateTime lastRecordTime,
 			  int minutesToNextReading,

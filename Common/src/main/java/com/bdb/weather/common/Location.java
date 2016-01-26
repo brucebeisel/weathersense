@@ -45,6 +45,7 @@ public class Location
      * 
      * @param file The file to import
      * @param locationCode The location of the data to be imported, this will be verified against the data in the file
+     * @param dayWeatherAverages
      * @throws IOException The file could not be read
      */
     public static void importCSVFile(File file, String locationCode, DayWeatherAverages dayWeatherAverages) throws IOException {
@@ -110,6 +111,8 @@ public class Location
      * Export the location data to a CSV file.
      * 
      * @param file The file to which the data will be exported
+     * @param locationCode
+     * @param dayAverages
      * @throws FileNotFoundException The specified file could not be written to
      */
     public static void exportCSVFile(File file, String locationCode, DayWeatherAverages dayAverages) throws FileNotFoundException {

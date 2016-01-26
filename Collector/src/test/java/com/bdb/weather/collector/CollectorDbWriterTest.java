@@ -68,9 +68,16 @@ public class CollectorDbWriterTest {
     private static HistoryTable historyTable;
     private static String dbUrl;
     
+    /**
+     *
+     */
     public CollectorDbWriterTest() {
     }
     
+    /**
+     *
+     * @throws IOException
+     */
     @BeforeClass
     public static void setUpClass() throws IOException {
         dbUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER,
@@ -144,22 +151,32 @@ public class CollectorDbWriterTest {
         historyTable = new HistoryTable(dbcon);
     }
     
+    /**
+     *
+     */
     @AfterClass
     public static void tearDownClass() {
         utils.dropSchema();
         dbcon.close();
     }
     
+    /**
+     *
+     */
     @Before
     public void setUp() {
     }
     
+    /**
+     *
+     */
     @After
     public void tearDown() {
     }
 
     /**
      * Test of init method, of class CollectorDbWriter.
+     * @throws java.lang.Exception
      */
     //@Test
     public void testInit() throws Exception {
@@ -172,6 +189,11 @@ public class CollectorDbWriterTest {
         fail("The test case is a prototype.");
     }
 
+    /**
+     *
+     * @throws IOException
+     * @throws SQLException
+     */
     @Test
     public void testAddHistoricalRecords() throws IOException, SQLException {
         System.out.println("addHistoricalRecords");
@@ -186,6 +208,11 @@ public class CollectorDbWriterTest {
         historyTable.deleteAllRows();
     }
 
+    /**
+     *
+     * @throws IOException
+     * @throws SQLException
+     */
     @Test
     public void testAddHistoricalRecordsTiming() throws IOException, SQLException {
         System.out.println("addHistoricalRecordsTiming");
@@ -205,6 +232,10 @@ public class CollectorDbWriterTest {
     }
 
     //@Test
+
+    /**
+     *
+     */
     public void testHandleAddHistoricalRecords() {
         System.out.println("handleAddHistoricalRecords");
         List<HistoricalRecord> records = null;
