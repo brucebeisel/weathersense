@@ -23,13 +23,14 @@ import java.util.logging.Logger;
 import com.bdb.util.jdbc.DBConnection;
 
 /**
+ * Database utilities for testing.
  *
  * @author Bruce
  */
 public class DatabaseUtilities {
     private final DBConnection connection;
-    public static final String DERBY_URL = "jdbc:derby:memory:" + DatabaseConstants.DATABASE_NAME + ";";
-    public static final String CREATE_DERBY_DB_URL = DERBY_URL + "create=true";
+    private static final String DERBY_URL = "jdbc:derby:memory:" + DatabaseConstants.DATABASE_NAME + ";";
+    private static final String CREATE_DERBY_DB_URL = DERBY_URL + "create=true";
     
     private static final String CREATE_SENSORS_TABLE_SQL =
             "CREATE  TABLE " + SensorTable.TABLE_NAME + " (\n" +
@@ -271,16 +272,31 @@ public class DatabaseUtilities {
         "total_rainfall decimal(7,3) NOT NULL," + 
         "PRIMARY KEY (storm_start))";
 
+    /**
+     * Constructor.
+     * 
+     * @param connection Connection to the database.
+     */
     public DatabaseUtilities(DBConnection connection) {
         this.connection = connection;
     } 
 
+    /**
+     * Connect to the derby database.
+     * 
+     * @return The database connection
+     */
     public static DBConnection connectToDerby() {
         DBConnection dbcon = new DBConnection(CREATE_DERBY_DB_URL, "", "", true);
         dbcon.connect();
         return dbcon;
     }
 
+    /**
+     * Create the database schema.
+     * 
+     * @return True if successful
+     */
     public boolean createDatabaseSchema() {
         try {
             createHistoryTables();
@@ -295,6 +311,9 @@ public class DatabaseUtilities {
         }
     }
 
+    /**
+     * Drop the database schema.
+     */
     public void dropSchema() {
         dropHistoryTables();
         dropSensorTable();
@@ -312,12 +331,20 @@ public class DatabaseUtilities {
         }
     }
 
+    /**
+     * Create the tables that are history related.
+     * 
+     * @throws SQLException An SQL error occurred
+     */
     public void createHistoryTables() throws SQLException {
         connection.execute(CREATE_HISTORY_TABLE_SQL);
         connection.execute(CREATE_SENSOR_VALUE_HISTORY_TABLE_SQL);
         connection.execute(CREATE_STORM_TABLE_SQL);
     }
 
+    /**
+     * Drop the history related tables.
+     */
     public void dropHistoryTables() {
         dropTable(HistoryTable.MEASUREMENT_HISTORY_TABLE_NAME);
         dropTable(HistoryTable.TABLE_NAME);
@@ -325,6 +352,11 @@ public class DatabaseUtilities {
 
     }
 
+    /**
+     * Create database tables related to summaries.
+     * 
+     * @throws SQLException An SQL error occurred
+     */
     public void createDailySummaryTables() throws SQLException {
         connection.execute(CREATE_SUMMARY_TABLE_SQL);
         connection.execute(CREATE_SENSOR_VALUE_SUMMARY_TABLE_SQL);
@@ -335,6 +367,9 @@ public class DatabaseUtilities {
         connection.execute(CREATE_WIND_SPEED_BIN_DURATION_TABLE_SQL);
     }
 
+    /**
+     * Drop the summary tables from the database.
+     */
     public void dropDailySummaryTables() {
         dropTable(WindSliceTable.BIN_TABLE_NAME);
         dropTable(WindSliceTable.TABLE_NAME);
@@ -344,26 +379,51 @@ public class DatabaseUtilities {
         dropTable(DailySummaryTable.TABLE_NAME);
         dropTable(TemperatureBinTable.TABLE_NAME);
     }
+
+    /**
+     * Create the sensor table.
+     * 
+     * @throws SQLException An SQL error occurred
+     */
     public void createSensorTable() throws SQLException {
         connection.execute(CREATE_SENSORS_TABLE_SQL);
     }
 
+    /**
+     * Drop the sensor table.
+     */
     public void dropSensorTable() {
         dropTable(SensorTable.TABLE_NAME);
     }
 
+    /**
+     * Create the weather station table.
+     * 
+     * @throws SQLException An SQL error occurred
+     */
     public void createWeatherStationTable() throws SQLException {
         connection.execute(CREATE_WEATHER_STATION_TABLE_SQL);
     }
 
+    /**
+     * Drop the weather station table.
+     */
     public void dropWeatherStationTable() {
         dropTable(WeatherStationTable.TABLE_NAME);
     }
 
+    /**
+     * Create collector commands table.
+     * 
+     * @throws SQLException An SQL error occurred
+     */
     public void createCollectorCommandsTable() throws SQLException {
         connection.execute(CREATE_COLLECTOR_COMMAND_TABLE_SQL);
     }
 
+    /**
+     * Drop the collector commands table.
+     */
     public void dropCollectorCommandsTable() {
         dropTable(CollectorCommandsTable.TABLE_NAME);
     }

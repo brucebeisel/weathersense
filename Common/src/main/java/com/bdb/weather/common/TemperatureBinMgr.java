@@ -27,6 +27,7 @@ import com.bdb.weather.common.db.TemperatureBinTable;
 import com.bdb.weather.common.measurement.Temperature;
 
 /**
+ * Class that manages the temperature bin list.
  *
  * @author Bruce
  */
@@ -35,41 +36,45 @@ public final class TemperatureBinMgr {
     private final TemperatureBinTable table;
 
     /**
+     * Constructor.
      *
-     * @param connection
+     * @param connection The connection to the database server
      */
     public TemperatureBinMgr(DBConnection connection) {
         table = new TemperatureBinTable(connection);
     }
 
     /**
+     * Get the temperature bin with the specified ID.
      *
-     * @param id
-     * @return
+     * @param id The bin ID
+     * @return The temperature bin or null if not found
      */
     public TemperatureBin getBin(int id) {
         return bins.get(id);
     }
 
     /**
+     * Check if the provided temperature is within the bin with the specified ID.
      *
-     * @param id
-     * @param t
-     * @return
+     * @param id The bin ID
+     * @param temperature The temperature to check
+     * @return True of the temperature is within the bin
      */
-    public boolean isTemperatureInBin(int id, Temperature t) {
+    public boolean isTemperatureInBin(int id, Temperature temperature) {
         TemperatureBin bin = getBin(id);
         if (bin == null)
             return false;
 
-        return bin.isInBin(t);
+        return bin.isInBin(temperature);
     }
 
     /**
+     * Get the bin ID given a threshold and threshold type.
      *
-     * @param threshold
-     * @param type
-     * @return
+     * @param threshold The threshold
+     * @param type The threshold type
+     * @return The bin ID or -1 if not found
      */
     public int getBinId(Temperature threshold, ThresholdType type) {
         for (TemperatureBin bin : bins.values()) {
@@ -81,16 +86,18 @@ public final class TemperatureBinMgr {
     }
 
     /**
+     * Get all of the temperature bins
      *
-     * @return
+     * @return The temperature bins
      */
     public Collection<TemperatureBin> getAllBins() {
         return Collections.unmodifiableCollection(bins.values());
     }
 
     /**
+     * Replace the temperature bins with the provided list and synchronize the database.
      *
-     * @param binList
+     * @param binList The new bin list
      */
     public void replaceBins(List<TemperatureBin> binList) {
         replaceBins(binList, true);
@@ -107,7 +114,7 @@ public final class TemperatureBinMgr {
     }
 
     /**
-     *
+     * Refresh the temperature bins from the database.
      */
     public void refresh() {
         List<TemperatureBin> binList = table.retrieveBins();
@@ -115,8 +122,9 @@ public final class TemperatureBinMgr {
     }
 
     /**
-     *
-     * @return
+     * Save the temperature bins in the database.
+     * 
+     * @return True if sync was successful
      */
     public boolean sync() {
         boolean rv = true;

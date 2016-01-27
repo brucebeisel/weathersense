@@ -20,9 +20,7 @@ import java.awt.Color;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -68,7 +66,6 @@ import com.bdb.weather.common.WeatherAverage;
 import com.bdb.weather.common.astronomical.SolarEventCalculator;
 import com.bdb.weather.display.ChartDataPane;
 import com.bdb.weather.display.DisplayConstants;
-
 
 /**
  * An XY Plot for a single day of data. This class provides a tabbed pane, one pane for the plot
@@ -373,11 +370,9 @@ abstract public class DayXYPlotPane extends ChartDataPane implements EventHandle
         currentDate = date;
         updateDomainAxis(currentDate);
         SolarEventCalculator solar = new SolarEventCalculator(location);
-        Calendar c = Calendar.getInstance();
-        c.set(date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
         
-        this.sunrise = LocalDateTime.ofInstant(solar.computeSunriseCalendar(c).toInstant(), ZoneId.systemDefault());
-        this.sunset = LocalDateTime.ofInstant(solar.computeSunsetCalendar(c).toInstant(), ZoneId.systemDefault());
+        this.sunrise = solar.computeSunriseLocalTime(date);
+        this.sunset = solar.computeSunsetLocalTime(date);
         
         addSunriseSunsetMarkers();
         addExtremeMarkers(plot, records, averages);

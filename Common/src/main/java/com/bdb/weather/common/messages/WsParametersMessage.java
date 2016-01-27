@@ -27,6 +27,7 @@ import com.bdb.weather.common.GeographicLocation;
 
 
 /**
+ * Class representing the weather station parameters message.
  *
  * @author Bruce
  */
@@ -51,6 +52,16 @@ public class WsParametersMessage {
         this(null, null, null, null, null, 0);
     }
 
+    /**
+     * Create a message from the provided parameters.
+     * 
+     * @param manufacturer The manufacturer parameter
+     * @param model The model parameter
+     * @param firmwareDate The firmware date parameter
+     * @param firmwareVersion The firmware version parameter
+     * @param location The location parameter
+     * @param weatherYearStartMonth  The weather year start month parameter
+     */
     public WsParametersMessage(String manufacturer, String model, String firmwareDate, String firmwareVersion, GeographicLocation location, int weatherYearStartMonth) {
         this.location = location;
         this.manufacturer = manufacturer;
@@ -61,36 +72,85 @@ public class WsParametersMessage {
         parameters = new TreeMap<>();
     }
 
+    /**
+     * Get the location.
+     * 
+     * @return The location
+     */
     public GeographicLocation getLocation() {
         return location;
     }
 
+    /**
+     * Get the manufacturer.
+     * 
+     * @return The manufacturer
+     */
     public String getManufacturer() {
         return manufacturer;
     }
 
+    /**
+     * Get the model name.
+     * 
+     * @return The model name
+     */
     public String getModel() {
         return model;
     }
 
+    /**
+     * Get the firmware date.
+     * 
+     * @return The firmware date
+     */
     public String getFirmwareDate() {
         return firmwareDate;
     }
 
+    /**
+     * Get the firmware version.
+     * 
+     * @return The firmware version
+     */
     public String getFirmwareVersion() {
         return firmwareVersion;
     }
 
+    /**
+     * Get the weather year start month.
+     * 
+     * @return The weather year start month
+     */
     public int getWeatherYearStartMonth() {
         return weatherYearStartMonth;
     }
+
+    /**
+     * Add a non-standard parameter.
+     * 
+     * @param key The key of the parameter
+     * @param value The value of the parameter
+     */
     public void addParameter(String key, String value) {
         parameters.put(key, value);
     }
 
+    /**
+     * Get the parameter keys.
+     * 
+     * @return The collection of keys
+     */
     public Set<String> getKeys() {
         return parameters.keySet();
     }
+
+    /**
+     * Get the value given a key.
+     * 
+     * @param key The key with which to look up the value
+     * @return The value or null if the key does not exist
+     */
     public String getValueForKey(String key) {
         return parameters.get(key);
     }

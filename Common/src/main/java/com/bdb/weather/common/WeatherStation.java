@@ -20,6 +20,7 @@ import com.bdb.weather.common.astronomical.SolarEventCalculator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Month;
 import java.time.ZoneId;
 import java.util.Calendar;
@@ -99,12 +100,9 @@ public final class WeatherStation {
      * @return The time of the sunrise
      */
     public LocalDateTime sunriseFor(LocalDate date) {
-        Calendar c = Calendar.getInstance();
-        c.set(date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
-        Calendar sunrise = solar.computeSunriseCalendar(c);
+        return solar.computeSunriseLocalTime(date);
 
-        return LocalDateTime.ofInstant(sunrise.toInstant(), ZoneId.systemDefault());
-
+        //return LocalDateTime.ofInstant(sunrise.toInstant(), ZoneId.systemDefault());
     }
 
     /**
@@ -114,11 +112,7 @@ public final class WeatherStation {
      * @return The time of the sunset
      */
     public LocalDateTime sunsetFor(LocalDate date) {
-        Calendar c = Calendar.getInstance();
-        c.set(date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
-        Calendar sunset = solar.computeSunsetCalendar(c);
-
-        return LocalDateTime.ofInstant(sunset.toInstant(), ZoneId.systemDefault());
+        return = solar.computeSunsetLocalTime(date);
     }
     
     /**

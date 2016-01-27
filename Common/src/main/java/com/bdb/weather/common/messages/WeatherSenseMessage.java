@@ -31,6 +31,9 @@ import com.bdb.util.Pair;
  * @author Bruce
  */
 public class WeatherSenseMessage {
+    /**
+     * The date formatter that is used to format dates that are in the messages.
+     */
     public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss");
     private static final String MESSAGE_TYPE_NAME = "message_type";
     private static final String NAME_VALUE_SEPARATOR = "=";
@@ -40,19 +43,40 @@ public class WeatherSenseMessage {
     private final List<Pair<String,String>> tokens;
     private static final Logger logger = Logger.getLogger(WeatherSenseMessage.class.getName());
     
+    /**
+     * Constructor.
+     * 
+     * @param messageType A string containing the message type
+     */
     public WeatherSenseMessage(String messageType) {
         tokens = new ArrayList<>();
         this.messageType = messageType;
     }
     
+    /**
+     * Get the message type.
+     * 
+     * @return The message type
+     */
     public String getMessageType() {
         return messageType;
     }
     
+    /**
+     * Add a token to the message.
+     * 
+     * @param name The name of the token
+     * @param value The value of the token
+     */
     public void addToken(String name, String value) {
         tokens.add(new Pair<>(name, value));
     }
     
+    /**
+     * Build the message from the provided type and tokens.
+     * 
+     * @return The message
+     */
     public String buildMessage() {
         StringBuilder sb = new StringBuilder(MESSAGE_TYPE_NAME);
         sb.append(NAME_VALUE_SEPARATOR).append(messageType).append(TOKEN_TERMINATOR);
@@ -64,10 +88,21 @@ public class WeatherSenseMessage {
         return sb.toString();
     }
     
+    /**
+     * Get the message tokens.
+     * 
+     * @return The list of name/value pairs
+     */
     public List<Pair<String,String>> getTokens() {
         return Collections.unmodifiableList(tokens);
     }
     
+    /**
+     * Parse a message into a WeatherSenseMessage.
+     * 
+     * @param messageString The message string
+     * @return The message class or null if the message string could not be parsed
+     */
     public static WeatherSenseMessage parseMessage(String messageString) {
         String stringTokens[] = messageString.split(";");
         WeatherSenseMessage message = null;
@@ -95,6 +130,13 @@ public class WeatherSenseMessage {
         return message;
     }
     
+    /**
+     * Extract the integer between square brackets.
+     * 
+     * @param token The token to search for an index
+     * @return The index value
+     * @throws ParseException The brackets could not be found or the integer value could not be parsed
+     */
     public static int extractIndex(String token) throws ParseException {
         int leftBracketIndex = token.indexOf('[');
         int rightBracketIndex = token.indexOf(']');
