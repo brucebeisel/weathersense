@@ -16,19 +16,14 @@
  */
 package com.bdb.weather.common.astronomical;
 
-import com.bdb.weather.common.GeographicLocation;
-import com.bdb.weather.common.measurement.AngularMeasurement;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.Month;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
-import java.util.Calendar;
-import java.util.TimeZone;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 /**
  * Parent class of the Sunrise and Sunset calculator classes.
@@ -36,9 +31,6 @@ import java.util.TimeZone;
 public class SolarEventCalculator {
 
     
-    /**
-     * The type of zenith for the sunrise/sunset
-     */
     public enum Zenith {
         /** Astronomical sunrise/set is when the sun is 18 degrees below the horizon. */
         ASTRONOMICAL(BigDecimal.valueOf(108)),
@@ -65,70 +57,24 @@ public class SolarEventCalculator {
 
     private BigDecimal latitude;
     private BigDecimal longitude;
-    private ZoneId     timeZone;
+    private ZoneId timeZone;
 
-    /**
-     * Constructs a new <code>SolarEventCalculator</code> using the given parameters.
-     * 
-     * @param location
-     *            <code>Location</code> of the place where the solar event should be calculated from.
-     * @param timeZoneIdentifier
-     *            time zone identifier of the timezone of the location parameter. For example,
-     *            "America/New_York".
-     */
-    public SolarEventCalculator(GeographicLocation location, String timeZoneIdentifier) {
-        latitude = new BigDecimal(location.getLatitude().get(AngularMeasurement.Unit.DEGREES));
-        longitude = new BigDecimal(location.getLongitude().get(AngularMeasurement.Unit.DEGREES));
+    public SolarEventCalculator(double latitudeValue, double longitudeValue, String timeZoneIdentifier) {
+        latitude = new BigDecimal(latitudeValue);
+        longitude = new BigDecimal(longitudeValue);
         this.timeZone = ZoneId.of(timeZoneIdentifier);
     }
     
-    public SolarEventCalculator(GeographicLocation location) {
-        this(location, TimeZone.getDefault().getID());
+    public SolarEventCalculator(double latitude, double longitude) {
+        this(latitude, longitude, ZoneId.systemDefault().getId());
     }
 
-    /**
-     * Computes the sunrise time for the given zenith at the given date.
-     * 
-     * @param solarZenith
-     *            <code>Zenith</code> enum corresponding to the type of sunrise to compute.
-     * @param date
-     *            <code>Calendar</code> object representing the date to compute the sunrise for.
-     * @return the sunrise time, in HH:MM format (24-hour clock), 00:00 if the sun does not rise on the given
-     *         date.
-     */
-    public String computeSunriseTime(Zenith solarZenith, LocalDate date) {
-        return computeSolarEventTimeString(solarZenith, date, true);
-    }
-    
-    /**
-     * Compute the sunrise for the given date.
-     * 
-     * @param solarZenith The type of zenith
-     * @param date The date
-     * @return The time of sunrise
-     */
-    public LocalDateTime computeSunriseLocalTime(Zenith solarZenith, LocalDate date) {
+    public LocalDateTime computeSunriseCalendar(Zenith solarZenith, LocalDate date) {
         return computeSolarEventTime(solarZenith, date, true);
     }
     
-    /**
-     * Compute the sunrise for the given date using the Official Zenith.
-     * 
-     * @param date The date
-     * @return The string representation of the sunrise
-     */
-    public String computeSunriseTime(LocalDate date) {
-        return computeSunriseTime(Zenith.OFFICIAL, date);
-    }
-    
-    /**
-     * Compute the sunrise for the given date using the Official Zenith.
-     * 
-     * @param date The date
-     * @return The time of the sunrise
-     */
-    public LocalDateTime computeSunriseLocalTime(LocalDate date) {
-        return computeSunriseLocalTime(Zenith.OFFICIAL, date);
+    public LocalDateTime computeSunriseCalendar(LocalDate date) {
+        return computeSunriseCalendar(Zenith.OFFICIAL, date);
     }
 
     /**
@@ -141,37 +87,17 @@ public class SolarEventCalculator {
      * @return the sunset time, in HH:MM format (24-hour clock), 00:00 if the sun does not set on the given
      *         date.
      */
-    public String computeSunsetTime(Zenith solarZenith, LocalDate date) {
-        return computeSolarEventTimeString(solarZenith, date, false);
-    }
     
-    /**
-     * Computes the sunset time for the given date and the official zenith.
-     * 
-     * @param date <code>Calendar</code> object representing the date to compute the sunset for.
-     * @return The sunset time, in HH:MM format (24-hour clock), 00:00 if the sun does not set on the given
-     *         date.
-     */
-    public String computeSunsetTime(LocalDate date) {
-        return computeSunsetTime(Zenith.OFFICIAL, date);
-    }
-    
-    /**
-     * Computes the sunset time for the given date and the official zenith.
-     * 
-     * @param date <code>Calendar</code> object representing the date to compute the sunset for.
-     * @return The sunset time
-     */
-    public LocalDateTime computeSunsetLocalTime(Zenith solarZenith, LocalDate date) {
+    public LocalDateTime computeSunsetCalendar(Zenith solarZenith, LocalDate date) {
         return computeSolarEventTime(solarZenith, date, false);
     }
     
-    public LocalDateTime computeSunsetLocalTime(LocalDate date) {
-        return computeSunsetLocalTime(Zenith.OFFICIAL, date);
+    public LocalDateTime computeSunsetCalendar(LocalDate date) {
+        return computeSunsetCalendar(Zenith.OFFICIAL, date);
     }
     
-    private BigDecimal computeSolarEventLocalTime(Zenith solarZenith, LocalDateTime dateTime, boolean isSunrise) {
-        ZonedDateTime zonedDateTime = dateTime.atZone(this.timeZone);
+    private BigDecimal computeSolarEventLocalTime(Zenith solarZenith, LocalDate date, boolean isSunrise) {
+        //date.setTimeZone(this.timeZone);
         BigDecimal longitudeHour = getLongitudeHour(date, isSunrise);
 
         BigDecimal meanAnomaly = getMeanAnomaly(longitudeHour);
@@ -183,19 +109,24 @@ public class SolarEventCalculator {
 
         BigDecimal sunLocalHour = getSunLocalHour(cosineSunLocalHour, isSunrise);
         BigDecimal localMeanTime = getLocalMeanTime(sunTrueLong, longitudeHour, sunLocalHour);
-        BigDecimal localTime = getLocalTime(localMeanTime, date);
+        BigDecimal localTime = getLocalTime(localMeanTime, date.atStartOfDay());
         return localTime;
     }
 
-    private String computeSolarEventTimeString(Zenith solarZenith, LocalDate date, boolean isSunrise) {
-        BigDecimal localTime = computeSolarEventLocalTime(solarZenith, date, isSunrise);
-        return getLocalTimeAsString(localTime);
-    }
-    
     private LocalDateTime computeSolarEventTime(Zenith solarZenith, LocalDate date, boolean isSunrise) {
         BigDecimal localTime = computeSolarEventLocalTime(solarZenith, date, isSunrise);
         
-        return getLocalTimeAsLocalTime(localTime, date);
+        String[] timeComponents = localTime.toPlainString().split("\\.");
+        int hour = Integer.parseInt(timeComponents[0]);
+
+        BigDecimal minutes = new BigDecimal("0." + timeComponents[1]);
+        minutes = minutes.multiply(BigDecimal.valueOf(60)).setScale(0, RoundingMode.HALF_EVEN);
+        if (minutes.intValue() == 60) {
+            minutes = BigDecimal.ZERO;
+            hour += 1;
+        }
+
+        return date.atStartOfDay().withHour(hour).withMinute(minutes.intValue());
     }
 
     /**
@@ -213,14 +144,14 @@ public class SolarEventCalculator {
      * 
      * @return longitudinal time in <code>BigDecimal</code> form.
      */
-    private BigDecimal getLongitudeHour(ZonedDateTime date, Boolean isSunrise) {
+    private BigDecimal getLongitudeHour(LocalDate date, Boolean isSunrise) {
         int offset = 18;
         if (isSunrise) {
             offset = 6;
         }
         BigDecimal dividend = BigDecimal.valueOf(offset).subtract(getBaseLongitudeHour());
         BigDecimal addend = divideBy(dividend, BigDecimal.valueOf(24));
-        BigDecimal longHour = getDayOfYear(date).add(addend);
+        BigDecimal longHour = new BigDecimal(date.getDayOfYear()).add(addend);
         return setScale(longHour);
     }
 
@@ -340,68 +271,27 @@ public class SolarEventCalculator {
         return setScale(localMeanTime);
     }
 
-    private BigDecimal getLocalTime(BigDecimal localMeanTime, LocalDate date) {
+    private BigDecimal getLocalTime(BigDecimal localMeanTime, LocalDateTime time) {
         BigDecimal utcTime = localMeanTime.subtract(getBaseLongitudeHour());
-        BigDecimal utcOffSet = getUTCOffSet(date);
+        BigDecimal utcOffSet = getUTCOffSet(time);
         BigDecimal utcOffSetTime = utcTime.add(utcOffSet);
-        return adjustForDST(utcOffSetTime, date);
+        return adjustForDST(utcOffSetTime);
     }
 
-    private BigDecimal adjustForDST(BigDecimal localMeanTime, LocalDate date) {
+    private BigDecimal adjustForDST(BigDecimal localMeanTime) {
         BigDecimal localTime = localMeanTime;
-        //return LocalDateTime.ofInstant(sunrise.toInstant(), ZoneId.systemDefault());
-        ZonedDateTime zdt = ZonedDateTime.of(date, null, ZoneId.systemDefault());
-        if (timeZone.inDaylightTime(date.getTime())) {
-            localTime = localTime.add(BigDecimal.ONE);
-        }
+
         if (localTime.doubleValue() > 24.0) {
             localTime = localTime.subtract(BigDecimal.valueOf(24));
         }
         return localTime;
     }
 
-    /**
-     * Returns the local rise/set time in the form HH:MM.
-     * 
-     * @param localTime
-     *            <code>BigDecimal</code> representation of the local rise/set time.
-     * @return <code>String</code> representation of the local rise/set time in HH:MM format.
-     */
-    private String getLocalTimeAsString(BigDecimal localTime) {
-        String[] timeComponents = localTime.toPlainString().split("\\.");
-        int hour = Integer.parseInt(timeComponents[0]);
-
-        BigDecimal minutes = new BigDecimal("0." + timeComponents[1]);
-        minutes = minutes.multiply(BigDecimal.valueOf(60)).setScale(0, RoundingMode.HALF_EVEN);
-        if (minutes.intValue() == 60) {
-            minutes = BigDecimal.ZERO;
-            hour += 1;
-        }
-
-        String minuteString = minutes.intValue() < 10 ? "0" + minutes.toPlainString() : minutes.toPlainString();
-        String hourString = (hour < 10) ? "0" + String.valueOf(hour) : String.valueOf(hour);
-        return hourString + ":" + minuteString;
-    }
-    
-    private LocalDateTime getLocalTimeAsLocalTime(BigDecimal localTime, LocalDateTime c) {
-        String localTimeStr = getLocalTimeAsString(localTime);
-        String timeComponents[] = localTimeStr.split(":");
-        
-        int hour = Integer.parseInt(timeComponents[0]);
-        int minute = Integer.parseInt(timeComponents[1]);
-        LocalDateTime time = c.withHour(hour).withMinute(minute);
-        return time;
-    }
-
     /** ******* UTILITY METHODS (Should probably go somewhere else. ***************** */
 
-    private BigDecimal getDayOfYear(LocalDate date) {
-        return new BigDecimal(date.get(ChronoField.DAY_OF_YEAR));
-    }
-
-    private BigDecimal getUTCOffSet(Calendar date) {
-        int offSetInMillis = date.get(Calendar.ZONE_OFFSET);
-        BigDecimal offSet = new BigDecimal(offSetInMillis / 3600000);
+    private BigDecimal getUTCOffSet(LocalDateTime time) {
+        long offsetInMillis = timeZone.getRules().getOffset(time).getTotalSeconds() * 1000;
+        BigDecimal offSet = new BigDecimal(offsetInMillis / 3600000);
         return offSet.setScale(0, RoundingMode.HALF_EVEN);
     }
 
@@ -431,11 +321,18 @@ public class SolarEventCalculator {
     }
     
     public static void main(String args[]) {
-        GeographicLocation loc = new GeographicLocation(new AngularMeasurement(32.954), new AngularMeasurement(-117.064));
-        SolarEventCalculator sec = new SolarEventCalculator(loc);
-        LocalDate c = LocalDate.now();
-        LocalDateTime sunset = sec.computeSunsetLocalTime(c);
-        System.out.println("Sunset = " + sec.computeSunsetTime(c) + " " + sunset.get(ChronoField.HOUR_OF_DAY) + ":" + sunset.get(ChronoField.MINUTE_OF_HOUR));
+        DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
+        SolarEventCalculator sec = new SolarEventCalculator(32.954, -117.064);
+
+        LocalDate date = LocalDate.now();
+        LocalDateTime sunrise = sec.computeSunriseCalendar(date);
+        LocalDateTime sunset = sec.computeSunsetCalendar(date);
+        System.out.println(formatter.format(sunrise) + " - " + formatter.format(sunset));
         
+        date = LocalDate.now();
+        date = date.withMonth(Month.JULY.getValue());
+        sunrise = sec.computeSunriseCalendar(date);
+        sunset = sec.computeSunsetCalendar(date);
+        System.out.println(formatter.format(sunrise) + " - " + formatter.format(sunset));
     }
 }
