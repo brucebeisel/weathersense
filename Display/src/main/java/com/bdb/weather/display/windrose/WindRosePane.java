@@ -93,7 +93,6 @@ public class WindRosePane extends ChartDataPane {
 
         TableColumn<WindSlice,String> headingColumn = new TableColumn<>("Heading");
         headingColumn.setCellValueFactory((rec) -> new ReadOnlyStringWrapper(Heading.headingForSlice(rec.getValue().getHeadingIndex(), 16).getCompassLabel()));
-
         dataTable.getColumns().add(headingColumn);
 
         TableColumn<WindSlice,String> percentOfWindColumn = new TableColumn<>("% of Wind");

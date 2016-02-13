@@ -184,7 +184,7 @@ public class DayRainPane extends ChartDataPane {
     /**
      * Load the data into the plot.
      * 
-     * @param data The data to load
+     * @param hourlyRain The data to load
      * @param records The list of historical records
      */
     public void loadData(DayHourRain hourlyRain, List<HistoricalRecord> records) {

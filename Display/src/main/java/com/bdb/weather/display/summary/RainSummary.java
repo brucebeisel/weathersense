@@ -21,7 +21,11 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.TimeZone;
 
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.FXCollections;
 import javafx.scene.Node;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import org.jfree.chart.ChartFactory;
@@ -45,32 +49,22 @@ import com.bdb.util.TimeUtils;
 import com.bdb.weather.common.SummaryRecord;
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.display.ChartDataPane;
+import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.axis.RainRangeAxis;
 
 /**
  * Plot to summarize rain over a specified period of time
  */
 public class RainSummary extends ChartDataPane implements ChartMouseListenerFX {
-    private XYPlot            rainPlot;
-    private JFreeChart        chart;
+    private XYPlot                  rainPlot;
+    private JFreeChart              chart;
     private final TableView         dataTable;
     private final ValueAxis         valueAxis = RainRangeAxis.create();
-    //private DefaultTableModel tableModel = new DefaultTableModel();
     private final SummaryInterval   interval;
     private final SummarySupporter  supporter;
     private static final String     RAIN_ROW_KEY = "Rain";
     private static final String     ET_ROW_KEY = "ET";
-    private static final int        INTERVAL_COLUMN = 0;
-    private static final int        RAINFALL_COLUMN = 1;
-    private static final int        ET_COLUMN = 2;
     
-    private static final String TABLE_HEADINGS[] = {
-        "Date",
-        "Rainfall",
-        "ET"
-    };
-
- 
     public RainSummary() {
         this(SummaryInterval.DAY_INTERVAL, null);
     }
@@ -80,8 +74,20 @@ public class RainSummary extends ChartDataPane implements ChartMouseListenerFX {
         this.setPrefSize(500, 300);
         this.interval = interval;
         this.supporter = supporter;
-        Node component = createChartElements();
         dataTable = new TableView();
+        Node component = createChartElements();
+
+        TableColumn<SummaryRecord,String> col = new TableColumn<>("Date");
+        col.setCellValueFactory((rec)->new ReadOnlyStringWrapper(DisplayConstants.formatDate(rec.getValue().getDate())));
+	dataTable.getColumns().add(col);
+        
+        TableColumn<SummaryRecord,Depth> rainfallColumn = new TableColumn<>("Rainfall");
+        rainfallColumn.setCellValueFactory((rec) -> new ReadOnlyObjectWrapper(rec.getValue().getTotalRainfall()));
+        dataTable.getColumns().add(rainfallColumn);
+        
+        TableColumn<SummaryRecord,Depth> etColumn = new TableColumn<>("ET");
+        etColumn.setCellValueFactory((rec) -> new ReadOnlyObjectWrapper(rec.getValue().getTotalET()));
+        dataTable.getColumns().add(etColumn);
 
         this.setTabContents(component, dataTable);
     }
@@ -109,23 +115,6 @@ public class RainSummary extends ChartDataPane implements ChartMouseListenerFX {
         
         rainPlot.setRangeAxis(valueAxis);
         rainPlot.getDomainAxis().setVerticalTickLabels(true);
-        
-        //DefaultTableColumnModel colModel = new DefaultTableColumnModel();
-        //dataTable.setModel(tableModel);
-        //dataTable.setColumnModel(colModel);
-        //dataTable.setAutoCreateColumnsFromModel(false);
-        for (String columnHeading : TABLE_HEADINGS) {
-            //TableColumn col = new TableColumn(columnHeading);
-            //col.setHeaderValue(TABLE_HEADINGS[i]);
-            //col.setModelIndex(i);
-            //colModel.addColumn(col);
-            //dataTable.getColumns().add(col);
-        }
-
-        //tableModel.setColumnCount(TABLE_HEADINGS.length);
-
-
-        //p.setCenter(dataTable);
 
         return chartViewer;
     }
@@ -136,14 +125,11 @@ public class RainSummary extends ChartDataPane implements ChartMouseListenerFX {
      * @param list The summary data
      */
     public void loadData(List<SummaryRecord> list) {
+        dataTable.setItems(FXCollections.observableList(list));
         TimeSeriesCollection ds = new TimeSeriesCollection();
         TimeSeries etSeries = new TimeSeries(ET_ROW_KEY);
         TimeSeries rainSeries = new TimeSeries(RAIN_ROW_KEY);
         
-        int n = 0;
-
-        //tableModel.setRowCount(list.size());
-
         Depth totalRain = new Depth(0.0);
         Depth totalET = new Depth(0.0);
 
@@ -153,28 +139,20 @@ public class RainSummary extends ChartDataPane implements ChartMouseListenerFX {
         for (SummaryRecord rec : list) {
             Depth rain = rec.getTotalRainfall();
 
-            String dateString = interval.getFormat().format(rec.getDate());
-            //tableModel.setValueAt(dateString, n, INTERVAL_COLUMN);
             RegularTimePeriod tp = RegularTimePeriod.createInstance(interval.getFreeChartClass(), TimeUtils.localDateTimeToDate(rec.getDate()), TimeZone.getDefault());
 
             if (rain != null) {
                 rainSeries.add(tp, rain.get());
-                //tableModel.setValueAt(Depth.getDefaultFormatter().format(rain.get()), n, RAINFALL_COLUMN);
                 totalRain = totalRain.add(rain);
             }
 
             Depth et = rec.getTotalET();
             if (et != null) {
                 etSeries.add(tp, et.get());
-                //tableModel.setValueAt(Depth.getDefaultFormatter().format(et.get()), n, ET_COLUMN);
                 totalET = totalET.add(et);
             }
-
-            n++;
         }
 
-        //ds.addValue(totalRain.get(), RAIN_ROW_KEY, "Total");
-        //ds.addValue(totalET.get(), ET_ROW_KEY, "Total");
         ds.addSeries(etSeries);
         ds.addSeries(rainSeries);
         rainPlot.setDataset(ds);
@@ -201,7 +179,6 @@ public class RainSummary extends ChartDataPane implements ChartMouseListenerFX {
             catch (DateTimeParseException e) {
                 // This will never happen because the same date formatter is used to create the category labels and parse the column key
             }
-            
         }
     }
 

@@ -100,7 +100,7 @@ public final class WeatherStation {
      * @return The time of the sunrise
      */
     public LocalDateTime sunriseFor(LocalDate date) {
-        return solar.computeSunriseLocalTime(date);
+        return solar.computeSunrise(date);
 
         //return LocalDateTime.ofInstant(sunrise.toInstant(), ZoneId.systemDefault());
     }
@@ -112,7 +112,7 @@ public final class WeatherStation {
      * @return The time of the sunset
      */
     public LocalDateTime sunsetFor(LocalDate date) {
-        return = solar.computeSunsetLocalTime(date);
+        return solar.computeSunset(date);
     }
     
     /**

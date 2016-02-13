@@ -116,8 +116,8 @@ abstract public class DayXYPlotPane extends ChartDataPane implements EventHandle
 
         TableColumn<HistoricalRecord,String> col = new TableColumn<>(TIME_HEADING);
         col.setCellValueFactory((rec)->new ReadOnlyStringWrapper(DisplayConstants.formatTime(rec.getValue().getTime().toLocalTime())));
-
 	dataTable.getColumns().add(col);
+
         doConfigure(displayMenu);
 	this.layout();
     }
@@ -371,8 +371,8 @@ abstract public class DayXYPlotPane extends ChartDataPane implements EventHandle
         updateDomainAxis(currentDate);
         SolarEventCalculator solar = new SolarEventCalculator(location);
         
-        this.sunrise = solar.computeSunriseLocalTime(date);
-        this.sunset = solar.computeSunsetLocalTime(date);
+        this.sunrise = solar.computeSunrise(date);
+        this.sunset = solar.computeSunset(date);
         
         addSunriseSunsetMarkers();
         addExtremeMarkers(plot, records, averages);

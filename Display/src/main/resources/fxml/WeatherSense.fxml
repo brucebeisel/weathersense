@@ -24,9 +24,9 @@
 		<MenuItem text="Today" onAction="#launchTodayView" />
 		<MenuItem text="Storms" onAction="#launchStormsView"/>
 		<MenuItem text="Day Summary" onAction="#launchDaySummaryView"/> 
-		<MenuItem text="Daily Summaries" onAction="#launchDailySummariesView"/> 
-		<MenuItem text="Monthly Summaries" onAction="#launchMonthlySummariesView"/>
-		<MenuItem text="Yearly Summaries" onAction="#launchYearlySummariesView"/>
+		<MenuItem text="Summary By Day" onAction="#launchDailySummariesView"/> 
+		<MenuItem text="Summary By Month" onAction="#launchMonthlySummariesView"/>
+		<MenuItem text="Summary By Year" onAction="#launchYearlySummariesView"/>
 		<SeparatorMenuItem />
 		<MenuItem text="Archive Free Plot" onAction="#launchHistoricalFreePlotView"/> 
 		<MenuItem text="Day Summary Free Plot" onAction="#launchDailyFreePlotView"/>

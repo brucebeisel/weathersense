@@ -55,16 +55,9 @@ import com.bdb.weather.display.windplot.WindSeriesDataItem;
  */
 public class DayWindPane extends DayXYPlotPane {
     private static final int GUST_SERIES_INDEX = 1;
-    private static final int WIND_SPEED_COLUMN = 1;
-    private static final int DIRECTION_COLUMN = 2;
-    private static final int MAX_WIND_SPEED_COLUMN = 3;
-    private static final int MAX_WIND_DIRECTION_COLUMN = 4;
-    private static final int GUST_COLUMN = 5;
-    private static final int GUST_DIRECTION_COLUMN = 6;
 
-    private static final String COLUMN_LABELS[] = { "Time", "Wind Speed", "Direction", "Max Wind Speed", "Max Direction", "Gust", "Gust Direction"};
-    private final WindSeries speedSeries = new WindSeries(COLUMN_LABELS[WIND_SPEED_COLUMN]);
-    private final TimeSeries gustSeries = new TimeSeries(COLUMN_LABELS[GUST_COLUMN]);
+    private final WindSeries speedSeries = new WindSeries("Wind Speed");
+    private final TimeSeries gustSeries = new TimeSeries("Gust");
     private TimeSeriesCollection dataset;
 
     public DayWindPane() {
@@ -148,55 +141,13 @@ public class DayWindPane extends DayXYPlotPane {
 
                 speedSeries.add(item);
 
-                //
-                // If the wind is calm, direction is pointless
-                //
-                /*
-                if (w.getSpeed().get() == 0.0)
-                    tableModel.setValueAt(DisplayConstants.WIND_DIR_WHEN_NO_WIND, n, DIRECTION_COLUMN);
-                else
-                    tableModel.setValueAt(w.getDirection().getCompassLabel(), n, DIRECTION_COLUMN);
-                */
-
-                w = r.getHighWind();
-                /*
-                if (w != null) {
-                    tableModel.setValueAt(w.getSpeed(), n, MAX_WIND_SPEED_COLUMN);
-                    if (w.getSpeed().get() == 0.0)
-                        tableModel.setValueAt(DisplayConstants.WIND_DIR_WHEN_NO_WIND, n, MAX_WIND_DIRECTION_COLUMN);
-                    else
-                        tableModel.setValueAt(w.getDirection().getCompassLabel(), n, MAX_WIND_DIRECTION_COLUMN);
-                }
-                else {
-                    tableModel.setValueAt(DisplayConstants.WIND_DIR_WHEN_NO_WIND, n, MAX_WIND_DIRECTION_COLUMN);
-                }
-*/
-
-
                 w = r.getWindGust();
-                //if (w != null) {
-                    //tableModel.setValueAt(w.getSpeed(), n, GUST_COLUMN);
-
-                    //if (w.getSpeed().get() == 0.0)
-                    //    tableModel.setValueAt(DisplayConstants.WIND_DIR_WHEN_NO_WIND, n, GUST_DIRECTION_COLUMN);
-                    //else
-                    //    tableModel.setValueAt(w.getDirection().getCompassLabel(), n, GUST_DIRECTION_COLUMN);
-                //}
-                //else {
-                //    tableModel.setValueAt(DisplayConstants.WIND_DIR_WHEN_NO_WIND, n, GUST_DIRECTION_COLUMN);
-                //}
 
                 if (w != null && w.getSpeed().get() > 0.0) {
                     period = new Minute(TimeUtils.localDateTimeToDate(r.getTime()));
                     gustSeries.add(period, w.getSpeed().get());
                 }
             }
-            //else {
-            //    tableModel.setValueAt(DisplayConstants.UNKNOWN_VALUE_STRING, n, WIND_SPEED_COLUMN);
-            //    tableModel.setValueAt(DisplayConstants.UNKNOWN_VALUE_STRING, n, GUST_COLUMN);
-            //    tableModel.setValueAt(DisplayConstants.UNKNOWN_VALUE_STRING, n, DIRECTION_COLUMN);
-            //}
-
             n++;
         }
 

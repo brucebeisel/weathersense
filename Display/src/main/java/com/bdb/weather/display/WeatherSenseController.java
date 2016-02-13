@@ -16,7 +16,6 @@
  */
 package com.bdb.weather.display;
 
-import java.awt.Dimension;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;

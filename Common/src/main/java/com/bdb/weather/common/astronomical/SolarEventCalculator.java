@@ -25,12 +25,17 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 
+import com.bdb.weather.common.GeographicLocation;
+import com.bdb.weather.common.measurement.AngularMeasurement;
+
 /**
  * Parent class of the Sunrise and Sunset calculator classes.
  */
 public class SolarEventCalculator {
-
     
+    /**
+     * The Zenith type of the solar event
+     */
     public enum Zenith {
         /** Astronomical sunrise/set is when the sun is 18 degrees below the horizon. */
         ASTRONOMICAL(BigDecimal.valueOf(108)),
@@ -59,41 +64,69 @@ public class SolarEventCalculator {
     private BigDecimal longitude;
     private ZoneId timeZone;
 
-    public SolarEventCalculator(double latitudeValue, double longitudeValue, String timeZoneIdentifier) {
+    /**
+     * Constructor.
+     * 
+     * @param location The latitude/longitude that will have its sunrise and sunsets calculated
+     * @param timeZoneIdentifier The time zone identifier
+     */
+    public SolarEventCalculator(GeographicLocation location, String timeZoneIdentifier) {
+        double latitudeValue = location.getLatitude().get(AngularMeasurement.Unit.DEGREES);
+        double longitudeValue = location.getLongitude().get(AngularMeasurement.Unit.DEGREES);
         latitude = new BigDecimal(latitudeValue);
         longitude = new BigDecimal(longitudeValue);
         this.timeZone = ZoneId.of(timeZoneIdentifier);
     }
     
-    public SolarEventCalculator(double latitude, double longitude) {
-        this(latitude, longitude, ZoneId.systemDefault().getId());
+    /**
+     * Constructor using the default time zone.
+     * 
+     * @param location The latitude/longitude that will have its sunrise and sunsets calculated
+     */
+    public SolarEventCalculator(GeographicLocation location) {
+        this(location, ZoneId.systemDefault().getId());
     }
 
-    public LocalDateTime computeSunriseCalendar(Zenith solarZenith, LocalDate date) {
+    /**
+     * Computes the sunrise time for the given zenith at the given date.
+     * 
+     * @param solarZenith <code>Zenith</code> corresponding to the type of sunset to compute.
+     * @param date The date for which the sunrise will be computed
+     * @return The sunset time
+     */
+    public LocalDateTime computeSunrise(Zenith solarZenith, LocalDate date) {
         return computeSolarEventTime(solarZenith, date, true);
     }
     
-    public LocalDateTime computeSunriseCalendar(LocalDate date) {
-        return computeSunriseCalendar(Zenith.OFFICIAL, date);
+    /**
+     * Computes the sunrise time for the given zenith at the given date using the OFFICIAL zenith.
+     * 
+     * @param date The date for which the sunrise will be computed
+     * @return The sunset time
+     */
+    public LocalDateTime computeSunrise(LocalDate date) {
+        return computeSunrise(Zenith.OFFICIAL, date);
     }
 
     /**
      * Computes the sunset time for the given zenith at the given date.
      * 
-     * @param solarZenith
-     *            <code>Zenith</code> enum corresponding to the type of sunset to compute.
-     * @param date
-     *            <code>Calendar</code> object representing the date to compute the sunset for.
-     * @return the sunset time, in HH:MM format (24-hour clock), 00:00 if the sun does not set on the given
-     *         date.
+     * @param solarZenith <code>Zenith</code> corresponding to the type of sunset to compute.
+     * @param date The date for which the sunset will be computed
+     * @return The sunset time
      */
-    
-    public LocalDateTime computeSunsetCalendar(Zenith solarZenith, LocalDate date) {
+    public LocalDateTime computeSunset(Zenith solarZenith, LocalDate date) {
         return computeSolarEventTime(solarZenith, date, false);
     }
     
-    public LocalDateTime computeSunsetCalendar(LocalDate date) {
-        return computeSunsetCalendar(Zenith.OFFICIAL, date);
+    /**
+     * Computes the sunset time for the given zenith at the given date using the OFFICIAL zenith.
+     * 
+     * @param date The date for which the sunset will be computed
+     * @return The sunset time
+     */
+    public LocalDateTime computeSunset(LocalDate date) {
+        return computeSunset(Zenith.OFFICIAL, date);
     }
     
     private BigDecimal computeSolarEventLocalTime(Zenith solarZenith, LocalDate date, boolean isSunrise) {
@@ -322,17 +355,21 @@ public class SolarEventCalculator {
     
     public static void main(String args[]) {
         DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
-        SolarEventCalculator sec = new SolarEventCalculator(32.954, -117.064);
+        GeographicLocation location = new GeographicLocation(new AngularMeasurement(32.954, AngularMeasurement.Unit.DEGREES),
+                                                             new AngularMeasurement(-117.064, AngularMeasurement.Unit.DEGREES));
+
+        SolarEventCalculator sec = new SolarEventCalculator(location);
 
         LocalDate date = LocalDate.now();
-        LocalDateTime sunrise = sec.computeSunriseCalendar(date);
-        LocalDateTime sunset = sec.computeSunsetCalendar(date);
+
+        LocalDateTime sunrise = sec.computeSunrise(date);
+        LocalDateTime sunset = sec.computeSunset(date);
         System.out.println(formatter.format(sunrise) + " - " + formatter.format(sunset));
         
         date = LocalDate.now();
         date = date.withMonth(Month.JULY.getValue());
-        sunrise = sec.computeSunriseCalendar(date);
-        sunset = sec.computeSunsetCalendar(date);
+        sunrise = sec.computeSunrise(date);
+        sunset = sec.computeSunset(date);
         System.out.println(formatter.format(sunrise) + " - " + formatter.format(sunset));
     }
 }
