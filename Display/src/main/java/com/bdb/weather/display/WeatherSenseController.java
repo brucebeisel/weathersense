@@ -62,7 +62,7 @@ import com.bdb.weather.display.summary.YearlySummariesPanel;
  *
  * @author bruce
  */
-public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentWeatherHandler {
+public class WeatherSenseController implements ViewLauncher, CurrentWeatherSubscriber.CurrentWeatherHandler {
     private WeatherStation ws;
     private DBConnection connection;
     private Stage topLevelStage;
@@ -138,7 +138,7 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
         stage.setOnCloseRequest((handler) -> cwpList.remove(form));
     }
 
-    @FXML
+    @FXML @Override
     public void launchCurrentWeatherView() {
 	CurrentWeatherCharts cwCharts = new CurrentWeatherCharts(ws, connection);
 	Stage stage = launchStage(cwCharts, "Current Weather", false);
@@ -147,7 +147,7 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     }
 
-    @FXML
+    @FXML @Override
     public void launchTodayView() {
         TodayGraphPane todayGraphPanel = new TodayGraphPane(connection);
 	launchStage(todayGraphPanel, "Today Weather", true);
@@ -174,14 +174,12 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
 
     @FXML
     public void launchDaySummaryView() {
-        DaySummaryGraphPane graphPanel = new DaySummaryGraphPane(ws, connection, LocalDate.now());
-	launchStage(graphPanel, "Weather", true);
-        graphPanel.loadData();
+        launchDaySummaryView(LocalDate.now());
     }
 
     @FXML
     public void launchDailySummariesView() {
-        DailySummariesPanel panel = new DailySummariesPanel(ws, connection, null, LocalDate.now().minusDays(30), LocalDate.now(), DateInterval.LAST_30_DAYS);
+        DailySummariesPanel panel = new DailySummariesPanel(ws, connection, this, LocalDate.now().minusDays(30), LocalDate.now(), DateInterval.LAST_30_DAYS);
         launchStage(panel, "Summary by Day", true);
     }
 
@@ -190,34 +188,34 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
         LocalDate end = LocalDate.now();
         LocalDate start = LocalDate.of(end.getYear(), Month.JANUARY, 1);
 
-        MonthlySummariesPanel monthlySummaryPanel = new MonthlySummariesPanel(ws, connection, null, start, end, DateInterval.THIS_YEAR);
+        MonthlySummariesPanel monthlySummaryPanel = new MonthlySummariesPanel(ws, connection, this, start, end, DateInterval.THIS_YEAR);
         launchStage(monthlySummaryPanel, "", true);
     }
 
     @FXML
     public void launchYearlySummariesView() {
-        YearlySummariesPanel yearlySummaryPanel = new YearlySummariesPanel(ws, connection, null);
+        YearlySummariesPanel yearlySummaryPanel = new YearlySummariesPanel(ws, connection, this);
         launchStage(yearlySummaryPanel, "", true);
     }
 
-    @FXML
+    @FXML @Override
     public void launchHistoricalFreePlotView() {
         HistoricalFreePlot freePlot = new HistoricalFreePlot(ws, connection);
         launchStage(freePlot.getNode(), "Archive Free Plot", true);
     }
 
-    @FXML
+    @FXML @Override
     public void launchDailyFreePlotView() {
         DailyFreePlot freePlot = new DailyFreePlot(ws, connection);
     }
 
-    @FXML
+    @FXML @Override
     public void launchMonthlyFreePlotView() {
         MonthlyFreePlot freePlot = new MonthlyFreePlot(ws, connection);
         launchStage(freePlot.getNode(), "Monthly Free Plot", true);
     }
 
-    @FXML
+    @FXML @Override
     public void launchStripChart() {
         StripChartManager stripChartManager = new StripChartManager();
 	launchStage(stripChartManager, "Strip Chart Manager", false);
@@ -290,5 +288,37 @@ public class WeatherSenseController implements CurrentWeatherSubscriber.CurrentW
     @FXML
     public void exit() {
 	Platform.exit();
+    }
+
+    @Override
+    public void launchDaySummaryView(LocalDate date) {
+        DaySummaryGraphPane graphPanel = new DaySummaryGraphPane(ws, connection, date);
+	launchStage(graphPanel, "Weather", true);
+        graphPanel.loadData();
+    }
+
+    @Override
+    public void launchDailySummariesView(LocalDate start, LocalDate end) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void launchDailySummariesView(DateInterval interval) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void launchMonthlySummariesView(DateInterval interval) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void launchHistoryEditor() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void launchStormView() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

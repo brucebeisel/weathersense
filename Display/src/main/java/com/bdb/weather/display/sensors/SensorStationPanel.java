@@ -29,6 +29,7 @@ import javafx.scene.layout.BorderPane;
 
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.util.jdbc.DBTable;
+import com.bdb.weather.common.BadBattery;
 
 import com.bdb.weather.common.SensorStationStatus;
 import com.bdb.weather.common.db.SensorStationStatusTable;
@@ -75,5 +76,13 @@ public class SensorStationPanel extends BorderPane {
         List<SensorStationStatus> stations = sensorStationStatusTable.query(clause);
 
         table.setItems(FXCollections.observableList(stations));
+
+        List<BadBattery> badBatteryList = sensorStationStatusTable.retrieveBadBatteryRecords();
+        for (BadBattery status : badBatteryList) {
+            System.out.println("Station: " + status.getSensorStationId() +
+                               " Time: " + DBTable.dateTimeFormatter().format(status.getTimeDetected()) +
+                               " Measurements: " + status.getMeasurementCount() +
+                               " Duration: " + status.getDuration().getSeconds());
+        }
     }
 }

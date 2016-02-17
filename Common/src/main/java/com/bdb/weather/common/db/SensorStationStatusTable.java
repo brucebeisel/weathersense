@@ -20,7 +20,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +31,7 @@ import com.bdb.util.jdbc.DBConnection;
 import com.bdb.util.jdbc.DBTable;
 
 import com.bdb.weather.common.SensorStationStatus;
+import com.bdb.weather.common.BadBattery;
 
 /**
  * Class that provides access to the sensor station status table.
@@ -134,11 +137,11 @@ public class SensorStationStatusTable extends DBTable<SensorStationStatus> {
     }
 
     /**
-     * Get the battery status for all of the sensor stations.
+     * Get the newest status for all of the sensor stations.
      * 
-     * @return The list of battery statuses
+     * @return The list of sensor status statuses
      */
-    List<SensorStationStatus> getLatestSensorStationStatus() {
+    public List<SensorStationStatus> getLatestSensorStationStatus() {
         String sql = "select max(" + TIME_COLUMN + ") from " + TABLE_NAME;
                      
         List<LocalDateTime> list = executeQuery(sql, (ResultSet rs, Object... args) -> {
@@ -157,6 +160,39 @@ public class SensorStationStatusTable extends DBTable<SensorStationStatus> {
         String whereClause = " where " + TIME_COLUMN + "='" + DBTable.dateTimeFormatter().format(time) + "'";
         List<SensorStationStatus> statusList = query(whereClause);
 
+        return statusList;
+    }
+
+    /**
+     * Get the station status records where the battery was first detected to not be OK.
+     * 
+     * @return The list of sensor station records where the battery is not OK
+     */
+    public List<BadBattery> retrieveBadBatteryRecords() {
+        String whereClause = " where " + BATTERY_OK_COLUMN + "=false";
+        List<SensorStationStatus> candidateStatusList = query(whereClause);
+        List<BadBattery> statusList = new ArrayList<>();
+        if (candidateStatusList.isEmpty())
+            return statusList;
+
+        //
+        // Trim the list to just the records when the battery first went bad.
+        //
+        statusList.add(new BadBattery(candidateStatusList.get(0).getSensorStationId(), candidateStatusList.get(0).getTime()));
+        for (int i = 1; i < candidateStatusList.size(); i++) {
+            SensorStationStatus first = candidateStatusList.get(i - 1);
+            SensorStationStatus second = candidateStatusList.get(i);
+
+            if (first.getSensorStationId() != second.getSensorStationId())
+                statusList.add(new BadBattery(second.getSensorStationId(), second.getTime()));
+            else {
+                Duration d = Duration.between(first.getTime(), second.getTime());
+                if (d.getSeconds() > 86400)
+                    statusList.add(new BadBattery(second.getSensorStationId(), second.getTime()));
+                else
+                    statusList.get(statusList.size() - 1).incrementMeasurementCount(second.getTime());
+            }
+        }
         return statusList;
     }
 

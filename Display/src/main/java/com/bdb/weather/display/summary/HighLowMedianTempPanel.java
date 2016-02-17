@@ -19,6 +19,8 @@ package com.bdb.weather.display.summary;
 import java.awt.Color;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
@@ -81,7 +83,6 @@ public class HighLowMedianTempPanel extends ChartDataPane implements ChartMouseL
     private final TableView            dataTable;
     private final DateAxis             dateAxis;
     private final NumberAxis           valueAxis = TemperatureRangeAxis.create();
-    //private final DefaultTableModel    tableModel = new DefaultTableModel();
     protected DateTimeFormatter        dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
     private final String               tableHeadings[];
     private final XYDifferenceRenderer diffRenderer = new XYDifferenceRenderer(new Color(100, 200, 100, 128), new Color(200, 100, 100, 128), false);
@@ -137,14 +138,7 @@ public class HighLowMedianTempPanel extends ChartDataPane implements ChartMouseL
         chartViewer.setPrefSize(500, 300);
         chartViewer.addChartMouseListener(this);
 
-
-        //DefaultTableColumnModel colModel = new DefaultTableColumnModel();
-
         dataTable = new TableView();
-        //dataTable.setModel(tableModel);
-        //dataTable.setColumnModel(colModel);
-
-        //dataTable.setAutoCreateColumnsFromModel(false);
 
         for (int i = 0; i < tableHeadings.length; i++) {
             TableColumn col = new TableColumn();
@@ -162,9 +156,7 @@ public class HighLowMedianTempPanel extends ChartDataPane implements ChartMouseL
      * @return An array of strings that are the column labels
      */
     private String[] getTableColumnLabels() {
-        String labels[] = { "Date", "High Temp", "Seasonal High Temp", "Low Temp", "Seasonal Low Temp", "Mean Temp", "Seasonal Mean Temp"
-        };
-
+        String labels[] = { "Date", "High Temp", "Seasonal High Temp", "Low Temp", "Seasonal Low Temp", "Mean Temp", "Seasonal Mean Temp" };
         return labels;
     }
 
@@ -257,8 +249,6 @@ public class HighLowMedianTempPanel extends ChartDataPane implements ChartMouseL
      * @param averages The averages to load
      */
     public void loadData(List<SummaryRecord> summaryList, WeatherAverages averages) {
-        //tableModel.setRowCount(summaryList.size());
-
         highDataset = new TimeSeriesCollection();
         lowDataset = new TimeSeriesCollection();
         meanDataset = new TimeSeriesCollection();
@@ -284,7 +274,11 @@ public class HighLowMedianTempPanel extends ChartDataPane implements ChartMouseL
             XYItemEntity itemEntity = (XYItemEntity)entity;
             XYDataset dataset = itemEntity.getDataset();
             Number x = dataset.getXValue(itemEntity.getSeriesIndex(), itemEntity.getItem());
-            LocalDateTime time = LocalDateTime.from(Instant.ofEpochMilli(x.longValue()));
+
+            //ZoneId id = ZoneId.of(ZoneId.systemDefault().getId());
+            //ZoneOffset offset = ZoneOffset.of(ZoneId.systemDefault().getId());
+            LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochSecond(x.longValue() / 1000), ZoneId.systemDefault());
+
             boolean doubleClick = event.getTrigger().getClickCount() == 2;
             if (doubleClick)
                 supporter.launchView(viewLauncher, time.toLocalDate());
