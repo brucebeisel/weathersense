@@ -16,6 +16,7 @@
  */
 package com.bdb.weather.common.db;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,9 +33,6 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.sql.rowset.serial.SerialBlob;
-
-import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.image.Image;
 
 import com.bdb.util.jdbc.DBConnection;
 import com.bdb.util.jdbc.DBTable;
@@ -152,7 +150,7 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
      * @param image The image to be saved to the database
      * @return True if image saved successfully
      */
-    public boolean addRadarImage(Image image) {
+    public boolean addRadarImage(BufferedImage image) {
          DopplerRadarImage dri = new DopplerRadarImage(LocalDateTime.now(), image);
          return addRadarImage(dri);
     }
@@ -263,7 +261,7 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
      * @return The newest image
      * @throws IOException A database error occurred
      */
-    public Image getNewestRadarImage() throws IOException {
+    public BufferedImage getNewestRadarImage() throws IOException {
         int maxSequence = getNewestSequence();
         
         if (maxSequence == -1)
@@ -285,10 +283,10 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
      * @throws SQLException The BLOB input stream could not be opened
      * @throws IOException The image could not be created from an input stream
      */
-    public static Image blobToImage(Blob blob) throws SQLException, IOException {
-        Image image;
+    public static BufferedImage blobToImage(Blob blob) throws SQLException, IOException {
+        BufferedImage image;
         try (InputStream is = blob.getBinaryStream()) {
-            image = new Image(is);
+            image = ImageIO.read(is);
         }
         return image;
     }
@@ -301,11 +299,10 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
      * @throws SQLException The BLOB could not be created
      * @throws IOException The output stream to write the BLOB could not be created
      */
-    public static Blob imageToBlob(Image image) throws SQLException, IOException {
+    public static Blob imageToBlob(BufferedImage image) throws SQLException, IOException {
         byte[] bytesOut;
-
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "jpeg", os);
+            ImageIO.write(image, "jpeg", os);
             bytesOut = os.toByteArray();
         }
         

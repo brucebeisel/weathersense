@@ -29,7 +29,7 @@ import com.bdb.util.jdbc.DBConnection;
  */
 public class DatabaseUtilities {
     private final DBConnection connection;
-    private static final String DERBY_URL = "jdbc:derby:memory:" + DatabaseConstants.DATABASE_NAME + ";";
+    public static final String DERBY_URL = "jdbc:derby:memory:" + DatabaseConstants.DATABASE_NAME + ";";
     private static final String CREATE_DERBY_DB_URL = DERBY_URL + "create=true";
     
     private static final String CREATE_SENSORS_TABLE_SQL =

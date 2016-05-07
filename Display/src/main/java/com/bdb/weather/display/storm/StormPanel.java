@@ -29,6 +29,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
@@ -55,7 +56,6 @@ import com.bdb.weather.display.DisplayConstants;
 import com.bdb.weather.display.RainPlot;
 import com.bdb.weather.display.RainPlot.RainEntry;
 import com.bdb.weather.display.StageUtilities;
-import com.bdb.weather.display.WeatherSense;
 
 /**
  *
@@ -142,7 +142,7 @@ public class StormPanel extends BorderPane {
         images = new TreeMap<>();
         entries = new ArrayList<>();
         List<DopplerRadarImage> dopplerList = radarTable.getRadarImagesForStorm(storm.getStartTime());
-        dopplerList.forEach((DopplerRadarImage dri) -> images.put(dri.getTime(), new Pair<>(dri, dri.getImage())));
+        dopplerList.forEach((DopplerRadarImage dri) -> images.put(dri.getTime(), new Pair<>(dri, SwingFXUtils.toFXImage(dri.getImage(), null))));
 
         if (!images.isEmpty()) {
             LocalDateTime endTime = storm.getEndTime();

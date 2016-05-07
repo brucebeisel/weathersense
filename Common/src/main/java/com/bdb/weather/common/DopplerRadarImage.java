@@ -16,26 +16,20 @@
  */
 package com.bdb.weather.common;
 
+import java.awt.image.BufferedImage;
 import java.time.LocalDateTime;
 
-import javafx.scene.image.Image;
-
-/**
- * Class that holds a Doppler Radar Image
- * 
- * @author bruce
- */
 public class DopplerRadarImage {
     private final LocalDateTime time;
-    private final Image image;
+    private final BufferedImage image;
     
     /**
      * Constructor.
      * 
-     * @param time The time the image was received
-     * @param image The image
+     * @param time Time the Doppler radar image was retrieved
+     * @param image The Doppler radar image
      */
-    public DopplerRadarImage(LocalDateTime time, Image image) {
+    public DopplerRadarImage(LocalDateTime time, BufferedImage image) {
         this.time = time;
         this.image = image;
     }
@@ -50,7 +44,7 @@ public class DopplerRadarImage {
     /**
      * @return the image
      */
-    public Image getImage() {
+    public BufferedImage getImage() {
         return image;
     }
 }

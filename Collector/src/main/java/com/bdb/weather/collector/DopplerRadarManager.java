@@ -16,6 +16,8 @@
  */
 package com.bdb.weather.collector;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.PixelGrabber;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -28,8 +30,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.PixelReader;
+import javax.imageio.ImageIO;
 
 import com.bdb.weather.common.DopplerRadarImage;
 
@@ -126,7 +127,10 @@ final class DopplerRadarManager {
             //
             // Get the image from the Internet
             //
-            Image image = new Image(imageUrl.openStream());
+            BufferedImage image = ImageIO.read(imageUrl);
+
+            if (image == null)
+                return;
 
             //
             // If the image has changed then add the image to the database, else ignore it
@@ -168,7 +172,7 @@ final class DopplerRadarManager {
      * 
      * @return True if this is a new image, else false
      */
-    private boolean checkForImageChange(Image image) {
+    private boolean checkForImageChange(BufferedImage image) {
         //
         // If the list is empty then just add the image to the list
         //
@@ -176,14 +180,20 @@ final class DopplerRadarManager {
             return true;
         
         boolean changed = false;
-        double width = image.getWidth();
-        double height = image.getHeight();
-        int currentImagePixels[] = new int[(int)width * (int)height];
-        PixelReader currentGrabber = image.getPixelReader();
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int currentImagePixels[] = new int[width * height];
+        PixelGrabber currentGrabber = new PixelGrabber(image, 0, 0, width, height, currentImagePixels, 0, width);
         
-        currentGrabber.getPixels(0, 0, (int)width, (int)height, null, currentImagePixels, 0, 0);
+        try {
+            currentGrabber.grabPixels();
+        }
+        catch (InterruptedException e) {
+            logger.log(Level.WARNING, "Caught exception", e);
+            return false;
+        }
         
-        int latestImagePixels[] = new int[(int)width * (int)height];
+        int latestImagePixels[] = new int[width * height];
 
         //
         // Compare each image in the cache against the passed in image. The comparison is done
@@ -199,20 +209,25 @@ final class DopplerRadarManager {
                 continue;
             }
             
-            PixelReader latestGrabber = latestImage.getImage().getPixelReader();
+            PixelGrabber latestGrabber = new PixelGrabber(latestImage.getImage(), 0, 0, width, height, latestImagePixels, 0, width);
 
-            latestGrabber.getPixels(0, 0, (int)width, (int)height, null, latestImagePixels, 0, 0);
+            try {
+                latestGrabber.grabPixels();
             
-            //
-            // Compare the pixels
-            //
-            for (int i = 0; i < latestImagePixels.length; i++) {
-                if (latestImagePixels[i] != currentImagePixels[i])
-                    changed = true;
+                //
+                // Compare the pixels
+                //
+                for (int i = 0; i < latestImagePixels.length; i++) {
+                    if (latestImagePixels[i] != currentImagePixels[i])
+                        changed = true;
+                }
+                
+                if (!changed)
+                    break;
             }
-            
-            if (!changed)
-                break;
+            catch (InterruptedException e) {
+                logger.log(Level.WARNING, "Caught exception", e);
+            }
         }
         
         return changed;
