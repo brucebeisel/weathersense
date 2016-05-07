@@ -16,12 +16,10 @@
  */
 package com.bdb.weather.common;
 
-import java.io.IOException;
 import java.net.URL;
 
+import javax.swing.ImageIcon;
 import javax.xml.bind.annotation.XmlEnum;
-
-import javafx.scene.image.Image;
 
 /**
  *
@@ -67,34 +65,32 @@ public enum Forecast {
     PARTLY_CLOUDY_WITH_RAIN_OR_SNOW_LATER("Clouds with Rain or Snow Later", "snow_day.jpg", "snow_night.jpg");
 
     private final String string;
-    private Image dayImage;
-    private Image nightImage;
+    private final ImageIcon dayImage;
+    private final ImageIcon nightImage;
 
     /**
      * Constructor.
      * 
-     * @param s The name of the forcast.
+     * @param s The name of the forecast.
      * 
      * @param dayIconFilename The icon for the forecast during the day
      * @param nightIconFilename  The icon for the forecast during at night
      */
     Forecast(String s, String dayIconFilename, String nightIconFilename) {
         string = s;
-        try {
-            URL url = Forecast.class.getResource("/com/bdb/weathersense/" + dayIconFilename);
+        URL url = Forecast.class.getResource("/com/bdb/weathersense/" + dayIconFilename);
+
+        if (url != null)
+            dayImage = new ImageIcon(url);
+        else
             dayImage = null;
+        
+        url = Forecast.class.getResource("/com/bdb/weathersense/" + nightIconFilename);
+
+        if (url != null)
+            nightImage = new ImageIcon(url);
+        else
             nightImage = null;
-
-            if (url != null)
-                dayImage = new Image(url.openStream());
-            
-            url = Forecast.class.getResource("/com/bdb/weathersense/" + nightIconFilename);
-
-            if (url != null)
-                nightImage = new Image(url.openStream());
-        }
-        catch (IOException e) {
-        }
     }
     
     /**
@@ -102,7 +98,7 @@ public enum Forecast {
      * 
      * @return The image
      */
-    public Image getDayImage() {
+    public ImageIcon getDayImage() {
         return dayImage;
     }
     
@@ -111,7 +107,7 @@ public enum Forecast {
      * 
      * @return The night image
      */
-    public Image getNightImage() {
+    public ImageIcon getNightImage() {
         return nightImage;
     }
     

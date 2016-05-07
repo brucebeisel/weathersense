@@ -16,24 +16,13 @@
  */
 package com.bdb.weather.common.astronomical;
 
-import javafx.application.Application;
-import static javafx.application.Application.launch;
-import javafx.scene.Scene;
-import javafx.scene.effect.BlurType;
-import javafx.scene.effect.InnerShadow;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.stage.Stage;
-
 /**
  *
  * @author bruce
  */
-public class LunarImage extends Application {
+public class LunarImage { //extends Application {
 
+    /*
     private void drawMoon(StackPane pane) {
         ImageView imageView = new ImageView();
 	Image icon = new Image("moon.jpg");
@@ -80,5 +69,6 @@ public class LunarImage extends Application {
     public static void main(String args[]) {
 	launch(args);
     }
+*/
     
 }
