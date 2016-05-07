@@ -181,7 +181,7 @@ public class WeatherUndergroundTest {
         WeatherUnderground instance = new WeatherUnderground("http://192.168.0.200:" + PORT + "?", "station", "password");
         CurrentWeather current = new CurrentWeather();
         instance.uploadCurrentWeather(current);
-        ThreadUtils.sleep(30000);
+        ThreadUtils.sleep(10000);
         assertEquals(0, instance.getStatistics().numSuccesses);
         assertEquals(1, instance.getStatistics().numFailures);
         assertEquals(1, instance.getStatistics().numAttempts);

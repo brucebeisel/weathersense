@@ -116,6 +116,7 @@ public class WeatherUnderground implements WeatherUploader {
     private static final String SUCCESS_RESPONSE = "success";
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final int READ_TIMEOUT_MILLIS = 1000;
+    private static final int CONNECT_TIMEOUT_MILLIS = 5000;
     private static final int READ_WAIT_SECONDS = 5;
 
     private String wuStationId;
@@ -344,6 +345,7 @@ public class WeatherUnderground implements WeatherUploader {
             logger.log(Level.FINE, "Sending to Weather Underground URL: ''{0}''", url);
             URLConnection connection = url.openConnection();
             connection.setReadTimeout(READ_TIMEOUT_MILLIS);
+            connection.setConnectTimeout(CONNECT_TIMEOUT_MILLIS);
             try (InputStream is = connection.getInputStream(); BufferedReader dis = new BufferedReader(new InputStreamReader(is))) {
 
                 boolean streamReady = false;
