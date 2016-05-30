@@ -47,17 +47,17 @@ main(int argc, char *argv[]) {
     string serialPortName("COM3");
     string logFile("C:\\WeatherSense\\2.4\\logs\\vp2_driver.log");
 #else
-    string archiveFile("/media/database/development/vp2/log/vp2.archive");
-    string logFile("/media/database/development/vp2/log/vp2_driver.log");
+    string archiveFile("/weathersense/2.4/archive/vp2.archive");
+    string logFile("/weathersense/2.4/log/vp2_driver.log");
     string serialPortName("/dev/ttyUSB0");
     signal(SIGPIPE, sigHandler);
     signal(SIGINT, sigHandler);
     signal(SIGTERM, sigHandler);
 #endif
 
-    //ofstream logStream(logFile.c_str(), ios::app | ios::ate | ios::out);
-    //VP2Logger::setLogStream(logStream);
-    VP2Logger::setLogLevel(VP2Logger::VP2_DEBUG1);
+    ofstream logStream(logFile.c_str(), ios::app | ios::ate | ios::out);
+    VP2Logger::setLogStream(logStream);
+    VP2Logger::setLogLevel(VP2Logger::VP2_INFO);
     WeatherSenseSocket socket("127.0.0.1", 11461);
     VantagePro2Station station(serialPortName, 19200);
     ArchiveManager archiveManager(archiveFile, station);

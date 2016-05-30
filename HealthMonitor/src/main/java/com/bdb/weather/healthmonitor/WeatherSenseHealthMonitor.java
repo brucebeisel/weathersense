@@ -101,7 +101,7 @@ public class WeatherSenseHealthMonitor implements Runnable {
 	    cwUnhealthyAnimation.setEnabled(false);
 
 	    badBatteryAnimation = new PiGlowBlinker(0, 500, 0, 100, Integer.MAX_VALUE, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.BLUE));
-	    //badBatteryAnimation.setEnabled(false);
+	    badBatteryAnimation.setEnabled(false);
 
 	    List<PiGlowLED> leds = new ArrayList<>(PiGlowLED.armLEDs(PiGlowArm.RIGHT));
 	    Collections.reverse(leds);
@@ -212,7 +212,7 @@ public class WeatherSenseHealthMonitor implements Runnable {
 
             boolean realPiGlow = true;
             String baseDirectory = "/weathersense";
-            String dbHost = "192.168.1.100";
+            String dbHost = "192.168.1.101";
                     
             for (String arg : args) {
                 switch (arg) {

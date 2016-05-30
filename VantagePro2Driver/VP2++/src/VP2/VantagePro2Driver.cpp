@@ -213,7 +213,7 @@ VantagePro2Driver::reopenStation() {
     if (!success)
         log.log(VP2Logger::VP2_ERROR) << "Failed to reopen weather station" << endl;
 
-    return sucess;
+    return success;
 }
 
 void
