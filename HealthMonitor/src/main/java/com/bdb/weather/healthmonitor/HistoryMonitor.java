@@ -42,6 +42,8 @@ public class HistoryMonitor implements HealthMonitor {
     private Connection connection = null;
     private PreparedStatement historyStatement;
     private PreparedStatement sensorStationStatusStatement;
+    private boolean historyHealth = true;
+    private boolean batteryHealth = true;
     private final int toleranceSeconds;
     private final List<PiGlowLED> leds;
     private final String HISTORY_SQL = "select max(date) from " + DatabaseConstants.DATABASE_NAME + ".history";
@@ -50,10 +52,8 @@ public class HistoryMonitor implements HealthMonitor {
 
     public static HistoryMonitor createHistoryMonitor(String host, List<PiGlowLED> leds, int toleranceMinutes) {
         HistoryMonitor monitor = new HistoryMonitor(host, leds, toleranceMinutes);
-        if (monitor.init(host))
-            return monitor;
-        else
-            return null;
+        monitor.openDatabase(host);
+        return monitor;
     }
 
     private HistoryMonitor(String host, List<PiGlowLED> leds, int toleranceMinutes) {
@@ -62,7 +62,10 @@ public class HistoryMonitor implements HealthMonitor {
         this.toleranceSeconds = toleranceMinutes * 60;
     }
 
-    private boolean init(String host) {
+    private void openDatabase(String host) {
+        if (connection != null)
+            return;
+
         try {
             String url = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, host, DatabaseConstants.DATABASE_PORT, DatabaseConstants.DATABASE_NAME);
             connection = DriverManager.getConnection(url, DatabaseConstants.DATABASE_USER, DatabaseConstants.DATABASE_PASSWORD);
@@ -71,10 +74,23 @@ public class HistoryMonitor implements HealthMonitor {
         }
         catch (SQLException ex) {
             logger.log(Level.SEVERE, "Failed to open database", ex);
-            return false;
+            closeDatabase();
         }
+    }
 
-        return true;
+    private void closeDatabase() {
+        if (connection == null)
+            return;
+
+        try {
+            connection.close();
+        }
+        catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to close database", e);
+        }
+        finally {
+            connection = null;
+        }
     }
 
     private boolean checkHistory() throws SQLException {
@@ -145,26 +161,18 @@ public class HistoryMonitor implements HealthMonitor {
     public boolean isHealthy() {
         try {
             if (connection == null)
-                init(host);
+                openDatabase(host);
             
-            boolean historyHealth = checkHistory();
-            boolean batteryHealth = checkBatteries();
+            historyHealth = checkHistory();
+            batteryHealth = checkBatteries();
             
             return historyHealth && batteryHealth;
         }
         catch (SQLException ex) {
-            try {
-                logger.log(Level.SEVERE, "Failed to get history or battery status", ex);
-                connection.close();
-                connection = null;
-                return false;
-            }
-            catch (SQLException ex1) {
-                logger.log(Level.INFO, "Failed to close database connection", ex1);
-            }
+            logger.log(Level.SEVERE, "Failed to get history or battery status", ex);
+            closeDatabase();
+            return false;
         }
-
-        return false;
     }
 
     @Override
@@ -174,6 +182,13 @@ public class HistoryMonitor implements HealthMonitor {
 
     @Override
     public String getMailMessage() {
-        return null;
+        if (connection == null)
+            return "Database could not be opened or had errors while verifying history and battery data";
+        else if (!historyHealth)
+            return "History data has not been stored recently";
+        else if (!batteryHealth)
+            return "A sensor station battery needs to be replaced";
+        else
+            return "History data and batteries are healthy";
     }
 }

@@ -70,8 +70,10 @@ public class WeatherSenseHealthMonitor implements Runnable {
     private ProcessMonitor processMonitor;
     private final ScheduledExecutorService executor;
     private PiGlow piglow;
-    private PiGlowAnimator healthyAnimator;
+    private PiGlowAnimator healthAnimator;
     private List<HealthMonitor> monitors = new ArrayList<>();
+    private PiGlowAnimation healthyAnimation;
+    private PiGlowAnimation unhealthyAnimation;
     private PiGlowAnimation cwUnhealthyAnimation;
     private PiGlowAnimation badBatteryAnimation;
     private static final Logger logger = Logger.getLogger(WeatherSenseHealthMonitor.class.getName());
@@ -103,6 +105,10 @@ public class WeatherSenseHealthMonitor implements Runnable {
 	    badBatteryAnimation = new PiGlowBlinker(0, 500, 0, 100, Integer.MAX_VALUE, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.BLUE));
 	    badBatteryAnimation.setEnabled(false);
 
+
+	    healthyAnimation = new PiGlowBlinker(0, 1000, 0, 100, Integer.MAX_VALUE, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.GREEN));
+	    unhealthyAnimation = new PiGlowBlinker(0, 250, 0, 100, Integer.MAX_VALUE, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.RED));
+
 	    List<PiGlowLED> leds = new ArrayList<>(PiGlowLED.armLEDs(PiGlowArm.RIGHT));
 	    Collections.reverse(leds);
 
@@ -116,10 +122,11 @@ public class WeatherSenseHealthMonitor implements Runnable {
 	    monitors.add(historyMonitor);
 	    monitors.add(processMonitor);
 
-	    healthyAnimator = new PiGlowAnimator(piglow);
-	    healthyAnimator.addAnimation(new PiGlowBlinker(0, 1000, 0, 100, Integer.MAX_VALUE, PiGlowLED.findLED(PiGlowArm.LEFT, PiGlowColor.GREEN)));
-	    healthyAnimator.addAnimation(cwUnhealthyAnimation);
-	    healthyAnimator.addAnimation(badBatteryAnimation);
+	    healthAnimator = new PiGlowAnimator(piglow);
+	    healthAnimator.addAnimation(healthyAnimation);
+	    healthAnimator.addAnimation(unhealthyAnimation);
+	    healthAnimator.addAnimation(cwUnhealthyAnimation);
+	    healthAnimator.addAnimation(badBatteryAnimation);
 	    initialized = true;
 	}
 	catch (RuntimeException e) {
@@ -136,7 +143,7 @@ public class WeatherSenseHealthMonitor implements Runnable {
 	if (initialized) {
 	    //processMonitor.startProcesses();
 	    executor.scheduleAtFixedRate(this, 10, 10, TimeUnit.SECONDS);
-	    healthyAnimator.start();
+	    healthAnimator.start();
 	}
     }
 
@@ -145,8 +152,8 @@ public class WeatherSenseHealthMonitor implements Runnable {
      */
     public void stop() {
         try {
-            healthyAnimator.stop();
-            healthyAnimator.waitForTermination(500);
+            healthAnimator.stop();
+            healthAnimator.waitForTermination(500);
         }
         catch (InterruptedException ex) {
             logger.log(Level.INFO, "Timed out waiting for PiGlow animator to terminator");
@@ -183,20 +190,8 @@ public class WeatherSenseHealthMonitor implements Runnable {
 	    logger.log(Level.INFO, "{0}", cwMonitor);
 	    cwUnhealthyAnimation.setEnabled(!cwMonitor.isHealthy());
 	    //processMonitor.dumpStatus();
-	    /*
-	    if (healthy) {
-		if (!healthyAnimator.isRunning()) {
-		    unhealthyAnimator.stop();
-		    healthyAnimator.start();
-		}
-	    }
-	    else {
-		if (!unhealthyAnimator.isRunning()) {
-		    healthyAnimator.stop();
-		    unhealthyAnimator.start();
-		}
-	    }
-		    */
+            healthyAnimation.setEnabled(healthy);
+            unhealthyAnimation.setEnabled(!healthy);
 	}
 	catch (Exception e) {
 	    logger.log(Level.SEVERE, "Caught unexpected exception ", e);
@@ -212,7 +207,7 @@ public class WeatherSenseHealthMonitor implements Runnable {
 
             boolean realPiGlow = true;
             String baseDirectory = "/weathersense";
-            String dbHost = "192.168.1.101";
+            String dbHost = "192.168.1.102";
                     
             for (String arg : args) {
                 switch (arg) {
