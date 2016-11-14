@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2015 Bruce Beisel
+ * Copyright (C) 2016 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,10 @@ package com.bdb.weather.common.db;
  */
 public final class DatabaseConstants {
     /**
+     * Database server
+     */
+    public static final String DATABASE_SERVER = "mysql";
+    /**
      * Default database host
      */
     public static final String DATABASE_HOST = "localhost";
@@ -38,11 +42,11 @@ public final class DatabaseConstants {
     /**
      * Formatter for creating the database URL
      */
-    public static final String DATABASE_URL_FORMATTER = "jdbc:mysql://%s:%s/%s";
+    public static final String DATABASE_URL_FORMATTER = "jdbc:%s://%s:%s/%s";
     /**
      * Default database URL
      */
-    public static final String DATABASE_URL = String.format(DATABASE_URL_FORMATTER, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME);
+    public static final String DATABASE_URL = String.format(DATABASE_URL_FORMATTER, DATABASE_SERVER, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME);
     /**
      * Default database user
      */

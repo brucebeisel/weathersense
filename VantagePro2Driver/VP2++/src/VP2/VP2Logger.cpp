@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2015 Bruce Beisel
+ * Copyright (C) 2016 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,6 +55,14 @@ VP2Logger::setLogLevel(Level level) {
 void
 VP2Logger::setLogStream(std::ostream &stream) {
     loggerStream = &stream;
+    maxFileSize = MAX_FILE_SIZE_INFINITE;
+}
+
+void
+VP2Logger::setLogFilePattern(std::string& pattern, int maxFiles, int maxFileSizeMb) {
+    this->logFilePattern = pattern;
+    this->maxFiles = maxFiles;
+    this->maxFileSize = maxFileSizeMb;
 }
 
 bool
@@ -62,6 +70,18 @@ VP2Logger::isLogEnabled(Level level) {
     return level <= currentLevel;
 }
 
+void
+VP2Logger::openLogFile() {
+    char filename[1024];
+
+    snprintf(filename, sizeof(filename), pattern, 0);
+    loggerStream = logStream(filename, ios::app | ios::ate | ios::out);
+}
+
+void
+VP2Logger::checkFileSize() {
+
+}
 ostream &
 VP2Logger::log(Level level) {
     char buffer[100];

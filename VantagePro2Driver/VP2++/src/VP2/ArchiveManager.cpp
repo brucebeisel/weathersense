@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2015 Bruce Beisel
+ * Copyright (C) 2016 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ namespace vp2 {
 
 ArchiveManager::ArchiveManager(const std::string & archiveFilename, VantagePro2Station & station) :
                                                                     archiveFile(archiveFilename),
-                                                                    station(&station),
+                                                                    station(station),
                                                                     timeOfLastPacketSent(0),
                                                                     log(VP2Logger::getLogger("ArchiveManager")) {
     findPacketTimeRange();
@@ -45,7 +45,7 @@ ArchiveManager::readArchive() {
 
     for (int i = 0; i < 5 && !result; i++) {
         list.clear();
-        if (station->wakeupStation() && station->dumpAfter(newestPacketTime, list)) {
+        if (station.wakeupStation() && station.dumpAfter(newestPacketTime, list)) {
             addPackets(list);
             result = true;
             break;
@@ -94,12 +94,12 @@ ArchiveManager::findPacketTimeRange() {
         byte buffer[VP2Constants::APB_BYTES_PER_RECORD];
         stream.seekg(0, ios::beg);
         stream.read(buffer, sizeof(buffer));
-        ArchivePacket packet = station->convertBufferToArchivePacket(buffer, 0);
+        ArchivePacket packet = station.convertBufferToArchivePacket(buffer, 0);
         oldestPacketTime = packet.getDateTime();
 
         stream.seekg(-VP2Constants::APB_BYTES_PER_RECORD, ios::end);
         stream.read(buffer, sizeof(buffer));
-        packet = station->convertBufferToArchivePacket(buffer, 0);
+        packet = station.convertBufferToArchivePacket(buffer, 0);
         newestPacketTime = packet.getDateTime();
     }
     else {
@@ -135,7 +135,7 @@ ArchiveManager::readPackets(vector<ArchivePacket> & list, DateTime startTime) {
         do {
             streamPosition = stream.tellg();
             stream.read(buffer, sizeof(buffer));
-            ArchivePacket packet = station->convertBufferToArchivePacket(buffer, 0);
+            ArchivePacket packet = station.convertBufferToArchivePacket(buffer, 0);
             stream.seekg(-(VP2Constants::APB_BYTES_PER_RECORD * 2), ios::cur);
             packetTime = packet.getDateTime();
         } while (startTime < packetTime && streamPosition > 0);
@@ -159,7 +159,7 @@ ArchiveManager::readPackets(vector<ArchivePacket> & list, DateTime startTime) {
         if (stream.eof())
             break;
 
-        ArchivePacket packet = station->convertBufferToArchivePacket(buffer, 0);
+        ArchivePacket packet = station.convertBufferToArchivePacket(buffer, 0);
         list.push_back(packet);
         timeOfLastPacketSent = packet.getDateTime();
     }

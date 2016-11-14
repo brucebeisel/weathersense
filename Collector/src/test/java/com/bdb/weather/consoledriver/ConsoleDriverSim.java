@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2015 Bruce Beisel
+ * Copyright (C) 2016 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -117,7 +116,7 @@ public class ConsoleDriverSim {
                 do {
                     record = dataGen.getNextHistoricalRecord(newestRecordTime);
                     if (record != null) {
-                        logger.fine("Sending historical with time " + SimpleDateFormat.getDateTimeInstance().format(record.getTime()));
+                        logger.log(Level.FINE, "Sending historical with time {0}", SimpleDateFormat.getDateTimeInstance().format(record.getTime()));
                         if (!sendMessage(record))
                             break;
                         newestRecordTime = record.getTime();
@@ -133,13 +132,7 @@ public class ConsoleDriverSim {
      *
      */
     public void start() {
-        thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                simLoop();
-            }
-        });
-        
+        thread = new Thread(() -> simLoop());
         thread.start();
     }
     
@@ -158,7 +151,7 @@ public class ConsoleDriverSim {
     
     private boolean sendMessage(Object msg) {
         try {
-            logger.fine("Sending message: " + msg.getClass().getName());
+            logger.log(Level.FINE, "Sending message: {0}", msg.getClass().getName());
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             marshaller.marshal(msg, System.out);
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
@@ -184,11 +177,11 @@ public class ConsoleDriverSim {
             ConsoleDriverSim sim = new ConsoleDriverSim(client);
 
             LocalDateTime c = LocalDateTime.now().minusMinutes(10);
-            SensorStationStatusMessage msg = new SensorStationStatusMessage(null);
             List<SensorStationStatus> list = new ArrayList<>();
             list.add(new SensorStationStatus(1, LocalDateTime.now(), null, null, null));
             list.add(new SensorStationStatus(2, LocalDateTime.now(), null, true, null));
             list.add(new SensorStationStatus(3, LocalDateTime.now(), null, true, 90));
+            SensorStationStatusMessage msg = new SensorStationStatusMessage(list);
             msg.setSensorStationStatusList(list);
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             StringWriter sw = new StringWriter();
@@ -197,7 +190,6 @@ public class ConsoleDriverSim {
             StringReader sr = new StringReader(sw.getBuffer().toString());
             msg = (SensorStationStatusMessage)unmarshaller.unmarshal(sr);
             System.out.println(msg);
-            System.exit(1);
             sim.start();
         }
         catch (IOException | JAXBException e) {

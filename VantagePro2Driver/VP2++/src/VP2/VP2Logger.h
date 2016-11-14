@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2015 Bruce Beisel
+ * Copyright (C) 2016 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,6 +61,15 @@ public:
     static void setLogStream(std::ostream & stream);
 
     /**
+     * Set the pattern to use for multiple log files.
+     * 
+     * @param pattern The pattern to be used for the files. The pattern must contain a printf formaatting string for integers.
+     * @param maxFiles The maximum number of files that will be maintained. Files beyond this value will be deleted
+     * @param maxFileSizeMb The maximum file size in megabytes. A new file will be created when the current file exceeds this size.
+     */
+    static void setLogFilePattern(std::string & pattern, int maxFiles, int maxFileSizeMb);
+
+    /**
      * Destructor.
      */
     virtual ~VP2Logger();
@@ -82,6 +91,7 @@ public:
     std::ostream & log(Level level);
 
 private:
+    static const int MAX_FILE_SIZE_INFINITE = -1;
     /**
      * Private constructor, only getLogger() can create a new logger.
      * 
@@ -108,6 +118,10 @@ private:
      * The stream used when the log level is not enabled
      */
     static std::ostream nullStream;
+
+    static std::string logFilePattern;
+    static int maxFiles;
+    static int maxFileSize;
 
     std::string loggerName;
 };

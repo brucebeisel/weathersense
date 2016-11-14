@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2015 Bruce Beisel
+ * Copyright (C) 2016 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,6 @@ import com.bdb.weather.common.db.DatabaseConstants;
  *
  */
 final class WeatherSenseCollector {
-    private static final String DEFAULT_DATABASE_HOST = "localhost";
     private static final String LOGGING_PROPERTY_FILE = "collector_logging.properties";
     private static final String COLLECTOR_PROPERTY_FILE = "com/bdb/weathersense/weathersense_collector.properties";
     private static final String DATABASE_HOST_PROPERTY = "weathersense.database-host";
@@ -73,28 +72,30 @@ final class WeatherSenseCollector {
                 properties.load(is);
 
 
-            String dbHost = DEFAULT_DATABASE_HOST;
+            String dbServer = DatabaseConstants.DATABASE_SERVER;
+            String dbHost = DatabaseConstants.DATABASE_HOST;
             String dbName = DatabaseConstants.DATABASE_NAME;
-            int dbPort = Integer.parseInt(DatabaseConstants.DATABASE_PORT);
+            String dbPort = DatabaseConstants.DATABASE_PORT;
 
             if (args.length > 0 && args[0].equals(HELP_ARG)) {
-                System.out.println("Usage: java WeatherSenseCollector [database host [database port]]");
+                System.out.println("Usage: java WeatherSenseCollector [database server [database host [database port]]]");
                 System.exit(0);
             }
                
             if (args.length > 0)
-                dbHost = args[0];
+                dbServer = args[0];
 
             if (args.length > 1)
-                dbPort = Integer.parseInt(args[1]);
+                dbHost = args[1];
+
+            if (args.length > 2)
+                dbPort = args[2];
 
             dbHost = properties.getProperty(DATABASE_HOST_PROPERTY, dbHost);
 
-            String prop = properties.getProperty(DATABASE_PORT_PROPERTY);
-            if (prop != null)
-                dbPort = Integer.parseInt(prop);
+            String prop = properties.getProperty(DATABASE_PORT_PROPERTY, dbPort);
 
-            String dbUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, dbHost, dbPort, dbName);
+            String dbUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, dbServer, dbHost, dbPort, dbName);
 
             String findMissingDataProp = properties.getProperty("weathersense.find_missing_data", "false");
 
@@ -110,13 +111,16 @@ final class WeatherSenseCollector {
             //
             // Start the socket reader for the XML interface
             //
-            writer.init(socketReaderThread, findMissingData);
+            if (!writer.init(socketReaderThread, findMissingData)) {
+                logger.log(Level.SEVERE, "Failed to initialize database writer");
+                System.exit(1);
+            }
             dataMonitor.init();
             socketReaderThread.start();
         }
         catch (IOException | SecurityException | NumberFormatException | SQLException | JAXBException e) {
             logger.log(Level.SEVERE, "Exception during initialization. Exiting", e);
-            System.exit(1);
+            System.exit(2);
         }
     }
 }

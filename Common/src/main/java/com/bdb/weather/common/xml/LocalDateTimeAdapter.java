@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2015 Bruce Beisel
+ * Copyright (C) 2016 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ public class LocalDateTimeAdapter extends XmlAdapter<String, LocalDateTime> {
  
     @Override
     public String marshal(LocalDateTime v) throws Exception {
-        return v.toString();
+        return formatter.format(v);
     }
     
 }

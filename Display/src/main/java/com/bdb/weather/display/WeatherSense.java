@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2015 Bruce Beisel
+ * Copyright (C) 2016 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,10 +61,8 @@ public class WeatherSense extends Application {
 	if (!args.isEmpty())
 	    databaseHost = args.get(0);
 	else
-	    //databaseHost = DatabaseConstants.DATABASE_HOST;
-            databaseHost = "192.168.1.100";
+	    databaseHost = DatabaseConstants.DATABASE_HOST;
 
-	databaseHost = "192.168.1.101";
         databaseUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, databaseHost, DatabaseConstants.DATABASE_PORT, DatabaseConstants.DATABASE_NAME);
 
         connection = new DBConnection(databaseUrl, DatabaseConstants.DATABASE_USER, DatabaseConstants.DATABASE_PASSWORD);

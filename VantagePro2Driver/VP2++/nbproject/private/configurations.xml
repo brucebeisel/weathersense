@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="97">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="0">
+      <df name="src">
+        <df name="VP2">
+          <in>ArchiveManager.cpp</in>
+          <in>ArchiveManager.h</in>
+          <in>ArchivePacket.cpp</in>
+          <in>ArchivePacket.h</in>
+          <in>BitConverter.cpp</in>
+          <in>BitConverter.h</in>
+          <in>CurrentWeather.cpp</in>
+          <in>CurrentWeather.h</in>
+          <in>ForecastRule.cpp</in>
+          <in>ForecastRule.h</in>
+          <in>Loop2Packet.cpp</in>
+          <in>Loop2Packet.h</in>
+          <in>LoopPacket.cpp</in>
+          <in>LoopPacket.h</in>
+          <in>ParametersMessage.cpp</in>
+          <in>ParametersMessage.h</in>
+          <in>ProtocolException.cpp</in>
+          <in>ProtocolException.h</in>
+          <in>Sensor.cpp</in>
+          <in>Sensor.h</in>
+          <in>SensorStation.cpp</in>
+          <in>SensorStation.h</in>
+          <in>SerialPort.cpp</in>
+          <in>SerialPort.h</in>
+          <in>UnitConverter.cpp</in>
+          <in>UnitConverter.h</in>
+          <in>VP2Constants.cpp</in>
+          <in>VP2Constants.h</in>
+          <in>VP2Logger.cpp</in>
+          <in>VP2Logger.h</in>
+          <in>VantagePro2CRC.cpp</in>
+          <in>VantagePro2CRC.h</in>
+          <in>VantagePro2Driver.cpp</in>
+          <in>VantagePro2Driver.h</in>
+          <in>VantagePro2Station.cpp</in>
+          <in>VantagePro2Station.h</in>
+          <in>Weather.cpp</in>
+          <in>Weather.h</in>
+          <in>WeatherSenseSocket.cpp</in>
+          <in>WeatherSenseSocket.h</in>
+          <in>WindDirectionSlices.cpp</in>
+          <in>WindDirectionSlices.h</in>
+          <in>WindSlice.cpp</in>
+          <in>WindSlice.h</in>
+          <in>main.cpp</in>
+        </df>
+        <df name="VP2ArchiveDump">
+          <in>main.cpp</in>
+        </df>
+      </df>
+    </df>
+  </logicalFolder>
+  <projectmakefile></projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <platform>3</platform>
+      </toolsSet>
+      <compile>
+        <compiledirpicklist>
+          <compiledirpicklistitem>.</compiledirpicklistitem>
+          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+        </compiledirpicklist>
+        <compiledir>${AUTO_FOLDER}</compiledir>
+        <compilecommandpicklist>
+          <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
+          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+        </compilecommandpicklist>
+        <compilecommand>${AUTO_COMPILE}</compilecommand>
+      </compile>
+      <dbx_gdbdebugger version="1">
+        <gdb_pathmaps>
+        </gdb_pathmaps>
+        <gdb_interceptlist>
+          <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
+        </gdb_interceptlist>
+        <gdb_options>
+          <DebugOptions>
+          </DebugOptions>
+        </gdb_options>
+        <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
+      </dbx_gdbdebugger>
+      <nativedebugger version="1">
+        <engine>gdb</engine>
+      </nativedebugger>
+      <runprofile version="9">
+        <runcommandpicklist>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+        </runcommandpicklist>
+        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <rundir>.</rundir>
+        <buildfirst>false</buildfirst>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+  </confs>
+</configurationDescriptor>

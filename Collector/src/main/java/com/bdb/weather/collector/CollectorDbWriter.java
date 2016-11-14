@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2015 Bruce Beisel
+ * Copyright (C) 2016 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -140,12 +140,14 @@ final class CollectorDbWriter implements WeatherDataWriter, Runnable {
      * @param runMissingDataFinder Whether to run the missing data finder
      * @throws SQLException  Could not set the automatic commit parameter on the database connection
      */
-    public void init(SocketReaderThread socketReader, boolean runMissingDataFinder) throws SQLException {
+    public boolean init(SocketReaderThread socketReader, boolean runMissingDataFinder) throws SQLException {
         Jmx.registerMBean(this);
         Runtime.getRuntime().addShutdownHook(new Thread(this));
         //this.socketReader = socketReader;
 
-        connection.connect();
+        if (!connection.connect())
+            return false;
+
         connection.getConnection().setAutoCommit(true);
 
         if (runMissingDataFinder)
@@ -156,6 +158,8 @@ final class CollectorDbWriter implements WeatherDataWriter, Runnable {
         executor.execute(() -> initializeStormStart());
 
         summarizer.catchup();
+
+        return true;
     }
 
     public void initializeStormStart() {

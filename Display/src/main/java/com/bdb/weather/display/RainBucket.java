@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2015 Bruce Beisel
+ * Copyright (C) 2016 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -243,7 +243,7 @@ public final class RainBucket extends Canvas {
     
     private void paintAverage(double average, double actual) {
         if (average > 0.0) {
-            if (average > actual)
+            if (average >= actual)
                 gc.setFill(BELOW_AVERAGE_PAINT);
             else
                 gc.setFill(ABOVE_AVERAGE_PAINT);
