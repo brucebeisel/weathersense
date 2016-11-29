@@ -52,5 +52,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	    <artifactId>derby</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project> 

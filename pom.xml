@@ -114,8 +114,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <dependency>
                 <groupId>org.apache.derby</groupId>
                 <artifactId>derby</artifactId>
-                <scope>test</scope>
                 <version>10.11.1.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.2.4</version>
+                <scope>compile</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
