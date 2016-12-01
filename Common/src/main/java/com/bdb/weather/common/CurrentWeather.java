@@ -940,7 +940,14 @@ public class CurrentWeather implements Serializable {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Time: ").append(fmt.format(time)).append("\n");
-        sb.append("Baro Trend: ").append(baroTrend);
+        sb.append("Indoor Temperature: ").append(indoorTemp).append("\n");
+        sb.append("Indoor Humidity: ").append(indoorHumidity).append("\n");
+        sb.append("Outdoor Temperature: ").append(outdoorTemp).append("\n");
+        sb.append("Outdoor Humidity: ").append(outdoorHumidity).append("\n");
+        sb.append("Wind Chill: ").append(windChill).append("\n");
+        sb.append("Dew Point: ").append(dewPoint).append("\n");
+        sb.append("Heat Index: ").append(heatIndex).append("\n");
+        sb.append("Baro Trend: ").append(baroTrend).append("\n");
         sb.append("Gust: ").append(gust);
         
         return sb.toString();

@@ -16,8 +16,9 @@
  */
 package com.bdb.weather.common.json;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,25 +26,21 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 
-import com.bdb.util.measurement.Measurement;
-
 /**
  *
  * @author bruce
  */
-public class MeasurementDeserializer implements JsonDeserializer<Measurement> {
-    private static final Logger logger = Logger.getLogger(MeasurementDeserializer.class.getName());
+public class LocalDateDeserializer implements JsonDeserializer<LocalDate> {
+    private static final Logger logger = Logger.getLogger(LocalDateTimeDeserializer.class.getName());
  
     @Override
-    public Measurement deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
+    public LocalDate deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
         try {
-            double value = json.getAsDouble();
-            Class<Measurement> c = (Class<Measurement>)typeOfT;
-            Measurement m = c.getConstructor(double.class).newInstance(value);
-            return m;
+            LocalDate time = LocalDate.parse(json.getAsString(), LocalDateSerializer.FORMATTER);
+            return time;
         }
-        catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
-            logger.log(Level.SEVERE, "Failed to deserialize " + typeOfT.getTypeName(), e);
+        catch (DateTimeParseException e) {
+            logger.log(Level.SEVERE, "Failed to deserialize LocalDateTime", e);
             return null;
         }
     }
