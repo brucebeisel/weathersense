@@ -69,7 +69,7 @@ public class WsParametersMessage {
         this.firmwareDate = firmwareDate;
         this.firmwareVersion = firmwareVersion;
         this.weatherYearStartMonth = weatherYearStartMonth;
-        parameters = new TreeMap<>();
+        this.parameters = new TreeMap<>();
     }
 
     /**

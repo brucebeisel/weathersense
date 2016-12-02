@@ -17,6 +17,7 @@
 package com.bdb.weather.common;
 
 import java.io.StringWriter;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -28,12 +29,15 @@ import com.bdb.weather.common.measurement.Temperature;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import com.bdb.weather.common.json.DurationDeserializer;
+import com.bdb.weather.common.json.DurationSerializer;
 import com.bdb.weather.common.json.LocalDateDeserializer;
 import com.bdb.weather.common.json.LocalDateSerializer;
 import com.bdb.weather.common.json.LocalDateTimeDeserializer;
 import com.bdb.weather.common.json.LocalDateTimeSerializer;
 import com.bdb.weather.common.json.MeasurementDeserializer;
 import com.bdb.weather.common.json.MeasurementSerializer;
+import com.bdb.weather.common.measurement.AngularMeasurement;
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Distance;
 import com.bdb.weather.common.measurement.Heading;
@@ -45,6 +49,7 @@ import com.bdb.weather.common.measurement.SoilMoisture;
 import com.bdb.weather.common.measurement.SolarRadiation;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.UvIndex;
+import com.bdb.weather.common.messages.WsParametersMessage;
 
 /**
  *
@@ -53,6 +58,8 @@ import com.bdb.weather.common.measurement.UvIndex;
 public class JsonTest {
     public static void main(String args[]) {
         GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(AngularMeasurement.class, new MeasurementSerializer());
+        gsonBuilder.registerTypeAdapter(AngularMeasurement.class, new MeasurementDeserializer());
         gsonBuilder.registerTypeAdapter(Depth.class, new MeasurementSerializer());
         gsonBuilder.registerTypeAdapter(Depth.class, new MeasurementDeserializer());
         gsonBuilder.registerTypeAdapter(Distance.class, new MeasurementSerializer());
@@ -81,9 +88,11 @@ public class JsonTest {
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer());
         gsonBuilder.registerTypeAdapter(LocalDate.class, new LocalDateSerializer());
         gsonBuilder.registerTypeAdapter(LocalDate.class, new LocalDateDeserializer());
+        gsonBuilder.registerTypeAdapter(Duration.class, new DurationSerializer());
+        gsonBuilder.registerTypeAdapter(Duration.class, new DurationDeserializer());
         Gson gson = gsonBuilder.create();
         CurrentWeather cw = new CurrentWeather();
-        cw.setTime(LocalDateTime.now());
+        cw.setTime(LocalDateTime.now().withNano(0));
         cw.setOutdoorTemperature(new Temperature(18.0));
         cw.setOutdoorHumidity(new Humidity(99.0));
         cw.setSolarRadiation(new SolarRadiation(1011));
@@ -122,10 +131,13 @@ public class JsonTest {
         cw.setHumidityForSensor(11, new Humidity(99));
         cw.setLeafWetnessForSensor(22, LeafWetness.MAX_LEAF_WETNESS);
         cw.setLeafTemperatureForSensor(20, new Temperature(45));
+        cw.setSoilMoistureForSensor(23, new SoilMoisture(2.0));
+        cw.setSoilTemperatureForSensor(24, new Temperature(2.0));
         String json = gson.toJson(cw);
         System.out.println("" + json.length() + " " +json);
 
         HistoricalRecord h = new HistoricalRecord(LocalDateTime.now());
+        h.setDuration(Duration.ofSeconds(300));
         h.setAvgOutdoorTemperature(new Temperature(20));
         String hjson = gson.toJson(h);
         System.out.println("" + hjson.length() + " " + hjson);
@@ -140,7 +152,22 @@ public class JsonTest {
         catch (Exception e) {
             e.printStackTrace();
         }
-        cw = gson.fromJson(json, CurrentWeather.class);
+        CurrentWeather cw2 = gson.fromJson(json, CurrentWeather.class);
         System.out.println(cw);
+        System.out.println(cw2);
+        boolean equal = cw.equals(cw2);
+        System.out.println("Equal: " + equal);
+
+        GeographicLocation location = new GeographicLocation(new AngularMeasurement(30.0), new AngularMeasurement(-60), new Distance(22.5));
+        WsParametersMessage msg = new WsParametersMessage("manufacturer", "model",
+                                                          "firmwareDate", "firmwareVersion",
+                                                          location , 6);
+        msg.addParameter("key1", "value1");
+        msg.addParameter("key2", "value2");
+        String json3 = gson.toJson(msg);
+        System.out.println(json3);
+        WsParametersMessage msg2 = gson.fromJson(json3, WsParametersMessage.class);
+        equal = msg.equals(msg2);
+        System.out.println("Msg Equals: " + equal);
     }
 }
