@@ -130,7 +130,7 @@ ParametersMessage::formatMessage() const {
     ss << "wsParametersMessage '{";
     ss << "\"manufacturer\":\"" << MANUFACTURER << "\",";
     ss << "\"model\":\"" << MODEL << "</model>";
-    ss << "\"firmwareDate\":\"" << firmwareDate << "\","
+    ss << "\"firmwareDate\":\"" << firmwareDate << "\",";
     ss << "\"firmwareVersion\":\"" << firmwareVersion << "\",";
     ss << "\"location\":{<latitude\":" << latitude << ",";
     ss << "\"longitude\":" << longitude << ",";

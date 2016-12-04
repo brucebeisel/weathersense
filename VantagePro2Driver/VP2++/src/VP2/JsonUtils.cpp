@@ -14,15 +14,17 @@
 #include <ostream>
 #include "JsonUtils.h"
 
+using namespace std;
+
 namespace vp2 {
 
 ostream &
-formatSensorMeasurement(ostream & os, bool addComma, int key, const string & sensorType, double measurement) const {
+JsonUtils::formatSensorMeasurement(ostream & os, bool addComma, int key, const string & sensorType, double measurement) {
     if (addComma)
         os << ",";
 
-    os << "\"" << key << "\":{\"sensorId\":" << key << "\"sensorType\":\"" << sensorType "\","
+    os << "\"" << key << "\":{\"sensorId\":" << key << "\"sensorType\":\"" << sensorType << "\","
                << "\"measurement\":" << measurement << "}";
-    return ss;
+    return os;
 }
 }

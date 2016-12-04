@@ -47,10 +47,10 @@ CurrentWeather::formatMessage() const {
        << "\"outdoorHumidity\":" << loopPacket.getOutsideHumidity() << ","
        << "\"dewPoint\":" << loop2Packet.getDewPoint() << ","
        << "\"windChill\":" << loop2Packet.getWindChill() << ","
-       << "\"heatIndex\":" << loop2Packet.getHeatIndex() << ","
+       << "\"heatIndex\":" << loop2Packet.getHeatIndex() << ",";
 
     if (loop2Packet.isThswValid())
-       ss << "\"thsw\":" << loop2Packet.getThsw() << ","
+       ss << "\"thsw\":" << loop2Packet.getThsw() << ",";
 
     ss << "\"wind\":{\"speed\":" << loopPacket.getWindSpeed() << ",\"direction\":" << loopPacket.getWindDirection() << "},"
        << "\"gust\":{\"speed\":" << loop2Packet.getWindGust10Minute() << ",\"direction\":" << loop2Packet.getWindGustHeading10Minute() << "},"

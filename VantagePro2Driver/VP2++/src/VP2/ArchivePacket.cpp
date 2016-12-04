@@ -268,7 +268,7 @@ ArchivePacket::formatMessage() const {
     for (int i = 0; i < VP2Constants::APB_MAX_SOIL_MOISTURES; i++) {
         int soilMoisture = BitConverter::toInt8(buffer, 48 + i);
         if (soilMoisture != VP2Constants::APB_INVALID_SOIL_MOISTURE) {
-            JsonUtils::formatSensorMeasurement(ss, addComma, CurrentWeather::SOIL_MOISTURE_BASE_SENSOR_ID + i, "SOIL_MOISTURE", static_cast<double(soilMoisture));
+            JsonUtils::formatSensorMeasurement(ss, addComma, CurrentWeather::SOIL_MOISTURE_BASE_SENSOR_ID + i, "SOIL_MOISTURE", static_cast<double>(soilMoisture));
             addComma = true;
         }
     }

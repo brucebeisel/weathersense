@@ -55,33 +55,33 @@ VP2Logger::setLogLevel(Level level) {
 void
 VP2Logger::setLogStream(std::ostream &stream) {
     loggerStream = &stream;
-    maxFileSize = MAX_FILE_SIZE_INFINITE;
+    //maxFileSize = MAX_FILE_SIZE_INFINITE;
 }
 
-void
-VP2Logger::setLogFilePattern(std::string& pattern, int maxFiles, int maxFileSizeMb) {
-    this->logFilePattern = pattern;
-    this->maxFiles = maxFiles;
-    this->maxFileSize = maxFileSizeMb;
-}
+//void
+//VP2Logger::setLogFilePattern(std::string& pattern, int maxFiles, int maxFileSizeMb) {
+//    this->logFilePattern = pattern;
+//    this->maxFiles = maxFiles;
+//    this->maxFileSize = maxFileSizeMb;
+//}
 
 bool
 VP2Logger::isLogEnabled(Level level) {
     return level <= currentLevel;
 }
 
-void
-VP2Logger::openLogFile() {
-    char filename[1024];
+//void
+//VP2Logger::openLogFile() {
+//    char filename[1024];
+//
+//    snprintf(filename, sizeof(filename), pattern, 0);
+//    loggerStream = logStream(filename, ios::app | ios::ate | ios::out);
+//}
 
-    snprintf(filename, sizeof(filename), pattern, 0);
-    loggerStream = logStream(filename, ios::app | ios::ate | ios::out);
-}
-
-void
-VP2Logger::checkFileSize() {
-
-}
+//void
+//VP2Logger::checkFileSize() {
+//
+//}
 ostream &
 VP2Logger::log(Level level) {
     char buffer[100];

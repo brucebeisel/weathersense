@@ -93,7 +93,7 @@ SensorStation::formatSensorStationStatusMessage(const vector<SensorStation> & li
         if (addComma)
             ss << ",";
 
-        ss << "\"sensorStationStatus\":{";
+        ss << "\"sensorStationStatus\":{"
            << "\"time\":\"" << Weather::formatDateTime(time) << "\","
            << "\"sensorStationId\":" << it->getSensorIndex() << ","
            << "\"batteryOk\":\"" << (it->getBatteryStatus() ? "true" : "false") << "\",";

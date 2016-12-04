@@ -6,6 +6,7 @@ SRCS=ArchiveManager.cpp \
 	BitConverter.cpp \
 	CurrentWeather.cpp \
 	ForecastRule.cpp \
+	JsonUtils.cpp \
 	Loop2Packet.cpp \
 	LoopPacket.cpp \
 	main.cpp \

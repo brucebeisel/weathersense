@@ -27,7 +27,6 @@
 
 namespace vp2 {
 
-}
 class JsonUtils {
 public:
     /**
@@ -39,7 +38,8 @@ public:
      * @param measurement The measurement from this sensor
      * @return The ostream to allow the calls to be chained
      */
-    static std::ostream & formatSensorMeasurement(std::ostream & os, bool addComma, int key, const std::string & sensorType, double measurement) const;
+    static std::ostream & formatSensorMeasurement(std::ostream & os, bool addComma, int key, const std::string & sensorType, double measurement);
+
 private:
     JsonUtils();
 
