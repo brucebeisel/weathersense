@@ -127,22 +127,21 @@ ParametersMessage::setRainCollectorSize(Rainfall value) {
 string
 ParametersMessage::formatMessage() const {
     ostringstream ss;
-    ss << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-    ss << "<wsParametersMessage>";
-    ss << "<manufacturer>" << MANUFACTURER << "</manufacturer>";
-    ss << "<model>" << MODEL << "</model>";
-    ss << "<firmwareDate>" << firmwareDate << "</firmwareDate>";
-    ss << "<firmwareVersion>" << firmwareVersion << "</firmwareVersion>";
-    ss << "<location><latitude>" << latitude << "</latitude>";
-    ss << "<longitude>" << longitude << "</longitude>";
-    ss << "<altitude>" << UnitConverter::feetToMillimeters(elevation) << "</altitude></location>";
-    ss << "<weatherYearStartMonth>" << rainSeasonStart << "</weatherYearStartMonth>";
-    ss << "<parameters>";
-    ss << "<entry><key>" << "Archive Period" << "</key><value>" << archivePeriod << "</value></entry>";
-    ss << "<entry><key>" << "Wind Cup Size" << "</key><value>" << (windCupSize == 0 ? "Small" : "Large") << "</value></entry>";
-    ss << "<entry><key>" << "Rain Collector Size" << "</key><value>" << rainCollectorSize << " inches" << "</value></entry>";
-    ss << "</parameters>";
-    ss << "</wsParametersMessage>";
+    ss << "wsParametersMessage '{";
+    ss << "\"manufacturer\":\"" << MANUFACTURER << "\",";
+    ss << "\"model\":\"" << MODEL << "</model>";
+    ss << "\"firmwareDate\":\"" << firmwareDate << "\","
+    ss << "\"firmwareVersion\":\"" << firmwareVersion << "\",";
+    ss << "\"location\":{<latitude\":" << latitude << ",";
+    ss << "\"longitude\":" << longitude << ",";
+    ss << "\"altitude\":" << UnitConverter::feetToMillimeters(elevation) << "},";
+    ss << "\"weatherYearStartMonth\":" << rainSeasonStart << ",";
+    ss << "\"parameters\":{";
+    ss << "{\"key\":" << "Archive Period" << ",\"value\":\"" << archivePeriod << "\"}";
+    ss << "{\"key\":" << "Wind Cup Size" << ",\"value\":\"" << (windCupSize == 0 ? "Small" : "Large") << "\"}";
+    ss << "{\"key\":" << "Rain Collector Size" << ",\"value\":\"" << rainCollectorSize << " inches" << "\"}";
+    ss << "}";
+    ss << "}'";
 
     return ss.str();
 }

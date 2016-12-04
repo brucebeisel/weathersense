@@ -69,15 +69,15 @@ SensorStation::setLinkQuality(int value) {
 string
 SensorStation::formatSensorStationMessage(const vector<SensorStation> & list) {
     ostringstream ss;
-    ss << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-    ss << "<sensorStationMessage>";
+    ss << "sensorStationMessage '{";
     for (vector<SensorStation>::const_iterator it = list.begin(); it != list.end(); ++it) {
-        ss << "<sensorStation>";
-        ss << "<name>Sensor Station - "<< it->sensorIndex << "</name><type>" << STATION_TYPES[it->type] << "</type><sensorStationId>" << it->sensorIndex << "</sensorStationId>";
-        ss <<"</sensorStation>";
+        ss << "\"sensorStation\":{";
+        ss << "\"name\":\"Sensor Station - "<< it->sensorIndex << "\","
+           << "\"type\":\"" << STATION_TYPES[it->type] << "\",\"sensorStationId\":" << it->sensorIndex;
+        ss << "}";
     }
 
-    ss <<"</sensorStationMessage>";
+    ss <<"}'";
 
     return ss.str();
 }
@@ -86,17 +86,24 @@ string
 SensorStation::formatSensorStationStatusMessage(const vector<SensorStation> & list, DateTime time) {
     ostringstream ss;
     
-    ss << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-       << "<sensorStationStatusMessage>";
+    ss << "sensorStationStatusMessage '{";
 
+    bool addComma = false;
     for (vector<SensorStation>::const_iterator it = list.begin(); it != list.end(); ++it) {
-        ss << "<sensorStationStatus>";
-        ss << "<time>" << Weather::formatDateTime(time) << "</time><sensorStationId>" << it->getSensorIndex() << "</sensorStationId><batteryOk>" << (it->getBatteryStatus() ? "true" : "false") << "</batteryOk>";
+        if (addComma)
+            ss << ",";
+
+        ss << "\"sensorStationStatus\":{";
+           << "\"time\":\"" << Weather::formatDateTime(time) << "\","
+           << "\"sensorStationId\":" << it->getSensorIndex() << ","
+           << "\"batteryOk\":\"" << (it->getBatteryStatus() ? "true" : "false") << "\",";
+
         if (it->getSensorStationType() == INTEGRATED_SENSOR_STATION)
-            ss << "<linkQuality>" << it->getLinkQuality() << "</linkQuality>";
-        ss << "</sensorStationStatus>";
+            ss << "\"linkQuality\":" << it->getLinkQuality();
+        ss << "}";
+        addComma = true;
     }
-    ss << "</sensorStationStatusMessage>";
+    ss << "}'";
 
     return ss.str();
 }

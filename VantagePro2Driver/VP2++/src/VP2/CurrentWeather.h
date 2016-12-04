@@ -31,6 +31,31 @@ namespace vp2 {
 class CurrentWeather {
 public:
     /**
+     * The base ID of extra thermometer sensors
+     */
+    static const int THERMOMETER_BASE_SENSOR_ID = 100;
+    /**
+     * The base ID of extra hygrometer sensors
+     */
+    static const int HYGROMETER_BASE_SENSOR_ID = 200;
+    /**
+     * The base ID of leaf wetness sensors
+     */
+    static const int LEAF_WETNESS_BASE_SENSOR_ID = 400;
+    /**
+     * The base ID of leaf temperature sensors
+     */
+    static const int LEAF_TEMPERATURE_BASE_SENSOR_ID = 500;
+    /**
+     * The base ID of soil moisture sensors
+     */
+    static const int SOIL_MOISTURE_BASE_SENSOR_ID = 600;
+    /**
+     * The base ID of soil temperature sensors
+     */
+    static const int SOIL_TEMPERATURE_BASE_SENSOR_ID = 700;
+
+    /**
      * Constructor.
      * 
      * @param loopPacket The LOOP packet that was read in the most recent loop through the current weather processor

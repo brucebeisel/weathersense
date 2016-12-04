@@ -23,6 +23,8 @@
 #include "BitConverter.h"
 #include "UnitConverter.h"
 #include "ArchivePacket.h"
+#include "JsonUtils.h"
+#include "CurrentWeather.h"
 
 using namespace std;
 
@@ -99,73 +101,72 @@ ArchivePacket::extractDate() const {
 std::string
 ArchivePacket::formatMessage() const {
     ostringstream ss;
-    ss << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-    ss << "<historicalRecord>";
+    ss << "archiveMessage '{";
     DateTime archiveTime = extractDate();
-    ss << "<time>" << Weather::formatDateTime(archiveTime) << "</time>";
-    ss << "<duration>" << (archivePeriod * 60) << "</duration>";
+    ss << "\"time\":" << Weather::formatDateTime(archiveTime) << ",";
+    ss << "\"duration\":" << (archivePeriod * 60) << ",";
 
     int value16 = BitConverter::toInt16(buffer, 4);
     if (value16 != VP2Constants::APB_INVALID_TEMPERATURE)
-        ss << "<avgOutdoorTemperature>" << UnitConverter::toCelcius((Temperature)value16 / TEMPERATURE_SCALE) << "</avgOutdoorTemperature>";
+        ss << "\"avgOutdoorTemperature\":" << UnitConverter::toCelcius((Temperature)value16 / TEMPERATURE_SCALE) << ",";
 
     value16 = BitConverter::toInt16(buffer, 6);
     if (value16 != VP2Constants::APB_INVALID_HIGH_TEMPERATURE)
-        ss << "<highOutdoorTemperature>" << UnitConverter::toCelcius((Temperature)value16 / TEMPERATURE_SCALE) << "</highOutdoorTemperature>";
+        ss << "\"highOutdoorTemperature\":" << UnitConverter::toCelcius((Temperature)value16 / TEMPERATURE_SCALE) << ",";
 
     value16 = BitConverter::toInt16(buffer, 8);
     if (value16 != VP2Constants::APB_INVALID_TEMPERATURE)
-        ss << "<lowOutdoorTemperature>" << UnitConverter::toCelcius((Temperature)value16 / TEMPERATURE_SCALE) << "</lowOutdoorTemperature>";
+        ss << "\"lowOutdoorTemperature\":" << UnitConverter::toCelcius((Temperature)value16 / TEMPERATURE_SCALE) << ",";
 
     value16 = BitConverter::toInt16(buffer, 10);
-    ss << "<rainfall>" << UnitConverter::toMillimeter((Rainfall)value16 * rainInterval) << "</rainfall>";
+    ss << "\"rainfall\":" << UnitConverter::toMillimeter((Rainfall)value16 * rainInterval) << ",";
 
     value16 = BitConverter::toInt16(buffer, 12);
-    ss << "<highRainfallRate>" << UnitConverter::toMillimeter((Rainfall)value16 * rainInterval) << "</highRainfallRate>";
+    ss << "\"highRainfallRate\":" << UnitConverter::toMillimeter((Rainfall)value16 * rainInterval) << ",";
 
     value16 = BitConverter::toInt16(buffer, 14);
     if (value16 != VP2Constants::APB_INVALID_BAROMETER)
-        ss << "<baroPressure>" << UnitConverter::toMillibars((Pressure)value16 / BAROMETER_SCALE) << "</baroPressure>";
+        ss << "\"baroPressure\":" << UnitConverter::toMillibars((Pressure)value16 / BAROMETER_SCALE) << ",";
 
     value16 = BitConverter::toInt16(buffer, 16);
     if (value16 != VP2Constants::APB_INVALID_SOLAR_RADIATION)
-        ss << "<avgSolarRadiation>" << value16 << "</avgSolarRadiation>";
+        ss << "\"avgSolarRadiation\":" << value16 << ",";
   
     value16 = BitConverter::toInt16(buffer, 20);
     if (value16 != VP2Constants::APB_INVALID_TEMPERATURE)
-        ss << "<indoorTemperature>" << UnitConverter::toCelcius((Temperature)value16 / TEMPERATURE_SCALE) << "</indoorTemperature>";
+        ss << "\"indoorTemperature\":" << UnitConverter::toCelcius((Temperature)value16 / TEMPERATURE_SCALE) << ",";
 
     int value8 = BitConverter::toInt8(buffer, 22);
     if (value8 != VP2Constants::APB_INVALID_HUMIDITY)
-        ss << "<indoorHumidity>" << value8 << "</indoorHumidity>";
+        ss << "\"indoorHumidity\":" << value8 << "<,";
 
     value8 = BitConverter::toInt8(buffer, 23);
     if (value8 != VP2Constants::APB_INVALID_HUMIDITY)
-        ss << "<outdoorHumidity>" << value8 << "</outdoorHumidity>";
+        ss << "\"outdoorHumidity\":" << value8 << ",";
 
     int windSpeed = BitConverter::toInt8(buffer, 24);
     if (windSpeed == VP2Constants::APB_INVALID_WIND_SPEED)
         windSpeed = 0;
     
-    ss << "<avgWind><speed>" << UnitConverter::toMetersPerSecond(windSpeed) << "</speed>";
+    ss << "\"avgWind\":\"speed\":" << UnitConverter::toMetersPerSecond(windSpeed);
 
     int windDirection = BitConverter::toInt8(buffer, 27);
     if (windDirection != VP2Constants::APB_INVALID_WIND_DIRECTION)
-        ss << "<direction>" << (windDirection * DEGREES_PER_SLICE) << "</direction>"; 
+        ss << ",\"direction\":" << (windDirection * DEGREES_PER_SLICE);
 
-    ss << "</avgWind>";
+    ss << "},";
 
     windSpeed = BitConverter::toInt8(buffer, 25);
     if (windSpeed == VP2Constants::APB_INVALID_WIND_SPEED)
         windSpeed = 0;
     
-    ss << "<highWind><speed>" << UnitConverter::toMetersPerSecond(windSpeed) << "</speed>"; 
+    ss << "\"highWind\":{\"speed\":" << UnitConverter::toMetersPerSecond(windSpeed);
 
     windDirection = BitConverter::toInt8(buffer, 26);
     if (windDirection != VP2Constants::APB_INVALID_WIND_DIRECTION)
-        ss << "<direction>" << (windDirection * DEGREES_PER_SLICE) << "</direction>";
+        ss << ",\"direction\"" << (windDirection * DEGREES_PER_SLICE);
 
-    ss << "</highWind>";
+    ss << "},";
 
     //
     // Use the wind gust data from the LOOP 2 packet if this archive packet is less than 10 minutes old,
@@ -176,7 +177,7 @@ ArchivePacket::formatMessage() const {
     if (span < 10 * 60) {
         log->log(VP2Logger::VP2_DEBUG1) << "Using gust from LOOP2 packet" << endl;
         if (windGust != 0.0)
-            ss << "<windGust><speed>" << windGust << "</speed><direction>" << windGustDirection << "</direction></windGust>";
+            ss << "\"windGust\":{\"speed\":" << windGust << ",\"direction\":" << windGustDirection << "},";
     }
     else {
         log->log(VP2Logger::VP2_DEBUG1) << "Setting gust to max wind speed/direction" << endl;
@@ -185,86 +186,93 @@ ArchivePacket::formatMessage() const {
             windSpeed = 0;
 
         windDirection = BitConverter::toInt8(buffer, 26);
-        ss << "<windGust><speed>" << UnitConverter::toMetersPerSecond(windSpeed) << "</speed>";
+        ss << "\"windGust\":{\"speed\":" << UnitConverter::toMetersPerSecond(windSpeed);
 
         if (windDirection != VP2Constants::APB_INVALID_WIND_DIRECTION)
-            ss << "<direction>" << (windDirection * DEGREES_PER_SLICE) << "</direction>";
+            ss << ",\"direction\":" << (windDirection * DEGREES_PER_SLICE);
 
-        ss << "</windGust>";
+        ss << "},";
     }
 
     value8 = BitConverter::toInt8(buffer, 28);
     if (value8 != VP2Constants::APB_INVALID_UV_INDEX)
-        ss << "<avgUvIndex>" << ((UvIndex)value8 / UV_INDEX_SCALE) << "</avgUvIndex>";
+        ss << "\"avgUvIndex\":" << ((UvIndex)value8 / UV_INDEX_SCALE) << ",";
 
     value8 = BitConverter::toInt8(buffer, 29);
     if (value8 != UNKNOWN_ET)
-        ss << "<evapotranspiration>" << UnitConverter::toMillimeter((Evapotranspiration)value8 / ET_SCALE) << "</evapotranspiration>";
+        ss << "\"evapotranspiration\":" << UnitConverter::toMillimeter((Evapotranspiration)value8 / ET_SCALE) << ",";
 
     value16 = BitConverter::toInt16(buffer, 30);
     if (value16 != UNKNOWN_SOLAR_RADIATION)
-        ss << "<highSolarRadiation>" << value16 << "</highSolarRadiation>";
+        ss << "\"highSolarRadiation\":" << value16 << ",";
 
     value8 = BitConverter::toInt8(buffer, 32);
     if (value8 != VP2Constants::APB_INVALID_UV_INDEX)
-        ss << "<highUvIndex>" << ((UvIndex)value8 / UV_INDEX_SCALE) << "</highUvIndex>";
+        ss << "\"highUvIndex\":" << ((UvIndex)value8 / UV_INDEX_SCALE) << ",";
 
-    for (int i = 0; i < VP2Constants::APB_MAX_LEAF_TEMPERATURES; i++) {
-        value8 = buffer[34 + i];
-        if (value8 != VP2Constants::APB_INVALID_LEAF_TEMPERATURE)
-            ss << ""; //leaf_temperature[{0}]={1};", i, value8 - EXTRA_TEMPERATURE_OFFSET);
-    }
-
-    ss << "<leafWetnessSensorEntries>";
+    ss << "\"leafWetnessSensorEntries\":{";
+    bool addComma = false;
     for (int i = 0; i < VP2Constants::APB_MAX_LEAF_WETNESSES; i++) {
         int leafWetness = BitConverter::toInt8(buffer, 36 + i);
         if (leafWetness != VP2Constants::APB_INVALID_LEAF_WETNESS) {
-            ss << "<entry><key>" << (500 + i) << "</key><value><sensorId>" << (500 + i) << "</sensorId><sensorType>LEAF_WETNESS</sensorType>";
-            ss << "<measurement xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"leafWetness\">";
-            ss << leafWetness << "</measurement></value></entry>";
+            JsonUtils::formatSensorMeasurement(ss, addComma, CurrentWeather::LEAF_WETNESS_BASE_SENSOR_ID +i, "LEAF_WETNESS", static_cast<double>(leafWetness));
+            addComma = true;
         }
     }
-    ss << "</leafWetnessSensorEntries>";
+    ss << "},";
 
-    for (int i = 0; i < VP2Constants::APB_MAX_SOIL_TEMPERATURES; i++) {
-        value8 = buffer[38 + i];
-        if (value8 != VP2Constants::APB_INVALID_SOIL_TEMPERATURE)
-            ss << "";//soil_temperature[{0}]={1};", i, value8 - EXTRA_TEMPERATURE_OFFSET);
-    }
-
-    ss << "<humiditySensorEntries>";
+    ss << "\"humiditySensorEntries\":{";
+    addComma = false;
     for (int i = 0; i < VP2Constants::APB_MAX_EXTRA_HUMIDITIES; i++) {
         int humidity = BitConverter::toInt8(buffer, 43 + i);
         if (humidity != VP2Constants::APB_INVALID_HUMIDITY) {
-            ss << "<entry><key>" << (200 + i) << "</key><value><sensorId>" << (200 + i) << "</sensorId><sensorType>HYGROMETER</sensorType>";
-            ss << "<measurement xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"humidity\">";
-            ss << humidity << "</measurement></value></entry>";
+            JsonUtils::formatSensorMeasurement(ss, addComma, CurrentWeather::HYGROMETER_BASE_SENSOR_ID + i, "HYGROMETER", static_cast<double>(humidity));
+            addComma = true;
         }
     }
-    ss << "</humiditySensorEntries>";
+    ss << "},";
 
-    ss << "<temperatureSensorEntries>";
+    ss << "\"temperatureSensorEntries\":{";
+    addComma = false;
     for (int i = 0; i < VP2Constants::APB_MAX_EXTRA_TEMPERATURES; i++) {
         int temperature = BitConverter::toInt8(buffer, 45 + i);
         if (temperature != VP2Constants::APB_INVALID_EXTRA_TEMPERATURE) {
-            ss << "<entry><key>" << (100 + i) << "</key><value><sensorId>" << (100 + i) << "</sensorId><sensorType>THERMOMETER</sensorType>";
-            ss << "<measurement xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"temperature\">";
-            ss << UnitConverter::toCelcius(temperature - EXTRA_TEMPERATURE_OFFSET) << "</measurement></value></entry>";
+            temperature = UnitConverter::toCelcius(temperature - EXTRA_TEMPERATURE_OFFSET);
+            JsonUtils::formatSensorMeasurement(ss, addComma, CurrentWeather::THERMOMETER_BASE_SENSOR_ID + i, "THERMOMETER", static_cast<double>(temperature));
+            addComma = true;
         }
     }
-    ss << "</temperatureSensorEntries>";
 
-    ss << "<soilMoistureSensorEntries>";
+    for (int i = 0; i < VP2Constants::APB_MAX_SOIL_TEMPERATURES; i++) {
+        int temperature = UnitConverter::toCelcius(buffer[38 + i] - EXTRA_TEMPERATURE_OFFSET);
+        if (temperature != VP2Constants::APB_INVALID_SOIL_TEMPERATURE) {
+            temperature = UnitConverter::toCelcius(temperature - EXTRA_TEMPERATURE_OFFSET);
+            JsonUtils::formatSensorMeasurement(ss, addComma, CurrentWeather::SOIL_TEMPERATURE_BASE_SENSOR_ID + i, "SOIL_TEMPERATURE", static_cast<double>(temperature));
+            addComma = true;
+        }
+    }
+
+    for (int i = 0; i < VP2Constants::APB_MAX_LEAF_TEMPERATURES; i++) {
+        int temperature = UnitConverter::toCelcius(buffer[34 + i] - EXTRA_TEMPERATURE_OFFSET);
+        if (value8 != VP2Constants::APB_INVALID_LEAF_TEMPERATURE) {
+            temperature = UnitConverter::toCelcius(temperature - EXTRA_TEMPERATURE_OFFSET);
+            JsonUtils::formatSensorMeasurement(ss, addComma, CurrentWeather::LEAF_TEMPERATURE_BASE_SENSOR_ID + i, "LEAF_TEMPERATURE", static_cast<double>(temperature));
+            addComma = true;
+        }
+    }
+
+    ss << "},";
+
+    ss << "\"soilMoistureSensorEntries\":{";
+    addComma = false;
     for (int i = 0; i < VP2Constants::APB_MAX_SOIL_MOISTURES; i++) {
         int soilMoisture = BitConverter::toInt8(buffer, 48 + i);
         if (soilMoisture != VP2Constants::APB_INVALID_SOIL_MOISTURE) {
-            ss << "<entry><key>" << (600 + i) << "</key><value><sensorId>" << (600 + i) << "</sensorId><sensorType>SOIL_MOISTURE</sensorType>";
-            ss << "<measurement xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"soilMoisture\">";
-            ss << soilMoisture << "</measurement></value></entry>";
+            JsonUtils::formatSensorMeasurement(ss, addComma, CurrentWeather::SOIL_MOISTURE_BASE_SENSOR_ID + i, "SOIL_MOISTURE", static_cast<double(soilMoisture));
+            addComma = true;
         }
     }
-    ss << "</soilMoistureSensorEntries>";
-    ss << "</historicalRecord>";
+    ss << "}" << "}'";
     return ss.str();
 }
 }
