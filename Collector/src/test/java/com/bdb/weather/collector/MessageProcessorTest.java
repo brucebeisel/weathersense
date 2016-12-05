@@ -34,12 +34,20 @@ import com.bdb.weather.common.SensorStation;
 import com.bdb.weather.common.SensorStationStatus;
 import com.bdb.weather.common.db.DatabaseUtilities;
 import com.bdb.weather.common.messages.WsParametersMessage;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+
+import com.bdb.weather.collector.messages.SensorStationMessage;
+import com.bdb.weather.common.GsonUtils;
+import com.bdb.weather.common.SensorStationType;
 
 /**
  *
@@ -50,12 +58,12 @@ public class MessageProcessorTest implements WeatherDataWriter, WeatherUploader 
     private static DatabaseUtilities utils;
 
     private static final String INITIALIZE_MESSAGE = CollectorConstants.MESSAGE_TYPE_TOKEN + "=" + CollectorConstants.INITIALIZE_TOKEN;
-    private static final String CURRENT_WEATHER_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><currentWeather><time>2014-05-17 23:10:25</time><indoorTemperature><value>24.88889</value></indoorTemperature><indoorHumidity><value>51</value></indoorHumidity><outdoorTemperature><value>17.27778</value></outdoorTemperature><outdoorHumidity><value>83</value></outdoorHumidity><dewPoint><value>14.44444</value></dewPoint><windChill><value>17.22222</value></windChill><heatIndex><value>17.22222</value></heatIndex><thsw><value>17.22222</value></thsw><wind><speed><value>0</value></speed><direction><value>180</value></direction></wind><windGust><speed><value>1.341124</value></speed><direction><value>180</value></direction></windGust><windSpeed10MinAvg><value>0.4470413</value></windSpeed10MinAvg><windSpeed2MinAvg><value>0.4470413</value></windSpeed2MinAvg><windDir2><value>180</value></windDir2><windDir3><value>202</value></windDir3><windDir4><value>225</value></windDir4><baroPressure><value>1011.412</value></baroPressure><baroTrend>RISING_SLOWLY</baroTrend><rainRate><value>0</value></rainRate><rainToday><value>0</value></rainToday><rain15Minute><value>0</value></rain15Minute><rainHour><value>0</value></rainHour><rain24Hour><value>0</value></rain24Hour><rainMonth><value>0</value></rainMonth><rainWeatherYear><value>147.32</value></rainWeatherYear><solarRadiation><value>0</value></solarRadiation><dayET><value>6.223</value></dayET><monthET><value>100.33</value></monthET><yearET><value>446.532</value></yearET><forecastRule>Increasing clouds with little temperature change.</forecastRule><forecast>PARTLY_CLOUDY</forecast><temperatureSensorEntries><entry><key>100</key><value><sensorId>100</sensorId><sensorType>THERMOMETER</sensorType><measurement xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"temperature\"><value>25.55556</value></measurement></value></entry></temperatureSensorEntries><humiditySensorEntries></humiditySensorEntries><soilMoistureSensorEntries></soilMoistureSensorEntries><leafWetnessSensorEntries></leafWetnessSensorEntries></currentWeather>";
-    private static final String HISTORICAL_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><historicalRecord><time>2014-05-17 23:15:00</time><duration>300</duration><avgOutdoorTemperature><value>17.22222</value></avgOutdoorTemperature><highOutdoorTemperature><value>17.27778</value></highOutdoorTemperature><lowOutdoorTemperature><value>17.16667</value></lowOutdoorTemperature><rainfall><value>0</value></rainfall><highRainfallRate><value>0</value></highRainfallRate><baroPressure><value>1011.378</value></baroPressure><avgSolarRadiation><value>0</value></avgSolarRadiation><indoorTemperature><value>24.88889</value></indoorTemperature><indoorHumidity><value>51</value></indoorHumidity><outdoorHumidity><value>83</value></outdoorHumidity><avgWind><speed><value>0</value></speed><direction><value>180</value></direction></avgWind><highWind><speed><value>0.8940825</value></speed><direction><value>180</value></direction></highWind><windGust><speed><value>1.341124</value></speed><direction><value>180</value></direction></windGust><highSolarRadiation><value>0</value></highSolarRadiation><leafWetnessSensorEntries></leafWetnessSensorEntries><humiditySensorEntries></humiditySensorEntries><temperatureSensorEntries><entry><key>100</key><value><sensorId>100</sensorId><sensorType>THERMOMETER</sensorType><measurement xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"temperature\"><value>25.55556</value></measurement></value></entry></temperatureSensorEntries><soilMoistureSensorEntries></soilMoistureSensorEntries></historicalRecord>";
-    private static final String SENSOR_STATION_STATUS_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><sensorStationStatusMessage><sensorStationStatus><time>2014-05-31 20:25:00</time><sensorStationId>1</sensorStationId><batteryOk>true</batteryOk><linkQuality>98</linkQuality></sensorStationStatus><sensorStationStatus><time>2014-05-31T20:25:00.0000000-07:00</time><sensorStationId>2</sensorStationId><batteryOk>true</batteryOk></sensorStationStatus></sensorStationStatusMessage>";
-    private static final String WEATHER_STATION_PARAMETERS_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><wsParametersMessage><manufacturer>Davis Instruments</manufacturer><model>Vantage Pro 2</model><firmwareDate>Sep 29 2009</firmwareDate><firmwareVersion>1.90</firmwareVersion><location><latitude><value>32.9</value></latitude><longitude><value>-117.1</value></longitude><altitude><value>147828</value></altitude></location><weatherYearStartMonth>7</weatherYearStartMonth><parameters><entry><key>Archive Period</key><value>5</value></entry><entry><key>Wind Cup Size</key><value>Large</value></entry><entry><key>Rain Collector Size</key><value>0.01 inches</value></entry></parameters></wsParametersMessage>";
-    private static final String SENSOR_MESSAGE_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><sensorMessage><sensor><type>THERMOMETER</type><sensorId>7</sensorId></sensor><sensor><type>THERMOMETER</type><sensorId>6</sensorId></sensor><sensor><type>HYGROMETER</type><sensorId>9</sensorId></sensor><sensor><type>HYGROMETER</type><sensorId>8</sensorId></sensor><sensor><type>BAROMETER</type><sensorId>1</sensorId></sensor><sensor><type>ANEMOMETER</type><sensorId>2</sensorId></sensor><sensor><type>RAIN_COLLECTOR</type><sensorId>5</sensorId></sensor><sensor><type>SOLAR_RADIATION</type><sensorId>4</sensorId></sensor><sensor><type>THERMOMETER</type><sensorId>100</sensorId></sensor></sensorMessage>";
-    private static final String SENSOR_STATION_MESSAGE_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><sensorStationMessage><sensorStation><name>Sensor Station - 1</name><type>INTEGRATED_SENSOR_STATION</type><sensorStationId>1</sensorStationId></sensorStation><sensorStation><name>Sensor Station - 2</name><type>TEMPERATURE_ONLY</type><sensorStationId>2</sensorStationId></sensorStation></sensorStationMessage>";
+    private static final String CURRENT_WEATHER_JSON = "current-weather '{\"time\":\"2016-12-04 20:51:04\",\"indoorTemp\":25.0,\"indoorHumidity\":45.0,\"outdoorTemp\":18.0,\"heatIndex\":45.0,\"windChill\":5.0,\"dewPoint\":34.0,\"thsw\":7.0,\"outdoorHumidity\":99.0,\"wind\":{\"speed\":10.0,\"direction\":180.0},\"gust\":{\"speed\":20.0,\"direction\":178.0},\"windSpeed10MinAvg\":11.0,\"windSpeed2MinAvg\":12.0,\"windDir2\":45.0,\"windDir3\":50.0,\"windDir4\":55.0,\"windDir5\":60.0,\"baroPressure\":1001.0,\"baroTrend\":\"STEADY\",\"forecast\":\"SUNNY\",\"forecastRule\":\"Forecast Rule\",\"solarRadiation\":1011.0,\"rainRate\":2.3,\"rain15Minute\":0.02,\"rainHour\":0.06,\"rain24Hour\":1.2,\"rainToday\":1.0,\"rainMonth\":4.3,\"rainWeatherYear\":12.12,\"rainCalendarYear\":10.9,\"stormStart\":\"2016-12-04\",\"stormRain\":1.2,\"dayET\":1.0,\"monthET\":20.0,\"yearET\":300.0,\"soilMoistureSensorEntries\":{\"23\":{\"sensorId\":23,\"sensorType\":\"SOIL_MOISTURE\",\"measurement\":2.0}},\"temperatureSensorEntries\":{\"10\":{\"sensorId\":10,\"sensorType\":\"THERMOMETER\",\"measurement\":28.0},\"20\":{\"sensorId\":20,\"sensorType\":\"LEAF_TEMPERATURE\",\"measurement\":45.0},\"24\":{\"sensorId\":24,\"sensorType\":\"SOIL_TEMPERATURE\",\"measurement\":2.0}},\"humiditySensorEntries\":{\"11\":{\"sensorId\":11,\"sensorType\":\"HYGROMETER\",\"measurement\":99.0}},\"leafWetnessSensorEntries\":{\"22\":{\"sensorId\":22,\"sensorType\":\"LEAF_WETNESS\",\"measurement\":15.0}}}'";
+    private static final String HISTORICAL_JSON = "historical '{\"time\":\"2016-12-04 22:05:30\",\"duration\":300,\"avgOutdoorTemperature\":20.0,\"highOutdoorTemperature\":22.0,\"lowOutdoorTemperature\":18.0,\"outdoorHumidity\":18.0,\"indoorTemperature\":18.0,\"indoorHumidity\":50.0,\"avgWind\":{\"speed\":10.0,\"direction\":180.0},\"highWind\":{\"speed\":12.0,\"direction\":175.0},\"gust\":{\"speed\":14.0,\"direction\":185.0},\"baroPressure\":1001.0,\"avgUvIndex\":8.8,\"avgSolarRadiation\":400.0,\"highSolarRadiation\":500.0,\"evapotranspiration\":0.2,\"rainfall\":0.1,\"highRainfallRate\":1.1,\"temperatureSensorEntries\":{\"100\":{\"sensorId\":100,\"sensorType\":\"THERMOMETER\",\"measurement\":10.0}},\"humiditySensorEntries\":{\"101\":{\"sensorId\":101,\"sensorType\":\"HYGROMETER\",\"measurement\":48.0}},\"leafWetnessSensorEntries\":{\"102\":{\"sensorId\":102,\"sensorType\":\"LEAF_WETNESS\",\"measurement\":15.0}},\"soilMoistureSensorEntries\":{\"103\":{\"sensorId\":103,\"sensorType\":\"SOIL_MOISTURE\",\"measurement\":2.0}}}'";
+    private static final String SENSOR_STATION_MESSAGE_JSON = "sensor-station '{\"sensorStationList\":[{\"name\":\"ISS\",\"type\":\"INTEGRATED_SENSOR_STATION\",\"sensorStationId\":1}]}'";
+    private static final String WEATHER_STATION_PARAMETERS_JSON = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><wsParametersMessage><manufacturer>Davis Instruments</manufacturer><model>Vantage Pro 2</model><firmwareDate>Sep 29 2009</firmwareDate><firmwareVersion>1.90</firmwareVersion><location><latitude><value>32.9</value></latitude><longitude><value>-117.1</value></longitude><altitude><value>147828</value></altitude></location><weatherYearStartMonth>7</weatherYearStartMonth><parameters><entry><key>Archive Period</key><value>5</value></entry><entry><key>Wind Cup Size</key><value>Large</value></entry><entry><key>Rain Collector Size</key><value>0.01 inches</value></entry></parameters></wsParametersMessage>";
+    private static final String SENSOR_MESSAGE_JSON = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><sensorMessage><sensor><type>THERMOMETER</type><sensorId>7</sensorId></sensor><sensor><type>THERMOMETER</type><sensorId>6</sensorId></sensor><sensor><type>HYGROMETER</type><sensorId>9</sensorId></sensor><sensor><type>HYGROMETER</type><sensorId>8</sensorId></sensor><sensor><type>BAROMETER</type><sensorId>1</sensorId></sensor><sensor><type>ANEMOMETER</type><sensorId>2</sensorId></sensor><sensor><type>RAIN_COLLECTOR</type><sensorId>5</sensorId></sensor><sensor><type>SOLAR_RADIATION</type><sensorId>4</sensorId></sensor><sensor><type>THERMOMETER</type><sensorId>100</sensorId></sensor></sensorMessage>";
+    private static final String SENSOR_STATION_STATUS_JSON = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><sensorStationMessage><sensorStation><name>Sensor Station - 1</name><type>INTEGRATED_SENSOR_STATION</type><sensorStationId>1</sensorStationId></sensorStation><sensorStation><name>Sensor Station - 2</name><type>TEMPERATURE_ONLY</type><sensorStationId>2</sensorStationId></sensorStation></sensorStationMessage>";
     private boolean receivedCurrentWeather;
     private boolean receivedHistorical;
     private boolean receivedSensorStationStatus;
@@ -76,6 +84,13 @@ public class MessageProcessorTest implements WeatherDataWriter, WeatherUploader 
     public static void setUpClass() {
         dbcon = DatabaseUtilities.connectToDerby();
         utils = new DatabaseUtilities(dbcon);
+
+        SensorStation ss = new SensorStation(1, SensorStationType.INTEGRATED_SENSOR_STATION, "ISS");
+        SensorStationMessage ssm = new SensorStationMessage(Arrays.asList(ss));
+        Gson gson = GsonUtils.gsonBuilder();
+        String s = gson.toJson(ssm);
+        System.out.println(s);
+
     }
     
     /**
@@ -109,7 +124,7 @@ public class MessageProcessorTest implements WeatherDataWriter, WeatherUploader 
      */
     @Test
     public void testConsumeDataString() throws JAXBException {
-        System.out.println("consumeDataString");
+        System.out.println("Running test consumeDataString...");
         MessageProcessor instance = new MessageProcessor("jdbc:derby:memory:weathersense24;create=true", "", "", this, this);
         LocalDateTime expectedTime = LocalDate.now().minusYears(1).atStartOfDay();
         String expResult = DateTimeFormatter.ofPattern(CollectorConstants.NEWEST_RECORD_DATE_FORMAT).format(expectedTime);
@@ -125,51 +140,58 @@ public class MessageProcessorTest implements WeatherDataWriter, WeatherUploader 
      * @throws JAXBException
      */
     @Test
-    public void testConsumeDataXML() throws JAXBException {
-        System.out.println("consumeDataXML");
-        String s = "<?xml bad XML";
+    public void testConsumeDataJSON() {
+        System.out.println("Running test consumeDataJSON...");
         MessageProcessor instance = new MessageProcessor("jdbc:derby:memory:weathersense24;create=true", "", "", this, this);
-        String result = instance.consumeMessages(Arrays.asList(s));
-        assertNull(result);
+        try {
+            String s = "current-weather '{ xsf bad JSON :: {{{}'";
+            String result = instance.consumeMessages(Arrays.asList(s));
+            assertNull(result);
+        }
+        catch(JsonParseException e) {
+            System.out.println("Caught expected exception" + e.getMessage());
+        }
 
         System.out.println("Current Weather");
         receivedCurrentWeather = false;
-        instance.consumeMessages(Arrays.asList(CURRENT_WEATHER_XML));
+        instance.consumeMessages(Arrays.asList(CURRENT_WEATHER_JSON));
         assertTrue(receivedCurrentWeather);
 
         System.out.println("Historical");
         receivedHistorical = false;
-        instance.consumeMessages(Arrays.asList(HISTORICAL_XML));
+        instance.consumeMessages(Arrays.asList(HISTORICAL_JSON));
         assertTrue(receivedHistorical);
 
+        System.out.println("Sensor Station Message");
+        receivedSensorStationMessage = false;
+        instance.consumeMessages(Arrays.asList(SENSOR_STATION_MESSAGE_JSON));
+        assertTrue(receivedSensorStationMessage);
+
+        /*
         System.out.println("Sensor Station Status");
         receivedSensorStationStatus = false;
-        instance.consumeMessages(Arrays.asList(SENSOR_STATION_STATUS_XML));
+        instance.consumeMessages(Arrays.asList(SENSOR_STATION_STATUS_JSON));
         assertTrue(receivedSensorStationStatus);
 
         System.out.println("Weather Station Parameters");
         receivedWeatherStationParamters = false;
-        instance.consumeMessages(Arrays.asList(WEATHER_STATION_PARAMETERS_XML));
+        instance.consumeMessages(Arrays.asList(WEATHER_STATION_PARAMETERS_JSON));
         assertTrue(receivedWeatherStationParamters);
 
         System.out.println("Sensor Message");
         receivedSensorMessage = false;
-        instance.consumeMessages(Arrays.asList(SENSOR_MESSAGE_XML));
+        instance.consumeMessages(Arrays.asList(SENSOR_MESSAGE_JSON));
         assertTrue(receivedSensorMessage);
 
-        System.out.println("Sensor Station Message");
-        receivedSensorStationMessage = false;
-        instance.consumeMessages(Arrays.asList(SENSOR_STATION_MESSAGE_XML));
-        assertTrue(receivedSensorStationMessage);
+        */
     }
 
     /**
      *
-     * @throws JAXBException
      */
     @Test
-    public void testFindToken() throws JAXBException {
-        System.out.println("findToken");
+    public void testFindToken() {
+        System.out.println("Running test findToken...");
         String s = "Hello World\nMore Stuff\n";
         MessageProcessor instance = new MessageProcessor("jdbc:derby:memory:weathersense24;create=true", "", "", this, this);
         int expResult = 11;

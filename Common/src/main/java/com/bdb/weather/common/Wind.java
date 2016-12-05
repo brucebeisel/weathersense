@@ -19,8 +19,6 @@ package com.bdb.weather.common;
 import java.io.Serializable;
 import java.util.Objects;
 
-import javax.xml.bind.annotation.XmlElement;
-
 import com.bdb.weather.common.measurement.Heading;
 import com.bdb.weather.common.measurement.Speed;
 
@@ -31,9 +29,7 @@ import com.bdb.weather.common.measurement.Speed;
  */
 public class Wind implements Serializable {
     private static final long serialVersionUID = -8433403188400671214L;
-    @XmlElement
     private final Speed speed;
-    @XmlElement
     private final Heading direction;
 
     /**

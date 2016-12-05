@@ -16,27 +16,14 @@
  */
 package com.bdb.weather.common;
 
-import java.io.StringWriter;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-
 import com.bdb.weather.common.measurement.Temperature;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
-import com.bdb.weather.common.json.DurationDeserializer;
-import com.bdb.weather.common.json.DurationSerializer;
-import com.bdb.weather.common.json.LocalDateDeserializer;
-import com.bdb.weather.common.json.LocalDateSerializer;
-import com.bdb.weather.common.json.LocalDateTimeDeserializer;
-import com.bdb.weather.common.json.LocalDateTimeSerializer;
-import com.bdb.weather.common.json.MeasurementDeserializer;
-import com.bdb.weather.common.json.MeasurementSerializer;
 import com.bdb.weather.common.measurement.AngularMeasurement;
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Distance;
@@ -44,11 +31,9 @@ import com.bdb.weather.common.measurement.Heading;
 import com.bdb.weather.common.measurement.Humidity;
 import com.bdb.weather.common.measurement.LeafWetness;
 import com.bdb.weather.common.measurement.Pressure;
-import com.bdb.weather.common.measurement.Rainfall;
 import com.bdb.weather.common.measurement.SoilMoisture;
 import com.bdb.weather.common.measurement.SolarRadiation;
 import com.bdb.weather.common.measurement.Speed;
-import com.bdb.weather.common.measurement.UvIndex;
 import com.bdb.weather.common.messages.WsParametersMessage;
 
 /**
@@ -57,40 +42,7 @@ import com.bdb.weather.common.messages.WsParametersMessage;
  */
 public class JsonTest {
     public static void main(String args[]) {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(AngularMeasurement.class, new MeasurementSerializer());
-        gsonBuilder.registerTypeAdapter(AngularMeasurement.class, new MeasurementDeserializer());
-        gsonBuilder.registerTypeAdapter(Depth.class, new MeasurementSerializer());
-        gsonBuilder.registerTypeAdapter(Depth.class, new MeasurementDeserializer());
-        gsonBuilder.registerTypeAdapter(Distance.class, new MeasurementSerializer());
-        gsonBuilder.registerTypeAdapter(Distance.class, new MeasurementDeserializer());
-        gsonBuilder.registerTypeAdapter(Heading.class, new MeasurementSerializer());
-        gsonBuilder.registerTypeAdapter(Heading.class, new MeasurementDeserializer());
-        gsonBuilder.registerTypeAdapter(Humidity.class, new MeasurementSerializer());
-        gsonBuilder.registerTypeAdapter(Humidity.class, new MeasurementDeserializer());
-        gsonBuilder.registerTypeAdapter(LeafWetness.class, new MeasurementSerializer());
-        gsonBuilder.registerTypeAdapter(LeafWetness.class, new MeasurementDeserializer());
-        gsonBuilder.registerTypeAdapter(Pressure.class, new MeasurementSerializer());
-        gsonBuilder.registerTypeAdapter(Pressure.class, new MeasurementDeserializer());
-        gsonBuilder.registerTypeAdapter(Rainfall.class, new MeasurementSerializer());
-        gsonBuilder.registerTypeAdapter(Rainfall.class, new MeasurementDeserializer());
-        gsonBuilder.registerTypeAdapter(SoilMoisture.class, new MeasurementSerializer());
-        gsonBuilder.registerTypeAdapter(SoilMoisture.class, new MeasurementDeserializer());
-        gsonBuilder.registerTypeAdapter(SolarRadiation.class, new MeasurementSerializer());
-        gsonBuilder.registerTypeAdapter(SolarRadiation.class, new MeasurementDeserializer());
-        gsonBuilder.registerTypeAdapter(Speed.class, new MeasurementSerializer());
-        gsonBuilder.registerTypeAdapter(Speed.class, new MeasurementDeserializer());
-        gsonBuilder.registerTypeAdapter(Temperature.class, new MeasurementSerializer());
-        gsonBuilder.registerTypeAdapter(Temperature.class, new MeasurementDeserializer());
-        gsonBuilder.registerTypeAdapter(UvIndex.class, new MeasurementSerializer());
-        gsonBuilder.registerTypeAdapter(UvIndex.class, new MeasurementDeserializer());
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer());
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer());
-        gsonBuilder.registerTypeAdapter(LocalDate.class, new LocalDateSerializer());
-        gsonBuilder.registerTypeAdapter(LocalDate.class, new LocalDateDeserializer());
-        gsonBuilder.registerTypeAdapter(Duration.class, new DurationSerializer());
-        gsonBuilder.registerTypeAdapter(Duration.class, new DurationDeserializer());
-        Gson gson = gsonBuilder.create();
+        Gson gson = GsonUtils.gsonBuilder();
         CurrentWeather cw = new CurrentWeather();
         cw.setTime(LocalDateTime.now().withNano(0));
         cw.setOutdoorTemperature(new Temperature(18.0));
@@ -139,19 +91,32 @@ public class JsonTest {
         HistoricalRecord h = new HistoricalRecord(LocalDateTime.now());
         h.setDuration(Duration.ofSeconds(300));
         h.setAvgOutdoorTemperature(new Temperature(20));
+        h.setHighOutdoorTemperature(new Temperature(22));
+        h.setLowOutdoorTemperature(new Temperature(18));
+        h.setOutdoorHumidity(new Humidity(18));
+        h.setIndoorTemperature(new Temperature(18));
+        h.setIndoorHumidity(new Humidity(50));
+        h.setAvgWind(new Wind(new Speed(10.0), new Heading(180)));
+        h.setHighWind(new Wind(new Speed(12.0), new Heading(175)));
+        h.setWindGust(new Wind(new Speed(14.0), new Heading(185)));
+        h.setBaroPressure(new Pressure(1001));
+        h.setAvgUvIndex(8.8F);
+        //h.setHighUvIndex(UvIndex.getUvIndex(7));
+        h.setAvgSolarRadiation(new SolarRadiation(400.0));
+        h.setHighSolarRadiation(new SolarRadiation(500.0));
+        h.setEvapotranspiration(new Depth(.2));
+        h.setRainfall(new Depth(.1));
+        h.setHighRainfallRate(new Depth(1.1));
+
+        h.setTemperatureForSensor(100, new Temperature(10.0));
+        h.setHumidityForSensor(101, new Humidity(48.0));
+        h.setLeafWetnessForSensor(102, LeafWetness.MAX_LEAF_WETNESS);
+        h.setSoilMoistureForSensor(103, new SoilMoisture(2));
+
+
         String hjson = gson.toJson(h);
         System.out.println("" + hjson.length() + " " + hjson);
 
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(com.bdb.weather.common.CurrentWeather.class);
-            Marshaller marshaller = jaxbContext.createMarshaller();
-            StringWriter sw = new StringWriter();
-            marshaller.marshal(cw, sw);
-            System.out.println("" + sw.getBuffer().length() + " " +sw.getBuffer());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
         CurrentWeather cw2 = gson.fromJson(json, CurrentWeather.class);
         System.out.println(cw);
         System.out.println(cw2);
@@ -169,5 +134,8 @@ public class JsonTest {
         WsParametersMessage msg2 = gson.fromJson(json3, WsParametersMessage.class);
         equal = msg.equals(msg2);
         System.out.println("Msg Equals: " + equal);
+
+        SensorStationMessage ssm;
+        SensorStation ss = new SensorStation(1, SensorStationType.INTEGRATED_SENSOR_STATION, "ISS");
     }
 }

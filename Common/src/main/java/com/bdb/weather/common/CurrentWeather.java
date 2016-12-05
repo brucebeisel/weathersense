@@ -16,9 +16,6 @@
  */
 package com.bdb.weather.common;
 
-import com.bdb.weather.common.xml.LocalDateTimeAdapter;
-import com.bdb.weather.common.xml.LocalDateAdapter;
-
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,10 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Heading;
@@ -52,7 +45,6 @@ import com.bdb.weather.common.measurement.UvIndex;
  * @since 1.0
  * 
  */
-@XmlRootElement
 public class CurrentWeather implements Serializable {
     private static final long serialVersionUID = -1292217095067065693L;
 
@@ -94,16 +86,9 @@ public class CurrentWeather implements Serializable {
     private Depth monthET;
     private Depth yearET;
 
-    @XmlElement(name="soilMoistureSensorValues", type=MeasurementEntry.class)
     private final Map<Integer,MeasurementEntry<SoilMoisture>> soilMoistureSensorEntries = new TreeMap<>();
-
-    @XmlElement(name="temperatureSensorValues", type=MeasurementEntry.class)
     private final Map<Integer,MeasurementEntry<Temperature>> temperatureSensorEntries = new TreeMap<>();
-    
-    @XmlElement(name="humiditySensorValues", type=MeasurementEntry.class)
     private final Map<Integer,MeasurementEntry<Humidity>> humiditySensorEntries = new TreeMap<>();
-
-    @XmlElement(name="leafWetnessSensorValues", type=MeasurementEntry.class)
     private final Map<Integer,MeasurementEntry<LeafWetness>> leafWetnessSensorEntries = new TreeMap<>();
     
     /**
@@ -117,7 +102,6 @@ public class CurrentWeather implements Serializable {
      * 
      * @param time The local time
      */
-    @XmlJavaTypeAdapter(type=java.time.LocalDateTime.class, value=LocalDateTimeAdapter.class)
     public void setTime(LocalDateTime time) {
         this.time = time;
     }
@@ -736,7 +720,6 @@ public class CurrentWeather implements Serializable {
      *
      * @param stormStart The start date of the current storm or null if there is no storm
      */
-    @XmlJavaTypeAdapter(type=java.time.LocalDate.class, value=LocalDateAdapter.class)
     public void setStormStart(LocalDate stormStart) {
         this.stormStart = stormStart;
     }

@@ -27,8 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBException;
-
 import com.bdb.weather.common.db.DatabaseConstants;
 
 /**
@@ -109,7 +107,7 @@ final class WeatherSenseCollector {
             DataMonitor dataMonitor = new DataMonitor(dbUrl, DatabaseConstants.DATABASE_USER, DatabaseConstants.DATABASE_PASSWORD, doppler, weatherUnderground, writer);
 
             //
-            // Start the socket reader for the XML interface
+            // Start the socket reader for the JSON interface
             //
             if (!writer.init(socketReaderThread, findMissingData)) {
                 logger.log(Level.SEVERE, "Failed to initialize database writer");
@@ -118,7 +116,7 @@ final class WeatherSenseCollector {
             dataMonitor.init();
             socketReaderThread.start();
         }
-        catch (IOException | SecurityException | NumberFormatException | SQLException | JAXBException e) {
+        catch (IOException | SecurityException | NumberFormatException | SQLException e) {
             logger.log(Level.SEVERE, "Exception during initialization. Exiting", e);
             System.exit(2);
         }

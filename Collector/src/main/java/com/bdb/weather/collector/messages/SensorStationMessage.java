@@ -19,10 +19,6 @@ package com.bdb.weather.collector.messages;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import com.bdb.weather.common.SensorStation;
 
@@ -31,10 +27,7 @@ import com.bdb.weather.common.SensorStation;
  * 
  * @author Bruce
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
 public class SensorStationMessage {
-    @XmlElement(name="sensorStation", type=SensorStation.class)
     private final List<SensorStation> sensorStationList;
     
     /**

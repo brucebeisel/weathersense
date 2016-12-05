@@ -66,9 +66,9 @@ interface WeatherDataWriter {
      * Set the current weather.
      * 
      * @param weather The POJO representation of the current weather
-     * @param xml The XML representation of the current weather
+     * @param json The JSON representation of the current weather
      */
-    public void setCurrentWeather(CurrentWeather weather, String xml);
+    public void setCurrentWeather(CurrentWeather weather, String json);
 
     /**
      * Request that the writer connect to the database.

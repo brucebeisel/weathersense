@@ -20,7 +20,6 @@ import com.bdb.weather.collector.messages.SensorStationMessage;
 import com.bdb.weather.collector.messages.SensorStationStatusMessage;
 import com.bdb.weather.collector.messages.SensorMessage;
 
-import java.io.StringReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,10 +28,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 
+import com.bdb.util.StringUtils;
 import com.bdb.util.jdbc.DBConnection;
 
 import com.bdb.weather.common.CurrentWeather;
@@ -41,6 +40,7 @@ import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.common.messages.WeatherSenseMessage;
 import com.bdb.weather.common.messages.WsParametersMessage;
 import com.bdb.weather.collector.socket.SocketDataProcessor;
+import com.bdb.weather.common.GsonUtils;
 
 /**
  * Process messages from the weather console driver.
@@ -51,11 +51,11 @@ final class MessageProcessor implements SocketDataProcessor {
     private final char MESSAGE_TERMINATOR = '\n';
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(CollectorConstants.NEWEST_RECORD_DATE_FORMAT);
     private final DateTimeFormatter dateTimeFormatter = CollectorConstants.dateTimeFormatter();
-    private final Unmarshaller unmarshaller;
     private final WeatherDataWriter writer;
     private final DBConnection connection;
     private final HistoryTable historyTable;
     private final WeatherUploader weatherUploader;
+    private final Gson gson;
     private static final Logger logger = Logger.getLogger(MessageProcessor.class.getName());
 
     /**
@@ -66,22 +66,11 @@ final class MessageProcessor implements SocketDataProcessor {
      * @param dbPassword The password for the database user
      * @param writer The database writer
      * @param uploader The object that uploads weather to the Internet
-     * @throws JAXBException An exception occurred while de-marshaling a message
      */
-    public MessageProcessor(String dbUrl, String dbUser, String dbPassword, WeatherDataWriter writer, WeatherUploader uploader) throws JAXBException {
+    public MessageProcessor(String dbUrl, String dbUser, String dbPassword, WeatherDataWriter writer, WeatherUploader uploader) {
         this.writer = writer;
-        JAXBContext jaxbContext = JAXBContext.newInstance(com.bdb.weather.common.CurrentWeather.class,
-                                                          com.bdb.weather.common.measurement.LeafWetness.class,
-                                                          com.bdb.weather.common.measurement.SoilMoisture.class,
-                                                          com.bdb.weather.common.messages.WsParametersMessage.class,
-                                                          com.bdb.weather.collector.messages.SensorStationMessage.class,
-                                                          com.bdb.weather.collector.messages.SensorStationStatusMessage.class,
-                                                          com.bdb.weather.collector.messages.SensorMessage.class,
-                                                          com.bdb.weather.common.HistoricalRecord.class);
-        unmarshaller = jaxbContext.createUnmarshaller();
-
+        gson = GsonUtils.gsonBuilder();
         connection = new DBConnection(dbUrl, dbUser, dbPassword);
-
         historyTable = new HistoryTable(connection);
         weatherUploader = uploader;
     }
@@ -96,14 +85,19 @@ final class MessageProcessor implements SocketDataProcessor {
     public String consumeMessages(List<String> messages) {
         List<HistoricalRecord> historicalRecords = new ArrayList<>();
         String response = null;
+
         for (String s : messages) {
-            logger.log(Level.FINER, "Processing command: {0}", s);
+            logger.log(Level.FINER, "Processing message: {0}", s);
             
-            if (s.startsWith("<?xml"))
-                processXmlMessage(s, historicalRecords);
+            List<String> tokens = StringUtils.tokenize(s);
+            //
+            // A 2 token message with the second token starting with a "}" is
+            // a JSON message.
+            //
+            if (tokens.size() == 2 && tokens.get(1).charAt(0) == '{')
+                processJsonMessage(tokens.get(0), tokens.get(1), historicalRecords);
             else
                 response = processTextMessage(s);
-
         }
 
         if (!historicalRecords.isEmpty()) {
@@ -174,48 +168,53 @@ final class MessageProcessor implements SocketDataProcessor {
     }
 
     /**
-     * Process an XML message.
+     * Process a JSON message.
      * 
-     * @param s The XML message
-     * 
-     * @return The response to send back or null if there is no response
+     * @param messageName The message name the determines the JSON content
+     * @param json The JSON text
      */
-    private void processXmlMessage(String s, List<HistoricalRecord> historicalRecords) {
-        try {
-            logger.fine("Received XML message");
-            logger.log(Level.FINER, "XML message {0}", s.substring(0, 10));
-            Object msg = unmarshaller.unmarshal(new StringReader(s));
-            if (msg instanceof SensorMessage) {
+    private void processJsonMessage(String messageName, String json, List<HistoricalRecord> historicalRecords) throws JsonParseException {
+        logger.fine("Received JSON message: " + messageName);
+
+        switch (messageName) {
+            case "sensor":
                 logger.fine("&&&&&&&&&&&&& Sensor Message &&&&&&&&&&&&&&&&&");
-                writer.updateSensorList(((SensorMessage)msg).getSensorList());
-            }
-            else if (msg instanceof HistoricalRecord) {
-                HistoricalRecord rec = (HistoricalRecord)msg;
+                SensorMessage sensorMessage = gson.fromJson(json, SensorMessage.class);
+                writer.updateSensorList(sensorMessage.getSensorList());
+                break;
+
+            case "historical":
+                HistoricalRecord rec = gson.fromJson(json, HistoricalRecord.class);
                 historicalRecords.add(rec);
-            }
-            else if (msg instanceof CurrentWeather) {
+                break;
+
+            case "current-weather":
                 logger.fine("################ Received Current Weather ################");
-                CurrentWeather cw = (CurrentWeather)msg;
-                writer.setCurrentWeather(cw, s);
+                CurrentWeather cw = gson.fromJson(json, CurrentWeather.class);
+                writer.setCurrentWeather(cw, json);
                 weatherUploader.uploadCurrentWeather(cw);
-            }
-            else if (msg instanceof WsParametersMessage) {
+                break;
+
+            case "weather-station-parameters":
                 logger.fine("**************** Received Weather Station Parameters **************");
-                writer.setWeatherStationParameters((WsParametersMessage)msg);
-            }
-            else if (msg instanceof SensorStationMessage) {
+                WsParametersMessage wsp = gson.fromJson(json, WsParametersMessage.class);
+                writer.setWeatherStationParameters(wsp);
+                break;
+
+            case "sensor-station":
                 logger.fine("$$$$$$$$$$$$$$$$$$ Sensor Station Message $$$$$$$$$$$$$$$$");
-                writer.updateSensorStationList(((SensorStationMessage)msg).getSensorStationList());
-            }
-            else if (msg instanceof SensorStationStatusMessage) {
+                SensorStationMessage ssm = gson.fromJson(json, SensorStationMessage.class);
+                writer.updateSensorStationList(ssm.getSensorStationList());
+                break;
+
+            case "sensor-station-status":
                 logger.fine("!!!!!!!!!!!!! Sensor Station Status Message !!!!!!!!!!!!!!");
-                writer.updateSensorStationStatus(((SensorStationStatusMessage)msg).getSensorStationStatusList());
-            }
-            else
-                logger.log(Level.SEVERE, "Received unknown message type {0}", msg.getClass().getName());
-        }
-        catch (JAXBException ex) {
-            logger.log(Level.SEVERE, "Failed to unmarshal XML message", ex);
+                SensorStationStatusMessage sssm = gson.fromJson(json, SensorStationStatusMessage.class);
+                writer.updateSensorStationStatus(sssm.getSensorStationStatusList());
+                break;
+
+            default:
+                logger.log(Level.SEVERE, "Received unknown message type {0}", messageName);
         }
     }
 }

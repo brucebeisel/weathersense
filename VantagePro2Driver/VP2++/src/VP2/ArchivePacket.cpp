@@ -101,7 +101,7 @@ ArchivePacket::extractDate() const {
 std::string
 ArchivePacket::formatMessage() const {
     ostringstream ss;
-    ss << "archiveMessage '{";
+    ss << "historical '{";
     DateTime archiveTime = extractDate();
     ss << "\"time\":" << Weather::formatDateTime(archiveTime) << ",";
     ss << "\"duration\":" << (archivePeriod * 60) << ",";

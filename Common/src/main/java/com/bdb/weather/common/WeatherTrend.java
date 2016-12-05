@@ -16,13 +16,10 @@
  */
 package com.bdb.weather.common;
 
-import javax.xml.bind.annotation.XmlEnum;
-
 /**
  *
  * @author bruce
  */
-@XmlEnum
 public enum WeatherTrend {
 
     /**

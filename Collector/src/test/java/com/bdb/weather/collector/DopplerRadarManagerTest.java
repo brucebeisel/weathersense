@@ -142,7 +142,7 @@ public class DopplerRadarManagerTest implements WeatherDataWriter {
     }
 
     @Override
-    public void setCurrentWeather(CurrentWeather weather, String xml) {
+    public void setCurrentWeather(CurrentWeather weather, String json) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

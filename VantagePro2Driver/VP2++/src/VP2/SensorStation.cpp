@@ -69,7 +69,7 @@ SensorStation::setLinkQuality(int value) {
 string
 SensorStation::formatSensorStationMessage(const vector<SensorStation> & list) {
     ostringstream ss;
-    ss << "sensorStationMessage '{";
+    ss << "sensor-station '{";
     for (vector<SensorStation>::const_iterator it = list.begin(); it != list.end(); ++it) {
         ss << "\"sensorStation\":{";
         ss << "\"name\":\"Sensor Station - "<< it->sensorIndex << "\","
@@ -86,7 +86,7 @@ string
 SensorStation::formatSensorStationStatusMessage(const vector<SensorStation> & list, DateTime time) {
     ostringstream ss;
     
-    ss << "sensorStationStatusMessage '{";
+    ss << "sensor-station-status '{";
 
     bool addComma = false;
     for (vector<SensorStation>::const_iterator it = list.begin(); it != list.end(); ++it) {

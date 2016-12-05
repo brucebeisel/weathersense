@@ -95,12 +95,11 @@ Sensor::detectSensors(LoopPacket loop, vector<Sensor> & sensors) {
 string
 Sensor::formatMessage(const vector<Sensor> & list) {
     ostringstream sb;
-    sb << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-    sb << "<sensorMessage>";
+    sb << "sensor '{";
     for (vector<Sensor>::const_iterator it = list.begin() ; it != list.end(); ++it) {
-        sb << "<sensor><type>" << SENSOR_NAMES[it->sensorType] << "</type><sensorId>" << it->sensorId << "</sensorId></sensor>";
+        sb << "\"sensor\":{\"type\":\"" << SENSOR_NAMES[it->sensorType] << "\",\"sensorId\":" << it->sensorId << "}";
     }
-    sb << "</sensorMessage>";
+    sb << "}";
 
     return sb.str();
 }

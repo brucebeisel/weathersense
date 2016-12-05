@@ -356,9 +356,9 @@ public class CollectorDbWriterTest {
     public void testSetCurrentWeather() {
         System.out.println("setCurrentWeather");
         CurrentWeather weather = null;
-        String xml = "";
+        String json = "";
         CollectorDbWriter instance = null;
-        instance.setCurrentWeather(weather, xml);
+        instance.setCurrentWeather(weather, json);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -370,9 +370,9 @@ public class CollectorDbWriterTest {
     public void testHandleUpdateCurrentWeather() {
         System.out.println("handleUpdateCurrentWeather");
         CurrentWeather weather = null;
-        String xml = "";
+        String json = "";
         CollectorDbWriter instance = null;
-        instance.handleUpdateCurrentWeather(weather, xml);
+        instance.handleUpdateCurrentWeather(weather, json);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

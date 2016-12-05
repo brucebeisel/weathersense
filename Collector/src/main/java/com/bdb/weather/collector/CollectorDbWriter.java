@@ -354,11 +354,11 @@ final class CollectorDbWriter implements WeatherDataWriter, Runnable {
      * Set the current weather.
      *
      * @param weather The current weather data
-     * @param xml The XML version of the current weather
+     * @param json The JSON version of the current weather
      */
     @Override
-    public void setCurrentWeather(CurrentWeather weather, String xml) {
-        executor.execute(() -> handleUpdateCurrentWeather(weather, xml));
+    public void setCurrentWeather(CurrentWeather weather, String json) {
+        executor.execute(() -> handleUpdateCurrentWeather(weather, json));
     }
 
     /**
@@ -428,11 +428,11 @@ final class CollectorDbWriter implements WeatherDataWriter, Runnable {
      * Handle a current weather update
      *
      * @param weather The current weather data
-     * @param xml The XML string received from the console driver
+     * @param json The JSON string received from the console driver
      */
-    public void handleUpdateCurrentWeather(CurrentWeather weather, String xml) {
+    public void handleUpdateCurrentWeather(CurrentWeather weather, String json) {
         logger.log(Level.INFO, "Received current weather at time {0}", CollectorConstants.dateTimeFormatter().format(weather.getTime()));
-        cwPublisher.sendCurrentWeather(xml);
+        cwPublisher.sendCurrentWeather(json);
 
         updateStorm(weather.getStormStart(), weather.getStormRain());
     }

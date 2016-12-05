@@ -20,11 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import com.bdb.weather.common.Sensor;
 
 /**
@@ -32,10 +27,7 @@ import com.bdb.weather.common.Sensor;
  * 
  * @author Bruce
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement
 public class SensorMessage {
-    @XmlElement(name="sensor", type=Sensor.class)
     private final List<Sensor> sensorList;
     
     /**

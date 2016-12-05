@@ -31,7 +31,7 @@ public final class CollectorConstants {
     public static final int COLLECTOR_PORT = 11461;
     
     /**
-     * The message type token used in the non-XML protocol with the collector.
+     * The message type token used in the non-JSON protocol with the collector.
      */
     public static final String MESSAGE_TYPE_TOKEN = "message_type";
     /**

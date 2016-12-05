@@ -64,13 +64,13 @@ final class CurrentWeatherPublisher {
     }
     
     /**
-     * Send the current weather as XML on the Multicast socket.
+     * Send the current weather as JSON on the Multicast socket.
      * 
-     * @param xml The current weather XML
+     * @param json The current weather JSON
      */
-    public void sendCurrentWeather(String xml) {
+    public void sendCurrentWeather(String json) {
         try {
-            byte[] b = xml.getBytes();
+            byte[] b = json.getBytes();
             DatagramPacket packet = new DatagramPacket(b, b.length, group, port);
             socket.send(packet);
         }

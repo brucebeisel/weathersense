@@ -127,7 +127,7 @@ ParametersMessage::setRainCollectorSize(Rainfall value) {
 string
 ParametersMessage::formatMessage() const {
     ostringstream ss;
-    ss << "wsParametersMessage '{";
+    ss << "weather-station-parameters '{";
     ss << "\"manufacturer\":\"" << MANUFACTURER << "\",";
     ss << "\"model\":\"" << MODEL << "</model>";
     ss << "\"firmwareDate\":\"" << firmwareDate << "\",";
