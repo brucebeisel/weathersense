@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 
 import com.bdb.util.Pair;
 import com.bdb.util.jdbc.DBConnection;
@@ -51,6 +51,7 @@ import com.bdb.weather.display.CurrentWeatherProcessor;
 import com.bdb.weather.display.Hideable;
 import com.bdb.weather.display.RainBucket;
 import com.bdb.weather.display.RainPlot;
+import com.bdb.weather.display.Refreshable;
 import com.bdb.weather.display.StageUtilities;
 import com.bdb.weather.display.WeatherDataMgr;
 import com.bdb.weather.display.preferences.UnitsPreferences;
@@ -61,7 +62,7 @@ import com.bdb.weather.display.preferences.UnitsPreferences;
  * @author Bruce
  *
  */
-public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcessor, Hideable  {
+public class CurrentWeatherCharts extends HBox implements CurrentWeatherProcessor, Hideable, Refreshable  {
     @FXML private Barometer               barometer;
     @FXML private WindGauge               windGauge;
     @FXML private Hygrometer              indoorHumidity;
@@ -212,8 +213,6 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         // TODO check the age of the current weather. if it is more that about 20 minutes old, ignore it
         LocalDateTime now = LocalDateTime.now();
         
-        forecastRule.setText("Forecast: " + cw.getForecastRule());
-        
         //
         // TODO: All this logic should be in the collector so that there are no null values
         // when we get here.
@@ -231,6 +230,11 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         
         rainPlot.setRainData(rainList);
 
+        if (cw == null)
+            return;
+
+        forecastRule.setText("Forecast: " + cw.getForecastRule());
+        
         //
         // Find the indoor and outdoor humidity for up to an hour ago
         //
@@ -339,5 +343,10 @@ public class CurrentWeatherCharts extends VBox implements CurrentWeatherProcesso
         catch (SQLException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Override
+    public void refresh() {
+        updateCurrentWeather(null);
     }
 }

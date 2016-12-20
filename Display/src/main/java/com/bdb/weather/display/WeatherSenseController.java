@@ -20,6 +20,9 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import javafx.fxml.FXML;
@@ -63,17 +66,27 @@ import com.bdb.weather.display.summary.YearlySummariesPanel;
  * @author bruce
  */
 public class WeatherSenseController implements ViewLauncher, CurrentWeatherSubscriber.CurrentWeatherHandler {
+    private static final int REFRESH_INTERVAL = 30;
     private WeatherStation ws;
     private DBConnection connection;
     private Stage topLevelStage;
     private final CurrentWeatherSubscriber subscriber;
     private final List<CurrentWeatherProcessor> cwpList = new ArrayList<>();
     private final UserPreferences prefs = UserPreferences.getInstance();
+    private final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
+    private final List<Refreshable> refreshList = new ArrayList<>();
     private static final Logger logger = Logger.getLogger(WeatherSenseController.class.getName());
 
     @SuppressWarnings("LeakingThisInConstructor")
     public WeatherSenseController() {
         subscriber = CurrentWeatherSubscriber.createSubscriber(this);
+	timer.scheduleAtFixedRate(() -> {
+            WeatherDataMgr.getInstance().refreshData();
+	    logger.info("Refreshing screens");
+	    refreshList.forEach((refresh) -> {
+                Platform.runLater(() -> refresh.refresh());
+            });
+	}, 0, REFRESH_INTERVAL, TimeUnit.SECONDS);
     }
 
     public void setData(WeatherStation ws, DBConnection connection, Stage stage) {
@@ -84,6 +97,7 @@ public class WeatherSenseController implements ViewLauncher, CurrentWeatherSubsc
 
     public void stop() {
 	subscriber.requestExit();
+        timer.shutdownNow();
     }
 
     @Override
@@ -109,6 +123,11 @@ public class WeatherSenseController implements ViewLauncher, CurrentWeatherSubsc
 
         if (root instanceof Hideable) {
             stage.setOnHidden((event) -> ((Hideable)((Window)event.getSource()).getScene().getRoot()).hide());
+        }
+
+        if (root instanceof Refreshable) {
+            System.out.println("Adding refreshable");
+            refreshList.add((Refreshable)root);
         }
 
         if (!modal)

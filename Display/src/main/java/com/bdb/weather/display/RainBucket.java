@@ -29,6 +29,7 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 
@@ -259,7 +260,7 @@ public final class RainBucket extends Canvas {
 
         if (origFont == null) {
             origFont = gc.getFont();
-            //defaultFont = Font.font(origFont.getFamily(), FontWeight.BOLD, origFont.getSize());
+            defaultFont = Font.font(origFont.getFamily(), FontWeight.BOLD, origFont.getSize());
             defaultFont = origFont;
         }
 
@@ -281,10 +282,10 @@ public final class RainBucket extends Canvas {
         // TODO Determine why the if below was commented out
         //if (actualSize.width < PREFERRED_SIZE.width || actualSize.height < PREFERRED_SIZE.height)
         //{
-        double wscale = actualSize.getWidth() / PREFERRED_SIZE.getWidth();
-        double hscale = actualSize.getHeight() / PREFERRED_SIZE.getHeight();
-        double scale = Math.min(wscale, hscale);
-        gc.scale(scale, scale);
+        //double wscale = actualSize.getWidth() / PREFERRED_SIZE.getWidth();
+        //double hscale = actualSize.getHeight() / PREFERRED_SIZE.getHeight();
+        //double scale = Math.min(wscale, hscale);
+        //gc.scale(scale, scale);
         //}
 
         //

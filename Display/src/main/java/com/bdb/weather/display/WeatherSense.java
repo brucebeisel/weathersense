@@ -49,8 +49,6 @@ public class WeatherSense extends Application {
     private DBConnection connection;
     private WeatherStationTable stationTable;
     private WeatherStation ws;
-    private final List<Refreshable> refreshList = new ArrayList<>();
-    private ScheduledExecutorService timer;
     private WeatherSenseController controller;
     private String databaseUrl;
     private static final Logger logger = Logger.getLogger(WeatherSense.class.getName());
@@ -63,7 +61,7 @@ public class WeatherSense extends Application {
 	else
 	    databaseHost = DatabaseConstants.DATABASE_HOST;
 
-        databaseUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, databaseHost, DatabaseConstants.DATABASE_PORT, DatabaseConstants.DATABASE_NAME);
+        databaseUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, DatabaseConstants.DATABASE_SERVER, databaseHost, DatabaseConstants.DATABASE_PORT, DatabaseConstants.DATABASE_NAME);
 
         connection = new DBConnection(databaseUrl, DatabaseConstants.DATABASE_USER, DatabaseConstants.DATABASE_PASSWORD);
 
@@ -111,20 +109,12 @@ public class WeatherSense extends Application {
 
         WeatherDataMgr.getInstance().initialize(databaseUrl, ws.getWeatherYearStartMonth());
 
-        timer = Executors.newSingleThreadScheduledExecutor();
-	timer.scheduleAtFixedRate(() -> {
-            WeatherDataMgr.getInstance().refreshData();
-	    logger.info("Refreshing screens");
-	    refreshList.forEach((refresh) -> refresh.refresh());
-	}, 0, REFRESH_INTERVAL, TimeUnit.SECONDS);
-
-
 	Image icon = new Image("com/bdb/weathersense/WeatherSense.jpg");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/WeatherSense.fxml"), ResourceBundle.getBundle("com.bdb.weathersense.Localization"));
         loader.load();
         BorderPane root = loader.getRoot();
         
-        Scene scene = new Scene(root, 800, 800);
+        Scene scene = new Scene(root, 600, 200);
         scene.getStylesheets().add("/styles/weathersense.css");
         stage.setTitle("WeatherSense 3.0");
 	stage.getIcons().add(icon);
@@ -138,7 +128,6 @@ public class WeatherSense extends Application {
     @Override
     public void stop() {
         System.out.println("Stopping application");
-	timer.shutdownNow();
         controller.stop();
 
     }

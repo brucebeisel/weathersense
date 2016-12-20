@@ -19,9 +19,7 @@ package com.bdb.weather.display.current;
 import java.awt.Color;
 import java.awt.GradientPaint;
 
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -66,7 +64,7 @@ public class Thermometer extends BorderPane {
      * @param max The maximum value for the thermometer scale
      */
     public Thermometer(String title, Temperature min, Temperature max) {
-	this.setPrefSize(150.0, 300.0);
+	this.setPrefSize(150.0, 200.0);
         minValue = min;
         maxValue = max;
         unitProperty.setValue(Temperature.getDefaultUnit());
@@ -111,8 +109,8 @@ public class Thermometer extends BorderPane {
         chart.setBackgroundPaint(Color.GRAY);
 
         ChartViewer chartViewer = new ChartViewer(chart);
-        chartViewer.setMinHeight(200);
-        chartViewer.setMinWidth(150);
+        chartViewer.setMinHeight(75);
+        chartViewer.setMinWidth(25);
         return chartViewer;
     }
 

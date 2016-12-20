@@ -8,12 +8,12 @@
 <?import com.bdb.weather.display.current.*?>
 <?import com.bdb.weather.display.*?>
 
-<fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml">
+<fx:root type="javafx.scene.layout.HBox" xmlns:fx="http://javafx.com/fxml">
     <BorderPane>
 	<center>
 	    <HBox>
 		<VBox>
-		    <DopplerRadar fx:id="dopplerRadar"/>
+		    <DopplerRadar fx:id="dopplerRadar" />
 		    <TilePane prefColumns="2" prefRows="1">
 			<Thermometer fx:id="indoorTemperature" title="Indoor"/>
 			<Thermometer fx:id="outdoorTemperature" title="Outdoor"/>
@@ -21,9 +21,9 @@
 		</VBox>
 		<TilePane prefRows="2"  prefColumns="2" >
 		    <Hygrometer fx:id="outdoorHumidity" title="Outdoor Humidity" />
-		    <Barometer fx:factory="create" fx:id="barometer" title="Barometer" prefWidth="250" prefHeight="250" />
+		    <Barometer fx:factory="create" fx:id="barometer" title="Barometer" />
 		    <Hygrometer fx:id="indoorHumidity" title="Indoor Humidity" />
-		    <WindGauge fx:id="windGauge" title="Windy" />
+		    <WindGauge fx:id="windGauge" title="Wind" />
 		</TilePane>
 	    </HBox>
 	</center>

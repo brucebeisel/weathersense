@@ -66,7 +66,7 @@ public class Hygrometer extends BorderPane {
      * @param titleString The title to add to the panel that contains the gauge
      */
     public Hygrometer(String titleString) {
-	this.setPrefSize(250.0, 250.0);
+	this.setPrefSize(200.0, 200.0);
 
 	ChartViewer chartViewer = createChartElements();
 	this.setTop(title);
@@ -119,10 +119,10 @@ public class Hygrometer extends BorderPane {
         chart.setBackgroundPaint(Color.GRAY);
         
         ChartViewer chartViewer = new ChartViewer(chart);
-        chartViewer.setMinHeight(250);
-        chartViewer.setMinWidth(250);
-        chartViewer.setMaxHeight(250);
-        chartViewer.setMaxWidth(250);
+        //chartViewer.setMinHeight(100);
+        //chartViewer.setMinWidth(100);
+        //chartViewer.setMaxHeight(400);
+        //chartViewer.setMaxWidth(400);
         //chartViewer.setBackground(Color.GRAY);
         return chartViewer;
     }

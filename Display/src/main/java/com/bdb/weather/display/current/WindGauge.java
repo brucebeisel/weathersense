@@ -95,7 +95,7 @@ public class WindGauge extends BorderPane {
      * Constructor.
      */
     public WindGauge() {
-	this.setPrefSize(250.0, 250.0);
+	this.setPrefSize(200.0, 200.0);
         lastHeading = 0.0;
         lastSpeed = 0.0;
         plot = new DialPlot();
@@ -201,10 +201,10 @@ public class WindGauge extends BorderPane {
         chart.setBackgroundPaint(Color.GRAY);
 
         chartViewer = new ChartViewer(chart);
-        chartViewer.setMinHeight(250);
-        chartViewer.setMinWidth(250);
-        chartViewer.setMaxHeight(250);
-        chartViewer.setMaxWidth(250);
+        //chartViewer.setMinHeight(100);
+        //chartViewer.setMinWidth(100);
+        //chartViewer.setMaxHeight(400);
+        //chartViewer.setMaxWidth(400);
         //chartViewer.setBackground(Color.GRAY);
         //chartViewer.setBorder(new BevelBorder(BevelBorder.RAISED));
 

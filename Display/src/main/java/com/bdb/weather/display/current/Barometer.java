@@ -66,7 +66,7 @@ public class Barometer extends BorderPane {
 
     public static Barometer create() {
         Barometer b = new Barometer();
-        //b.setPrefSize(250, 250);
+        b.setPrefSize(200, 200);
         return b;
     }
 
@@ -106,6 +106,7 @@ public class Barometer extends BorderPane {
         }
 
         scale = new StandardDialScale(min.get(), max.get(), 240.0, -300.0, dialTickIncrements, 10);
+        scale.setTickLabelFont(scale.getTickLabelFont().deriveFont(14.0F));
         scale.setTickRadius(.9);
         scale.setTickLabelFormatter(Pressure.getDefaultFormatter());
         scale.setTickLabelOffset(.25);
@@ -149,10 +150,10 @@ public class Barometer extends BorderPane {
         chart.setBackgroundPaint(StageUtilities.toAwtColor(colorPrefs.getColorPref(ColorPreferences.GUAGE_BACKGROUND)));
 
         ChartViewer chartViewer = new ChartViewer(chart);
-        chartViewer.setMinHeight(250);
-        chartViewer.setMinWidth(250);
-        chartViewer.setMaxHeight(250);
-        chartViewer.setMaxWidth(250);
+        chartViewer.setMinHeight(200);
+        chartViewer.setMinWidth(200);
+        chartViewer.setMaxHeight(10000);
+        chartViewer.setMaxWidth(10000);
 
         //chartViewer.setBorder(new BevelBorder(BevelBorder.RAISED));
 
