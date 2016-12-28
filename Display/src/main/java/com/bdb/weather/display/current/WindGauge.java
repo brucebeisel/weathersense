@@ -18,6 +18,7 @@ package com.bdb.weather.display.current;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GradientPaint;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -112,6 +113,7 @@ public class WindGauge extends BorderPane {
         plot.addLayer(new DialBackground(new GradientPaint(0.0f, 0.0f, Color.LIGHT_GRAY, 100.0f, 0.0f, Color.blue)));
 
         StandardDialScale scale = new StandardDialScale(0.0, 360.0, 90.0, -360.0, 45.0, 1);
+        scale.setTickLabelFont(scale.getTickLabelFont().deriveFont(14.0F).deriveFont(Font.PLAIN));
         scale.setTickRadius(.9);
         scale.setTickLabelFormatter(new CompassHeadingFormat());
         scale.setTickLabelOffset(0.06);
@@ -122,6 +124,7 @@ public class WindGauge extends BorderPane {
         plot.addScale(WIND_DIR_SCALE, scale);
 
         scale = new StandardDialScale(0.0, 50.0, 225.0, -270.0, 10.0, 9);
+        scale.setTickLabelFont(scale.getTickLabelFont().deriveFont(14.0F).deriveFont(Font.PLAIN));
         scale.setTickRadius(.4);
         scale.setTickLabelFormatter(new DecimalFormat("##"));
         scale.setTickLabelOffset(.15);

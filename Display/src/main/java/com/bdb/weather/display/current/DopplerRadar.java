@@ -113,13 +113,14 @@ public class DopplerRadar extends BorderPane {
             Tooltip  tip = new Tooltip();
             tip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
             tip.setGraphic(web);
+            frameInfo.setTooltip(tip);
             //radarImage.setTooltip(tip);
         }
     }
 
     public void configure(DBConnection connection, String url) {
         setTooltip(url);
-        dopplerRadarTable = new DopplerRadarTable(connection);    
+        //dopplerRadarTable = new DopplerRadarTable(connection);    
 	loadImages();
     }
     
@@ -154,7 +155,7 @@ public class DopplerRadar extends BorderPane {
             if (dopplerRadarTable == null)
                 return;
 
-            Platform.runLater(() -> webEngine.reload());
+            //Platform.runLater(() -> webEngine.reload());
 
             dopplerRadarImages = dopplerRadarTable.getNewerRadarImages(NUM_ANIMATION_IMAGES);
 
@@ -162,6 +163,7 @@ public class DopplerRadar extends BorderPane {
 
             for (DopplerRadarImage doppler : dopplerRadarImages) {
                 WritableImage thumbnail = SwingFXUtils.toFXImage(doppler.getImage(), null);
+                doppler.getImage().flush();
                 ImageView iv = new ImageView(thumbnail);
                 iv.setFitWidth(doppler.getImage().getWidth() / 2);
                 iv.setFitHeight(doppler.getImage().getHeight() / 2);
@@ -170,7 +172,7 @@ public class DopplerRadar extends BorderPane {
                 thumbnails.add(iv);
             }
 
-            logger.log(Level.FINE, "Currently animating %d thumbnails", thumbnails.size());
+            logger.log(Level.FINE, "Currently animating %1 thumbnails", thumbnails.size());
         }
         catch (Exception e) {
             logger.log(Level.WARNING, "Caught exception while loading Doppler radar image", e);

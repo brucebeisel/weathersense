@@ -17,6 +17,7 @@
 package com.bdb.weather.display.current;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GradientPaint;
 
 import javafx.beans.property.ObjectProperty;
@@ -103,6 +104,7 @@ public class Thermometer extends BorderPane {
         thermometerPlot.setSubrange(2, 1000.0, 1000.0);
         thermometerPlot.setBackgroundPaint(Color.GRAY);
         thermometerPlot.setOutlineVisible(false);
+        thermometerPlot.setValueFont(thermometerPlot.getValueFont().deriveFont(14.0F).deriveFont(Font.PLAIN));
 
         chart = new JFreeChart(thermometerPlot);
         chart.setTitle(titleProperty.getValue());

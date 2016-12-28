@@ -17,6 +17,7 @@
 package com.bdb.weather.display.current;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GradientPaint;
 import java.text.DecimalFormat;
 
@@ -79,6 +80,7 @@ public class Hygrometer extends BorderPane {
     private ChartViewer createChartElements() {
         humidityPlot.addLayer(new DialBackground(new GradientPaint(0.0f, 0.0f, Color.LIGHT_GRAY, 100.0f, 0.0f, Color.blue)));
         StandardDialScale scale = new StandardDialScale(Humidity.MIN_HUMIDITY.get(), Humidity.MAX_HUMIDITY.get(), 240.0, -300.0, 10.0, 9);
+        scale.setTickLabelFont(scale.getTickLabelFont().deriveFont(14.0F).deriveFont(Font.PLAIN));
         scale.setTickRadius(.9);
         scale.setTickLabelFormatter(new DecimalFormat("#"));
         scale.setTickLabelOffset(.2);

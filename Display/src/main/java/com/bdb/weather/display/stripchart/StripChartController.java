@@ -286,8 +286,11 @@ public class StripChartController extends BorderPane {
                 break;
 
             case RAINFALL:
-                // Rainfall data does not exist in the historical record
-                datasetNames = null;
+                datasetNames = RAINFALL_DATASETS;
+                values[0] = 0.0;
+                values[1] = 0.0;
+                values[2] = rec.getHighRainfallRate().get();
+                rec.getRainfall();
                 break;
 
             case PRESSURE:

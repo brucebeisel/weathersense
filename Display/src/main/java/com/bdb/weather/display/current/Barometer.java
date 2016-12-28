@@ -17,6 +17,7 @@
 package com.bdb.weather.display.current;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Paint;
 
@@ -106,7 +107,7 @@ public class Barometer extends BorderPane {
         }
 
         scale = new StandardDialScale(min.get(), max.get(), 240.0, -300.0, dialTickIncrements, 10);
-        scale.setTickLabelFont(scale.getTickLabelFont().deriveFont(14.0F));
+        scale.setTickLabelFont(scale.getTickLabelFont().deriveFont(14.0F).deriveFont(Font.PLAIN));
         scale.setTickRadius(.9);
         scale.setTickLabelFormatter(Pressure.getDefaultFormatter());
         scale.setTickLabelOffset(.25);

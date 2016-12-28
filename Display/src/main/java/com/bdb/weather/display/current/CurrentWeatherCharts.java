@@ -347,6 +347,6 @@ public class CurrentWeatherCharts extends HBox implements CurrentWeatherProcesso
 
     @Override
     public void refresh() {
-        updateCurrentWeather(null);
+        //updateCurrentWeather(null);
     }
 }

@@ -16,6 +16,7 @@
  */
 package com.bdb.weather.display;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 import javafx.beans.property.ObjectProperty;
@@ -32,7 +33,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-
 public final class RainBucket extends Canvas {
     private GraphicsContext         gc;
     private double                  value = 0.0;
@@ -41,8 +41,9 @@ public final class RainBucket extends Canvas {
     private String                  unitLabel;
     private double                  valueTop = GUAGE_BOTTOM;
     private Font                    origFont = null;
-    private Font                    defaultFont = null;
+    private Font                    boldFont = null;
     private NumberFormat            formatter;
+    private NumberFormat            tickLabelFormatter = new DecimalFormat("0.0");
     private double                  average;
     private double                  toDateAverage;
     private final ObjectProperty<Color>   beakerColorProperty = new SimpleObjectProperty<>(new Color(.4, .4, 1.0, 1.0));
@@ -103,8 +104,6 @@ public final class RainBucket extends Canvas {
         this.unitLabel = unitLabel;
         this.formatter = formatter;
         setRainfallAmount(0.0);
-        //setPreferredSize(PREFERRED_SIZE);
-        //setMaximumSize(PREFERRED_SIZE);
     }
 
     /**
@@ -256,12 +255,13 @@ public final class RainBucket extends Canvas {
 
     private void paint() {
 	gc = this.getGraphicsContext2D();
+        gc.save();
         gc.clearRect(0, 0, getWidth(), getHeight());
+
 
         if (origFont == null) {
             origFont = gc.getFont();
-            defaultFont = Font.font(origFont.getFamily(), FontWeight.BOLD, origFont.getSize());
-            defaultFont = origFont;
+            boldFont = Font.font(origFont.getFamily(), FontWeight.BOLD, origFont.getSize());
         }
 
         Dimension2D actualSize = new Dimension2D(getWidth(), getHeight());
@@ -280,12 +280,11 @@ public final class RainBucket extends Canvas {
         //
         // If the JComponent has been resized smaller than the preferred size, then scale
         // TODO Determine why the if below was commented out
-        //if (actualSize.width < PREFERRED_SIZE.width || actualSize.height < PREFERRED_SIZE.height)
-        //{
-        //double wscale = actualSize.getWidth() / PREFERRED_SIZE.getWidth();
-        //double hscale = actualSize.getHeight() / PREFERRED_SIZE.getHeight();
-        //double scale = Math.min(wscale, hscale);
-        //gc.scale(scale, scale);
+        //if (actualSize.width < PREFERRED_SIZE.width || actualSize.height < PREFERRED_SIZE.height) {
+            double wscale = actualSize.getWidth() / PREFERRED_SIZE.getWidth();
+            double hscale = actualSize.getHeight() / PREFERRED_SIZE.getHeight();
+            double scale = Math.min(wscale, hscale);
+            gc.scale(scale, scale);
         //}
 
         //
@@ -312,16 +311,17 @@ public final class RainBucket extends Canvas {
         gc.setStroke(Color.BLACK);
 
         for (double tickValue = 0; tickValue <= maxValue; tickValue += tickIncrement) {
-            Text valueString = new Text(formatter.format(tickValue));
+            Text valueString = new Text(tickLabelFormatter.format(tickValue));
             valueString.setFont(gc.getFont());
             double tickY = valueLocation(tickValue);
             gc.strokeLine(RIGHT_X + 5, tickY, RIGHT_X + 5 + TICK_LINE_LENGTH, tickY);
-            gc.strokeText(valueString.getText(), RIGHT_X + TICK_LINE_LENGTH + 5 + 5, tickY + Math.round(valueString.getLayoutBounds().getHeight() / 4));
+            gc.fillText(valueString.getText(), RIGHT_X + TICK_LINE_LENGTH + 5 + 5, tickY + Math.round(valueString.getLayoutBounds().getHeight() / 4));
         }
 
         //
         // Draw the water that fills the beaker based on the current value
         //
+        Paint origFill = gc.getFill();
         gc.setFill(waterPaint);
         gc.fillRect(INSET, valueTop, GUAGE_WIDTH, GUAGE_BOTTOM - valueTop);
 
@@ -333,33 +333,32 @@ public final class RainBucket extends Canvas {
 
         paintAverage(average, value);
         paintAverage(toDateAverage, value);
+        gc.setFill(origFill);
 
         //
         // Draw the current value
         //
         gc.setStroke(Color.BLACK);
         Text valueString = new Text(formatter.format(value) + unitLabel); 
-        gc.setFont(defaultFont);
-        gc.strokeText(valueString.getText(), LEFT_X + (GUAGE_WIDTH / 2) - (Math.round(valueString.getLayoutBounds().getWidth()) / 2), BOTTOM_Y - INSET);
+        gc.setFont(boldFont);
+        gc.fillText(valueString.getText(), LEFT_X + (GUAGE_WIDTH / 2) - (Math.round(valueString.getLayoutBounds().getWidth()) / 2), BOTTOM_Y - INSET);
 
         //
         // Draw the average values
         //
         if (average > 0.0) {
             valueString = new Text(formatter.format(average) + unitLabel);
-            valueString.setFont(gc.getFont());
-            gc.strokeText(valueString.getText(), LEFT_X + (GUAGE_WIDTH / 2) - (Math.round(valueString.getLayoutBounds().getWidth()) / 2), TOP_Y + OVAL_HEIGHT + (Math.round(valueString.getLayoutBounds().getHeight()) / 2));
+            valueString.setFont(boldFont);
+            gc.fillText(valueString.getText(), LEFT_X + (GUAGE_WIDTH / 2) - (Math.round(valueString.getLayoutBounds().getWidth()) / 2), TOP_Y + OVAL_HEIGHT + (Math.round(valueString.getLayoutBounds().getHeight()) / 2));
         }
 
         if (toDateAverage > 0.0) {
             valueString = new Text(formatter.format(toDateAverage) + unitLabel);
-            valueString.setFont(gc.getFont());
-            gc.strokeText(valueString.getText(),
+            valueString.setFont(boldFont);
+            gc.fillText(valueString.getText(),
                           LEFT_X + (GUAGE_WIDTH / 2) - (Math.round(valueString.getLayoutBounds().getWidth()) / 2),
-                          TOP_Y + OVAL_HEIGHT + (Math.round(valueString.getLayoutBounds().getHeight()) / 2) + (GUAGE_HEIGHT / 2) - (defaultFont.getSize() / 2));
+                          TOP_Y + OVAL_HEIGHT + (Math.round(valueString.getLayoutBounds().getHeight()) / 2) + (GUAGE_HEIGHT / 2) - (gc.getFont().getSize() / 2));
         }
-        gc.setFont(origFont);
-
+        gc.restore();
     }
-
 }

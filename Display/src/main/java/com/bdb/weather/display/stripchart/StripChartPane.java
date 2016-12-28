@@ -104,6 +104,13 @@ public class StripChartPane extends BorderPane implements CurrentWeatherProcesso
             stripChart.setRightAxis(rightAxisType);
             createDatasetCheckBoxes(rightAxisType, false);
         }
+
+        retrieveInitialData();
+
+        for (HistoricalRecord rec : initialData) {
+            updateDatasetFromHistorical(rec, leftAxisType);
+            updateDatasetFromHistorical(rec, rightAxisType);
+        }
     }
     /*
         //setBackground(Color.BLUE);
@@ -235,8 +242,79 @@ public class StripChartPane extends BorderPane implements CurrentWeatherProcesso
 
     @Override
     public void updateCurrentWeather(CurrentWeather cw) {
-        updateDatasets(cw, leftAxisType);
-        updateDatasets(cw, rightAxisType);
+        updateDatasetFromCurrentWeather(cw, leftAxisType);
+        updateDatasetFromCurrentWeather(cw, rightAxisType);
+    }
+
+    /**
+     * Update the datasets for the specified measurement type with the specified historical weather.
+     * 
+     * @param cw The current weather
+     * @param axisType The measurement type to update
+     */
+    private void updateDatasetFromHistorical(HistoricalRecord rec, MeasurementType axisType) {
+        double values[] = new double[10]; // ugly, should be based on some maxium
+        String[] datasetNames;
+        switch (axisType) {
+            case TEMPERATURE:
+                datasetNames = TEMPERATURE_DATASETS;
+                values[0] = rec.getAvgOutdoorTemperature().get();
+                values[1] = rec.getIndoorTemperature().get();
+                values[2] = rec.getHeatIndex().get();
+                values[3] = rec.getWindChill().get();
+                values[4] = rec.getDewPoint().get();
+                break;
+            case WIND_CHILL:
+                datasetNames = WIND_CHILL_DATASETS;
+                values[0] = rec.getWindChill().get();
+                break;
+            case HEAT_INDEX:
+                datasetNames = HEAT_INDEX_DATASETS;
+                values[0] = rec.getHeatIndex().get();
+                break;
+            case DEW_POINT:
+                datasetNames = DEW_POINT_DATASETS;
+                values[0] = rec.getDewPoint().get();
+                break;
+            case HUMIDITY:
+                datasetNames = HUMIDITY_DATASETS;
+                values[0] = rec.getOutdoorHumidity().get();
+                values[1] = rec.getIndoorHumidity().get();
+                break;
+            case WIND:
+                datasetNames = WIND_DATASETS;
+                values[0] = rec.getAvgWind().getSpeed().get();
+                break;
+            case RAINFALL:
+                datasetNames = RAINFALL_DATASETS;
+                values[0] = 0.0;
+                values[1] = 0.0;
+                values[2] = rec.getHighRainfallRate().get();
+                break;
+            case PRESSURE:
+                datasetNames = PRESSURE_DATASETS;
+                values[0] = rec.getBaroPressure().get();
+                break;
+            case SOLAR_RADIATION:
+                datasetNames = SOLAR_RADIATION_DATASETS;
+                values[0] = rec.getAvgSolarRadiation().get();
+                break;
+            case UV_INDEX:
+                datasetNames = UV_INDEX_DATASETS;
+                values[0] = rec.getAvgUvIndex();
+                break;
+            case NONE:
+                datasetNames = NONE_DATASETS;
+                break;
+            default:
+                datasetNames = NONE_DATASETS;
+                break;
+        }
+
+        LocalDateTime time = rec.getTime();
+        for (int i = 0; i < datasetNames.length; i++) {
+            stripChart.addItem(datasetNames[i], time, values[i]);
+        }
     }
 
     /**
@@ -245,7 +323,7 @@ public class StripChartPane extends BorderPane implements CurrentWeatherProcesso
      * @param cw The current weather
      * @param axisType The measurement type to update
      */
-    private void updateDatasets(CurrentWeather cw, MeasurementType axisType) {
+    private void updateDatasetFromCurrentWeather(CurrentWeather cw, MeasurementType axisType) {
         double values[] = new double[10]; // ugly, should be based on some maxium
         String[] datasetNames;
         switch (axisType) {
@@ -316,7 +394,7 @@ public class StripChartPane extends BorderPane implements CurrentWeatherProcesso
      * 
      * @return The list of records
      */
-    public List<HistoricalRecord> retrieveInitialData() {
+    private void retrieveInitialData() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime start;
         if (initialData.isEmpty()) {
@@ -327,6 +405,5 @@ public class StripChartPane extends BorderPane implements CurrentWeatherProcesso
             start = rec.getTime().plusSeconds(1);
         }
         initialData.addAll(historyTable.queryRecordsForTimePeriod(start, now));
-        return initialData;
     }
 }

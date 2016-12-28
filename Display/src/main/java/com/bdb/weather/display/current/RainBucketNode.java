@@ -34,8 +34,8 @@ import com.bdb.weather.display.RainBucket;
  *
  */
 public class RainBucketNode extends BorderPane {
-    private RainBucket       rainBucket;
-    private Label            title;
+    private RainBucket             rainBucket;
+    private Label                  title;
     private final StringProperty   titleProperty = new SimpleStringProperty();
 
     public RainBucketNode() {
@@ -52,10 +52,8 @@ public class RainBucketNode extends BorderPane {
     public RainBucketNode(String labelString, Depth maxValue, Depth average, Depth averageToDate) {
         Depth.Unit unit = Depth.getDefaultUnit();
         rainBucket = new RainBucket(maxValue.get(), unit.getFormatter(), unit.toString(), average.get(), averageToDate.get());
-        //rainBucket.setBorder(new EtchedBorder(EtchedBorder.RAISED));
         title = new Label(labelString);
         title.setTextAlignment(TextAlignment.CENTER);
-        //label.setBorder(new EtchedBorder(EtchedBorder.RAISED));
         setCenter(rainBucket);
         BorderPane.setAlignment(title, Pos.CENTER);
         setBottom(title);

@@ -103,7 +103,7 @@ public class WeatherSenseController implements ViewLauncher, CurrentWeatherSubsc
     @Override
     public void handleCurrentWeather(CurrentWeather currentWeather) {
         final CurrentWeather curWeather = currentWeather;
-        logger.fine(String.format("Updating %s current weather processors", cwpList.size()));
+        logger.fine(String.format("Updating {0} current weather processors", cwpList.size()));
         
         WeatherDataMgr.getInstance().fillInCurrentWeather(curWeather);
         Platform.runLater(() -> cwpList.forEach((cwp) -> cwp.updateCurrentWeather(curWeather)));
@@ -114,7 +114,7 @@ public class WeatherSenseController implements ViewLauncher, CurrentWeatherSubsc
         if (modal)
             stage.initModality(Modality.APPLICATION_MODAL);
 
-        stage.initOwner(topLevelStage);
+        //stage.initOwner(topLevelStage);
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/weathersense.css");
         stage.setTitle(title);
