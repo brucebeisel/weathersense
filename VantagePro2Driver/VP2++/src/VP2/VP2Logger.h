@@ -99,6 +99,9 @@ private:
      */
     VP2Logger(const std::string & name);
 
+    void openLogFile();
+    void checkFileSize();
+
     /**
      * Collection of loggers, so that only one is create per name.
      */

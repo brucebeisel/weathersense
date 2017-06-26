@@ -1,4 +1,4 @@
-CC= g++ -g
+CC= g++
 CXXFLAGS= -g
 
 SRCS=ArchiveManager.cpp \
@@ -25,7 +25,17 @@ SRCS=ArchiveManager.cpp \
 	WindDirectionSlices.cpp \
 	WindSlice.cpp
 
-OBJS=$(SRCS:.cpp=.o)
+OBJDIR=../../target/VP2
+OBJLIST=$(SRCS:.cpp=.o)
+OBJS=$(addprefix $(OBJDIR)/, $(OBJLIST))
 
-vp2: $(OBJS)
+$(OBJDIR)/%.o : %.cpp
+	$(CC) $(CXXFLAGS) -c $< -o $@
+	
+
+vp2: $(OBJDIR) $(OBJS)
 	$(CC) -o vp2 $(OBJS)
+
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+

@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <iomanip>
+#include <fstream>
+#include <stdio.h>
 #include <time.h>
 #include "Weather.h"
 #include "VP2Logger.h"
@@ -26,6 +28,10 @@ VP2Logger::Level VP2Logger::currentLevel = VP2Logger::VP2_INFO;
 ostream * VP2Logger::loggerStream = &cerr;
 ostream VP2Logger::nullStream(0);
 map<string, VP2Logger *> VP2Logger::loggers;
+int VP2Logger::maxFileSize;
+int VP2Logger::maxFiles;
+string VP2Logger::logFilePattern;
+
 const static char *LEVEL_STRINGS[] = {"ERROR  ", "WARNING", "INFO   ", "DEBUG1 ", "DEBUG2 ", "DEBUG3 "};
 
 VP2Logger::VP2Logger(const string & name) : loggerName(name) {
@@ -60,9 +66,9 @@ VP2Logger::setLogStream(std::ostream &stream) {
 
 void
 VP2Logger::setLogFilePattern(std::string& pattern, int maxFiles, int maxFileSizeMb) {
-    this->logFilePattern = pattern;
-    this->maxFiles = maxFiles;
-    this->maxFileSize = maxFileSizeMb;
+    VP2Logger::logFilePattern = pattern;
+    VP2Logger::maxFiles = maxFiles;
+    VP2Logger::maxFileSize = maxFileSizeMb;
 }
 
 bool
@@ -74,14 +80,15 @@ void
 VP2Logger::openLogFile() {
     char filename[1024];
 
-    snprintf(filename, sizeof(filename), pattern, 0);
-    loggerStream = logStream(filename, ios::app | ios::ate | ios::out);
+    snprintf(filename, sizeof(filename), logFilePattern.c_str(), 0);
+    loggerStream = new ofstream(filename, ios::app | ios::ate | ios::out);
 }
 
 void
 VP2Logger::checkFileSize() {
 
 }
+
 ostream &
 VP2Logger::log(Level level) {
     char buffer[100];
