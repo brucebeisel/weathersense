@@ -6,24 +6,6 @@
     </data>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/BitConverter.cpp</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/ArchivePacket.h</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/Loop2Packet.h</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/LoopPacket.cpp</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/ArchivePacket.cpp</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/VP2Logger.cpp</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/main.cpp</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/CurrentWeather.h</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/ArchiveManager.h</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/ArchiveManager.cpp</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/BitConverter.h</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/CurrentWeather.cpp</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/ParametersMessage.h</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/Sensor.h</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/VP2Logger.h</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/ForecastRule.h</file>
-            <file>file:/C:/Users/bruce/Documents/GitHub/weathersense/VantagePro2Driver/VP2++/src/VP2/ForecastRule.cpp</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

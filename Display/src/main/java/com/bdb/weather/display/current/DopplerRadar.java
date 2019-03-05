@@ -120,7 +120,7 @@ public class DopplerRadar extends BorderPane {
 
     public void configure(DBConnection connection, String url) {
         setTooltip(url);
-        //dopplerRadarTable = new DopplerRadarTable(connection);    
+        dopplerRadarTable = new DopplerRadarTable(connection);    
 	loadImages();
     }
     
@@ -199,6 +199,7 @@ public class DopplerRadar extends BorderPane {
 	    // Load the radar image and the date/time text
 	    //
 	    LocalDateTime time = dopplerRadarImages.get(animationFrame).getTime();
+	    radarImage.getChildren().clear();
 	    radarImage.getChildren().setAll(thumbnails.get(animationFrame++));
 	    frameInfo.setText("" + animationFrame + " of " + thumbnails.size() + " (" + sdf.format(time) + ")");
 	}

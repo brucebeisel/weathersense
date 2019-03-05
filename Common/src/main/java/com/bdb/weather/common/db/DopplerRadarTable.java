@@ -179,6 +179,7 @@ public class DopplerRadarTable extends DBTable<DopplerRadarImage> {
             stmt.setBlob(3, blob);
 
             success = executeAddRow(stmt);
+            blob.free();
 
             if (success)       
                 trimTable();

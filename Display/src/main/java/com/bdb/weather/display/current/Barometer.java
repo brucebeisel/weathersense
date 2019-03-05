@@ -86,7 +86,7 @@ public class Barometer extends BorderPane {
 
 	ChartViewer chartViewer = createChartElements(min, max);
 	this.setTop(title);
-        this.setCenter(chartViewer);
+         this.setCenter(chartViewer);
 	BorderPane.setAlignment(title, Pos.CENTER);
     }
 
