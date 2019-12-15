@@ -24,7 +24,7 @@ import javafx.scene.control.Menu;
 
 import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.ui.TextAnchor;
+import org.jfree.chart.ui.TextAnchor;
 
 import com.bdb.util.TimeUtils;
 import com.bdb.weather.common.SummaryRecord;

@@ -20,10 +20,10 @@ import java.awt.Color;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import javafx.scene.control.TableColumn;
@@ -114,7 +114,7 @@ public class HighLowMedianTempPanel extends ChartDataPane implements ChartMouseL
                                                                           interval.getLegacyFormat(),
                                                                           Temperature.getDefaultFormatter());
         
-        diffRenderer.setBaseToolTipGenerator(ttgen);
+        diffRenderer.setDefaultToolTipGenerator(ttgen);
         
         plot.setRenderer(LOW_DATASET, diffRenderer);
         plot.setRenderer(HIGH_DATASET, diffRenderer);
@@ -188,7 +188,7 @@ public class HighLowMedianTempPanel extends ChartDataPane implements ChartMouseL
         for (SummaryRecord r : summaryList) {
             //tableModel.setValueAt(dateFormat.format(r.getDate()), n, DATE_COLUMN);
 
-            RegularTimePeriod p = RegularTimePeriod.createInstance(interval.getFreeChartClass(), TimeUtils.localDateTimeToDate(r.getDate().atStartOfDay()), TimeZone.getDefault());
+            RegularTimePeriod p = RegularTimePeriod.createInstance(interval.getFreeChartClass(), TimeUtils.localDateTimeToDate(r.getDate().atStartOfDay()), TimeZone.getDefault(), Locale.getDefault());
 
             WeatherAverage averages = averagesCollection.getAverage(r.getDate());
             averageLowSeries.add(p, averages.getLowTemperature().get());

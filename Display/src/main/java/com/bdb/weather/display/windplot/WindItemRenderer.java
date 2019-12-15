@@ -23,6 +23,7 @@ import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
+
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CrosshairState;
 import org.jfree.chart.plot.PlotOrientation;
@@ -30,10 +31,10 @@ import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRendererState;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.ui.RectangleEdge;
 
 /**
  *
@@ -48,7 +49,7 @@ public class WindItemRenderer extends XYLineAndShapeRenderer {
     
     public WindItemRenderer() {
         super();
-        setBaseShapesVisible(false);
+        setDefaultShapesVisible(false);
     }
     
     public void setWindDirectionPaint(Paint paint) {

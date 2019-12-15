@@ -41,6 +41,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     </archive>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.3</version>
+                <configuration>
+                    <mainClass>com.bdb.weather.display.WeatherSense</mainClass>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
@@ -62,7 +70,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <dependency>
             <groupId>org.jfree</groupId>
             <artifactId>jfreechart</artifactId>
-            <version>1.0.19</version>
+            <version>1.5.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart-fx</artifactId>
+            <version>1.0.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -73,27 +87,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
          <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
-            <version>11</version>
+            <version>13</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>11</version>
+            <version>13</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>11</version>
+            <version>13</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
-            <version>11</version>
+            <version>13</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
-            <version>11</version>
+            <version>13</version>
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>

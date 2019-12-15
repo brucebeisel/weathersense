@@ -24,7 +24,7 @@ import java.util.List;
 import org.jfree.chart.axis.NumberTick;
 import org.jfree.chart.plot.PolarPlot;
 import org.jfree.chart.renderer.DefaultPolarItemRenderer;
-import org.jfree.ui.TextAnchor;
+import org.jfree.chart.ui.TextAnchor;
 
 /**
  *

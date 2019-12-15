@@ -19,6 +19,7 @@ package com.bdb.weather.display.summary;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -109,7 +110,7 @@ public class RainSummary extends ChartDataPane implements ChartMouseListenerFX {
 
         StandardXYToolTipGenerator ttgen = new StandardXYToolTipGenerator(StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT, interval.getLegacyFormat(), Depth.getDefaultFormatter());
         
-        renderer.setBaseToolTipGenerator(ttgen);
+        renderer.setDefaultToolTipGenerator(ttgen);
         //renderer.setSeriesPaint(0, Color.BLUE); // TODO Use color preferences
         //renderer.setSeriesPaint(1, Color.RED); // TODO Use color preferences
         
@@ -139,7 +140,7 @@ public class RainSummary extends ChartDataPane implements ChartMouseListenerFX {
         for (SummaryRecord rec : list) {
             Depth rain = rec.getTotalRainfall();
 
-            RegularTimePeriod tp = RegularTimePeriod.createInstance(interval.getFreeChartClass(), TimeUtils.localDateTimeToDate(rec.getDate()), TimeZone.getDefault());
+            RegularTimePeriod tp = RegularTimePeriod.createInstance(interval.getFreeChartClass(), TimeUtils.localDateTimeToDate(rec.getDate()), TimeZone.getDefault(), Locale.getDefault());
 
             if (rain != null) {
                 rainSeries.add(tp, rain.get());

@@ -137,7 +137,7 @@ public class DayRainPane extends ChartDataPane {
         rainPlot.setNoDataMessage("There is no data for the specified day");
         
         BarRenderer renderer = (BarRenderer)rainPlot.getRenderer();
-        renderer.setBasePaint(Color.BLUE);
+        renderer.setDefaultPaint(Color.BLUE);
         renderer.setSeriesPaint(0, Color.BLUE);
         renderer.setSeriesPaint(1, Color.RED);
         renderer.setSeriesItemLabelGenerator(0, new RainItemLabelGenerator(StandardCategoryItemLabelGenerator.DEFAULT_LABEL_FORMAT_STRING, Depth.getDefaultFormatter()));

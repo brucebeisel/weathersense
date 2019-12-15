@@ -22,6 +22,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import javafx.scene.control.TableColumn;
@@ -159,21 +160,21 @@ public class TemperatureDeviationPlotPanel extends ChartDataPane {
 
         this.setTabContents(chartViewer, dataTable);
 
-	lowRenderer.setBasePaint(Color.BLUE);
-	lowRenderer.setBaseItemLabelGenerator(labelGen);
-	lowRenderer.setBaseToolTipGenerator(ttGen);
-	lowRenderer.setBarAlignmentFactor(.6);
-	lowRenderer.setShadowVisible(false);
+        lowRenderer.setDefaultPaint(Color.BLUE);
+        lowRenderer.setDefaultItemLabelGenerator(labelGen);
+        lowRenderer.setDefaultToolTipGenerator(ttGen);
+        lowRenderer.setBarAlignmentFactor(.6);
+        lowRenderer.setShadowVisible(false);
 	
-	meanRenderer.setSeriesPaint(0, Color.CYAN);
-	meanRenderer.setBaseItemLabelGenerator(labelGen);
-        meanRenderer.setBaseToolTipGenerator(ttGen);
-	meanRenderer.setBarAlignmentFactor(.3);
-	meanRenderer.setShadowVisible(false);
+        meanRenderer.setSeriesPaint(0, Color.CYAN);
+        meanRenderer.setDefaultItemLabelGenerator(labelGen);
+        meanRenderer.setDefaultToolTipGenerator(ttGen);
+        meanRenderer.setBarAlignmentFactor(.3);
+        meanRenderer.setShadowVisible(false);
 	
-	highRenderer.setSeriesPaint(0, Color.GRAY);
-	highRenderer.setBaseItemLabelGenerator(labelGen);
-        highRenderer.setBaseToolTipGenerator(ttGen);
+        highRenderer.setSeriesPaint(0, Color.GRAY);
+        highRenderer.setDefaultItemLabelGenerator(labelGen);
+        highRenderer.setDefaultToolTipGenerator(ttGen);
 	highRenderer.setShadowVisible(false);
     }
     
@@ -199,7 +200,7 @@ public class TemperatureDeviationPlotPanel extends ChartDataPane {
 	    //tableModel.setValueAt(dateString, n, DATE_COLUMN);
 
 	    Temperature deviation = supporter.retrieveLowOutdoorTemperature(record).subtract(averages.getLowTemperature());
-	    RegularTimePeriod period = RegularTimePeriod.createInstance(interval.getFreeChartClass(), TimeUtils.localDateTimeToDate(record.getDate().atStartOfDay()), TimeZone.getDefault());
+	    RegularTimePeriod period = RegularTimePeriod.createInstance(interval.getFreeChartClass(), TimeUtils.localDateTimeToDate(record.getDate().atStartOfDay()), TimeZone.getDefault(), Locale.getDefault());
 	    TimeSeriesDataItem item = new TimeSeriesDataItem(period, deviation.get());
 	    lowSeries.add(item);
 	    //tableModel.setValueAt(deviation, n, LOW_COLUMN);

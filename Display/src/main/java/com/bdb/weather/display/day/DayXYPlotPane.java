@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -49,7 +50,6 @@ import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.IntervalMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.renderer.xy.XYLine3DRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.RegularTimePeriod;
@@ -144,15 +144,15 @@ abstract public class DayXYPlotPane extends ChartDataPane implements EventHandle
         //
         // Set up the renderer to generate tool tips, not show shapes
         //
-        XYLineAndShapeRenderer renderer = new XYLine3DRenderer();
-        renderer.setBaseShapesVisible(false);
-        renderer.setBaseToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
+        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        renderer.setDefaultShapesVisible(false);
+        renderer.setDefaultToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
         //renderer.setDefaultEntityRadius(1);
         plot.setRenderer(0, renderer);
 
-        renderer = new XYLine3DRenderer();
-        renderer.setBaseShapesVisible(false);
-        renderer.setBaseToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
+        renderer = new XYLineAndShapeRenderer();
+        renderer.setDefaultShapesVisible(false);
+        renderer.setDefaultToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
         //renderer.setDefaultEntityRadius(1);
         plot.setRenderer(1, renderer);
 
@@ -275,7 +275,7 @@ abstract public class DayXYPlotPane extends ChartDataPane implements EventHandle
         getPlot().getRangeAxis().setAutoRange(true);
 
         records.stream().forEach((r) -> {
-            RegularTimePeriod p = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(r.getTime()), TimeZone.getDefault());
+            RegularTimePeriod p = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(r.getTime()), TimeZone.getDefault(), Locale.getDefault());
             
             entries.stream().forEach((entry) -> {
                 Measurement m = entry.seriesInfo.getValue(r);

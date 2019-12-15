@@ -32,8 +32,8 @@ import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.ui.TextAnchor;
 import org.jfree.data.Range;
-import org.jfree.ui.TextAnchor;
 
 import com.bdb.util.TimeUtils;
 
@@ -87,7 +87,7 @@ public class DayTemperaturePane extends DayXYPlotPane implements EventHandler<Ac
         });
 
         XYToolTipGenerator ttg = new StandardXYToolTipGenerator(StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT, DateFormat.getTimeInstance(), Temperature.getDefaultFormatter());
-        getPlot().getRenderer().setBaseToolTipGenerator(ttg);
+        getPlot().getRenderer().setDefaultToolTipGenerator(ttg);
 
         return controls;
     }

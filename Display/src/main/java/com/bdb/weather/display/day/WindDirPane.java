@@ -41,7 +41,7 @@ import org.jfree.chart.plot.PolarPlot;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.util.ShapeUtilities;
+import org.jfree.chart.util.ShapeUtils;
 
 import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.display.ChartDataPane;
@@ -80,7 +80,7 @@ class ItemRenderer extends CompassPolarItemRenderer {
 
             Point p = plot.translateToJava2D(theta, radius, plot.getAxis(), dataArea);
 
-            Shape shape = ShapeUtilities.createTranslatedShape(point, p.getX(), p.getY());
+            Shape shape = ShapeUtils.createTranslatedShape(point, p.getX(), p.getY());
 
             g2.fill(shape);
         }
@@ -118,7 +118,7 @@ public class WindDirPane extends ChartDataPane {
             long millis = Math.round(time);
             return "" + millis;
         };
-        renderer.setBaseToolTipGenerator(ttg);
+        renderer.setSeriesToolTipGenerator(0, ttg);
         plot.setRenderer(renderer);
 
         ((NumberAxis)plot.getAxis()).setRange(-240.0, 60.0 * 24);

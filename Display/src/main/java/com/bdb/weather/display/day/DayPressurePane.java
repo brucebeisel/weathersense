@@ -27,7 +27,7 @@ import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.ui.TextAnchor;
+import org.jfree.chart.ui.TextAnchor;
 
 import com.bdb.util.TimeUtils;
 import com.bdb.weather.common.SummaryRecord;
@@ -58,9 +58,9 @@ public class DayPressurePane extends DayXYPlotPane {
         controls.add(new SeriesControl(HistoricalSeriesInfo.HIGH_SOLAR_RADIATION_SERIES, true, false));
 
         XYToolTipGenerator ttg = new StandardXYToolTipGenerator(StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT, DateFormat.getTimeInstance(), Pressure.getDefaultFormatter());
-        getPlot().getRenderer(0).setBaseToolTipGenerator(ttg);
+        getPlot().getRenderer(0).setDefaultToolTipGenerator(ttg);
         ttg = new StandardXYToolTipGenerator(StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT, DateFormat.getTimeInstance(), SolarRadiation.getDefaultFormatter());
-        getPlot().getRenderer(1).setBaseToolTipGenerator(ttg);
+        getPlot().getRenderer(1).setDefaultToolTipGenerator(ttg);
 
         return controls;
     }

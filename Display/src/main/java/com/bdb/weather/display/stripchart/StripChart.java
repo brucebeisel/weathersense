@@ -39,10 +39,10 @@ import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DefaultXYItemRenderer;
+import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.ui.RectangleEdge;
 
 /**
  * Display a strip chart with up to two separate Y axes.
@@ -134,9 +134,9 @@ public class StripChart extends BorderPane {
 
     private void createRenderer(int dataset, TimeSeriesCollection collection, NumberFormat format) {
         DefaultXYItemRenderer renderer = new DefaultXYItemRenderer();
-        renderer.setBaseShapesVisible(false);
+        renderer.setDefaultShapesVisible(false);
         
-        renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator(StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
+        renderer.setDefaultToolTipGenerator(new StandardXYToolTipGenerator(StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                                                                         DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG),
                                                                         format));
                                                                         

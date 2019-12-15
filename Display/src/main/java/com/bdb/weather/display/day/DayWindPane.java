@@ -31,7 +31,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.ui.TextAnchor;
+import org.jfree.chart.ui.TextAnchor;
 
 import com.bdb.util.TimeUtils;
 
@@ -91,7 +91,7 @@ public class DayWindPane extends DayXYPlotPane {
                                                                           DateFormat.getTimeInstance(DateFormat.SHORT),
                                                                           Speed.getDefaultFormatter());
 
-        getPlot().getRenderer().setBaseToolTipGenerator(ttgen);
+        getPlot().getRenderer().setDefaultToolTipGenerator(ttgen);
 
         return controls;
     }

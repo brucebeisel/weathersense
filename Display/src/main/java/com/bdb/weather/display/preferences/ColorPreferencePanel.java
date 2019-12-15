@@ -250,7 +250,7 @@ public class ColorPreferencePanel extends BorderPane implements Changeable {
     }
 
     private void configureRenderer() {
-        renderer.setBaseShapesVisible(false);
+        renderer.setDefaultShapesVisible(false);
         for (int i = 0; i < dataset.getSeriesCount(); i++) {
             String seriesName = (String)dataset.getSeriesKey(i);
 

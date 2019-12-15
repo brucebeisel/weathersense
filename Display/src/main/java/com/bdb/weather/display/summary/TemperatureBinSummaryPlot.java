@@ -58,10 +58,10 @@ public class TemperatureBinSummaryPlot extends BorderPane {
         countPlot.setDataset(countDataset);
         
         BarRenderer r = new BarRenderer();
-        r.setBaseItemLabelsVisible(true);     
-        r.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator());
+        r.setDefaultItemLabelsVisible(true);     
+        r.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator());
         r.setSeriesPaint(0, Color.BLUE);
-        r.setBasePaint(Color.BLUE);
+        r.setDefaultPaint(Color.BLUE);
         countPlot.setRenderer(r);
         
         NumberAxis durationAxis = new NumberAxis("Duration (Hours)");
@@ -69,13 +69,13 @@ public class TemperatureBinSummaryPlot extends BorderPane {
         durationPlot.setRangeAxis(durationAxis);
         durationPlot.setDataset(durationDataset);
         r = new BarRenderer();
-        r.setBaseItemLabelsVisible(true);
+        r.setDefaultItemLabelsVisible(true);
         NumberFormat format = DecimalFormat.getNumberInstance();
         format.setMaximumFractionDigits(1);
         format.setMinimumFractionDigits(1);
-        r.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator(StandardCategoryItemLabelGenerator.DEFAULT_LABEL_FORMAT_STRING, format));
+        r.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator(StandardCategoryItemLabelGenerator.DEFAULT_LABEL_FORMAT_STRING, format));
         r.setSeriesPaint(0, Color.RED);
-        r.setBasePaint(Color.RED);
+        r.setDefaultPaint(Color.RED);
         durationPlot.setRenderer(r);
         
         plot.getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.DOWN_90);

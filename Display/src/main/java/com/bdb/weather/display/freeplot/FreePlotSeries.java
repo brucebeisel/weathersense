@@ -21,6 +21,7 @@ import java.awt.Paint;
 import java.awt.Stroke;
 import java.time.temporal.TemporalAccessor;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.function.Function;
 
@@ -121,7 +122,7 @@ public class FreePlotSeries<T> {
         series.clear();
         data.stream().forEach((obj) -> {
             TemporalAccessor time = getTimeMethod.apply(obj);
-            RegularTimePeriod period = RegularTimePeriod.createInstance(timePeriod, TimeUtils.localDateTimeToDate(time) , TimeZone.getDefault());
+            RegularTimePeriod period = RegularTimePeriod.createInstance(timePeriod, TimeUtils.localDateTimeToDate(time), TimeZone.getDefault(), Locale.getDefault());
             Measurement m;
             m = getDataMethod.apply(obj);
             if (m != null) {

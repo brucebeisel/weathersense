@@ -69,7 +69,7 @@ public class WindRosePlot extends PolarPlot {
         setAxis(axis);
 
         renderer = new CompassPolarItemRenderer();
-        renderer.setBasePaint(Color.black);
+        renderer.setDefaultPaint(Color.black);
         renderer.setShapesVisible(false);
         renderer.setDrawOutlineWhenFilled(false);
         renderer.setFillComposite(AlphaComposite.Src);

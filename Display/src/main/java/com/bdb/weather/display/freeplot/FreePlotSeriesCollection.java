@@ -88,8 +88,8 @@ public class FreePlotSeriesCollection<T> {
         this.factory = factory;
         this.plot = plot;
         renderer = new DefaultXYItemRenderer();
-        renderer.setBaseShapesVisible(false);
-        renderer.setBaseToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
+        renderer.setDefaultShapesVisible(false);
+        renderer.setDefaultToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
         renderer.setDrawSeriesLineAsPath(true);
         plot.setDataset(datasetIndex, dataset);
         plot.setRenderer(datasetIndex, renderer);

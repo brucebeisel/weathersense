@@ -23,6 +23,7 @@ import java.text.DateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 
@@ -40,12 +41,12 @@ import org.jfree.chart.renderer.xy.StandardXYBarPainter;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.RegularTimePeriod;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.TimeSeriesDataItem;
-import org.jfree.ui.RectangleEdge;
 
 import com.bdb.util.TimeUtils;
 import com.bdb.weather.common.measurement.Depth;
@@ -193,15 +194,15 @@ private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:m
         XYBarRenderer renderer = new XYBarRenderer();
         renderer.setShadowVisible(false);
         renderer.setBarPainter(new StandardXYBarPainter());
-        renderer.setBasePaint(Color.BLUE);
+        renderer.setDefaultPaint(Color.BLUE);
         renderer.setSeriesPaint(0, Color.BLUE);
-        renderer.setBaseToolTipGenerator(ttg);
+        renderer.setDefaultToolTipGenerator(ttg);
         plot.setRenderer(renderer);
         
         XYItemRenderer rateRenderer = new XYLineAndShapeRenderer(true, false);
-        rateRenderer.setBasePaint(Color.RED);
+        rateRenderer.setDefaultPaint(Color.RED);
         rateRenderer.setSeriesPaint(0, Color.RED);
-        rateRenderer.setBaseToolTipGenerator(ttg);
+        rateRenderer.setDefaultToolTipGenerator(ttg);
         rainRatePlot.setRenderer(rateRenderer);
     }
     
@@ -212,8 +213,8 @@ private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:m
      */
     public void setRainData(List<RainEntry> list) {
         if (list.size() == rainSeries.getItemCount()) {
-            RegularTimePeriod n0 = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(list.get(0).time), TimeZone.getDefault());
-            RegularTimePeriod n1 = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(list.get(list.size() - 1).time), TimeZone.getDefault());
+            RegularTimePeriod n0 = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(list.get(0).time), TimeZone.getDefault(), Locale.getDefault());
+            RegularTimePeriod n1 = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(list.get(list.size() - 1).time), TimeZone.getDefault(), Locale.getDefault());
 
             RegularTimePeriod e0 = rainSeries.getDataItem(0).getPeriod();
             RegularTimePeriod e1 = rainSeries.getDataItem(rainSeries.getItemCount() - 1).getPeriod();
@@ -236,7 +237,7 @@ private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:m
             // Load the graph
             //
             for (RainEntry r : list) {
-                RegularTimePeriod p = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(r.time), TimeZone.getDefault());
+                RegularTimePeriod p = RegularTimePeriod.createInstance(Minute.class, TimeUtils.localDateTimeToDate(r.time), TimeZone.getDefault(), Locale.getDefault());
 
                 if (r.rainfall != null) {
                     TimeSeriesDataItem item = new TimeSeriesDataItem(p, r.rainfall.get());

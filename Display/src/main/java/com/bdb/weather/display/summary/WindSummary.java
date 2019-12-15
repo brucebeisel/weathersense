@@ -19,6 +19,7 @@ package com.bdb.weather.display.summary;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -111,8 +112,8 @@ public class WindSummary extends ChartDataPane implements ChartMouseListenerFX {
         // Set up the renderer to generate tool tips, not show shapes
         //
         DefaultXYItemRenderer renderer = new DefaultXYItemRenderer();
-        renderer.setBaseShapesVisible(false);
-        renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator(StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
+        renderer.setDefaultShapesVisible(false);
+        renderer.setDefaultToolTipGenerator(new StandardXYToolTipGenerator(StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                                                                         interval.getLegacyFormat(),
                                                                         Speed.getDefaultFormatter()));
         renderer.setDefaultEntityRadius(1);
@@ -166,7 +167,10 @@ public class WindSummary extends ChartDataPane implements ChartMouseListenerFX {
         TimeSeries windGustSeries = new TimeSeries("Maximum Gust");
         
         for (int i = 0; i < records.size(); i++) {
-            RegularTimePeriod p = RegularTimePeriod.createInstance(interval.getFreeChartClass(), TimeUtils.localDateTimeToDate(records.get(i).getDate().atStartOfDay()), TimeZone.getDefault());
+            RegularTimePeriod p = RegularTimePeriod.createInstance(interval.getFreeChartClass(),
+                                                                   TimeUtils.localDateTimeToDate(records.get(i).getDate().atStartOfDay()),
+                                                                   TimeZone.getDefault(),
+                                                                   Locale.getDefault());
             maxSpeedSeries.add(p, records.get(i).getMaxWindSpeed().get());
             avgSpeedSeries.add(p, records.get(i).getAvgWindSpeed().get());
             Speed gust = records.get(i).getMaxWindGust();

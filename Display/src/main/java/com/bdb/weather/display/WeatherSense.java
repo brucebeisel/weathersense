@@ -55,7 +55,7 @@ public class WeatherSense extends Application {
 	if (!args.isEmpty())
 	    databaseHost = args.get(0);
 	else
-	    databaseHost = DatabaseConstants.DATABASE_HOST;
+	    databaseHost = "192.168.1.200";
 
         databaseUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, DatabaseConstants.DATABASE_SERVER, databaseHost, DatabaseConstants.DATABASE_PORT, DatabaseConstants.DATABASE_NAME);
 
@@ -76,9 +76,9 @@ public class WeatherSense extends Application {
             Platform.exit();
         }
 
-	Application.Parameters params = getParameters();
-	List<String> args = params.getRaw();
-	openDatabase(args);
+        Application.Parameters params = getParameters();
+        List<String> args = params.getRaw();
+        openDatabase(args);
         WeatherStationMgr.initialize(connection);
 
         UnitsPreferences.getInstance();
@@ -105,7 +105,7 @@ public class WeatherSense extends Application {
 
         WeatherDataMgr.getInstance().initialize(databaseUrl, ws.getWeatherYearStartMonth());
 
-	Image icon = new Image("com/bdb/weathersense/WeatherSense.jpg");
+        Image icon = new Image("com/bdb/weathersense/WeatherSense.jpg");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/WeatherSense.fxml"), ResourceBundle.getBundle("com.bdb.weathersense.Localization"));
         loader.load();
         BorderPane root = loader.getRoot();
@@ -113,10 +113,10 @@ public class WeatherSense extends Application {
         Scene scene = new Scene(root, 600, 200);
         scene.getStylesheets().add("/styles/weathersense.css");
         stage.setTitle("WeatherSense 3.0");
-	stage.getIcons().add(icon);
+        stage.getIcons().add(icon);
         stage.setScene(scene);
         controller = loader.getController();
-	controller.setData(ws, connection, stage);
+        controller.setData(ws, connection, stage);
         stage.sizeToScene();
         stage.show();
     }

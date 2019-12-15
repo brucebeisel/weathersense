@@ -52,7 +52,7 @@ import org.jfree.data.time.Year;
 import org.jfree.data.time.ohlc.OHLCSeries;
 import org.jfree.data.time.ohlc.OHLCSeriesCollection;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.ui.RectangleEdge;
+import org.jfree.chart.ui.RectangleEdge;
 
 import com.bdb.util.measurement.Measurement;
 
@@ -188,7 +188,7 @@ public abstract class HighLowPanel<T extends Measurement> extends ChartDataPane 
         this.setTabContents(chartViewer, dataTable);
 
         HighLowItemLabelGenerator ttg = new HiLoItemLabelGenerator(interval.getLegacyFormat(), format);
-        plot.getRenderer().setBaseToolTipGenerator(ttg);
+        plot.getRenderer().setDefaultToolTipGenerator(ttg);
     }
     
     protected XYPlot getPlot() {
