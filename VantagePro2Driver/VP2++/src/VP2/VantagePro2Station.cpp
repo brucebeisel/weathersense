@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2016 Bruce Beisel
+ * Copyright (C) 2020 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -619,7 +619,7 @@ VantagePro2Station::sendOKedCommand(const string & command) {
         if (!serialPort.read(buffer, 6))
             success = false;
         else if ((char)buffer[0] != VP2Constants::LINE_FEED ||
-            (char)buffer[1] != VP2Constants::CARRIAGE_RETURN ||
+                 (char)buffer[1] != VP2Constants::CARRIAGE_RETURN ||
                  (char)buffer[2] != 'O' ||
                  (char)buffer[3] != 'K' ||
                  (char)buffer[4] != VP2Constants::LINE_FEED ||
