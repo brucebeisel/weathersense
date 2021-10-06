@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2020 Bruce Beisel
+ * Copyright (C) 2021 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ public:
      * The trend of the barometer as reported in the LOOP packet
      */
     enum BaroTrend {
+	UNKNOWN = 255,
         FALLING_RAPIDLY = 196,
         FALLING_SLOWLY = 236,
         STEADY = 0,
@@ -119,62 +120,62 @@ public:
 private:
     static DateTime extractDate(int time);
 
-    static const int TEMPERATURE_OFFSET = 90;
-    static const Temperature TEMPERATURE_SCALE;
-    static const int INVALID_EXTRA_TEMPERATURE = 255;
-    static const int INVALID_EXTRA_HUMIDITY = 255;
-    static const int INVALID_UV_INDEX = 255;
-    static const int INVALID_LEAF_WETNESS = 255;
-    static const int INVALID_SOIL_MOISTURE = 255;
-    static const int INVALID_SOLAR_RADIATION = 32767;
-    static const int STORM_START_YEAR_OFFSET = 2000;
-    static const Rainfall STORM_RAINFALL_SCALE;
-    static const Pressure BAROMETER_SCALE;
+    static const int                TEMPERATURE_OFFSET = 90;
+    static const Temperature        TEMPERATURE_SCALE;
+    static const int                INVALID_EXTRA_TEMPERATURE = 255;
+    static const int                INVALID_EXTRA_HUMIDITY = 255;
+    static const int                INVALID_UV_INDEX = 255;
+    static const int                INVALID_LEAF_WETNESS = 255;
+    static const int                INVALID_SOIL_MOISTURE = 255;
+    static const int                INVALID_SOLAR_RADIATION = 32767;
+    static const int                STORM_START_YEAR_OFFSET = 2000;
+    static const Rainfall           STORM_RAINFALL_SCALE;
+    static const Pressure           BAROMETER_SCALE;
     static const Evapotranspiration DAY_ET_SCALE;
     static const Evapotranspiration MONTH_ET_SCALE;
     static const Evapotranspiration YEAR_ET_SCALE;
 
-    int nextRecord;
-    Temperature outsideTemperature;
-    Temperature insideTemperature;
-    Humidity outsideHumidity;
-    Humidity insideHumidity;
-    Speed windSpeed;
-    Heading windDirection;
-    Pressure barometricPressure;
-    BaroTrend baroTrend;
-    Rainfall rainRate;
-    Rainfall stormRain;
-    Rainfall dayRain;
-    Rainfall monthRain;
-    Rainfall yearRain;
-    UvIndex uvIndex;
-    SolarRadiation solarRadiation;
+    int                nextRecord;
+    Temperature        outsideTemperature;
+    Temperature        insideTemperature;
+    Humidity           outsideHumidity;
+    Humidity           insideHumidity;
+    Speed              windSpeed;
+    Heading            windDirection;
+    Pressure           barometricPressure;
+    BaroTrend          baroTrend;
+    Rainfall           rainRate;
+    Rainfall           stormRain;
+    Rainfall           dayRain;
+    Rainfall           monthRain;
+    Rainfall           yearRain;
+    int                uvIndex;
+    SolarRadiation     solarRadiation;
     Evapotranspiration dayET;
     Evapotranspiration monthET;
     Evapotranspiration yearET;
-    Forecast forecastIcon;
-    int forecastRule;
-    DateTime sunRiseTime;
-    DateTime sunSetTime;
-    DateTime stormStart;
-    Speed avgWindSpeed10Min;
-    Speed avgWindSpeed2Min;
+    Forecast           forecastIcon;
+    int                forecastRule;
+    DateTime           sunRiseTime;
+    DateTime           sunSetTime;
+    DateTime           stormStart;
+    Speed              avgWindSpeed10Min;
+    Speed              avgWindSpeed2Min;
 
-    SoilMoisture soilMoisture[NUM_SOIL_MOISTURES];
-    LeafWetness leafWetness[NUM_LEAF_WETNESSES];
-    Temperature leafTemperature[NUM_LEAF_TEMPERATURES];
-    bool leafTemperatureValid[NUM_LEAF_TEMPERATURES];
-    Temperature soilTemperature[NUM_SOIL_TEMPERATURES];
-    bool soilTemperatureValid[NUM_SOIL_TEMPERATURES];
-    Temperature temperatureExtra[NUM_EXTRA_TEMPERATURES];
-    bool temperatureExtraValid[NUM_EXTRA_TEMPERATURES];
-    Humidity humidityExtra[NUM_EXTRA_HUMIDITIES];
-    int transmitterBatteryStatus;
-    float consoleBatteryVoltage;
-    VP2Logger log;
+    SoilMoisture       soilMoisture[NUM_SOIL_MOISTURES];
+    LeafWetness        leafWetness[NUM_LEAF_WETNESSES];
+    Temperature        leafTemperature[NUM_LEAF_TEMPERATURES];
+    bool               leafTemperatureValid[NUM_LEAF_TEMPERATURES];
+    Temperature        soilTemperature[NUM_SOIL_TEMPERATURES];
+    bool               soilTemperatureValid[NUM_SOIL_TEMPERATURES];
+    Temperature        temperatureExtra[NUM_EXTRA_TEMPERATURES];
+    bool               temperatureExtraValid[NUM_EXTRA_TEMPERATURES];
+    Humidity           humidityExtra[NUM_EXTRA_HUMIDITIES];
+    int                transmitterBatteryStatus;
+    float              consoleBatteryVoltage;
+    VP2Logger          log;
 
-    static Rainfall rainfallIncrement;
+    static Rainfall    rainfallIncrement;
 };
 }
 #endif

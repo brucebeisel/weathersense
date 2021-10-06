@@ -25,6 +25,7 @@
 #include "VP2Logger.h"
 #include "ArchiveManager.h"
 #include "VantagePro2Driver.h"
+#include "CurrentWeatherPublisher.h"
 
 using namespace std;
 using namespace vp2;
@@ -56,12 +57,13 @@ main(int argc, char *argv[]) {
 #endif
 
     ofstream logStream(logFile.c_str(), ios::app | ios::ate | ios::out);
-    VP2Logger::setLogStream(logStream);
-    VP2Logger::setLogLevel(VP2Logger::VP2_INFO);
+    //VP2Logger::setLogStream(logStream);
+    VP2Logger::setLogLevel(VP2Logger::VP2_DEBUG3);
     WeatherSenseSocket socket("127.0.0.1", 11461);
+    CurrentWeatherPublisher cwPublisher;
     VantagePro2Station station(serialPortName, 19200);
     ArchiveManager archiveManager(archiveFile, station);
-    VantagePro2Driver driver(archiveManager, socket, station);
+    VantagePro2Driver driver(archiveManager, socket, cwPublisher, station);
 
     VP2Logger & log = VP2Logger::getLogger("VP2 Main");
 

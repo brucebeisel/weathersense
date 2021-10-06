@@ -135,7 +135,7 @@ ParametersMessage::formatMessage() const {
     ss << "<firmwareVersion>" << firmwareVersion << "</firmwareVersion>";
     ss << "<location><latitude>" << latitude << "</latitude>";
     ss << "<longitude>" << longitude << "</longitude>";
-    ss << "<altitude>" << UnitConverter::feetToMillimeters(elevation) << "</altitude></location>";
+    ss << "<elevation>" << UnitConverter::feetToMillimeters(elevation) << "</elevation></location>";
     ss << "<weatherYearStartMonth>" << rainSeasonStart << "</weatherYearStartMonth>";
     ss << "<parameters>";
     ss << "<entry><key>" << "Archive Period" << "</key><value>" << archivePeriod << "</value></entry>";

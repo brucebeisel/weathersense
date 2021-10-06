@@ -115,7 +115,7 @@ LoopPacket::getYearRain() const {
 
 UvIndex
 LoopPacket::getUvIndex() const {
-    return uvIndex;
+    return static_cast<UvIndex>(uvIndex) / 10.0F;
 }
 
 Evapotranspiration
@@ -254,6 +254,9 @@ LoopPacket::parseLoopPacket(byte buffer[]) {
 
     if (buffer[3] != 'P') {
         switch (BitConverter::toInt8(buffer, 3)) {
+	    case 255:
+		baroTrend = UNKNOWN;
+		break;
             case 196:
                 baroTrend = FALLING_RAPIDLY;
                 break;
@@ -270,7 +273,7 @@ LoopPacket::parseLoopPacket(byte buffer[]) {
                 baroTrend = RISING_RAPIDLY;
                 break;
             default:
-                log.log(VP2Logger::VP2_ERROR) << "Invalid barometer trend " << buffer[3] << endl;
+                log.log(VP2Logger::VP2_ERROR) << "Invalid barometer trend 0x" << hex << (int)buffer[3] << dec << endl;
                 return false;
         }
     }
@@ -349,6 +352,20 @@ LoopPacket::parseLoopPacket(byte buffer[]) {
 
     for (int i = 0; i < NUM_LEAF_WETNESSES; i++)
         leafWetness[i] = BitConverter::toInt8(buffer, 66 + i);
+
+    int indoorAlarms = (int)BitConverter::toInt8(buffer, 70);
+    int rainAlarms = (int)BitConverter::toInt8(buffer, 71);
+    int outsideAlarms1 = (int)BitConverter::toInt8(buffer, 72);
+    int outsideAlarms2 = (int)BitConverter::toInt8(buffer, 73);
+    int extraTemperatureHumidityAlarms[8];
+    int alarmIndex = 74;
+    for (int i = 0; i <= 8; i++)
+	extraTemperatureHumidityAlarms[i] = (int)BitConverter::toInt8(buffer, alarmIndex + i);
+
+    int soilLeafAlarms[4];
+    alarmIndex = 82;
+    for (int i = 0; i <= 4; i++)
+	soilLeafAlarms[i] = (int)BitConverter::toInt8(buffer, alarmIndex + i);
 
     transmitterBatteryStatus = (int)BitConverter::toInt8(buffer, 86);
     log.log(VP2Logger::VP2_DEBUG2) << "Transmitter Battery Status: " << transmitterBatteryStatus << endl;

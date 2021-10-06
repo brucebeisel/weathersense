@@ -19,6 +19,7 @@
 #include <iostream>
 #include <vector>
 #include "CurrentWeather.h"
+#include "CurrentWeatherPublisher.h"
 #include "SensorStation.h"
 #include "VP2Logger.h"
 #include "VantagePro2Driver.h"
@@ -30,9 +31,10 @@ extern bool signalCaught;
 }
 
 namespace vp2 {
-VantagePro2Driver::VantagePro2Driver(ArchiveManager & archiveManager, WeatherSenseSocket & socket, VantagePro2Station & station) :
+VantagePro2Driver::VantagePro2Driver(ArchiveManager & archiveManager, WeatherSenseSocket & socket, CurrentWeatherPublisher & cwp, VantagePro2Station & station) :
                                                                 station(station),
                                                                 socket(socket),
+                                                                currentWeatherPublisher(cwp),
                                                                 archiveManager(archiveManager),
                                                                 exitLoop(false),
                                                                 receivedFirstLoopPacket(false),
@@ -153,14 +155,15 @@ VantagePro2Driver::stop() {
 
 bool
 VantagePro2Driver::processCurrentWeather(const CurrentWeather & cw) {
-    string currentWeatherMessage = cw.formatMessage();
+    //string currentWeatherMessage = cw.formatMessage();
     nextRecord = cw.getNextPacket();
 
     if (receivedFirstLoopPacket)
-        socket.sendData(currentWeatherMessage);
+        currentWeatherPublisher.sendCurrentWeather(cw);
+        //socket.sendData(currentWeatherMessage);
 
     log.log(VP2Logger::VP2_DEBUG1) << "Previous Next Record: " << previousNextRecord << " Next Record: " << nextRecord << endl;
-    log.log(VP2Logger::VP2_DEBUG3) << currentWeatherMessage << endl;
+    //log.log(VP2Logger::VP2_DEBUG3) << currentWeatherMessage << endl;
     receivedFirstLoopPacket = true;
     return signalCaught || previousNextRecord != nextRecord;
 }

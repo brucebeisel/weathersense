@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2020 Bruce Beisel
+ * Copyright (C) 2021 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,35 +181,37 @@ private:
     static const int SET_TIME_LENGTH = 6;
     static const int LOOP_PACKET_WAIT = 2000;
     static const int VP2_YEAR_OFFSET = 2000;
+    static const int HILOW_PACKET_SIZE = 436;
 
-    bool sendOKedCommand(const std::string &);
-    bool sendAckedCommand(const std::string &);
-    bool consumeAck();
-    bool readLoopPacket(LoopPacket & loopPacket);
-    bool readLoop2Packet(Loop2Packet & loop2Packet);
-    void parseArchivePage(std::vector<ArchivePacket> &, const byte * buffer, int firstRecord, DateTime newestPacketTime);
-    bool processArchivePage(std::vector<ArchivePacket> &, int firstRecord, DateTime newestPacketTime);
+    bool        sendOKedCommand(const std::string &);
+    bool        sendAckedCommand(const std::string &);
+    bool        consumeAck();
+    bool        readLoopPacket(LoopPacket & loopPacket);
+    bool        readLoop2Packet(Loop2Packet & loop2Packet);
+    void        parseArchivePage(std::vector<ArchivePacket> &, const byte * buffer, int firstRecord, DateTime newestPacketTime);
+    bool        processArchivePage(std::vector<ArchivePacket> &, int firstRecord, DateTime newestPacketTime);
     std::string getStringValue(const std::string & command);
-    Rainfall getRainCollectorSize() const;
-    bool readEEPROM(const std::string & address, int count);
-    void dump(std::vector<ArchivePacket> & list);
-    bool archivePacketContainsData(const byte * buffer, int offset);
+    Rainfall    getRainCollectorSize() const;
+    bool        readEEPROM(const std::string & address, int count);
+    void        dump(std::vector<ArchivePacket> & list);
+    bool        archivePacketContainsData(const byte * buffer, int offset);
+    bool        requestHiLowPacket();
 
-    SerialPort serialPort;
-    std::string portName;
-    int baudRate;
-    byte buffer[512];
-    Rainfall rainCollectorSize;
-    WindDirectionSlices pastWindDirs;
-    Speed windGust10Minute;
-    Heading windGustDirection10Minute;
-    Callback * callback;
+    SerialPort                 serialPort;
+    std::string                portName;
+    int                        baudRate;
+    byte                       buffer[512];
+    Rainfall                   rainCollectorSize;
+    WindDirectionSlices        pastWindDirs;
+    Speed                      windGust10Minute;
+    Heading                    windGustDirection10Minute;
+    Callback *                 callback;
     std::vector<SensorStation> sensorStations;
-    int archivePeriod;
-    std::vector<Sensor> sensors;
-    float consoleBatteryVoltage;
-    bool firstLoopPacket;
-    VP2Logger log;
+    int                        archivePeriod;
+    std::vector<Sensor>        sensors;
+    float                      consoleBatteryVoltage;
+    bool                       firstLoopPacket;
+    VP2Logger                  log;
 };
 }
 

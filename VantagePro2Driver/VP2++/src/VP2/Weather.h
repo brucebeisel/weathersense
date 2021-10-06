@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2020 Bruce Beisel
+ * Copyright (C) 2021 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ typedef double Temperature;
 typedef double Pressure;
 typedef double Humidity;
 typedef double SolarRadiation;
-typedef int    UvIndex;
+typedef float  UvIndex;
 typedef int    LeafWetness;
 typedef int    SoilMoisture;
 typedef float  Heading;

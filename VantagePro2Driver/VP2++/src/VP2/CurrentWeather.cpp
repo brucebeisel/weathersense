@@ -85,7 +85,7 @@ CurrentWeather::formatMessage() const {
         ss << "<yearET>" << loopPacket.getYearET() << "</yearET>";
 
     if (loopPacket.isUvIndexValid())
-        ss << "<uvIndex><index>" << loopPacket.getUvIndex() << "</index></uvIndex>";
+        ss << "<uvIndex>" << loopPacket.getUvIndex() << "</uvIndex>";
 
     if (loopPacket.isStormOngoing())
         ss << "<stormStart>" << Weather::formatDate(loopPacket.getStormStart()) << "</stormStart><stormRain>" << loopPacket.getStormRain() << "</stormRain>";

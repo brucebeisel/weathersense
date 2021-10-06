@@ -194,8 +194,9 @@ ArchivePacket::formatMessage() const {
     }
 
     value8 = BitConverter::toInt8(buffer, 28);
-    if (value8 != VP2Constants::APB_INVALID_UV_INDEX)
+    if (value8 != VP2Constants::APB_INVALID_UV_INDEX) {
         ss << "<avgUvIndex>" << ((UvIndex)value8 / UV_INDEX_SCALE) << "</avgUvIndex>";
+    }
 
     value8 = BitConverter::toInt8(buffer, 29);
     if (value8 != UNKNOWN_ET)
@@ -206,8 +207,9 @@ ArchivePacket::formatMessage() const {
         ss << "<highSolarRadiation>" << value16 << "</highSolarRadiation>";
 
     value8 = BitConverter::toInt8(buffer, 32);
-    if (value8 != VP2Constants::APB_INVALID_UV_INDEX)
+    if (value8 != VP2Constants::APB_INVALID_UV_INDEX) {
         ss << "<highUvIndex>" << ((UvIndex)value8 / UV_INDEX_SCALE) << "</highUvIndex>";
+    }
 
     for (int i = 0; i < VP2Constants::APB_MAX_LEAF_TEMPERATURES; i++) {
         value8 = buffer[34 + i];

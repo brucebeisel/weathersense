@@ -238,7 +238,8 @@ VantagePro2Station::getParameters(ParametersMessage & parameters) {
     if (!readEEPROM(VP2Constants::EE_ELEVATION, 2))
         return false;
 
-    int ialt = BitConverter::toInt16(buffer, 0);
+    int ialt = BitConverter::toInt16(buffer, 0) & 0xFF;
+    cout << "buffer[0]: " << (int)buffer[0] << " buffer[1]: " << (int)buffer[1] << " ialt: " << ialt << endl;
     parameters.setElevation(ialt);
 
     parameters.setArchivePeriod(archivePeriod);
@@ -256,6 +257,7 @@ VantagePro2Station::getParameters(ParametersMessage & parameters) {
     parameters.setWindCupSize(buffer[0] & 0x8);
     parameters.setRainCollectorSize(rainCollectorSize);
 
+    log.log(VP2Logger::VP2_INFO) << "Parameters message : " << parameters.formatMessage() << endl;
     return true;
 }
 

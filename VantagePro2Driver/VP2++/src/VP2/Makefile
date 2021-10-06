@@ -1,10 +1,11 @@
 CC= g++
-CXXFLAGS= -g
+CXXFLAGS= -g -Wno-psabi
 
 SRCS=ArchiveManager.cpp \
 	ArchivePacket.cpp \
 	BitConverter.cpp \
 	CurrentWeather.cpp \
+	CurrentWeatherPublisher.cpp \
 	ForecastRule.cpp \
 	Loop2Packet.cpp \
 	LoopPacket.cpp \
@@ -32,9 +33,13 @@ OBJS=$(addprefix $(OBJDIR)/, $(OBJLIST))
 $(OBJDIR)/%.o : %.cpp
 	$(CC) $(CXXFLAGS) -c $< -o $@
 	
+all: vp2
 
 vp2: $(OBJDIR) $(OBJS)
 	$(CC) -o vp2 $(OBJS)
+
+clean:
+	rm $(OBJS)
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)

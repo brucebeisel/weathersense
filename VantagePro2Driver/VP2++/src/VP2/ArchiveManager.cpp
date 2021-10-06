@@ -52,6 +52,9 @@ ArchiveManager::readArchive() {
         }
     }
 
+    if (list.size() > 0)
+        cout << "Archive: " << list[0].formatMessage() << endl;
+
     return result;
 }
 

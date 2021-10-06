@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2020 Bruce Beisel
+ * Copyright (C) 2021 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 namespace vp2 {
 class VP2Logger;
 class CurrentWeather;
+class CurrentWeatherPublisher;
 
 /**
  * Class that coordinates the communications with the Vantage Pro 2 console.
@@ -44,7 +45,7 @@ public:
      * @param socket The object that communicates with the WeatherSense collector
      * @param station The object that handles the command protocols with the VP2 console
      */
-    VantagePro2Driver(ArchiveManager & archiveManager, WeatherSenseSocket & socket, VantagePro2Station & station);
+    VantagePro2Driver(ArchiveManager & archiveManager, WeatherSenseSocket & socket, CurrentWeatherPublisher & cwp, VantagePro2Station & station);
 
     /**
      * Destructor.
@@ -109,6 +110,7 @@ private:
 
     VantagePro2Station & station;
     WeatherSenseSocket & socket;
+    CurrentWeatherPublisher & currentWeatherPublisher;
     ArchiveManager & archiveManager;
     bool exitLoop;
     bool receivedFirstLoopPacket;
