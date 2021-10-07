@@ -16,6 +16,7 @@
  */
 package com.bdb.weather.collector;
 
+import com.bdb.weather.uploader.WeatherUploader;
 import com.bdb.weather.collector.messages.SensorStationMessage;
 import com.bdb.weather.collector.messages.SensorStationStatusMessage;
 import com.bdb.weather.collector.messages.SensorMessage;

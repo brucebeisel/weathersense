@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2016 Bruce Beisel
+ * Copyright (C) 2021 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.bdb.weather.collector.wunderground;
+package com.bdb.weather.uploader.weatherunderground;
 
 import java.time.temporal.TemporalAccessor;
 
@@ -25,6 +25,7 @@ import com.bdb.weather.common.measurement.Pressure;
 import com.bdb.weather.common.measurement.SolarRadiation;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
+import com.bdb.weather.common.measurement.UvIndex;
 
 /**
  *
@@ -115,4 +116,6 @@ public class WeatherUndergroundRecord {
      * The current solar radiation reading
      */
     public SolarRadiation solarRadiation;
+
+    public UvIndex uvIndex;
 }
