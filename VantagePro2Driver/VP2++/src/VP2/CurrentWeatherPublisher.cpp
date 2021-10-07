@@ -102,15 +102,6 @@ CurrentWeatherPublisher::createSocket()
     groupAddr.sin_addr.s_addr = inet_addr(MULTICAST_HOST.c_str());
     groupAddr.sin_port = htons(MULTICAST_PORT);
 
-    char loopback = 0;
-    if (setsockopt(socketId, IPPROTO_IP, IP_MULTICAST_LOOP, &loopback, sizeof(loopback)) < 0) {
-	int e = errno;
-	logger.log(VP2Logger::VP2_ERROR) <<  "setsockopt() for loopback failed. Errno = " << e << endl;
-        close(socketId);
-        socketId = NO_SOCKET;
-        return false;
-    }
-
     struct sockaddr_in saddr;
     if (!getLocalIpAddress(saddr)) {
 	logger.log(VP2Logger::VP2_ERROR) <<  "setsockopt() getting local IP address failed." << endl;
@@ -119,8 +110,6 @@ CurrentWeatherPublisher::createSocket()
         return false;
     }
 
-    //struct in_addr local;
-    //local.s_addr = inet_addr("9.5.1.1");
     if (setsockopt(socketId, IPPROTO_IP, IP_MULTICAST_IF, (char *)&saddr.sin_addr, sizeof(saddr.sin_addr)) < 0) {
 	int e = errno;
 	logger.log(VP2Logger::VP2_ERROR) <<  "setsockopt() for local interface failed. Errno = " << e << endl;

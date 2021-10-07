@@ -59,7 +59,7 @@ public class CurrentWeatherSubscriber implements Runnable {
      *
      */
     public static final int DEFAULT_PORT = 11461;
-    private static final int RECEIVE_TIMEOUT_MILLIS = 2000;
+    private static final int RECEIVE_TIMEOUT_MILLIS = 10000;
     private final MulticastSocket socket;
     private final CurrentWeatherHandler handler;
     private Thread thread;

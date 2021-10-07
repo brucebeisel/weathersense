@@ -29,40 +29,42 @@ public class UvIndex implements Serializable {
     /**
      * The minimum UV index value
      */
-    public static final int MIN_UV_INDEX = 0;
+    public static final float MIN_UV_INDEX = 0.0F;
     /**
      * The maximum UV index value
      */
-    public static final int MAX_UV_INDEX = 15;
+    public static final float MAX_UV_INDEX = 15.0F;
     
+    /*
     private static final UvIndex UV_INDEX_VALUES[] = new UvIndex[MAX_UV_INDEX + 1];
     static {
         for (int i = MIN_UV_INDEX; i <= MAX_UV_INDEX; i++)
             UV_INDEX_VALUES[i] = new UvIndex(i);
     }
+    */
     
     @XmlValue
-    private final int index;
+    private final float index;
     
     /**
      * Get a UvIndex from a integer value.
      * 
      * @param uvIndex The integer equivalent of a UV index
      * @return The UV index
-     */
-    public static UvIndex getUvIndex(int uvIndex) {
+    public static UvIndex getUvIndex(float uvIndex) {
         if (uvIndex < MIN_UV_INDEX || uvIndex > MAX_UV_INDEX)
             throw new IllegalArgumentException(String.format("UV Index must be between %d and %d (inclusive)", MIN_UV_INDEX, MAX_UV_INDEX));
         
         return UV_INDEX_VALUES[uvIndex];
     }
+     */
 
     /**
      * Constructor.
      * 
      * @param index The integer equivalent of a UV index
      */
-    private UvIndex(int index) {
+    public UvIndex(float index) {
         if (index < MIN_UV_INDEX || index > MAX_UV_INDEX)
             throw new IllegalArgumentException(String.format("UV Index must be between %d and %d (inclusive)", MIN_UV_INDEX, MAX_UV_INDEX));
         
@@ -78,7 +80,7 @@ public class UvIndex implements Serializable {
      * 
      * @return The index
      */
-    public int getIndex() {
+    public float getIndex() {
         return index;
     }
 
@@ -90,7 +92,7 @@ public class UvIndex implements Serializable {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 47 * hash + this.index;
+        hash = 47 * hash + Math.round(this.index * 10.0F);
         return hash;
     }
 

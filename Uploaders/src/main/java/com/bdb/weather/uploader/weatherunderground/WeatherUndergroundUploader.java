@@ -328,6 +328,8 @@ public class WeatherUndergroundUploader implements CurrentWeatherSubscriber.Curr
 
         sb.append(WUNDERGROUND_RAPIDFIRE_FREQ);
 
+        System.out.println(sb);
+
         return sb;
     }
 

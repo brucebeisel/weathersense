@@ -332,9 +332,9 @@ public class HistoryTable extends DBTable<HistoricalRecord> {
             if (!rs.wasNull())
                 rec.setAvgUvIndex(fval);
             
-            int ival = rs.getInt(HIGH_UV_INDEX_COLUMN);
+            fval = rs.getInt(HIGH_UV_INDEX_COLUMN);
             if (!rs.wasNull())
-                rec.setHighUvIndex(UvIndex.getUvIndex(ival));
+                rec.setHighUvIndex(new UvIndex(fval));
             
             d = rs.getDouble(AVG_SOLAR_RADIATION_COLUMN);
             if (!rs.wasNull())
@@ -548,7 +548,7 @@ public class HistoryTable extends DBTable<HistoricalRecord> {
                     
                     UvIndex uvIndex = record.getHighUvIndex();
                     if (uvIndex != null)
-                        stmt.setInt(n++, uvIndex.getIndex());
+                        stmt.setFloat(n++, uvIndex.getIndex());
                     else
                         stmt.setNull(n++, Types.INTEGER);
                     
