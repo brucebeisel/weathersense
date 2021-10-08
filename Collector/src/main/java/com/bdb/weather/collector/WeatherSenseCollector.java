@@ -16,7 +16,6 @@
  */
 package com.bdb.weather.collector;
 
-import com.bdb.weather.collector.wunderground.WeatherUnderground;
 import com.bdb.weather.collector.socket.SocketReaderThread;
 
 import java.io.IOException;
@@ -102,11 +101,10 @@ final class WeatherSenseCollector {
             boolean findMissingData = findMissingDataProp.equals("true");
 
             CollectorDbWriter writer = new CollectorDbWriter(dbUrl, DatabaseConstants.DATABASE_USER, DatabaseConstants.DATABASE_PASSWORD);
-            WeatherUnderground weatherUnderground = new WeatherUnderground();
-            MessageProcessor processor = new MessageProcessor(dbUrl, DatabaseConstants.DATABASE_USER, DatabaseConstants.DATABASE_PASSWORD, writer, weatherUnderground);
+            MessageProcessor processor = new MessageProcessor(dbUrl, DatabaseConstants.DATABASE_USER, DatabaseConstants.DATABASE_PASSWORD, writer);
             SocketReaderThread socketReaderThread = new SocketReaderThread(CollectorConstants.COLLECTOR_PORT, processor);
             DopplerRadarManager doppler = new DopplerRadarManager(writer);
-            DataMonitor dataMonitor = new DataMonitor(dbUrl, DatabaseConstants.DATABASE_USER, DatabaseConstants.DATABASE_PASSWORD, doppler, weatherUnderground, writer);
+            DataMonitor dataMonitor = new DataMonitor(dbUrl, DatabaseConstants.DATABASE_USER, DatabaseConstants.DATABASE_PASSWORD, doppler, writer);
 
             //
             // Start the socket reader for the XML interface

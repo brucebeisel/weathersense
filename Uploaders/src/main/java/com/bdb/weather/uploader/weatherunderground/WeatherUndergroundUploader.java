@@ -131,9 +131,9 @@ public class WeatherUndergroundUploader implements CurrentWeatherSubscriber.Curr
      * Class to hold the statistics about the communications with Weather Underground.
      */
     public static class Statistics {
-        int numAttempts;
-        int numSuccesses;
-        int numFailures;
+        public int numAttempts;
+        public int numSuccesses;
+        public int numFailures;
     };
 
     /**

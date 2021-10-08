@@ -129,7 +129,7 @@ public class Archive {
             record.setAvgSolarRadiation(new SolarRadiation(12.0));
             record.setHighSolarRadiation(new SolarRadiation(100.0));
             record.setAvgUvIndex(5.0F);
-            record.setHighUvIndex(UvIndex.getUvIndex(10));
+            record.setHighUvIndex(new UvIndex(10));
             record.setEvapotranspiration(new Depth(50.0));
 
             record.setAvgWind(new Wind(new Speed(4.0), new Heading(90.0F)));

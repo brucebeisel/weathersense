@@ -104,7 +104,7 @@ public class DataGenerator {
         cw.setStormRain(new Depth(.8));
         cw.setStormStart(LocalDate.now());
         cw.setSolarRadiation(new SolarRadiation(4.0));
-        cw.setUvIndex(UvIndex.getUvIndex(7));
+        cw.setUvIndex(new UvIndex(7));
         cw.setBaroTrend(WeatherTrend.RISING_RAPIDLY);
         cw.setForecast(Forecast.MOSTLY_CLOUDY);
         cw.setDewPoint(new Temperature(18.0));
@@ -157,7 +157,7 @@ public class DataGenerator {
         record.setAvgSolarRadiation(new SolarRadiation(12.0));
         record.setHighSolarRadiation(new SolarRadiation(100.0));
         record.setAvgUvIndex(5.0F);
-        record.setHighUvIndex(UvIndex.getUvIndex(10));
+        record.setHighUvIndex(new UvIndex(10));
         record.setEvapotranspiration(new Depth(50.0));
 
         record.setAvgWind(new Wind(new Speed(4.0), new Heading(90.0F)));
