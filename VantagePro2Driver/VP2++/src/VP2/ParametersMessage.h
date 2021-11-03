@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,31 +36,31 @@ public:
     virtual ~ParametersMessage();
 
     std::string getFirmwareDate() const;
-    void setFirmwareDate(const std::string & value);
+    void        setFirmwareDate(const std::string & value);
 
     std::string getFirmwareVersion() const;
-    void setFirmwareVersion(const std::string & value);
+    void        setFirmwareVersion(const std::string & value);
 
-    double getLatitude() const;
-    void setLatitude(double value);
+    double      getLatitude() const;
+    void        setLatitude(double value);
 
-    double getLongitude() const;
-    void setLongitude(double value);
+    double      getLongitude() const;
+    void        setLongitude(double value);
 
-    int getElevation() const;
-    void setElevation(int value);
+    int         getElevation() const;
+    void        setElevation(int value);
 
-    int getRainSeasonStart() const;
-    void setRainSeasonStart(int value);
+    int         getRainSeasonStart() const;
+    void        setRainSeasonStart(int value);
 
-    int getArchivePeriod() const;
-    void setArchivePeriod(int value);
+    int         getArchivePeriod() const;
+    void        setArchivePeriod(int value);
 
-    int getWindCupSize() const;
-    void setWindCupSize(int value);
+    int         getWindCupSize() const;
+    void        setWindCupSize(int value);
 
-    Rainfall getRainCollectorSize() const;
-    void setRainCollectorSize(Rainfall value);
+    Rainfall    getRainCollectorSize() const;
+    void        setRainCollectorSize(Rainfall value);
 
     std::string formatMessage() const;
 
@@ -75,13 +75,13 @@ private:
     //
     std::string firmwareDate;
     std::string firmwareVersion;
-    double latitude;
-    double longitude;
-    int elevation;
-    int rainSeasonStart;
-    int archivePeriod;
-    int windCupSize;
-    Rainfall rainCollectorSize;
+    double      latitude;
+    double      longitude;
+    int         elevation;
+    int         rainSeasonStart;
+    int         archivePeriod;
+    int         windCupSize;
+    Rainfall    rainCollectorSize;
 };
 }
 #endif	/* PARAMETERS_MESSAGE_H */

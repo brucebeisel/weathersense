@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,6 +60,8 @@ static int CRC_TABLE[] = {
     0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0,
 };
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 int
 VantagePro2CRC::calculateCRC(const byte * buffer, int length) {
     int crc = 0;
@@ -70,6 +72,8 @@ VantagePro2CRC::calculateCRC(const byte * buffer, int length) {
     return crc;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 VantagePro2CRC::checkCRC(const byte * buffer, int length) {
     int sentCRC = BitConverter::toInt16(buffer, length, false) & 0xFFFF;

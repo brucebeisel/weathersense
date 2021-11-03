@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,12 +28,12 @@ class UnitConverter {
 public:
  
     /**
-     * Convert from Fahrenheit to Celcius
+     * Convert from Fahrenheit to Celsius
      * 
      * @param temperature The temperature in Fahrenheit
-     * @return The temperature in Celcius
+     * @return The temperature in Celsius
      */
-    static Temperature toCelcius(Temperature temperature);
+    static Temperature toCelsius(Temperature temperature);
 
     /**
      * Convert from inches to millimeters.
@@ -53,11 +53,17 @@ public:
 
     /**
      * Convert from MPH to meters per second.
+     *
      * @param speed The wind speed in MPH
      * @return The wind speed in meters per second
      */
     static Speed toMetersPerSecond(Speed speed);
 
+    /**
+     * Convert feet to millimeters
+     *
+     * @param elevation An elevation in feet
+     */
     static double feetToMillimeters(double elevation);
 private:
     /**

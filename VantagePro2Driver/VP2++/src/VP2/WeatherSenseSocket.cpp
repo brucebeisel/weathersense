@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,8 @@ using namespace std;
 
 namespace vp2 {
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 WeatherSenseSocket::WeatherSenseSocket(const string & host, unsigned short port) : reader(NULL),
                                                                         host(host),
                                                                         port(port),
@@ -54,20 +56,23 @@ WeatherSenseSocket::WeatherSenseSocket(const string & host, unsigned short port)
 #endif
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 WeatherSenseSocket::~WeatherSenseSocket() {
 #ifdef _WIN32
     WSACleanup();
 #endif
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 WeatherSenseSocket::setHistoricalReader(HistoricalReader & reader) {
     this->reader = &reader;
 }
 
-/// <summary>
-/// Disconnect from the collector
-/// </summary>
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 WeatherSenseSocket::disconnectSocket() {
     if (socketId != NO_SOCKET) {
@@ -76,19 +81,15 @@ WeatherSenseSocket::disconnectSocket() {
     }
 }
 
-/// <summary>
-/// Check if there is a connector with the collector
-/// </summary>
-/// <returns>True if a connection exists</returns>
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 WeatherSenseSocket::isSocketConnected() const {
     return socketId != NO_SOCKET;
 }
 
-/// <summary>
-/// Write a string to the collector
-/// </summary>
-/// <param name="s">The string to write</param>
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 WeatherSenseSocket::writeString(const string & s) {
     if (socketId != NO_SOCKET) {
@@ -102,9 +103,8 @@ WeatherSenseSocket::writeString(const string & s) {
     }
 }
 
-/// <summary>
-/// Connect to the collector
-/// </summary>
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 WeatherSenseSocket::connectSocket() {
     //
@@ -185,11 +185,8 @@ WeatherSenseSocket::connectSocket() {
     }
 }
 
-/// <summary>
-/// Send data to the WeatherSense collector
-/// </summary>
-/// <param name="data">The data to send</param>
-/// <returns>True if the data was sent</returns>
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 WeatherSenseSocket::sendData(const string & data) {
     

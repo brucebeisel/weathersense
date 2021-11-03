@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,18 +45,18 @@ public:
      */
     bool parseLoop2Packet(const byte[]);
 
-    Speed getWindGust10Minute() const;
-    Heading getWindGustHeading10Minute() const;
-    Speed getWindSpeed2MinuteAvg() const;
-    Rainfall getRainHour() const;
-    Rainfall getRain15Minute() const;
-    Rainfall getRain24Hour() const;
+    Speed       getWindGust10Minute() const;
+    Heading     getWindGustHeading10Minute() const;
+    Speed       getWindSpeed2MinuteAvg() const;
+    Rainfall    getRainHour() const;
+    Rainfall    getRain15Minute() const;
+    Rainfall    getRain24Hour() const;
     Temperature getDewPoint() const;
     Temperature getHeatIndex() const;
     Temperature getWindChill() const;
-    bool isThswValid() const;
+    bool        isThswValid() const;
     Temperature getThsw() const;
-    Pressure getAtmPressure() const;
+    Pressure    getAtmPressure() const;
 
     /**
      * Set the rainfall increment that will be used to translate the rain bucket tip count to an actual amount of rain.
@@ -66,19 +66,20 @@ public:
     static void setRainfallIncrement(Rainfall increment);
 
 private:
-    Speed windGust10Minute;
-    Heading windGustHeading10Minute;
-    Speed windSpeed2MinuteAvg;
-    Rainfall rain15Minute;
-    Rainfall rainHour;
-    Rainfall rain24Hour;
+    Speed       windGust10Minute;
+    Heading     windGustHeading10Minute;
+    Speed       windSpeed2MinuteAvg;
+    Rainfall    rain15Minute;
+    Rainfall    rainHour;
+    Rainfall    rain24Hour;
     Temperature dewPoint;
     Temperature heatIndex;
     Temperature windChill;
     Temperature thsw;
-    bool thswValid;
-    Pressure atmPressure;
-    VP2Logger log;
+    bool        thswValid;
+    Pressure    atmPressure;
+    VP2Logger   log;
+
     static Rainfall rainfallIncrement;
 };
 }

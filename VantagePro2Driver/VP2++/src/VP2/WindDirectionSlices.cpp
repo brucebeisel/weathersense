@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ namespace vp2 {
 const Heading WindDirectionSlices::DEGREES_PER_SLICE = static_cast<Heading>(22.5);
 const Heading WindDirectionSlices::HALF_SLICE = DEGREES_PER_SLICE / static_cast<Heading>(2.0);
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 WindDirectionSlices::WindDirectionSlices() {
     Heading heading = -HALF_SLICE;
     for (int i = 0; i < NUM_SLICES; i++) {
@@ -34,9 +36,13 @@ WindDirectionSlices::WindDirectionSlices() {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 WindDirectionSlices::~WindDirectionSlices() {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 WindDirectionSlices::addHeading(Heading heading) {
     if (heading > 360.0 - HALF_SLICE)
@@ -65,10 +71,8 @@ WindDirectionSlices::addHeading(Heading heading) {
     std::sort(windSlices, &windSlices[NUM_SLICES]);
 }
 
-/// <summary>
-/// Get the list of past headings that have the most number of samples
-/// </summary>
-/// <returns>The list of past headings, up to a maximum of 4</returns>
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 WindDirectionSlices::pastHeadings(vector<int> & headings) const {
     //

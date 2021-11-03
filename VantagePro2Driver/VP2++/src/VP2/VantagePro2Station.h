@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -166,6 +166,10 @@ public:
      */
     bool retrieveSensorStationInfo();
 
+    bool retrieveAlarmSettings();
+
+    bool retrieveHiLowValues();
+
 
 private:
     static const int NUM_ARCHIVE_PAGES = 512;
@@ -183,8 +187,21 @@ private:
     static const int VP2_YEAR_OFFSET = 2000;
     static const int HILOW_PACKET_SIZE = 436;
 
-    bool        sendOKedCommand(const std::string &);
-    bool        sendAckedCommand(const std::string &);
+    /**
+     * Send a command that expects on "OK" response.
+
+     * @param command The command to be sent to the VP2 console
+     * @return True if the command was sent successfully
+     */
+    bool        sendOKedCommand(const std::string & command);
+
+    /**
+     * Send a command that expects an ACK response.
+     *
+     * @param command The command to be sent to the VP2 console
+     * @return True if the command was sent successfully
+     */
+    bool        sendAckedCommand(const std::string & command);
     bool        consumeAck();
     bool        readLoopPacket(LoopPacket & loopPacket);
     bool        readLoop2Packet(Loop2Packet & loop2Packet);
@@ -195,7 +212,6 @@ private:
     bool        readEEPROM(const std::string & address, int count);
     void        dump(std::vector<ArchivePacket> & list);
     bool        archivePacketContainsData(const byte * buffer, int offset);
-    bool        requestHiLowPacket();
 
     SerialPort                 serialPort;
     std::string                portName;

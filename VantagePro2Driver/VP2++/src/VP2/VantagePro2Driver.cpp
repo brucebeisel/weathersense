@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,9 @@ extern bool signalCaught;
 }
 
 namespace vp2 {
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 VantagePro2Driver::VantagePro2Driver(ArchiveManager & archiveManager, WeatherSenseSocket & socket, CurrentWeatherPublisher & cwp, VantagePro2Station & station) :
                                                                 station(station),
                                                                 socket(socket),
@@ -52,9 +55,13 @@ VantagePro2Driver::VantagePro2Driver(ArchiveManager & archiveManager, WeatherSen
     consoleTimeSetTime = time(0) - TIME_SET_INTERVAL + (1 * 3600);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 VantagePro2Driver::~VantagePro2Driver() {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 VantagePro2Driver::connected(DateTime newestArchiveTimeFromCollector) {
     log.log(VP2Logger::VP2_DEBUG1) << "Connected with collector. Archive time = " << Weather::formatDateTime(newestArchiveTimeFromCollector) << endl;
@@ -72,6 +79,8 @@ VantagePro2Driver::connected(DateTime newestArchiveTimeFromCollector) {
     socket.sendData(message);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 int
 VantagePro2Driver::initialize() {
     log.log(VP2Logger::VP2_INFO) << "Initializing..." << endl;
@@ -146,6 +155,8 @@ VantagePro2Driver::initialize() {
     return 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 VantagePro2Driver::stop() {
     exitLoop = true;
@@ -153,6 +164,8 @@ VantagePro2Driver::stop() {
     socket.disconnectSocket();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 VantagePro2Driver::processCurrentWeather(const CurrentWeather & cw) {
     //string currentWeatherMessage = cw.formatMessage();
@@ -168,6 +181,8 @@ VantagePro2Driver::processCurrentWeather(const CurrentWeather & cw) {
     return signalCaught || previousNextRecord != nextRecord;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 VantagePro2Driver::processArchive(const vector<ArchivePacket> & archive) {
 
@@ -208,6 +223,8 @@ VantagePro2Driver::processArchive(const vector<ArchivePacket> & archive) {
     return true;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 VantagePro2Driver::reopenStation() {
     station.closeStation();
@@ -219,6 +236,8 @@ VantagePro2Driver::reopenStation() {
     return success;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 VantagePro2Driver::mainLoop() {
     DateTime stationTime = station.getTime();
@@ -252,6 +271,13 @@ VantagePro2Driver::mainLoop() {
                 consoleTimeSetTime = now;
 
             }
+
+            //
+            // Get the high/low values
+            //
+            HiLowPacket packet;
+            if (station.retrieveHiLowValues(packet))
+                cout << "Got hi/low packet" << endl;
 
             //
             // Get the current weather values for about a minute

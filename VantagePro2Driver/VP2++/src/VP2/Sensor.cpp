@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,11 +35,15 @@ static const char *SENSOR_NAMES[] = {
     "BAROMETER"
 };
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Sensor::Sensor(SensorType type, int id) {
     sensorType = type;
     sensorId = id;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 Sensor::detectSensors(LoopPacket loop, vector<Sensor> & sensors) {
     sensors.push_back(Sensor(THERMOMETER, OUTDOOR_THERMOMETER_SENSOR_ID));
@@ -87,11 +91,8 @@ Sensor::detectSensors(LoopPacket loop, vector<Sensor> & sensors) {
     }
 }
 
-/// <summary>
-/// Format the sensor message
-/// </summary>
-/// <param name="list">The list from which to build the message</param>
-/// <returns>The message as a string</returns>
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 string
 Sensor::formatMessage(const vector<Sensor> & list) {
     ostringstream sb;
