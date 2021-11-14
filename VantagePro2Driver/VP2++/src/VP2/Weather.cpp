@@ -77,8 +77,8 @@ Weather::dumpBuffer(const byte buffer[], int nbytes) {
 ////////////////////////////////////////////////////////////////////////////////
 void
 Weather::sleep(long millis) {
-#ifdef _WIN32
-    Sleep(millis);
+#ifdef __CYGWIN__
+    sleep(millis);
 #else
     usleep(millis * 1000);
 #endif

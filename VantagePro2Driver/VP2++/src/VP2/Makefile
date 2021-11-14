@@ -1,5 +1,5 @@
 CC= g++
-CXXFLAGS= -g -Wno-psabi
+CXXFLAGS= -g -std=c++17
 
 SRCS=ArchiveManager.cpp \
 	ArchivePacket.cpp \
@@ -7,6 +7,7 @@ SRCS=ArchiveManager.cpp \
 	CurrentWeather.cpp \
 	CurrentWeatherPublisher.cpp \
 	ForecastRule.cpp \
+    HiLowPacket.cpp \
 	Loop2Packet.cpp \
 	LoopPacket.cpp \
 	main.cpp \
@@ -14,17 +15,19 @@ SRCS=ArchiveManager.cpp \
 	ProtocolException.cpp \
 	Sensor.cpp \
 	SensorStation.cpp \
-	SerialPort.cpp \
+    SerialPort.cpp \
 	UnitConverter.cpp \
 	VantagePro2CRC.cpp \
 	VantagePro2Driver.cpp \
 	VantagePro2Station.cpp \
 	VP2Constants.cpp \
 	VP2Logger.cpp \
+    VP2Utils.cpp \
 	Weather.cpp \
 	WeatherSenseSocket.cpp \
 	WindDirectionSlices.cpp \
 	WindSlice.cpp
+
 
 OBJDIR=../../target/VP2
 OBJLIST=$(SRCS:.cpp=.o)

@@ -23,7 +23,7 @@
 
 namespace vp2 {
 /**
- * Class that parses and stores the data from the LOOP packet.
+ * Class that decodes and stores the data from the LOOP packet.
  */
 class LoopPacket {
 public:
@@ -68,10 +68,10 @@ public:
     /**
      * Parse the LOOP packet buffer.
      * 
-     * @param buffer The buffer to parse
-     * @return True if the LOOP packet was parsed successfully
+     * @param buffer The buffer to decode
+     * @return True if the LOOP packet was decoded successfully
      */
-    bool               parseLoopPacket(byte buffer[]);
+    bool               decodeLoopPacket(byte buffer[]);
 
     int                getNextRecord() const;
     Temperature        getOutsideTemperature() const;

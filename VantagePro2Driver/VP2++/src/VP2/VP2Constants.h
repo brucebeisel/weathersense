@@ -17,6 +17,7 @@
 #ifndef VP2_CONSTANTS_H
 #define	VP2_CONSTANTS_H
 #include <string>
+#include "Weather.h"
 
 namespace vp2 {
 /**
@@ -30,17 +31,18 @@ public:
     //
     // Various values used generically in various command protocols
     //
-    static const int  NO_VALUE = 0xFF;
-    static const char LINE_FEED = '\n';
-    static const char CARRIAGE_RETURN = '\r';
-    static const char ACK = 0x6;
-    static const char NACK = 0x21; // Not an ASCII NACK, but it is what is used
-    static const char CANCEL = 0x18;
-    static const char ESCAPE = 0x15;
-    static const std::string COMMAND_TERMINATOR;
-    static const std::string CRC_FAILURE;
-    static const std::string RESPONSE_FRAME;
-    static const std::string COMMAND_RECOGNIZED_RESPONSE;
+    static constexpr char NULLCHAR = '\0';
+    static constexpr int  NO_VALUE = 0xFF;
+    static constexpr char LINE_FEED = '\n';
+    static constexpr char CARRIAGE_RETURN = '\r';
+    static constexpr char ACK = 0x6;
+    static constexpr char NACK = 0x21; // Not an ASCII NACK, but it is what is used
+    static constexpr char CANCEL = 0x18;
+    static constexpr char ESCAPE = 0x15;
+    static constexpr char COMMAND_TERMINATOR[] = {LINE_FEED, NULLCHAR};
+    static constexpr char CRC_FAILURE[] =  {CANCEL, NULLCHAR};
+    static constexpr char RESPONSE_FRAME[] = {LINE_FEED, CARRIAGE_RETURN, NULLCHAR};
+    static constexpr char COMMAND_RECOGNIZED_RESPONSE[] = {LINE_FEED, CARRIAGE_RETURN, 'O', 'K', LINE_FEED, CARRIAGE_RETURN, NULLCHAR};
 
     //
     // Wakeup command/response
@@ -242,6 +244,7 @@ public:
     static const int APB_MAX_LEAF_WETNESSES = 2;
     static const int APB_MAX_LEAF_TEMPERATURES = 2;
 
+
     //
     // Dump/Dump After responses
     //
@@ -250,75 +253,40 @@ public:
     static const std::string DMP_RESEND_PAGE;
 
     static const int NUM_ARCHIVE_RECORDS = 2560;
-    //
-    // Archive packet (Rev B)
-    //
-    static const int APB_BYTES_PER_RECORD = 52;
-    static const int APB_REV_A_RECORD_TYPE = 0xFF;
-    static const int APB_REV_B_RECORD_TYPE = 0;
-    static const int APB_DATE_STAMP_OFFSET = 0;
-    static const int APB_TIME_STAMP_OFFSET = 2;
-    static const int APB_OUTSIDE_TEMPERATURE_OFFSET = 4;
-    static const int APB_HIGH_OUTSIDE_TEMPERATURE_OFFSET = 6;
-    static const int APB_LOW_OUTSIDE_TEMPERATURE_OFFSET = 8;
-    static const int APB_RAINFALL_OFFSET = 10;
-    static const int APB_HIGH_RAIN_RATE_OFFSET = 12;
-    static const int APB_BAROMETER_OFFSET = 14;
-    static const int APB_SOLAR_RADIATION_OFFSET = 16;
-    static const int APB_NUM_WIND_SAMPLES_OFFSET = 18;
-    static const int APB_INSIDE_TEMPERATURE_OFFSET = 20;
-    static const int APB_INSIDE_HUMIDITY_OFFSET = 22;
-    static const int APB_OUTSIDE_HUMIDITY_OFFSET = 23;
-    static const int APB_AVG_WIND_SPEED_OFFSET = 24;
-    static const int APB_HIGH_WIND_SPEED_OFFSET = 25;
-    static const int APB_DIR_OF_HIGH_WIND_SPEED_OFFSET = 26;
-    static const int APB_PREVAILING_WIND_DIRECTION_OFFSET = 27;
-    static const int APB_AVG_UV_INDEX_OFFSET = 28;
-    static const int APB_ET_OFFSET = 29;
-    static const int APB_HIGH_SOLAR_RADIATION_OFFSET = 30;
-    static const int APB_HIGH_UV_INDEX_OFFSET = 32;
-    static const int APB_FORECAST_RULE_OFFSET = 33;
-    static const int APB_LEAF_TEMPERATURE_BASE_OFFSET = 34;
-    static const int APB_LEAF_WETNESS_BASE_OFFSET = 36;
-    static const int APB_SOIL_TEMPERATURE_BASE_OFFSET = 38;
-    static const int APB_RECORD_TYPE_OFFSET = 42;
-    static const int APB_EXTRA_HUMIDITIES_BASE_OFFSET = 43;
-    static const int APB_EXTRA_TEMPERATURES_BASE_OFFSET = 45;
-    static const int APB_SOIL_MOISTURES_BASE_OFFSET = 48;
-
-    static const int APB_EXTRA_TEMPERATURE_OFFSET = 90;
-
-    static const int APB_INVALID_TEMPERATURE = 32767;
-    static const int APB_INVALID_HIGH_TEMPERATURE = -32768;
-    static const int APB_INVALID_EXTRA_TEMPERATURE = 255;
-    static const int APB_INVALID_HUMIDITY = 255;
-    static const int APB_INVALID_WIND_DIRECTION = 255;
-    static const int APB_INVALID_WIND_SPEED = 255;
-    static const int APB_INVALID_UV_INDEX = 255;
-    static const int APB_INVALID_LEAF_WETNESS = 255;
-    static const int APB_INVALID_LEAF_TEMPERATURE = 255;
-    static const int APB_INVALID_SOIL_TEMPERATURE = 255;
-    static const int APB_INVALID_SOIL_MOISTURE = 255;
-    static const int APB_INVALID_BAROMETER = 0;
-    static const int APB_INVALID_SOLAR_RADIATION = 32767;
-
-    static const int APB_MIN_LEAF_WETNESS = 0;
-    static const int APB_MAX_LEAF_WETNESS = 15;
-
-    static const int APB_TEMPERATURE_SCALE = 10;
-    static const int APB_AVG_UV_INDEX_SCALE = 10;
-    static const int APB_ET_SCALE = 1000;
-    static const int APB_BAROMETER_SCALE = 1000;
 
     //
     // Common constants
     //
-    static const Temperature TEMPERATURE_16BIT_SCALE = 10.0;
-    static const int         TEMPERATURE_16BIT_INVALID_VALUE = 32767;
-    static const Temperature TEMPERATURE_8BIT_OFFSET = 90.0;
-    static const int         TEMPERATURE_8BIT_INVALID_VALUE = 255;
-    static const Pressure    BAROMETER_SCALE = 1000.0;
-    static const int         YEAR_OFFSET = 2000;
+    static constexpr Temperature        TEMPERATURE_16BIT_SCALE = 10.0;
+    static constexpr int                TEMPERATURE_16BIT_INVALID_VALUE = 32767;
+    static constexpr Temperature        TEMPERATURE_8BIT_OFFSET = 90.0;
+    static constexpr int                TEMPERATURE_8BIT_INVALID_VALUE = 255;
+    static constexpr Pressure           BAROMETER_SCALE = 1000.0;
+    static constexpr int                YEAR_OFFSET = 2000;
+    static constexpr UvIndex            UV_INDEX_SCALE= 10.0;
+    static constexpr Evapotranspiration ET_SCALE= 1000.0;
+
+    static constexpr int INVALID_16BIT_TEMPERATURE = 32767;
+    static constexpr int INVALID_16BIT_HIGH_TEMPERATURE = -32768;
+    static constexpr int INVALID_8BIT_TEMPERATURE = 255;
+    static constexpr int INVALID_HUMIDITY = 255;
+    static constexpr int INVALID_WIND_DIRECTION = 255;
+    static constexpr int INVALID_WIND_SPEED = 255;
+    static constexpr int INVALID_UV_INDEX = 255;
+    static constexpr int INVALID_LEAF_WETNESS = 255;
+    static constexpr int INVALID_LEAF_TEMPERATURE = 255;
+    static constexpr int INVALID_SOIL_TEMPERATURE = 255;
+    static constexpr int INVALID_SOIL_MOISTURE = 255;
+    static constexpr int INVALID_BAROMETER = 0;
+    static constexpr int INVALID_SOLAR_RADIATION = 32767;
+    static constexpr int INVALID_ET = 0;
+
+    //
+    // A wind slice is a segment of wind direction that is centered on a compass direction such
+    // as N, NNE, NE, etc.
+    //
+    static constexpr int NUM_WIND_DIR_SLICES = 16;
+    static constexpr double DEGREES_PER_SLICE = 360.0 / NUM_WIND_DIR_SLICES;
 };
 }
 

@@ -124,9 +124,9 @@ Loop2Packet::getAtmPressure() const {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 bool
-Loop2Packet::parseLoop2Packet(const byte *buffer) {
+Loop2Packet::decodeLoop2Packet(const byte *buffer) {
     if (rainfallIncrement == 0.0) {
-        log.log(VP2Logger::VP2_ERROR) << "Rain increment not set, cannot parse LOOP2 packet" << endl;
+        log.log(VP2Logger::VP2_ERROR) << "Rain increment not set, cannot decode LOOP2 packet" << endl;
         return false;
     }
 
@@ -153,12 +153,12 @@ Loop2Packet::parseLoop2Packet(const byte *buffer) {
     rain15Minute = UnitConverter::toMillimeter((Rainfall)BitConverter::toInt16(buffer, 52) * rainfallIncrement);
     rainHour = UnitConverter::toMillimeter((Rainfall)BitConverter::toInt16(buffer, 54) * rainfallIncrement);
     rain24Hour = UnitConverter::toMillimeter((Rainfall)BitConverter::toInt16(buffer, 58) * rainfallIncrement);
-    dewPoint = UnitConverter::toCelcius(BitConverter::toInt16(buffer, 30));
-    heatIndex = UnitConverter::toCelcius(BitConverter::toInt16(buffer, 35));
-    windChill = UnitConverter::toCelcius(BitConverter::toInt16(buffer, 37));
+    dewPoint = UnitConverter::toCelsius(BitConverter::toInt16(buffer, 30));
+    heatIndex = UnitConverter::toCelsius(BitConverter::toInt16(buffer, 35));
+    windChill = UnitConverter::toCelsius(BitConverter::toInt16(buffer, 37));
     int thswRaw = BitConverter::toInt16(buffer, 37);
     thswValid = thswRaw != 32767;
-    thsw = UnitConverter::toCelcius(thswRaw);
+    thsw = UnitConverter::toCelsius(thswRaw);
     atmPressure = (Pressure)BitConverter::toInt16(buffer, 65) / 1000.0F;
 
 

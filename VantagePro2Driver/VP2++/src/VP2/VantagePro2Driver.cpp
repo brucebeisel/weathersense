@@ -20,6 +20,7 @@
 #include <vector>
 #include "CurrentWeather.h"
 #include "CurrentWeatherPublisher.h"
+#include "HiLowPacket.h"
 #include "SensorStation.h"
 #include "VP2Logger.h"
 #include "VantagePro2Driver.h"

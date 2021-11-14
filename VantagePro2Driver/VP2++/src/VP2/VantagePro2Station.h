@@ -31,6 +31,7 @@
 
 namespace vp2 {
 class CurrentWeather;
+class HiLowPacket;
 
 /**
  * Class that handles the command protocols with the VP2 console.
@@ -168,7 +169,7 @@ public:
 
     bool retrieveAlarmSettings();
 
-    bool retrieveHiLowValues();
+    bool retrieveHiLowValues(HiLowPacket &packet);
 
 
 private:
@@ -205,7 +206,7 @@ private:
     bool        consumeAck();
     bool        readLoopPacket(LoopPacket & loopPacket);
     bool        readLoop2Packet(Loop2Packet & loop2Packet);
-    void        parseArchivePage(std::vector<ArchivePacket> &, const byte * buffer, int firstRecord, DateTime newestPacketTime);
+    void        decodeArchivePage(std::vector<ArchivePacket> &, const byte * buffer, int firstRecord, DateTime newestPacketTime);
     bool        processArchivePage(std::vector<ArchivePacket> &, int firstRecord, DateTime newestPacketTime);
     std::string getStringValue(const std::string & command);
     Rainfall    getRainCollectorSize() const;

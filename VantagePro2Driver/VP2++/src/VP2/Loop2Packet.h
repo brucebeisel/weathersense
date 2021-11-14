@@ -23,7 +23,7 @@
 namespace vp2 {
 
 /**
- * Class that parses and holds the data from the VP2 LOOP 2 packet.
+ * Class that decodes and holds the data from the VP2 LOOP 2 packet.
  */
 class Loop2Packet {
 public:
@@ -40,10 +40,10 @@ public:
     /**
      * Parse the LOOP 2 packet.
      * 
-     * @param The buffer from which to parse the packet
-     * @return True if the buffer was parsed successfully
+     * @param The buffer from which to decode the packet
+     * @return True if the buffer was decoded successfully
      */
-    bool parseLoop2Packet(const byte[]);
+    bool decodeLoop2Packet(const byte[]);
 
     Speed       getWindGust10Minute() const;
     Heading     getWindGustHeading10Minute() const;

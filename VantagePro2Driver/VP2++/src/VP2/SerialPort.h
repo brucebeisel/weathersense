@@ -16,7 +16,7 @@
  */
 #ifndef SERIAL_PORT_H
 #define SERIAL_PORT_H
-#ifdef _WIN32
+#ifdef __CYGWIN__
 #include <windows.h>
 #else
 typedef int HANDLE;

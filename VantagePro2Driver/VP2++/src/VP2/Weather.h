@@ -24,19 +24,19 @@ namespace vp2 {
 //
 // Typedefs for the various weather types
 //
-typedef double Speed;
-typedef double Rainfall;
-typedef double Temperature;
-typedef double Pressure;
-typedef double Humidity;
-typedef double SolarRadiation;
-typedef float  UvIndex;
-typedef int    LeafWetness;
-typedef int    SoilMoisture;
-typedef float  Heading;
-typedef char   byte;
-typedef time_t DateTime;
-typedef double Evapotranspiration;
+using Speed = double;
+using Rainfall = double;
+using Temperature = double;
+using Pressure = double;
+using Humidity = double;
+using SolarRadiation = double;
+using UvIndex = float;
+using LeafWetness = int;
+using SoilMoisture = int;
+using Heading = float;
+using byte = char;
+using DateTime = time_t;
+using Evapotranspiration = double;
 
 /**
  * Utility container class for various functions.

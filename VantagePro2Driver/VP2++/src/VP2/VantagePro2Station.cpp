@@ -23,6 +23,7 @@
 #include <sstream>
 #include "VP2Constants.h"
 #include "CurrentWeather.h"
+#include "HiLowPacket.h"
 #include "VantagePro2CRC.h"
 #include "BitConverter.h"
 #include "ProtocolException.h"
@@ -330,7 +331,7 @@ VantagePro2Station::readLoopPacket(LoopPacket & loopPacket) {
     if (!serialPort.read(buffer, LOOP_PACKET_SIZE))
         return false;
 
-    if (!loopPacket.parseLoopPacket(buffer))
+    if (!loopPacket.decodeLoopPacket(buffer))
         return false;
 
     //
@@ -362,7 +363,7 @@ VantagePro2Station::readLoop2Packet(Loop2Packet & loop2Packet) {
     if (!serialPort.read(buffer, LOOP_PACKET_SIZE))
         return false;
 
-    if (!loop2Packet.parseLoop2Packet(buffer))
+    if (!loop2Packet.decodeLoop2Packet(buffer))
         return false;
 
     log.log(VP2Logger::VP2_DEBUG1) << "LOOP2 packet read successfully" << endl;
@@ -475,7 +476,7 @@ VantagePro2Station::convertBufferToArchivePacket(const byte * buffer, int index)
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 void
-VantagePro2Station::parseArchivePage(vector<ArchivePacket> & list, const byte * buffer, int firstRecord, DateTime newestPacketTime) {
+VantagePro2Station::decodeArchivePage(vector<ArchivePacket> & list, const byte * buffer, int firstRecord, DateTime newestPacketTime) {
     int recordCount = 0;
     log.log(VP2Logger::VP2_DEBUG1) << "Parsing archive page. Newest packet time = " << Weather::formatDateTime(newestPacketTime) << endl;
 
@@ -522,7 +523,7 @@ VantagePro2Station::processArchivePage(vector<ArchivePacket> & list, int firstRe
     for (int i = 0; i < 3; i++) {
         if (serialPort.read(buffer, ARCHIVE_PAGE_SIZE + CRC_BYTES)) {
             if (VantagePro2CRC::checkCRC(buffer, ARCHIVE_PAGE_SIZE)) {
-                parseArchivePage(list, buffer, firstRecord, newestPacketTime);
+                decodeArchivePage(list, buffer, firstRecord, newestPacketTime);
                 rv = true;
                 break;
             }
@@ -662,7 +663,7 @@ VantagePro2Station::retrieveHiLowValues(HiLowPacket & packet) {
         return false;
     }
 
-    packet.parseHiLowPacket(buffer);
+    packet.decodeHiLowPacket(buffer);
     cout << "Hi/Low packet:" << endl << packet.formatMessage() << endl;
     return true;
 }

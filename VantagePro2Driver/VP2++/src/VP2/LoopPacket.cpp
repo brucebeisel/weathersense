@@ -19,6 +19,7 @@
 #include "BitConverter.h"
 #include "UnitConverter.h"
 #include "VP2Constants.h"
+#include "VP2Utils.h"
 #include "VantagePro2CRC.h"
 #include "LoopPacket.h"
 
@@ -327,9 +328,9 @@ LoopPacket::isStormOngoing() const {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 bool
-LoopPacket::parseLoopPacket(byte buffer[]) {
+LoopPacket::decodeLoopPacket(byte buffer[]) {
     if (rainfallIncrement == 0) {
-        log.log(VP2Logger::VP2_ERROR) << "Rain increment not set, cannot parse LOOP packet" << endl;
+        log.log(VP2Logger::VP2_ERROR) << "Rain increment not set, cannot decode LOOP packet" << endl;
         return false;
     }
 
@@ -401,7 +402,7 @@ LoopPacket::parseLoopPacket(byte buffer[]) {
         //int temperature = BitConverter::toInt8(buffer, 29 + i);
         //leafTemperatureValid[i] = temperature != INVALID_EXTRA_TEMPERATURE;
         //leafTemperature[i] = UnitConverter::toCelsius(temperature - TEMPERATURE_OFFSET);
-        leafTemperature[i] = VP2Utils::parse8BitTemperature(buffer, 29 + i, leafTemperatureValid[i]);
+        leafTemperature[i] = VP2Utils::decode8BitTemperature(buffer, 29 + i, leafTemperatureValid[i]);
     }
 
     outsideHumidity = BitConverter::toInt8(buffer, 33);

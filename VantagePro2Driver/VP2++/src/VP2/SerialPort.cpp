@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _WIN32
+#ifndef __CYGWIN__
 #include <fcntl.h>
 #include <termios.h>
 #include <errno.h>
 #include <unistd.h>
+#include <winsock2.h>
 #endif
 #include <iostream>
 #include "VP2Logger.h"
@@ -40,7 +41,7 @@ SerialPort::SerialPort(const std::string & device, int baudRate) : device(device
 SerialPort::~SerialPort(){
 }
 
-#ifdef _WIN32
+#ifdef __CYGWIN__
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 bool

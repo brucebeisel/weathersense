@@ -23,7 +23,7 @@
 
 namespace vp2 {
 /**
- * Class that parses and stores the data from the High/Low packet.
+ * Class that decodes and stores the data from the High/Low packet.
  */
 class HiLowPacket {
 public:
@@ -40,10 +40,10 @@ public:
     /**
      * Parse the High/Lows packet buffer.
      * 
-     * @param buffer The buffer to parse
-     * @return True if the Hi/Low packet was parsed successfully
+     * @param buffer The buffer to decodes
+     * @return True if the Hi/Low packet was decodes successfully
      */
-    bool parseHiLowPacket(byte buffer[]);
+    bool decodeHiLowPacket(byte buffer[]);
 
     std::string formatMessage() const;
 
@@ -180,48 +180,45 @@ public:
     //
 
 private:
-    template<typename T>
-    struct HighValues {
-        T        dayHighValue;
-        DateTime dayHighValueTime;
-        T        monthHighValue;
-        T        yearHighValue;
-    };
 
     template<typename T>
-    struct LowValues {
-        T        dayLowValue;
-        DateTime dayLowValueTime;
-        T        monthLowValue;
-        T        yearLowValue;
+    struct Values {
+        T        dayExtremeValue;
+        DateTime dayExtremeValueTime;
+        T        monthExtremeValue;
+        T        yearExtremeValue;
     };
+
+    template<typename T> using LowValues = Values<T>;
+    template<typename T> using HighValues = Values<T>;
 
     template<typename T>
-    struct HiLowValues {
-        LowValues<T>  lows;
-        HighValues<T> highs;
+    struct HighLowValues {
+        Values<T>  lows;
+        Values<T> highs;
     };
 
+    bool decodeHiLowTemperature(const byte buffer[], HighLowValues<Temperature> & values, int baseOffset);
 
-    HiLowValues<Pressure>     barometer;
-    LowValues<Wind>           wind;
-    HiLowValues<Temperature>  insideTemperature;
-    HiLowValues<Humidity>     insideHumidity;
-    HiLowValues<Temperature>  outsideTemperature;
-    HiLowValues<Humidity>     outsideHumidity;
-    HiLowValues<Temperature>  dewPoint;
-    HiValues<Temperature>     heatIndex;
-    LowValues<Temperature>    windChill;
-    HiValues<Temperature>     thsw;
-    HiValues<SolarRadiation>  solarRadiation;
-    HiValues<UvIndex>         uvIndex;
-    HiValues<Rainfall>        rainRate;
-    HiLowValues<Temperature>  extraTemperatures[7];
-    HiLowValues<Temperature>  soilTemperatures[4];
-    HiLowValues<Temperature>  leafTemperatures[4];
-    HiLowValues<Humidity>     extraHumidity[NUM_EXTRA_HUMIDITIES];
-    HiLowValues<SoilMoisture> soilMoisture[4];
-    HiLowValues<LeafWetness>  leafWetness[4];
+    HighLowValues<Pressure>     barometer;
+    LowValues<Speed>            wind;
+    HighLowValues<Temperature>  insideTemperature;
+    HighLowValues<Humidity>     insideHumidity;
+    HighLowValues<Temperature>  outsideTemperature;
+    HighLowValues<Humidity>     outsideHumidity;
+    HighLowValues<Temperature>  dewPoint;
+    HighValues<Temperature>     heatIndex;
+    LowValues<Temperature>      windChill;
+    HighValues<Temperature>     thsw;
+    HighValues<SolarRadiation>  solarRadiation;
+    HighValues<UvIndex>         uvIndex;
+    HighValues<Rainfall>        rainRate;
+    HighLowValues<Temperature>  extraTemperatures[7];
+    HighLowValues<Temperature>  soilTemperatures[4];
+    HighLowValues<Temperature>  leafTemperatures[4];
+    HighLowValues<Humidity>     extraHumidity[NUM_EXTRA_HUMIDITIES];
+    HighLowValues<SoilMoisture> soilMoisture[4];
+    HighLowValues<LeafWetness>  leafWetness[4];
 
     VP2Logger          log;
 

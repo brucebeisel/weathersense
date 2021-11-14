@@ -20,10 +20,10 @@ namespace vp2 {
     //
     // Generic strings for various command protocols
     //
-    const std::string VP2Constants::COMMAND_TERMINATOR = std::string(1, VP2Constants::LINE_FEED);
-    const std::string VP2Constants::CRC_FAILURE = std::string(1, VP2Constants::CANCEL);
-    const std::string VP2Constants::RESPONSE_FRAME = std::string(1, VP2Constants::LINE_FEED) + std::string(1, VP2Constants::CARRIAGE_RETURN);;
-    const std::string VP2Constants::COMMAND_RECOGNIZED_RESPONSE = VP2Constants::RESPONSE_FRAME + "OK" + VP2Constants::RESPONSE_FRAME;
+    //const std::string VP2Constants::COMMAND_TERMINATOR = std::string(1, VP2Constants::LINE_FEED);
+    //const std::string VP2Constants::CRC_FAILURE = std::string(1, VP2Constants::CANCEL);
+    //const std::string VP2Constants::RESPONSE_FRAME = std::string(1, VP2Constants::LINE_FEED) + std::string(1, VP2Constants::CARRIAGE_RETURN);;
+    //const std::string VP2Constants::COMMAND_RECOGNIZED_RESPONSE = VP2Constants::RESPONSE_FRAME + "OK" + VP2Constants::RESPONSE_FRAME;
 
     //
     // Wakeup command/response

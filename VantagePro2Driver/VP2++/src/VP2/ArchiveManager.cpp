@@ -91,7 +91,7 @@ ArchiveManager::addPackets(const vector<ArchivePacket> & packets) {
     stream.open(archiveFile.c_str(), ofstream::out | ios::app | ios::binary);
     for (vector<ArchivePacket>::const_iterator it = packets.begin(); it != packets.end(); ++it) {
         if (newestPacketTime < it->getDateTime()) {
-            stream.write(it->getBuffer(), VP2Constants::APB_BYTES_PER_RECORD);
+            stream.write(it->getBuffer(), ArchivePacket::BYTES_PER_PACKET);
             newestPacketTime = it->getDateTime();
             log.log(VP2Logger::VP2_DEBUG1) << "Archived packet with time: " << Weather::formatDateTime(it->getDateTime()) << endl;
         }
@@ -107,14 +107,14 @@ void
 ArchiveManager::findPacketTimeRange() {
     ifstream stream(archiveFile.c_str(), ios::in | ios::binary | ios::ate);
     streampos fileSize = stream.tellg();
-    if (fileSize > VP2Constants::APB_BYTES_PER_RECORD) {
-        byte buffer[VP2Constants::APB_BYTES_PER_RECORD];
+    if (fileSize > ArchivePacket::BYTES_PER_PACKET) {
+        byte buffer[ArchivePacket::BYTES_PER_PACKET];
         stream.seekg(0, ios::beg);
         stream.read(buffer, sizeof(buffer));
         ArchivePacket packet = station.convertBufferToArchivePacket(buffer, 0);
         oldestPacketTime = packet.getDateTime();
 
-        stream.seekg(-VP2Constants::APB_BYTES_PER_RECORD, ios::end);
+        stream.seekg(-ArchivePacket::BYTES_PER_PACKET, ios::end);
         stream.read(buffer, sizeof(buffer));
         packet = station.convertBufferToArchivePacket(buffer, 0);
         newestPacketTime = packet.getDateTime();
@@ -140,9 +140,9 @@ ArchiveManager::getArchiveRecords(std::vector<ArchivePacket>& list) {
 void
 ArchiveManager::readPackets(vector<ArchivePacket> & list, DateTime startTime) {
     log.log(VP2Logger::VP2_DEBUG1) << "Reading packets after " << Weather::formatDateTime(startTime) << endl;
-    byte buffer[VP2Constants::APB_BYTES_PER_RECORD];
+    byte buffer[ArchivePacket::BYTES_PER_PACKET];
     ifstream stream(archiveFile.c_str(), ios::in | ios::binary);
-    stream.seekg(-VP2Constants::APB_BYTES_PER_RECORD, ios::end);
+    stream.seekg(-ArchivePacket::BYTES_PER_PACKET, ios::end);
     streampos streamPosition;
     DateTime packetTime;
 
@@ -157,7 +157,7 @@ ArchiveManager::readPackets(vector<ArchivePacket> & list, DateTime startTime) {
             streamPosition = stream.tellg();
             stream.read(buffer, sizeof(buffer));
             ArchivePacket packet = station.convertBufferToArchivePacket(buffer, 0);
-            stream.seekg(-(VP2Constants::APB_BYTES_PER_RECORD * 2), ios::cur);
+            stream.seekg(-(ArchivePacket::BYTES_PER_PACKET * 2), ios::cur);
             packetTime = packet.getDateTime();
         } while (startTime < packetTime && streamPosition > 0);
 
@@ -170,7 +170,7 @@ ArchiveManager::readPackets(vector<ArchivePacket> & list, DateTime startTime) {
             stream.seekg(0, ios::beg);
         }
         else
-            stream.seekg(VP2Constants::APB_BYTES_PER_RECORD * 2, ios::cur);
+            stream.seekg(ArchivePacket::BYTES_PER_PACKET * 2, ios::cur);
     }
     else
         stream.seekg(0, ios::beg);
