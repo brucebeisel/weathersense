@@ -53,8 +53,6 @@ public:
     //
     // Testing Commands
     //
-    static constexpr std::string FOOBAR("foobar");
-
     static const std::string TEST_CMD;
     static const std::string STATION_TYPE_CMD;
     // Console diagnostics report
