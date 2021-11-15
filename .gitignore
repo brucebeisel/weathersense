@@ -5,3 +5,4 @@
 *.log
 /WeatherSenseDisplayJavaFX/target/
 /Uploaders/target/
+*.o
