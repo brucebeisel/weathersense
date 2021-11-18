@@ -24,6 +24,7 @@
 #include "SensorStation.h"
 #include "VP2Logger.h"
 #include "VantagePro2Driver.h"
+#include "Vp2Decoder.h"
 #include "VP2Constants.h"
 
 using namespace std;
@@ -112,6 +113,8 @@ VantagePro2Driver::initialize() {
         log.log(VP2Logger::VP2_ERROR) << "Failed to retrieve rain collector size" << endl;
         return 3;
     }
+
+    VP2Decoder::setRainCollectorSize(station.getRainCollectorSize());
 
     if (!station.retrieveArchivePeriod()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to retrieve archive period" << endl;
@@ -253,7 +256,7 @@ VantagePro2Driver::mainLoop() {
             // the console. It has been observed that on a rare occasion the console
             // never wakes up. Only restarting this driver fixes the issue. Reopening
             // the serial port will hopefully fix this issue. It is hoped that if
-            // the this does not work will cause the health monitor to restart the
+            // this does not work, it will cause the health monitor to restart the
             // driver, also fixing the issue.
             //
             if (!station.wakeupStation()) {

@@ -63,7 +63,7 @@ CurrentWeather::formatMessage() const {
 
     ss << "<wind><speed>" << loopPacket.getWindSpeed() << "</speed><direction>" << loopPacket.getWindDirection() << "</direction></wind>"
        << "<windGust><speed>" << loop2Packet.getWindGust10Minute() << "</speed><direction>" << loop2Packet.getWindGustHeading10Minute() << "</direction></windGust>"
-       << "<windSpeed10MinAvg>" << loopPacket.getAvgWindSpeed10Min() << "</windSpeed10MinAvg>" 
+       << "<windSpeed10MinAvg>" << loop2Packet.getWindSpeed10MinuteAvg() << "</windSpeed10MinAvg>" 
        << "<windSpeed2MinAvg>" << loop2Packet.getWindSpeed2MinuteAvg() << "</windSpeed2MinAvg>";
 
     vector<int> pastWindDirsList;
@@ -72,12 +72,13 @@ CurrentWeather::formatMessage() const {
        ss << "<windDir" << i + 2 << ">" << pastWindDirsList.at(i) << "</windDir" << i + 2 << ">";
    
     ss << "<baroPressure>" << loopPacket.getBarometricPressure() << "</baroPressure>"
+       << "<atmPressure>" << loop2Packet.getAtmPressure() << "</atmPressure>"
        << "<baroTrend>" << loopPacket.getBaroTrendString() << "</baroTrend>"
        << "<rainRate>" << loopPacket.getRainRate() << "</rainRate>"
        << "<rainToday>" << loopPacket.getDayRain() << "</rainToday>"
        << "<rain15Minute>" << loop2Packet.getRain15Minute() << "</rain15Minute>"
        << "<rainHour>" << loop2Packet.getRainHour() << "</rainHour>"
-       <<  "<rain24Hour>" << loop2Packet.getRain24Hour() << "</rain24Hour>"
+       << "<rain24Hour>" << loop2Packet.getRain24Hour() << "</rain24Hour>"
        << "<rainMonth>" << loopPacket.getMonthRain() << "</rainMonth>" 
        << "<rainWeatherYear>" << loopPacket.getYearRain() << "</rainWeatherYear>";
     
@@ -104,7 +105,7 @@ CurrentWeather::formatMessage() const {
         << "<forecast>" << loopPacket.getForecastIconString() << "</forecast>" 
         << "<temperatureSensorEntries>";
 
-    for (int i = 0; i < LoopPacket::NUM_EXTRA_TEMPERATURES; i++) {
+    for (int i = 0; i < VP2Constants::MAX_EXTRA_TEMPERATURES; i++) {
         if (loopPacket.isExtraTemperatureValid(i)) {
             ss << "<entry><key>" << 100 + i << "</key><value><sensorId>" << 100 + i << "</sensorId><sensorType>THERMOMETER</sensorType>"
                << "<measurement xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"temperature\">"
@@ -114,7 +115,7 @@ CurrentWeather::formatMessage() const {
     ss << "</temperatureSensorEntries>"
        << "<humiditySensorEntries>";
 
-    for (int i = 0; i < LoopPacket::NUM_EXTRA_HUMIDITIES; i++) {
+    for (int i = 0; i < VP2Constants::MAX_EXTRA_HUMIDITIES; i++) {
         if (loopPacket.isExtraHumidityValid(i)) {
             ss << "<entry><key>" << 200 + i << "</key><value><sensorId>" << 200 + i << "</sensorId><sensorType>HYGROMETER</sensorType>"
                << "<measurement xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"humidity\">"
@@ -125,7 +126,7 @@ CurrentWeather::formatMessage() const {
     ss << "</humiditySensorEntries>"
        << "<soilMoistureSensorEntries>";
 
-    for (int i = 0; i < LoopPacket::NUM_SOIL_MOISTURES; i++) {
+    for (int i = 0; i < VP2Constants::MAX_SOIL_MOISTURES; i++) {
         if (loopPacket.isSoilMoistureValid(i)) {
             ss << "<entry><key>" << 600 + i << "</key><value><sensorId>" << 600 + i << "</sensorId><sensorType>SOIL_MOISTURE</sensorType>"
                << "<measurement xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"soilMoisture\">"
@@ -135,7 +136,7 @@ CurrentWeather::formatMessage() const {
     ss << "</soilMoistureSensorEntries>"
        << "<leafWetnessSensorEntries>";
 
-    for (int i = 0; i < LoopPacket::NUM_LEAF_WETNESSES; i++) {
+    for (int i = 0; i < VP2Constants::MAX_LEAF_WETNESSES; i++) {
         if (loopPacket.isLeafWetnessValid(i)) {
             ss << "<entry><key>" << 500 + i << "</key><value><sensorId>" << 500 + i << "</sensorId><sensorType>LEAF_WETNESS</sensorType>"
                << "<measurement xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"leafWetness\">"

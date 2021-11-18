@@ -26,30 +26,6 @@ namespace vp2 {
 class ForecastRule {
 public:
     /**
-     * The array of forecast strings.
-     */
-    static const std::string FORECAST[];
-
-    /**
-     * Constructor.
-     * 
-     * @param rule The rule that this class represents
-     */
-    ForecastRule(int rule);
-
-    /**
-     * Destructor.
-     */
-    virtual ~ForecastRule();
-
-    /**
-     * Get the rule's integer value.
-     * 
-     * @return The rule value
-     */
-    int getRule() const;
-       
-    /**
      * Return the string representation of this rule's forecast.
      * 
      * @param rule The rule
@@ -58,7 +34,11 @@ public:
     static const std::string & forecastString(int rule);
 
 private:
-    int rule;
+    ForecastRule();
+    /**
+     * The array of forecast strings.
+     */
+    static const std::string FORECAST[];
     static const int NUM_RULES;
 };
 }

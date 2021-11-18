@@ -20,6 +20,7 @@
 #include <string>
 #include "VP2Logger.h"
 #include "Weather.h"
+#include "VP2Constants.h"
 
 namespace vp2 {
 /**
@@ -27,14 +28,6 @@ namespace vp2 {
  */
 class LoopPacket {
 public:
-    // TODO Use the constants from VP2 constants
-    static const int NUM_EXTRA_TEMPERATURES = 7;
-    static const int NUM_EXTRA_HUMIDITIES =   7;
-    static const int NUM_SOIL_TEMPERATURES =  4;
-    static const int NUM_LEAF_TEMPERATURES =  3;
-    static const int NUM_SOIL_MOISTURES =     4;
-    static const int NUM_LEAF_WETNESSES =     3;
-
     /**
      * The trend of the barometer as reported in the LOOP packet
      */
@@ -50,19 +43,32 @@ public:
     /**
      * The forecast reported by the LOOP packet.
      */
+    unsigned int RAIN_BIT = 0x1;
+    unsigned int MOSTLY_CLOUDY_BIT = 0x2;
+    unsigned int PARTLY_CLOUDY_BIT = 0x6;
+    unsigned int SUNNY_BIT = 0x8;
+    unsigned int SNOW_BIT = 0x10;
+
     enum Forecast {
-        SUNNY =                                  8,
-        PARTLY_CLOUDY =                          6,
-        MOSTLY_CLOUDY =                          2,
-        MOSTLY_CLOUDY_WITH_RAIN =                3,
-        MOSTLY_CLOUDY_WITH_SNOW =               18,
-        MOSTLY_CLOUDY_WITH_RAIN_OR_SNOW =       19,
-        PARTLY_CLOUDY_WITH_RAIN_LATER =          7,
-        PARTLY_CLOUDY_WITH_SNOW_LATER =         22,
-        PARTLY_CLOUDY_WITH_RAIN_OR_SNOW_LATER = 23
+        SUNNY =                                 0x08,
+        PARTLY_CLOUDY =                         0x06,
+        MOSTLY_CLOUDY =                         0x02,
+        MOSTLY_CLOUDY_WITH_RAIN =               0x03,
+        MOSTLY_CLOUDY_WITH_SNOW =               0x12,
+        MOSTLY_CLOUDY_WITH_RAIN_OR_SNOW =       0x13,
+        PARTLY_CLOUDY_WITH_RAIN_LATER =         0x07,
+        PARTLY_CLOUDY_WITH_SNOW_LATER =         0x16,
+        PARTLY_CLOUDY_WITH_RAIN_OR_SNOW_LATER = 0x17
     };
 
+    /**
+     * Constructor.
+     */
     LoopPacket();
+
+    /**
+     * Destructor.
+     */
     ~LoopPacket();
 
     /**
@@ -116,27 +122,10 @@ public:
     Evapotranspiration getMonthET() const;
     Evapotranspiration getYearET() const;
 
-    static void        setRainfallIncrement(Rainfall increment);
-
 private:
+    static const int LOOP_PACKET_TYPE = 0;
+
     VP2Logger          log;
-
-    static DateTime extractStormStartDate(int time);
-
-    static const int                TEMPERATURE_OFFSET = 90;
-    static const Temperature        TEMPERATURE_SCALE;
-    static const int                INVALID_EXTRA_TEMPERATURE = 255;
-    static const int                INVALID_EXTRA_HUMIDITY = 255;
-    static const int                INVALID_UV_INDEX = 255;
-    static const int                INVALID_LEAF_WETNESS = 255;
-    static const int                INVALID_SOIL_MOISTURE = 255;
-    static const int                INVALID_SOLAR_RADIATION = 32767;
-    static const int                STORM_START_YEAR_OFFSET = 2000;
-    static const Rainfall           STORM_RAINFALL_SCALE;
-    static const Pressure           BAROMETER_SCALE;
-    static const Evapotranspiration DAY_ET_SCALE;
-    static const Evapotranspiration MONTH_ET_SCALE;
-    static const Evapotranspiration YEAR_ET_SCALE;
 
     int                nextRecord;
     Temperature        outsideTemperature;
@@ -152,32 +141,39 @@ private:
     Rainfall           dayRain;
     Rainfall           monthRain;
     Rainfall           yearRain;
-    int                uvIndex;
+    UvIndex            uvIndex;
+    bool               uvIndexValid;
     SolarRadiation     solarRadiation;
     Evapotranspiration dayET;
     Evapotranspiration monthET;
     Evapotranspiration yearET;
     Forecast           forecastIcon;
     int                forecastRule;
-    DateTime           sunRiseTime;
-    DateTime           sunSetTime;
+    DateTime           sunriseTime;
+    DateTime           sunsetTime;
     DateTime           stormStart;
     Speed              avgWindSpeed10Min;
     Speed              avgWindSpeed2Min;
     int                transmitterBatteryStatus;
     float              consoleBatteryVoltage;
 
-    SoilMoisture       soilMoisture[NUM_SOIL_MOISTURES];
-    LeafWetness        leafWetness[NUM_LEAF_WETNESSES];
-    Temperature        leafTemperature[NUM_LEAF_TEMPERATURES];
-    bool               leafTemperatureValid[NUM_LEAF_TEMPERATURES];
-    Temperature        soilTemperature[NUM_SOIL_TEMPERATURES];
-    bool               soilTemperatureValid[NUM_SOIL_TEMPERATURES];
-    Temperature        temperatureExtra[NUM_EXTRA_TEMPERATURES];
-    bool               temperatureExtraValid[NUM_EXTRA_TEMPERATURES];
-    Humidity           humidityExtra[NUM_EXTRA_HUMIDITIES];
+    SoilMoisture       soilMoisture[VP2Constants::MAX_SOIL_MOISTURES];
+    bool               soilMoistureValid[VP2Constants::MAX_SOIL_MOISTURES];
 
-    static Rainfall    rainfallIncrement;
+    LeafWetness        leafWetness[VP2Constants::MAX_LEAF_WETNESSES];
+    bool               leafWetnessValid[VP2Constants::MAX_LEAF_WETNESSES];
+
+    Temperature        leafTemperature[VP2Constants::MAX_LEAF_TEMPERATURES];
+    bool               leafTemperatureValid[VP2Constants::MAX_LEAF_TEMPERATURES];
+
+    Temperature        soilTemperature[VP2Constants::MAX_SOIL_TEMPERATURES];
+    bool               soilTemperatureValid[VP2Constants::MAX_SOIL_TEMPERATURES];
+
+    Temperature        temperatureExtra[VP2Constants::MAX_EXTRA_TEMPERATURES];
+    bool               temperatureExtraValid[VP2Constants::MAX_EXTRA_TEMPERATURES];
+
+    Humidity           humidityExtra[VP2Constants::MAX_EXTRA_HUMIDITIES];
+    bool               humidityExtraValid[VP2Constants::MAX_EXTRA_HUMIDITIES];
 };
 }
 #endif

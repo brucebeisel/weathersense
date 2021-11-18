@@ -107,12 +107,22 @@ public:
      */
     DateTime getTime();
 
+
+    /**
+     * Decode a buffer into a single archive packet.
+     *
+     * @param buffer The buffer from which to decode the archive packet
+     * @param index  The index within the buffer to start decoding the archive packet
+     *
+     * @return The decoded archive packet
+     */
     ArchivePacket convertBufferToArchivePacket(const byte * buffer, int index) const;
 
     /**
      * Perform a dump of the archive after the specified time.
      * 
-     * @param time the time after which to dump the archive
+     * @param time    The time after which to dump the archive
+     * @param archive The vector into which the dumped archive packets will be returned
      * @return True if successful
      */
     bool dumpAfter(DateTime time, std::vector<ArchivePacket> & archive);
@@ -154,6 +164,13 @@ public:
     bool retrieveRainCollectorSize();
 
     /**
+     * Get the size of the rain collector that was previously retrieved
+     *
+     * @return The size of the rain collector in inches
+     */
+    Rainfall    getRainCollectorSize() const;
+
+    /**
      * Retrieve the archive period from the console.
      * 
      * @return True if the archive period was stored successfully
@@ -173,20 +190,24 @@ public:
 
 
 private:
-    static const int NUM_ARCHIVE_PAGES = 512;
-    static const int ARCHIVE_PAGE_SIZE = 265;
-    static const int LOOP_PACKET_SIZE = 99;
-    static const int RECORDS_PER_ARCHIVE_PAGE = 5;
-    static const int BYTES_PER_ARCHIVE_RECORD = 52;
-    static const int CRC_BYTES = 2;
-    static const int TIME_RESPONSE_LENGTH = 6;
-    static const int DUMP_AFTER_RESPONSE_LENGTH = 4;
-    static const int TIME_LENGTH = 4;
-    static const int WAKEUP_TRIES = 5;
-    static const int SET_TIME_LENGTH = 6;
-    static const int LOOP_PACKET_WAIT = 2000;
-    static const int VP2_YEAR_OFFSET = 2000;
-    static const int HILOW_PACKET_SIZE = 436;
+    static constexpr int WAKEUP_TRIES = 5;               // The number of times to try to wake up the console before performing a disconnect/reconnect cycle
+    static constexpr int CRC_BYTES = 2;                  // The number of bytes in the CRC
+
+    static constexpr int NUM_ARCHIVE_PAGES = 512;        // The total number of pages in the console's memory
+    static constexpr int ARCHIVE_PAGE_SIZE = 265;        // 1 sequence byte, 5 52 byte records (260 bytes) and 4 spare bytes. 1 + 260 + 4 = 265 bytes
+    static constexpr int BYTES_PER_ARCHIVE_RECORD = 52;  // The size of each archive record
+    static constexpr int RECORDS_PER_ARCHIVE_PAGE = 5;   // The number of archive records per archive page
+    static constexpr int DUMP_AFTER_RESPONSE_LENGTH = 4; // The length of the response to the DUMP AFTER command
+
+    static constexpr int LOOP_PACKET_SIZE = 99;
+    static constexpr int TIME_RESPONSE_LENGTH = 6;
+    static constexpr int TIME_LENGTH = 4;
+    static constexpr int SET_TIME_LENGTH = 6;
+    static constexpr int LOOP_PACKET_WAIT = 2000;
+    static constexpr int VP2_YEAR_OFFSET = 2000;
+    static constexpr int HILOW_PACKET_SIZE = 436;
+    static constexpr int NO_VALUE = 0xFF;
+
 
     /**
      * Send a command that expects on "OK" response.
@@ -209,7 +230,6 @@ private:
     void        decodeArchivePage(std::vector<ArchivePacket> &, const byte * buffer, int firstRecord, DateTime newestPacketTime);
     bool        processArchivePage(std::vector<ArchivePacket> &, int firstRecord, DateTime newestPacketTime);
     std::string getStringValue(const std::string & command);
-    Rainfall    getRainCollectorSize() const;
     bool        readEEPROM(const std::string & address, int count);
     void        dump(std::vector<ArchivePacket> & list);
     bool        archivePacketContainsData(const byte * buffer, int offset);

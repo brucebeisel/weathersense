@@ -32,7 +32,7 @@ BitConverter::~BitConverter() {
 ////////////////////////////////////////////////////////////////////////////////
 int
 BitConverter::toInt8(const byte buffer[], int index) {
-    return (int)buffer[index] & 0xFF;
+    return static_cast<int>(buffer[index]) & 0xFF;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -73,12 +73,12 @@ BitConverter::bitsToInt(const byte * bits, bool littleEndian) {
     int result = 0;
     if (littleEndian) {
         for (int n = sizeof(T) - 1; n >= 0; n--) {
-            result = (result << 8) + ((int)bits[n] & 0xFF);
+            result = (result << 8) + (static_cast<int>(bits[n]) & 0xFF);
         }
     }
     else {
         for (int n = 0; n < sizeof(T); n++)
-            result = (result << 8) + ((int)bits[n] & 0xFF);
+            result = (result << 8) + (static_cast<int>(bits[n]) & 0xFF);
     }
 
     return result;

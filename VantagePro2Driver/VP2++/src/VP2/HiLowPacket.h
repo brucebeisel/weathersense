@@ -20,6 +20,7 @@
 #include <string>
 #include "VP2Logger.h"
 #include "Weather.h"
+#include "VP2Constants.h"
 
 namespace vp2 {
 /**
@@ -27,13 +28,6 @@ namespace vp2 {
  */
 class HiLowPacket {
 public:
-    static const int NUM_EXTRA_TEMPERATURES = 7;
-    static const int NUM_EXTRA_HUMIDITIES = 7;
-    static const int NUM_SOIL_TEMPERATURES = 4;
-    static const int NUM_LEAF_TEMPERATURES = 3;
-    static const int NUM_SOIL_MOISTURES = 4;
-    static const int NUM_LEAF_WETNESSES = 3;
-
     HiLowPacket();
     ~HiLowPacket();
 
@@ -183,10 +177,11 @@ private:
 
     template<typename T>
     struct Values {
-        T        dayExtremeValue;
-        DateTime dayExtremeValueTime;
-        T        monthExtremeValue;
-        T        yearExtremeValue;
+        T           dayExtremeValue;
+        DateTime    dayExtremeValueTime;
+        T           monthExtremeValue;
+        T           yearExtremeValue;
+        std::string formatXML(bool low) const;
     };
 
     template<typename T> using LowValues = Values<T>;
@@ -194,8 +189,9 @@ private:
 
     template<typename T>
     struct HighLowValues {
-        Values<T>  lows;
-        Values<T> highs;
+        Values<T>   lows;
+        Values<T>   highs;
+        std::string formatXML() const;
     };
 
     bool decodeHiLowTemperature(const byte buffer[], HighLowValues<Temperature> & values, int baseOffset);
@@ -213,16 +209,15 @@ private:
     HighValues<SolarRadiation>  solarRadiation;
     HighValues<UvIndex>         uvIndex;
     HighValues<Rainfall>        rainRate;
-    HighLowValues<Temperature>  extraTemperatures[7];
-    HighLowValues<Temperature>  soilTemperatures[4];
-    HighLowValues<Temperature>  leafTemperatures[4];
-    HighLowValues<Humidity>     extraHumidity[NUM_EXTRA_HUMIDITIES];
-    HighLowValues<SoilMoisture> soilMoisture[4];
-    HighLowValues<LeafWetness>  leafWetness[4];
+    Rainfall                    highHourRainRate;
+    HighLowValues<Temperature>  extraTemperature[VP2Constants::MAX_EXTRA_TEMPERATURES];
+    HighLowValues<Temperature>  soilTemperature[VP2Constants::MAX_SOIL_TEMPERATURES];
+    HighLowValues<Temperature>  leafTemperature[VP2Constants::MAX_LEAF_TEMPERATURES];
+    HighLowValues<Humidity>     extraHumidity[VP2Constants::MAX_EXTRA_HUMIDITIES];
+    HighLowValues<SoilMoisture> soilMoisture[VP2Constants::MAX_SOIL_MOISTURES];
+    HighLowValues<LeafWetness>  leafWetness[VP2Constants::MAX_LEAF_WETNESSES];
 
     VP2Logger          log;
-
-    static Rainfall    rainfallIncrement;
 };
 }
 #endif

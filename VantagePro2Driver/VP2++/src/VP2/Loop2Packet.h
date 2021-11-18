@@ -48,6 +48,7 @@ public:
     Speed       getWindGust10Minute() const;
     Heading     getWindGustHeading10Minute() const;
     Speed       getWindSpeed2MinuteAvg() const;
+    Speed       getWindSpeed10MinuteAvg() const;
     Rainfall    getRainHour() const;
     Rainfall    getRain15Minute() const;
     Rainfall    getRain24Hour() const;
@@ -58,17 +59,13 @@ public:
     Temperature getThsw() const;
     Pressure    getAtmPressure() const;
 
-    /**
-     * Set the rainfall increment that will be used to translate the rain bucket tip count to an actual amount of rain.
-     * 
-     * @param increment The value that will be used to convert to actual rainfall amounts
-     */
-    static void setRainfallIncrement(Rainfall increment);
-
 private:
+    static const int LOOP2_PACKET_TYPE = 1;
+
     Speed       windGust10Minute;
     Heading     windGustHeading10Minute;
     Speed       windSpeed2MinuteAvg;
+    Speed       windSpeed10MinuteAvg;
     Rainfall    rain15Minute;
     Rainfall    rainHour;
     Rainfall    rain24Hour;
@@ -79,8 +76,6 @@ private:
     bool        thswValid;
     Pressure    atmPressure;
     VP2Logger   log;
-
-    static Rainfall rainfallIncrement;
 };
 }
 #endif

@@ -32,125 +32,13 @@ public:
     // Various values used generically in various command protocols
     //
     static constexpr char NULLCHAR = '\0';
-    static constexpr int  NO_VALUE = 0xFF;
     static constexpr char LINE_FEED = '\n';
     static constexpr char CARRIAGE_RETURN = '\r';
     static constexpr char ACK = 0x6;
     static constexpr char NACK = 0x21; // Not an ASCII NACK, but it is what is used
     static constexpr char CANCEL = 0x18;
     static constexpr char ESCAPE = 0x15;
-    static constexpr char COMMAND_TERMINATOR[] = {LINE_FEED, NULLCHAR};
-    static constexpr char CRC_FAILURE[] =  {CANCEL, NULLCHAR};
-    static constexpr char RESPONSE_FRAME[] = {LINE_FEED, CARRIAGE_RETURN, NULLCHAR};
-    static constexpr char COMMAND_RECOGNIZED_RESPONSE[] = {LINE_FEED, CARRIAGE_RETURN, 'O', 'K', LINE_FEED, CARRIAGE_RETURN, NULLCHAR};
 
-    //
-    // Wakeup command/response
-    //
-    static const std::string WAKEUP_COMMAND;
-    static const std::string WAKEUP_RESPONSE;
-
-    //
-    // Testing Commands
-    //
-    static const std::string TEST_CMD;
-    static const std::string STATION_TYPE_CMD;
-    // Console diagnostics report
-    static const std::string RECEIVE_CHECK_CMD;
-    // Move console to main current conditions screen
-    static const std::string FORCE_CONSOLE_TO_MAIN_SCREEN_CMD;
-    // Firmware date
-    static const std::string FIRMWARE_DATE_CMD;
-    // Get the list of receivers as a bitmap, bit 0 represents station ID 1
-    static const std::string RECEIVER_LIST_CMD;
-    // Get the firmware version
-    static const std::string FIRMWARE_VERSION_CMD;
-
-    //
-    // Current Data Commands
-    //
-    // Get the current data values, alarms, battery status, etc. through the LOOP packet
-    static const std::string LOOP_CMD;
-    // Get the current values through both the LOOP and LOOP2 packets
-    static const std::string LPS_CMD;
-    // Get the high and low that includes daily, monthly and yearly
-    static const std::string HIGH_LOW_CMD;
-    // Set the yearly rainfall
-    static const std::string SET_YEARLY_RAIN_CMD;
-    // Set the yearly ET
-    static const std::string SET_YEARLY_ET_CMD;
-
-    //
-    // Download Commands
-    //
-    // Dump the entire archive
-    static const std::string DUMP_ARCHIVE_CMD;
-    // Dump the archive after a given date/time
-    static const std::string DUMP_AFTER_CMD;
-
-    //
-    // EEPROM Commands
-    //
-    // Read the entire EEPROM data block
-    static const std::string DUMP_EEPROM_CMD;
-    // Read EEPROM address as hex strings
-    static const std::string READ_EEPROM_AS_HEX_CMD;
-    // Write a single byte to EEPROM as hex strings
-    static const std::string WRITE_EEPROM_AS_HEX_CMD;
-    // Read EEPROM address as binary
-    static const std::string READ_EEPROM_AS_BINARY_CMD;
-    // Write to EEPROM as binary
-    static const std::string WRITE_EEPROM_AS_BINARY_CMD;
-
-    //
-    // Calibration Commands
-    //
-    // Send temperature and humidity calibration values
-    static const std::string CALIBRATE_TEMPERATURE_HUMIDITY;
-    static const std::string CALIBRATE_TEMPERATURE_HUMIDITY2;
-    // Sets barometric offset using local reading and/or elevation
-    static const std::string SET_BAROMETRIC_DATA_CMD;
-    // Get the current barometer calibration parameters
-    static const std::string SET_BAROMETRIC_CAL_DATA_CMD;
-
-    //
-    // Clearing Commands
-    //
-    // Clear the archived data
-    static const std::string CLEAR_ARCHIVE_CMD;
-    // Clear the alarm thresholds
-    static const std::string CLEAR_ALARM_THRESHOLDS_CMD;
-    // Set temperature and humidity calibration offsets to zero
-    static const std::string CLEAR_TEMPERATURE_HUMIDTY_CALIBRATIONS_CMD;
-    // Clear the graph points
-    static const std::string CLEAR_GRAPHS_CMD;
-    // Clear cumulative value
-    static const std::string CLEAR_CUMULATIVE_VALUE_CMD;
-    // Clear the daily, monthly or yearly high values
-    static const std::string CLEAR_HIGH_VALUES_CMD;
-    // Clear the daily, monthly or yearly low values
-    static const std::string CLEAR_LOW_VALUES_CMD;
-    // Clear active alarms
-    static const std::string CLEAR_ACTIVE_ALARMS_CMD;
-    // Clear all current data values
-    static const std::string CLEAR_CURRENT_DATA_VALUES_CMD;
-
-    //
-    // Configuration Commands
-    //
-    static const std::string SET_BAUD_RATE_CMD;
-    static const std::string SET_TIME_CMD;
-    static const std::string GET_TIME_CMD;
-    // Set the gain of the radio receiver. Only Vantage Pro (not VP2 or Vue)
-    static const std::string SET_GAIN_CMD;
-    // Set how often the console saves an archive record
-    static const std::string SET_ARCHIVE_PERIOD_CMD;
-    static const std::string STOP_ARCHIVING_CMD;
-    static const std::string START_ARCHIVING_CMD;
-    // Reinitialize the console after making any significant changes to the console's configuration
-    static const std::string REINITIALIZE_CMD;
-    // Turn on/off the console's light
-    static const std::string CONTROL_LAMP_CMD;
 
     //
     // Station Types
@@ -224,19 +112,8 @@ public:
     static const std::string EE_RAIN_SEASON_START;
     static const std::string EE_ARCHIVE_PERIOD;
 
-    //
-    // Maximum counts
-    //
-    static const int MAX_SENSOR_STATIONS = 16;
-    static const int LOOP_MAX_EXTRA_TEMPERATURES = 7;
-    static const int LOOP_MAX_EXTRA_HUMIDITIES = 7;
-    static const int LOOP_MAX_SOIL_TEMPERATURES = 4;
-    static const int LOOP_MAX_SOIL_MOISTURES = 4;
-    static const int LOOP_MAX_LEAF_TEMPERATURES = 4;
-    static const int LOOP_MAX_LEAF_WETNESSES = 4;
-
-    static const int APB_MAX_EXTRA_TEMPERATURES = 3;
-    static const int APB_MAX_EXTRA_HUMIDITIES = 2;
+    //static const int APB_MAX_EXTRA_TEMPERATURES = 3;
+    //static const int APB_MAX_EXTRA_HUMIDITIES = 2;
     // The serial protocol document says this is 4, but the 4th value is not set to the Dash value when there
     // are not soil temperature sensors.
     static const int APB_MAX_SOIL_TEMPERATURES = 3;
@@ -245,14 +122,23 @@ public:
     static const int APB_MAX_LEAF_TEMPERATURES = 2;
 
 
-    //
-    // Dump/Dump After responses
-    //
-    static const std::string DMP_SEND_NEXT_PAGE;
-    static const std::string DMP_CANCEL_DOWNLOAD;
-    static const std::string DMP_RESEND_PAGE;
 
     static const int NUM_ARCHIVE_RECORDS = 2560;
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+// Everything below has been vetted. Everything above might be moved
+
+    //
+    // Maximum counts
+    //
+    static const int MAX_SENSOR_STATIONS = 16;
+    static const int MAX_EXTRA_TEMPERATURES = 7;
+    static const int MAX_EXTRA_HUMIDITIES = 7;
+    static const int MAX_SOIL_TEMPERATURES = 4;
+    static const int MAX_SOIL_MOISTURES = 4;
+    static const int MAX_LEAF_TEMPERATURES = 4;
+    static const int MAX_LEAF_WETNESSES = 4;
 
     //
     // Common constants
@@ -262,15 +148,19 @@ public:
     static constexpr Temperature        TEMPERATURE_8BIT_OFFSET = 90.0;
     static constexpr int                TEMPERATURE_8BIT_INVALID_VALUE = 255;
     static constexpr Pressure           BAROMETER_SCALE = 1000.0;
+    static constexpr Speed              AVG_WIND_SPEED_SCALE = 10.0;
     static constexpr int                YEAR_OFFSET = 2000;
     static constexpr UvIndex            UV_INDEX_SCALE= 10.0;
-    static constexpr Evapotranspiration ET_SCALE= 1000.0;
+    static constexpr Evapotranspiration DAY_ET_SCALE= 1000.0;
+    static constexpr Evapotranspiration MONTH_YEAR_ET_SCALE= 100.0;
+    static constexpr Rainfall           STORM_RAIN_SCALE= 100.0;
 
     static constexpr int INVALID_16BIT_TEMPERATURE = 32767;
     static constexpr int INVALID_16BIT_HIGH_TEMPERATURE = -32768;
     static constexpr int INVALID_8BIT_TEMPERATURE = 255;
     static constexpr int INVALID_HUMIDITY = 255;
-    static constexpr int INVALID_WIND_DIRECTION = 255;
+    static constexpr int INVALID_WIND_DIRECTION_SLICE = 255;
+    static constexpr int INVALID_WIND_DIRECTION = 0;
     static constexpr int INVALID_WIND_SPEED = 255;
     static constexpr int INVALID_UV_INDEX = 255;
     static constexpr int INVALID_LEAF_WETNESS = 255;
@@ -279,7 +169,11 @@ public:
     static constexpr int INVALID_SOIL_MOISTURE = 255;
     static constexpr int INVALID_BAROMETER = 0;
     static constexpr int INVALID_SOLAR_RADIATION = 32767;
+    static constexpr int INVALID_THSW = 32767;
     static constexpr int INVALID_ET = 0;
+    static constexpr int NO_STORM_ACTIVE_DATE = -1;
+    static constexpr int MIN_LEAF_WETNESS = 0;
+    static constexpr int MAX_LEAF_WETNESS = 15;
 
     //
     // A wind slice is a segment of wind direction that is centered on a compass direction such

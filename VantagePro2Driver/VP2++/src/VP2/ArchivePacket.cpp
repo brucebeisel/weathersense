@@ -20,7 +20,7 @@
 #include <sstream>
 #include "VP2Logger.h"
 #include "VP2Constants.h"
-#include "VP2Utils.h"
+#include "VP2Decoder.h"
 #include "BitConverter.h"
 #include "UnitConverter.h"
 #include "ArchivePacket.h"
@@ -118,15 +118,15 @@ ArchivePacket::formatMessage() const {
 
     bool valid;
 
-    Temperature t = VP2Utils::decode16BitTemperature(buffer, OUTSIDE_TEMPERATURE_OFFSET, valid);
+    Temperature t = VP2Decoder::decode16BitTemperature(buffer, OUTSIDE_TEMPERATURE_OFFSET, valid);
     if (valid)
         ss << "<avgOutdoorTemperature>" << t << "</avgOutdoorTemperature>";
 
-    t = VP2Utils::decode16BitTemperature(buffer, HIGH_OUTSIDE_TEMPERATURE_OFFSET, valid);
+    t = VP2Decoder::decode16BitTemperature(buffer, HIGH_OUTSIDE_TEMPERATURE_OFFSET, valid);
     if (valid)
         ss << "<highOutdoorTemperature>" << t << "</highOutdoorTemperature>";
 
-    t = VP2Utils::decode16BitTemperature(buffer, LOW_OUTSIDE_TEMPERATURE_OFFSET, valid);
+    t = VP2Decoder::decode16BitTemperature(buffer, LOW_OUTSIDE_TEMPERATURE_OFFSET, valid);
     if (valid)
         ss << "<lowOutdoorTemperature>" << t << "</lowOutdoorTemperature>";
 
@@ -136,23 +136,23 @@ ArchivePacket::formatMessage() const {
     value16 = BitConverter::toInt16(buffer, HIGH_RAIN_RATE_OFFSET);
     ss << "<highRainfallRate>" << UnitConverter::toMillimeter((Rainfall)value16 * rainInterval) << "</highRainfallRate>";
 
-    Pressure baroPressure = VP2Utils::decodeBarometricPressure(buffer, BAROMETER_OFFSET, valid);
+    Pressure baroPressure = VP2Decoder::decodeBarometricPressure(buffer, BAROMETER_OFFSET, valid);
     if (valid)
         ss << "<baroPressure>" << baroPressure << "</baroPressure>";
 
-    SolarRadiation sr = VP2Utils::decodeSolarRadiation(buffer, SOLAR_RADIATION_OFFSET, valid);
+    SolarRadiation sr = VP2Decoder::decodeSolarRadiation(buffer, SOLAR_RADIATION_OFFSET, valid);
     if (valid)
         ss << "<avgSolarRadiation>" << sr << "</avgSolarRadiation>";
   
-    t = VP2Utils::decode16BitTemperature(buffer, INSIDE_TEMPERATURE_OFFSET, valid);
+    t = VP2Decoder::decode16BitTemperature(buffer, INSIDE_TEMPERATURE_OFFSET, valid);
     if (valid)
         ss << "<indoorTemperature>" << t << "</indoorTemperature>";
 
-    Humidity h = VP2Utils::decodeHumidity(buffer, INSIDE_HUMIDITY_OFFSET, valid);
+    Humidity h = VP2Decoder::decodeHumidity(buffer, INSIDE_HUMIDITY_OFFSET, valid);
     if (valid)
         ss << "<indoorHumidity>" << h << "</indoorHumidity>";
 
-    h = VP2Utils::decodeHumidity(buffer, OUTSIDE_HUMIDITY_OFFSET, valid);
+    h = VP2Decoder::decodeHumidity(buffer, OUTSIDE_HUMIDITY_OFFSET, valid);
     if (valid)
         ss << "<outdoorHumidity>" << h << "</outdoorHumidity>";
 
@@ -160,8 +160,8 @@ ArchivePacket::formatMessage() const {
     // Both wind speed and direction must be valid to generate the XML
     //
     bool valid2;
-    Speed windSpeed = VP2Utils::decodeWindSpeed(buffer, AVG_WIND_SPEED_OFFSET, valid);
-    Heading windDir = VP2Utils::decodeWindDirectionSlice(buffer, PREVAILING_WIND_DIRECTION_OFFSET, valid2);
+    Speed windSpeed = VP2Decoder::decodeWindSpeed(buffer, AVG_WIND_SPEED_OFFSET, valid);
+    Heading windDir = VP2Decoder::decodeWindDirectionSlice(buffer, PREVAILING_WIND_DIRECTION_OFFSET, valid2);
 
     if (valid && valid2) {
         ss << "<avgWind><speed>" << windSpeed << "</speed>"
@@ -169,8 +169,8 @@ ArchivePacket::formatMessage() const {
            << "</avgWind>";
     }
 
-    windSpeed = VP2Utils::decodeWindSpeed(buffer, HIGH_WIND_SPEED_OFFSET, valid);
-    windDir = VP2Utils::decodeWindDirectionSlice(buffer, DIR_OF_HIGH_WIND_SPEED_OFFSET, valid2);
+    windSpeed = VP2Decoder::decodeWindSpeed(buffer, HIGH_WIND_SPEED_OFFSET, valid);
+    windDir = VP2Decoder::decodeWindDirectionSlice(buffer, DIR_OF_HIGH_WIND_SPEED_OFFSET, valid2);
 
     if (valid && valid2) {
         ss << "<highWind><speed>" << windSpeed << "</speed>"
@@ -206,19 +206,19 @@ ArchivePacket::formatMessage() const {
     }
 */
 
-    UvIndex uvIndex = VP2Utils::decodeUvIndex(buffer, AVG_UV_INDEX_OFFSET, valid);
+    UvIndex uvIndex = VP2Decoder::decodeUvIndex(buffer, AVG_UV_INDEX_OFFSET, valid);
     if (valid)
         ss << "<avgUvIndex>" << uvIndex << "</avgUvIndex>";
 
-    Evapotranspiration et = VP2Utils::decodeET(buffer, ET_OFFSET, valid);
+    Evapotranspiration et = VP2Decoder::decodeDayET(buffer, ET_OFFSET, valid);
     if (valid)
         ss << "<evapotranspiration>" << et << "</evapotranspiration>";
 
-    sr = VP2Utils::decodeSolarRadiation(buffer, HIGH_SOLAR_RADIATION_OFFSET, valid);
+    sr = VP2Decoder::decodeSolarRadiation(buffer, HIGH_SOLAR_RADIATION_OFFSET, valid);
     if (valid)
         ss << "<highSolarRadiation>" << value16 << "</highSolarRadiation>";
 
-    uvIndex = VP2Utils::decodeUvIndex(buffer, HIGH_UV_INDEX_OFFSET, valid);
+    uvIndex = VP2Decoder::decodeUvIndex(buffer, HIGH_UV_INDEX_OFFSET, valid);
     if (valid)
         ss << "<highUvIndex>" << uvIndex << "</highUvIndex>";
 
@@ -253,7 +253,7 @@ ArchivePacket::formatMessage() const {
 
     ss << "<humiditySensorEntries>";
     for (int i = 0; i < MAX_EXTRA_HUMIDITIES; i++) {
-        h = VP2Utils::decodeHumidity(buffer, EXTRA_HUMIDITIES_BASE_OFFSET + i, valid);
+        h = VP2Decoder::decodeHumidity(buffer, EXTRA_HUMIDITIES_BASE_OFFSET + i, valid);
         if (valid) {
             ss << "<entry><key>" << (200 + i) << "</key><value><sensorId>" << (200 + i) << "</sensorId><sensorType>HYGROMETER</sensorType>";
             ss << "<measurement xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"humidity\">";
@@ -264,7 +264,7 @@ ArchivePacket::formatMessage() const {
 
     ss << "<temperatureSensorEntries>";
     for (int i = 0; i < MAX_EXTRA_TEMPERATURES; i++) {
-        t = VP2Utils::decode8BitTemperature(buffer, EXTRA_TEMPERATURES_BASE_OFFSET + i, valid);
+        t = VP2Decoder::decode8BitTemperature(buffer, EXTRA_TEMPERATURES_BASE_OFFSET + i, valid);
         if (valid) {
             ss << "<entry><key>" << (100 + i) << "</key><value><sensorId>" << (100 + i) << "</sensorId><sensorType>THERMOMETER</sensorType>";
             ss << "<measurement xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"temperature\">";

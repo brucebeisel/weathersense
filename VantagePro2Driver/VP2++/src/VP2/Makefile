@@ -22,7 +22,7 @@ SRCS=ArchiveManager.cpp \
 	VantagePro2Station.cpp \
 	VP2Constants.cpp \
 	VP2Logger.cpp \
-    VP2Utils.cpp \
+    VP2Decoder.cpp \
 	Weather.cpp \
 	WeatherSenseSocket.cpp \
 	WindDirectionSlices.cpp \
@@ -47,3 +47,10 @@ clean:
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
+depend:
+	rm -f Makefile.depend; \
+	for i in $(SRCS); do \
+		$(CC) -MM -MT "$(OBJDIR)/`basename $$i .cpp`.o" $$i >> Makefile.depend; \
+	done;
+
+include Makefile.depend
