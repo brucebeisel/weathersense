@@ -370,7 +370,10 @@ VantagePro2Station::currentValuesLoop(int records) {
         // Build a list of past wind directions. This is to mimic what is shown on the
         // console
         //
-        pastWindDirs.addHeading(loopPacket.getWindDirection());
+        if (loopPacket.getWindSpeed() > 0)
+            pastWindDirs.addHeading(loopPacket.getWindDirection());
+        else
+            pastWindDirs.processCalmWindSample();
 
         //
         // Keep the wind gust data in order to populate the next archive packet. This may

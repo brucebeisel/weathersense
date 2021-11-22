@@ -36,7 +36,7 @@ $(OBJDIR)/%.o : %.cpp
 all: vp2
 
 vp2: $(OBJDIR) $(OBJS)
-	$(CC) -o vp2 $(OBJS)
+	$(CC) -g -o vp2 $(OBJS)
 
 clean:
 	rm $(OBJS)

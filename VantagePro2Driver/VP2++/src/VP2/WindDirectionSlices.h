@@ -45,6 +45,12 @@ public:
     void addHeading(Heading heading);
 
     /**
+     * Process a wind sample with a zero speed.
+     */
+    void processCalmWindSample();
+
+
+    /**
      * Return the past heading tendencies.
      * 
      * @param headings The directions that the wind has been blowing most often in the last hour
@@ -52,10 +58,15 @@ public:
     void pastHeadings(std::vector<int> & headings) const;
 
 private:
+    void removeOldSamples(DateTime time);
+    void find10MinuteDominantWindDirection(DateTime time);
+
     /**
      * Each wind slice (N, NNE, NE...) will be tracked for direction tendency
      */
     static const int NUM_SLICES = 16;
+
+    static const std::string SLICE_NAMES[NUM_SLICES];
 
     /**
      * The number of degrees each wind slice occupies.
@@ -64,14 +75,21 @@ private:
     static const Heading HALF_SLICE;
 
     /**
-     * The wind over the past hour is used to determine the direction tendencies.
+     * The wind over the past 10 minutes is used to determine the direction tendencies.
      */
-    static const int AGE_SPAN = 60 * 60;
+    static const int AGE_SPAN = 10 * 60;
+
+    /**
+     * The number of samples needed to be part of the direction tendencies
+     */
+    static const int SECONDS_PER_SAMPLE = 4;
 
     /**
      * Number of directions that are reported to the collector.
      */
     static const int MAX_PAST_HEADINGS = 4;
+
+    int totalSamples;
     WindSlice windSlices[NUM_SLICES];
 };
 }

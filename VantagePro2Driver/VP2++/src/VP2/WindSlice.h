@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,10 +36,11 @@ public:
      * Constructor.
      * 
      * @param slice The slice number from 1 - max
+     * @param name The name of the wind direction (N, NW, etc.)
      * @param low The lowest direction in this slice (exclusive)
      * @param high The highest direction in this slice (inclusive)
      */
-    WindSlice(int slice, Heading low, Heading high);
+    WindSlice(int slice, const std::string & name, Heading low, Heading high);
 
     /**
      * Destructor.
@@ -50,10 +51,11 @@ public:
      * Set the values that describe the slice.
      * 
      * @param slice The slice number from 1 - max
+     * @param name The name of the wind direction (N, NW, etc.)
      * @param low The lowest direction in this slice (exclusive)
      * @param high The highest direction in this slice (inclusive)
      */
-    void setValues(int slice, Heading low, Heading high);
+    void setValues(int slice, const std::string & name, Heading low, Heading high);
 
     /**
      * Get the heading at the center of this slice.
@@ -61,6 +63,13 @@ public:
      * @return The center heading
      */
     Heading getCenter() const;
+
+    /**
+     * Get the name of the heading.
+     *
+     * @return The name of the heading
+     */
+    std::string getName() const;
 
     /**
      * Check if a heading is in the wind slice.
@@ -93,6 +102,21 @@ public:
     int getSampleSize() const;
 
     /**
+     * Set the last time this heading was the 10 minute dominant wind direction.
+     *
+     * @param The time this heading was the 10 minute dominant wind direction
+     */
+    void setLast10MinuteDominantTime(time_t time);
+
+    /**
+     * Get the time this heading was the 10 minute dominant wind direction.
+     *
+     * @return The time this heading was the 10 minute dominant wind direction
+     */
+    time_t getLast10MinuteDominantTime() const;
+
+
+    /**
      * Less than operator needed for sorting.
      */
     friend bool operator<(const WindSlice & lhs, const WindSlice & rhs);
@@ -103,10 +127,12 @@ public:
     friend std::ostream & operator<<(std::ostream &, const WindSlice &);
 
 private:
-    int slice;
-    Heading lowHeading;
-    Heading highHeading;
+    int                   slice;
+    std::string           name;
+    Heading               lowHeading;
+    Heading               highHeading;
     std::vector<DateTime> samples;
+    time_t                last10MinuteDominantTime;
 };
 }
 

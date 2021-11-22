@@ -15,8 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <time.h>
+#include <cstring>
 #include <vector>
 #include <algorithm>
+#include <iomanip>
 #include "WindDirectionSlices.h"
 
 using namespace std;
@@ -26,58 +28,124 @@ namespace vp2 {
 const Heading WindDirectionSlices::DEGREES_PER_SLICE = static_cast<Heading>(22.5);
 const Heading WindDirectionSlices::HALF_SLICE = DEGREES_PER_SLICE / static_cast<Heading>(2.0);
 
-WindDirectionSlices::WindDirectionSlices() {
+const std::string WindDirectionSlices::SLICE_NAMES[NUM_SLICES] = {
+    "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"
+};
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+WindDirectionSlices::WindDirectionSlices() : totalSamples(0) {
     Heading heading = -HALF_SLICE;
     for (int i = 0; i < NUM_SLICES; i++) {
-        windSlices[i].setValues(i, heading, heading + DEGREES_PER_SLICE);
+        windSlices[i].setValues(i, SLICE_NAMES[i], heading, heading + DEGREES_PER_SLICE);
         heading += DEGREES_PER_SLICE;
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 WindDirectionSlices::~WindDirectionSlices() {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 WindDirectionSlices::addHeading(Heading heading) {
+    DateTime now = time(0);
+
     if (heading > 360.0 - HALF_SLICE)
         heading -= static_cast<Heading>(360.0);
 
+    removeOldSamples(now);
+
+    totalSamples = 0;
     for (int i = 0; i < NUM_SLICES; i++) {
         if (windSlices[i].isInSlice(heading)) {
-            windSlices[i].addSample(time(0));
+            windSlices[i].addSample(now);
         }
+        totalSamples += windSlices[i].getSampleSize();
     }
 
     //
-    // Get rid of the old samples
+    // Only find the dominant wind direction if enough wind samples have been collected
     //
-    DateTime now = time(0);
-    DateTime before = now - AGE_SPAN;
-
-    for (int i = 0; i < NUM_SLICES; i++) {
-        windSlices[i].removeOldSamples(before);
- 
-    }
+    if (totalSamples > (AGE_SPAN / 2) / SECONDS_PER_SAMPLE)
+        find10MinuteDominantWindDirection(now);
 
     //
-    // Sort the array based on the number of samples
+    // Sort the array based on the last 10 minute dominant time
     //
     std::sort(windSlices, &windSlices[NUM_SLICES]);
 }
 
-/// <summary>
-/// Get the list of past headings that have the most number of samples
-/// </summary>
-/// <returns>The list of past headings, up to a maximum of 4</returns>
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void
+WindDirectionSlices::find10MinuteDominantWindDirection(DateTime now) {
+    int highSampleCount = 0;
+    int highCountIndex = -1;
+    for (int i = 0; i < NUM_SLICES; i++) {
+        if (windSlices[i].getSampleSize() > highSampleCount) {
+            highSampleCount = windSlices[i].getSampleSize();
+            highCountIndex = i;
+        }
+
+        if (now - windSlices[i].getLast10MinuteDominantTime() > 3600)
+            windSlices[i].setLast10MinuteDominantTime(0);
+    }
+
+    if (highCountIndex != -1)
+        windSlices[highCountIndex].setLast10MinuteDominantTime(now);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void
+WindDirectionSlices::processCalmWindSample() {
+    removeOldSamples(time(0));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void
+WindDirectionSlices::removeOldSamples(DateTime now) {
+    //
+    // Get rid of the old samples
+    //
+    DateTime before = now - AGE_SPAN;
+
+    for (int i = 0; i < NUM_SLICES; i++) {
+        windSlices[i].removeOldSamples(before);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 WindDirectionSlices::pastHeadings(vector<int> & headings) const {
+    cout << "Wind Direction Slices: Samples: " << totalSamples << endl;
+    for (int i = 0; i < NUM_SLICES; i++) { 
+        char buffer[100];
+        DateTime dtime = windSlices[i].getLast10MinuteDominantTime();
+        if (dtime > 0) {
+            struct tm tm;
+            Weather::localtime(dtime, tm);
+            strftime(buffer, sizeof(buffer), "%H:%M:%S", &tm);
+        }
+        else
+            strcpy(buffer, "Never");
+
+        cout << "Direction: " << setw(3) << windSlices[i].getName() << " (" << setw(5) << windSlices[i].getCenter()
+             << ") Count: " << setw(3) << windSlices[i].getSampleSize() << " Last Dominant Time: " << setw(8) << buffer << endl;
+    }
+
     //
-    // Pull out the 4 with the highest number of samples
+    // Pull out the 4 that have been dominant most recently in the last hour
     //
     headings.clear();
-    for (int i = NUM_SLICES - 1; i >= NUM_SLICES - MAX_PAST_HEADINGS; i--) {
-        if (windSlices[i].getSampleSize() > 0)
-            headings.push_back((int)windSlices[i].getCenter());
+    for (int i = 0; i < MAX_PAST_HEADINGS; i++) {
+        if (windSlices[i].getLast10MinuteDominantTime() != 0)
+            headings.push_back(static_cast<int>(windSlices[i].getCenter()));
     }
 }
 }
