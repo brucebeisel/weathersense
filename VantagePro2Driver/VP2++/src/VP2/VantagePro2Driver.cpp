@@ -244,10 +244,11 @@ VantagePro2Driver::reopenStation() {
 ////////////////////////////////////////////////////////////////////////////////
 void
 VantagePro2Driver::mainLoop() {
-    DateTime stationTime = station.getTime();
-    log.log(VP2Logger::VP2_INFO) << "Station Time: " << Weather::formatDateTime(stationTime) << endl;
+    DateTime consoleTime = station.retrieveConsoleTime();
+    log.log(VP2Logger::VP2_INFO) << "Station Time: " << Weather::formatDateTime(consoleTime) << endl;
     vector<ArchivePacket> list;
     list.reserve(VP2Constants::NUM_ARCHIVE_RECORDS);
+    bool lampOn = true;
 
     while (!exitLoop) {
         try {
@@ -263,6 +264,9 @@ VantagePro2Driver::mainLoop() {
                 reopenStation();
                 continue;
             }
+
+            station.controlConsoleLamp(lampOn);
+            lampOn = !lampOn;
 
             //
             // If it has been more than a day since the time was set, set the time
