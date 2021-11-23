@@ -45,7 +45,7 @@ VantagePro2Driver::VantagePro2Driver(ArchiveManager & archiveManager, WeatherSen
                                                                 receivedFirstLoopPacket(false),
                                                                 nextRecord(-1),
                                                                 previousNextRecord(-1),
-                                                                lastPacketTime(0),
+                                                                lastArchivePacketTime(0),
                                                                 log(VP2Logger::getLogger("VantagePro2Driver")),
                                                                 sensorStationSendTime(0) {
     //
@@ -67,8 +67,8 @@ VantagePro2Driver::~VantagePro2Driver() {
 void
 VantagePro2Driver::connected(DateTime newestArchiveTimeFromCollector) {
     log.log(VP2Logger::VP2_DEBUG1) << "Connected with collector. Archive time = " << Weather::formatDateTime(newestArchiveTimeFromCollector) << endl;
-    archiveManager.setNewestRecordTime(newestArchiveTimeFromCollector);
-    lastPacketTime = newestArchiveTimeFromCollector;
+    //archiveManager.setNewestRecordTime(newestArchiveTimeFromCollector);
+    lastArchivePacketTime = newestArchiveTimeFromCollector;
     nextRecord = -1;
     string sensorMessage = Sensor::formatMessage(station.getSensors());
     socket.sendData(sensorMessage);
@@ -131,7 +131,6 @@ VantagePro2Driver::initialize() {
         return 6;
     }
 
-
     //
     // Get one current weather record so that the sensors are detected
     //
@@ -144,7 +143,7 @@ VantagePro2Driver::initialize() {
         return 7;
     }
 
-    if (!archiveManager.readArchive()) {
+    if (!archiveManager.synchronizeArchive()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to read the archive during initialization" << endl;
         return 8;
     }
@@ -196,7 +195,7 @@ VantagePro2Driver::processArchive(const vector<ArchivePacket> & archive) {
         DateTime now = time(0);
         DateTime age = now - it->getDateTime();
         if (age < 3600) {
-            int maxPackets = (int)((station.getArchivePeriod() * 60.0F) / ((41.0F + 1.0F - 1.0F) / 16.0F));
+            int maxPackets = static_cast<int>(((static_cast<float>(station.getArchivePeriod()) * 60.0F) / ((41.0F + 1.0F - 1.0F) / 16.0F)));
             int actualPackets = it->getWindSampleCount();
             int issReception = (actualPackets * 100) / maxPackets;
             if (issReception > 100)
@@ -242,8 +241,12 @@ VantagePro2Driver::reopenStation() {
 ////////////////////////////////////////////////////////////////////////////////
 void
 VantagePro2Driver::mainLoop() {
-    DateTime consoleTime = station.retrieveConsoleTime();
-    log.log(VP2Logger::VP2_INFO) << "Station Time: " << Weather::formatDateTime(consoleTime) << endl;
+    DateTime consoleTime;
+    if (station.retrieveConsoleTime(consoleTime))
+        log.log(VP2Logger::VP2_INFO) << "Station Time: " << Weather::formatDateTime(consoleTime) << endl;
+    else
+        log.log(VP2Logger::VP2_INFO) << "Station Time retrieval failed" << endl;
+
     vector<ArchivePacket> list;
     list.reserve(VP2Constants::NUM_ARCHIVE_RECORDS);
     //bool lampOn = true;
@@ -300,9 +303,9 @@ VantagePro2Driver::mainLoop() {
             // go get it.
             //
             if (previousNextRecord != nextRecord) {
-                if (archiveManager.readArchive()) {
+                if (archiveManager.synchronizeArchive()) {
                     do {
-                        archiveManager.getArchiveRecords(list);
+                        lastArchivePacketTime = archiveManager.getArchiveRecordsAfter(lastArchivePacketTime, list);
                         if (!processArchive(list))
                             break;
                     } while (list.size() > 0);

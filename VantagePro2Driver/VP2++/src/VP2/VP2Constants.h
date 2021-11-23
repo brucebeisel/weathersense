@@ -39,38 +39,27 @@ public:
     static constexpr char CANCEL = 0x18;
     static constexpr char ESCAPE = 0x15;
 
-
-    //
-    // Station Types
-    //
-    static const int WIZARD_III = 0;
-    static const int WIZARD_II = 1;
-    static const int MONITOR = 2;
-    static const int PERCEPTION = 3;
-    static const int GRO_WEATHER = 4;
-    static const int ENERGY_ENVIRONMONITOR = 5;
-    static const int HEALTH_ENVIRONMONITOR = 6;
-    static const int VANTAGE_PRO = 16;
-    static const int VANTAGE_PRO2 = 16;
-    static const int VANTAGE_VUE = 17;
-
     //
     // Cumulative Values that can be cleared using CLRVAR
     //
-    static const int DAILY_RAIN_CUM = 13;
-    static const int STORM_RAIN_CUM = 14;
-    static const int MONTH_RAIN_CUM = 16;
-    static const int YEAR_RAIN_CUM = 17;
-    static const int DAY_ET_CUM = 26;
-    static const int MONTH_ET_CUM = 25;
-    static const int YEAR_ET_CUM = 27;
+    enum CumulativeValue {
+        DAILY_RAIN_CUM = 13,
+        STORM_RAIN_CUM = 14,
+        MONTH_RAIN_CUM = 16,
+        YEAR_RAIN_CUM = 17,
+        DAY_ET_CUM = 26,
+        MONTH_ET_CUM = 25,
+        YEAR_ET_CUM = 27
+    };
 
     //
     // High/Low Clear Types
     //
-    static const int CLEAR_DAILY_VALUES = 0;
-    static const int CLEAR_MONTHLY_VALUES = 1;
-    static const int CLEAR_YEARILY_VALUES = 2;
+    enum ExtremePeriod {
+        DAILY_EXTREMES = 0,
+        MONTHLY_EXTREMES = 1,
+        YEARLY_EXTREMES = 2
+    };
 
     enum ArchivePeriod {
         ONE_MINUTE = 1,
@@ -111,17 +100,6 @@ public:
     static const std::string EE_SETUP_BITS;
     static const std::string EE_RAIN_SEASON_START;
     static const std::string EE_ARCHIVE_PERIOD;
-
-    //static const int APB_MAX_EXTRA_TEMPERATURES = 3;
-    //static const int APB_MAX_EXTRA_HUMIDITIES = 2;
-    // The serial protocol document says this is 4, but the 4th value is not set to the Dash value when there
-    // are not soil temperature sensors.
-    static const int APB_MAX_SOIL_TEMPERATURES = 3;
-    static const int APB_MAX_SOIL_MOISTURES = 4;
-    static const int APB_MAX_LEAF_WETNESSES = 2;
-    static const int APB_MAX_LEAF_TEMPERATURES = 2;
-
-
 
     static const int NUM_ARCHIVE_RECORDS = 2560;
 

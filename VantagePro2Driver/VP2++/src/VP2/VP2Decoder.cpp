@@ -7,6 +7,7 @@
 namespace vp2 {
 
 Rainfall VP2Decoder::rainCollectorSize = static_cast<Rainfall>(0.0);
+VP2Logger VP2Decoder::log(VP2Logger::getLogger("VP2Decoder"));
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -252,6 +253,9 @@ VP2Decoder::setRainCollectorSize(Rainfall collectorSize) {
 ////////////////////////////////////////////////////////////////////////////////
 Rainfall
 VP2Decoder::decodeRain(const byte buffer[], int offset) {
+    if (rainCollectorSize == 0.0)
+        log.log(VP2Logger::VP2_WARNING) << "Decoding rain value before rain collector size has been set" << std::endl;
+    
     int value16 = BitConverter::toInt16(buffer, offset);
     Rainfall rain = UnitConverter::toMillimeter(static_cast<Rainfall>(value16) * rainCollectorSize);
 

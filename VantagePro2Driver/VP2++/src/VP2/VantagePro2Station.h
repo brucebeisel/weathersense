@@ -159,9 +159,9 @@ public:
     bool clearAlarmThresholds();
     bool clearTemperatureHumidityCalibrationOffsets();
     bool clearGraphPoints();
-    bool clearCumulativeValue(int valueType);
-    bool clearHighValues(int valueType);
-    bool clearLowValues(int valueType);
+    bool clearCumulativeValue(VP2Constants::CumulativeValue cumValue);
+    bool clearHighValues(VP2Constants::ExtremePeriod period);
+    bool clearLowValues(VP2Constants::ExtremePeriod period);
     bool clearActiveAlarms();
     bool clearCurrentData();
 
@@ -182,9 +182,10 @@ public:
     /**
      * Get the clock time on the console.
      * 
-     * @return The time
+     * @param stationTime The time that was retrieved or 0 on failure
+     * @return True if the time was retrieved successfully
      */
-    DateTime retrieveConsoleTime();
+    bool retrieveConsoleTime(DateTime &stationTime);
 
 
     /**
@@ -293,17 +294,6 @@ public:
      * @return The list of sensors
      */
     const std::vector<Sensor> & getSensors() const;
-
-
-    /**
-     * Decode a buffer into a single archive packet.
-     *
-     * @param buffer The buffer from which to decode the archive packet
-     * @param index  The index within the buffer to start decoding the archive packet
-     *
-     * @return The decoded archive packet
-     */
-    ArchivePacket convertBufferToArchivePacket(const byte * buffer, int index) const;
 
     /**
      * Retrieve various parameters from the console.
