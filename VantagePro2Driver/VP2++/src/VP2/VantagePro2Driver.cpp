@@ -214,14 +214,12 @@ VantagePro2Driver::processArchive(const vector<ArchivePacket> & archive) {
             }
 
             string ssMessage = SensorStation::formatSensorStationStatusMessage(sensorStations, it->getDateTime());
-            if (!socket.sendData(ssMessage))
-                return false;
+            socket.sendData(ssMessage);
         }
 
         string message = it->formatMessage();
         log.log(VP2Logger::VP2_INFO) << "=== Archive === " << Weather::formatDateTime(it->getDateTime()) << " =============" << endl;
-        if (!socket.sendData(message))
-            return false;
+        socket.sendData(message);
     }
 
     return true;
