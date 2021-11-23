@@ -16,8 +16,6 @@
  */
 package com.bdb.weather.collector;
 
-import com.bdb.weather.collector.wunderground.WeatherUnderground;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -49,7 +47,6 @@ final class DataMonitor {
     private final ScheduledExecutorService executor;
     private final WeatherStationTable wsTable;
     private final DopplerRadarManager dopplerMgr;
-    private final WeatherUnderground weatherUnderground;
     private final CollectorCommandsTable collectorCommandsTable;
     private final WeatherDataWriter writer;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(CollectorCommand.COMMAND_DATE_FORMAT);
@@ -65,13 +62,12 @@ final class DataMonitor {
      * @param wu The weather underground object that write the weather data to the weather underground web site
      * @param writer The database writer thread that does all of the writing to the database
      */
-    public DataMonitor(String dbUrl, String user, String password, DopplerRadarManager dpm, WeatherUnderground wu, WeatherDataWriter writer) {
+    public DataMonitor(String dbUrl, String user, String password, DopplerRadarManager dpm, WeatherDataWriter writer) {
         connection = new DBConnection(dbUrl, user, password);
         executor = Executors.newSingleThreadScheduledExecutor();
         wsTable = new WeatherStationTable(connection);
         collectorCommandsTable = new CollectorCommandsTable(connection);
         dopplerMgr = dpm;
-        weatherUnderground = wu;
         this.writer = writer;
     }
 
@@ -121,8 +117,8 @@ final class DataMonitor {
             }
             else {
                 checkForDopplerUrlChanges(ws.getDopplerRadarUrl());
-                if (!ws.getWeatherUndergroundStationId().isEmpty())
-                    weatherUnderground.setStationParameters(ws.getWeatherUndergroundStationId(), ws.getWeatherUndergroundPassword());
+                //if (!ws.getWeatherUndergroundStationId().isEmpty()) // TODO Figure out what the uploader needs from the station parameters
+                //    weatherUnderground.setStationParameters(ws.getWeatherUndergroundStationId(), ws.getWeatherUndergroundPassword());
                 checkForCollectorCommands();
             }
             connection.close();

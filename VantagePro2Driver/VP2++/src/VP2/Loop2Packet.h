@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 namespace vp2 {
 
 /**
- * Class that parses and holds the data from the VP2 LOOP 2 packet.
+ * Class that decodes and holds the data from the VP2 LOOP 2 packet.
  */
 class Loop2Packet {
 public:
@@ -40,46 +40,42 @@ public:
     /**
      * Parse the LOOP 2 packet.
      * 
-     * @param The buffer from which to parse the packet
-     * @return True if the buffer was parsed successfully
+     * @param The buffer from which to decode the packet
+     * @return True if the buffer was decoded successfully
      */
-    bool parseLoop2Packet(const byte[]);
+    bool decodeLoop2Packet(const byte[]);
 
-    Speed getWindGust10Minute() const;
-    Heading getWindGustHeading10Minute() const;
-    Speed getWindSpeed2MinuteAvg() const;
-    Rainfall getRainHour() const;
-    Rainfall getRain15Minute() const;
-    Rainfall getRain24Hour() const;
+    Speed       getWindGust10Minute() const;
+    Heading     getWindGustHeading10Minute() const;
+    Speed       getWindSpeed2MinuteAvg() const;
+    Speed       getWindSpeed10MinuteAvg() const;
+    Rainfall    getRainHour() const;
+    Rainfall    getRain15Minute() const;
+    Rainfall    getRain24Hour() const;
     Temperature getDewPoint() const;
     Temperature getHeatIndex() const;
     Temperature getWindChill() const;
-    bool isThswValid() const;
+    bool        isThswValid() const;
     Temperature getThsw() const;
-    Pressure getAtmPressure() const;
-
-    /**
-     * Set the rainfall increment that will be used to translate the rain bucket tip count to an actual amount of rain.
-     * 
-     * @param increment The value that will be used to convert to actual rainfall amounts
-     */
-    static void setRainfallIncrement(Rainfall increment);
+    Pressure    getAtmPressure() const;
 
 private:
-    Speed windGust10Minute;
-    Heading windGustHeading10Minute;
-    Speed windSpeed2MinuteAvg;
-    Rainfall rain15Minute;
-    Rainfall rainHour;
-    Rainfall rain24Hour;
+    static const int LOOP2_PACKET_TYPE = 1;
+
+    Speed       windGust10Minute;
+    Heading     windGustHeading10Minute;
+    Speed       windSpeed2MinuteAvg;
+    Speed       windSpeed10MinuteAvg;
+    Rainfall    rain15Minute;
+    Rainfall    rainHour;
+    Rainfall    rain24Hour;
     Temperature dewPoint;
     Temperature heatIndex;
     Temperature windChill;
     Temperature thsw;
-    bool thswValid;
-    Pressure atmPressure;
-    VP2Logger log;
-    static Rainfall rainfallIncrement;
+    bool        thswValid;
+    Pressure    atmPressure;
+    VP2Logger   log;
 };
 }
 #endif

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,244 +19,347 @@
 #include "BitConverter.h"
 #include "UnitConverter.h"
 #include "VP2Constants.h"
+#include "VP2Decoder.h"
 #include "VantagePro2CRC.h"
 #include "LoopPacket.h"
 
 using namespace std;
 
 namespace vp2 {
-const Temperature LoopPacket::TEMPERATURE_SCALE = 10.0f;
-Rainfall LoopPacket::rainfallIncrement = 0.0;
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 LoopPacket::LoopPacket(void) : log(VP2Logger::getLogger("LoopPacket")) {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 LoopPacket::~LoopPacket(void) {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 int
 LoopPacket::getNextRecord() const {
     return nextRecord;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 LoopPacket::BaroTrend
 LoopPacket::getBaroTrend() const {
     return baroTrend;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Temperature
 LoopPacket::getOutsideTemperature() const {
     return outsideTemperature;
 }
         
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Temperature
 LoopPacket::getInsideTemperature() const {
     return insideTemperature;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Humidity
 LoopPacket::getOutsideHumidity() const {
     return outsideHumidity;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Humidity
 LoopPacket::getInsideHumidity() const {
     return insideHumidity;
 }
 
-Speed LoopPacket::getWindSpeed() const {
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+Speed
+LoopPacket::getWindSpeed() const {
     return windSpeed;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Speed
 LoopPacket::getAvgWindSpeed10Min() const {
     return avgWindSpeed10Min;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Heading
 LoopPacket::getWindDirection() const {
     return windDirection;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Pressure
 LoopPacket::getBarometricPressure() const {
     return barometricPressure;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Rainfall
 LoopPacket::getRainRate() const {
     return rainRate;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Rainfall
 LoopPacket::getStormRain() const {
     return stormRain;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 DateTime
 LoopPacket::getStormStart() const {
     return stormStart;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Rainfall
 LoopPacket::getDayRain() const {
     return dayRain;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Rainfall
 LoopPacket::getMonthRain() const {
     return monthRain;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Rainfall
 LoopPacket::getYearRain() const {
     return yearRain;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 UvIndex
 LoopPacket::getUvIndex() const {
-    return static_cast<UvIndex>(uvIndex) / 10.0F;
+    return uvIndex;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Evapotranspiration
 LoopPacket::getYearET() const {
     return yearET;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Evapotranspiration
 LoopPacket::getMonthET() const {
     return monthET;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Evapotranspiration
 LoopPacket::getDayET() const {
     return dayET;
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 LoopPacket::isUvIndexValid() const {
-    return uvIndex != INVALID_UV_INDEX;
+    return uvIndexValid;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 SolarRadiation
 LoopPacket::getSolarRadiation() const {
     return solarRadiation;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 LoopPacket::isSolarRadiationValid() const {
-    return solarRadiation != INVALID_SOLAR_RADIATION;
+    return solarRadiation != VP2Constants::INVALID_SOLAR_RADIATION;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 float
 LoopPacket::getConsoleBatteryVoltage() const {
     return consoleBatteryVoltage;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 LoopPacket::Forecast
 LoopPacket::getForecastIcon() const {
     return forecastIcon;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 int
 LoopPacket::getForecastRule() const {
     return forecastRule;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 LoopPacket::isTransmitterBatteryGood(int index) const {
     return (transmitterBatteryStatus & (1 << (index - 1))) == 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 LoopPacket::isExtraTemperatureValid(int index) const {
     return temperatureExtraValid[index];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Temperature
 LoopPacket::getExtraTemperature(int index) const {
     return temperatureExtra[index];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 LoopPacket::isExtraHumidityValid(int index) const {
-    return humidityExtra[index] != INVALID_EXTRA_HUMIDITY;
+    return humidityExtraValid[index];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Humidity
 LoopPacket::getExtraHumidity(int index) const {
     return humidityExtra[index];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 LeafWetness
 LoopPacket::getLeafWetness(int index) const {
     return leafWetness[index];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 LoopPacket::isLeafWetnessValid(int index) const {
-    return leafWetness[index] != INVALID_LEAF_WETNESS;
+    return leafWetnessValid[index];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 int
 LoopPacket::getSoilMoisture(int index) const {
     return soilMoisture[index];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 LoopPacket::isSoilMoistureValid(int index) const {
-    return soilMoisture[index] != INVALID_SOIL_MOISTURE;
+    return soilMoistureValid[index];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Temperature
 LoopPacket::getSoilTemperature(int index) const {
     return soilTemperature[index];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 LoopPacket::isSoilTemperatureValid(int index) const {
     return soilTemperatureValid[index];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Temperature
 LoopPacket::getLeafTemperature(int index) const {
     return leafTemperature[index];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 LoopPacket::isLeafTemperatureValid(int index) const {
     return leafTemperatureValid[index];
 }
 
-//
-// The last couple of LOOP packets that have a valid storm start will
-// report a storm rain total of 0.0 inches. This may be an indicator that the storm has stopped,
-// but we are not using that at this point in time. By definition the storm rain has to be > 0, so
-// we will stop reporting an ongoing storm if the storm rain is 0.0
-//
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 LoopPacket::isStormOngoing() const {
+    //
+    // The last couple of LOOP packets that have a valid storm start will
+    // report a storm rain total of 0.0 inches. This may be an indicator that the storm has stopped,
+    // but we are not using that at this point in time. By definition the storm rain has to be > 0, so
+    // we will stop reporting an ongoing storm if the storm rain is 0.0
+    //
     return stormStart != 0 && stormRain > 0.0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
-LoopPacket::parseLoopPacket(byte buffer[]) {
-    if (rainfallIncrement == 0) {
-        log.log(VP2Logger::VP2_ERROR) << "Rain increment not set, cannot parse LOOP packet" << endl;
+LoopPacket::decodeLoopPacket(byte buffer[]) {
+    //
+    // Perform a number of validation on the Loop packet before decoding all of the values
+    //
+    if (buffer[0] != 'L' || buffer[1] != 'O' || buffer[2] != 'O') {
+        log.log(VP2Logger::VP2_ERROR) << "LOOP buffer does not begin with LOO: "
+                                      << "[0] = " << buffer[0] << " [1] = " << buffer[1] << " [2] = " << buffer[2] << endl;
         return false;
     }
 
-    if (buffer[0] != 'L' || buffer[1] != 'O' || buffer[2] != 'O') {
-        log.log(VP2Logger::VP2_ERROR) << "LOOP buffer does not begin with LOO: [0] = " << buffer[0] << " [1] = " << buffer[1] << " [2] = " << buffer[2] << endl;
+    if (!VantagePro2CRC::checkCRC(buffer, 97)) {
+        log.log(VP2Logger::VP2_ERROR) << "LOOP packet failed CRC check" << endl;
         return false;
     }
+
+
+    int packetType = BitConverter::toInt8(buffer, 4);
+    if (packetType != LOOP_PACKET_TYPE) {
+        log.log(VP2Logger::VP2_ERROR)<< "Invalid packet type for LOOP packet. Expected: "
+                                     << LOOP_PACKET_TYPE << " Received: " << packetType << endl;
+        return false;
+    }
+
+    if (buffer[95] != VP2Constants::LINE_FEED || buffer[96] != VP2Constants::CARRIAGE_RETURN) {
+        log.log(VP2Logger::VP2_ERROR) << "<LF><CR> not found" << endl;
+        return false;
+    }
+
 
     if (buffer[3] != 'P') {
         switch (BitConverter::toInt8(buffer, 3)) {
-	    case 255:
-		baroTrend = UNKNOWN;
-		break;
+            case 255:
+                baroTrend = UNKNOWN;
+                break;
             case 196:
                 baroTrend = FALLING_RAPIDLY;
                 break;
@@ -278,154 +381,88 @@ LoopPacket::parseLoopPacket(byte buffer[]) {
         }
     }
 
-    int packetType = BitConverter::toInt8(buffer, 4);
-
-    if (packetType != 0) {
-        log.log(VP2Logger::VP2_ERROR)<< "Invalid packet type for LOOP packet: " << packetType << endl;
-        return false;
-    }
-
     nextRecord = BitConverter::toInt16(buffer,5);
-    barometricPressure = UnitConverter::toMillibars((Pressure)BitConverter::toInt16(buffer, 7) / 1000.0F);
-    insideTemperature = UnitConverter::toCelcius((Pressure)BitConverter::toInt16(buffer, 9) / TEMPERATURE_SCALE);
-    insideHumidity = BitConverter::toInt8(buffer, 11);
-    outsideTemperature = UnitConverter::toCelcius(BitConverter::toInt16(buffer, 12) / TEMPERATURE_SCALE);
-    windSpeed = UnitConverter::toMetersPerSecond((Speed)BitConverter::toInt8(buffer, 14));
-    avgWindSpeed10Min = UnitConverter::toMetersPerSecond((Speed)BitConverter::toInt8(buffer, 15));
-    windDirection = static_cast<Heading>(BitConverter::toInt16(buffer, 16));
-    //
-    // Zero degrees from the weather station means no wind, translate 360 to 0 for north
-    //
-    if (windDirection == 360)
-        windDirection = 0;
 
-    for (int i = 0; i < NUM_EXTRA_TEMPERATURES; i++) {
-        int temperature = BitConverter::toInt8(buffer, 18 + i);
-        temperatureExtraValid[i] = temperature != INVALID_EXTRA_TEMPERATURE;
-        temperatureExtra[i] = UnitConverter::toCelcius(temperature - TEMPERATURE_OFFSET);
-    }
+    bool valid;
+    barometricPressure = VP2Decoder::decodeBarometricPressure(buffer, 7, valid);
+    insideTemperature = VP2Decoder::decode16BitTemperature(buffer, 9, valid);
+    insideHumidity = VP2Decoder::decodeHumidity(buffer, 11, valid);
+    outsideTemperature = VP2Decoder::decode16BitTemperature(buffer, 12, valid);
+    windSpeed = VP2Decoder::decodeWindSpeed(buffer, 14, valid);
+    avgWindSpeed10Min = VP2Decoder::decodeWindSpeed(buffer, 15, valid);
+    windDirection = VP2Decoder::decodeWindDirection(buffer, 16, valid);
 
-    for (int i = 0; i < NUM_SOIL_TEMPERATURES; i++) {
-        int temperature = BitConverter::toInt8(buffer, 25 + i);
-        soilTemperatureValid[i] = temperature != INVALID_EXTRA_TEMPERATURE;
-        soilTemperature[i] = UnitConverter::toCelcius((float)temperature - TEMPERATURE_OFFSET);
-    }
+    for (int i = 0; i < VP2Constants::MAX_EXTRA_TEMPERATURES; i++)
+        temperatureExtra[i] = VP2Decoder::decode8BitTemperature(buffer, 18 + i, temperatureExtraValid[i]);
 
-    for (int i = 0; i < NUM_LEAF_TEMPERATURES; i++) {
-        int temperature = BitConverter::toInt8(buffer, 29 + i);
-        leafTemperatureValid[i] = temperature != INVALID_EXTRA_TEMPERATURE;
-        leafTemperature[i] = UnitConverter::toCelcius(temperature - TEMPERATURE_OFFSET);
-    }
+    for (int i = 0; i < VP2Constants::MAX_SOIL_TEMPERATURES; i++)
+        soilTemperature[i] = VP2Decoder::decode8BitTemperature(buffer, 25 + i, soilTemperatureValid[i]);
 
-    outsideHumidity = BitConverter::toInt8(buffer, 33);
+    for (int i = 0; i < VP2Constants::MAX_LEAF_TEMPERATURES; i++)
+        leafTemperature[i] = VP2Decoder::decode8BitTemperature(buffer, 29 + i, leafTemperatureValid[i]);
 
-    for (int i = 0; i < NUM_EXTRA_HUMIDITIES; i++) {
-        humidityExtra[i] = BitConverter::toInt8(buffer, 34 + i);
-    }
+    outsideHumidity = VP2Decoder::decodeHumidity(buffer, 33, valid);
 
-    rainRate = UnitConverter::toMillimeter((float)BitConverter::toInt16(buffer, 41) / 100.0F);
+    for (int i = 0; i < VP2Constants::MAX_EXTRA_HUMIDITIES; i++)
+        humidityExtra[i] = VP2Decoder::decodeHumidity(buffer, 34 + i, humidityExtraValid[i]);
 
-    uvIndex = BitConverter::toInt8(buffer, 43);
-    solarRadiation = BitConverter::toInt16(buffer, 44);
+    rainRate = VP2Decoder::decodeRain(buffer, 41);
 
-    stormRain = UnitConverter::toMillimeter((float)BitConverter::toInt16(buffer, 46) / 100.0F);
+    uvIndex = VP2Decoder::decodeUvIndex(buffer, 43, uvIndexValid);
+    solarRadiation = VP2Decoder::decodeSolarRadiation(buffer, 44, valid);
 
-    int stormStart = BitConverter::toInt16(buffer, 48);
+    stormRain = VP2Decoder::decodeStormRain(buffer, 46);
+    stormStart = VP2Decoder::decodeStormStartDate(buffer, 48);
 
-    if (stormStart != -1)
-        this->stormStart = extractDate(stormStart);
+    dayRain = VP2Decoder::decodeRain(buffer, 50);
+    monthRain = VP2Decoder::decodeRain(buffer, 52);
+    yearRain = VP2Decoder::decodeRain(buffer, 54);
 
-    dayRain = UnitConverter::toMillimeter((float)BitConverter::toInt16(buffer, 50) * rainfallIncrement);
-    monthRain = UnitConverter::toMillimeter((float)BitConverter::toInt16(buffer, 52) * rainfallIncrement);
-    yearRain = UnitConverter::toMillimeter((float)BitConverter::toInt16(buffer, 54) * rainfallIncrement);
+    dayET = VP2Decoder::decodeDayET(buffer, 56, valid);
+    monthET = VP2Decoder::decodeMonthYearET(buffer, 58, valid);
+    yearET = VP2Decoder::decodeMonthYearET(buffer, 60, valid);
 
-    int idayET = BitConverter::toInt16(buffer, 56);
-    int imonthET = BitConverter::toInt16(buffer, 58);
-    int iyearET = BitConverter::toInt16(buffer, 60);
-    log.log(VP2Logger::VP2_DEBUG3) << "ET: Day=" << idayET << ", Month=" << imonthET << ", Year=" << iyearET << endl;
-    dayET = UnitConverter::toMillimeter((float)BitConverter::toInt16(buffer, 56) / 1000.0F);
-    monthET = UnitConverter::toMillimeter((float)BitConverter::toInt16(buffer, 58) / 100.0F);
-    yearET = UnitConverter::toMillimeter((float)BitConverter::toInt16(buffer, 60) / 100.0F);
+    for (int i = 0; i < VP2Constants::MAX_SOIL_MOISTURES; i++)
+        soilMoisture[i] = VP2Decoder::decodeSoilMoisture(buffer, 62 + i, valid);
 
-    for (int i = 0; i < NUM_SOIL_MOISTURES; i++)
-        soilMoisture[i] = BitConverter::toInt8(buffer, 62 + i);
+    for (int i = 0; i < VP2Constants::MAX_LEAF_WETNESSES; i++)
+        leafWetness[i] = VP2Decoder::decodeLeafWetness(buffer, 66 + i, valid);
 
-    for (int i = 0; i < NUM_LEAF_WETNESSES; i++)
-        leafWetness[i] = BitConverter::toInt8(buffer, 66 + i);
-
+/*
     int indoorAlarms = (int)BitConverter::toInt8(buffer, 70);
     int rainAlarms = (int)BitConverter::toInt8(buffer, 71);
     int outsideAlarms1 = (int)BitConverter::toInt8(buffer, 72);
     int outsideAlarms2 = (int)BitConverter::toInt8(buffer, 73);
+
     int extraTemperatureHumidityAlarms[8];
     int alarmIndex = 74;
     for (int i = 0; i <= 8; i++)
-	extraTemperatureHumidityAlarms[i] = (int)BitConverter::toInt8(buffer, alarmIndex + i);
+        extraTemperatureHumidityAlarms[i] = BitConverter::toInt8(buffer, alarmIndex + i);
 
     int soilLeafAlarms[4];
     alarmIndex = 82;
     for (int i = 0; i <= 4; i++)
-	soilLeafAlarms[i] = (int)BitConverter::toInt8(buffer, alarmIndex + i);
+        soilLeafAlarms[i] = BitConverter::toInt8(buffer, alarmIndex + i);
+*/
 
-    transmitterBatteryStatus = (int)BitConverter::toInt8(buffer, 86);
+    transmitterBatteryStatus = BitConverter::toInt8(buffer, 86);
     log.log(VP2Logger::VP2_DEBUG2) << "Transmitter Battery Status: " << transmitterBatteryStatus << endl;
-    consoleBatteryVoltage = (((int)BitConverter::toInt16(buffer, 87) * 300) / 512) / 100.0F;
-    forecastIcon = (Forecast)BitConverter::toInt8(buffer, 89);
+
+    consoleBatteryVoltage = VP2Decoder::decodeConsoleBatteryVoltage(buffer, 87);
+    log.log(VP2Logger::VP2_DEBUG2) << "Console Battery Voltage: " << consoleBatteryVoltage << endl;
+
+    forecastIcon = static_cast<Forecast>(BitConverter::toInt8(buffer, 89));
     forecastRule = BitConverter::toInt8(buffer, 90);
 
-    int sunrise = BitConverter::toInt16(buffer, 91);
-    int sunset = BitConverter::toInt16(buffer, 93);
-    int sunriseHour = sunrise / 100;
-    int sunriseMinute = sunrise % 100;
-    int sunsetHour = sunset / 100;
-    int sunsetMinute = sunset % 100;
+    sunriseTime = VP2Decoder::decodeTime(buffer, 91);
+    sunsetTime = VP2Decoder::decodeTime(buffer, 93);
 
-    time_t now = time(0);
-    struct tm tm;
-    Weather::localtime(now, tm);
-    tm.tm_hour = sunriseHour;
-    tm.tm_min = sunriseMinute;
-    sunRiseTime = mktime(&tm);
-    tm.tm_hour = sunsetHour;
-    tm.tm_min = sunsetMinute;
-    sunSetTime = mktime(&tm);
-
-    if (buffer[95] != VP2Constants::LINE_FEED || buffer[96] != VP2Constants::CARRIAGE_RETURN) {
-        log.log(VP2Logger::VP2_ERROR) << "<LF><CR> not found" << endl;
-        return false;
-    }
-
-    bool rv =  VantagePro2CRC::checkCRC(buffer, 97);
-
-    if (!rv)
-        log.log(VP2Logger::VP2_ERROR) << "LOOP packet failed CRC check" << endl;
-
-    return rv;
+    return true;
 }
 
-DateTime
-LoopPacket::extractDate(int time) {
-    int year = (time & 0x3F) + STORM_START_YEAR_OFFSET;
-    int day = (time >> 7) & 0x1F;
-    int month = (time >> 12) & 0xF;
 
-    time_t now = ::time(0);
-    struct tm tm;
-    Weather::localtime(now, tm);
-    tm.tm_year = year - 1900;
-    tm.tm_mon = month - 1;
-    tm.tm_mday = day;
-    tm.tm_hour = 0;
-    tm.tm_min = 0;
-    tm.tm_sec = 0;
-    return mktime(&tm);
-}
-
-void
-LoopPacket::setRainfallIncrement(Rainfall increment) {
-    rainfallIncrement = increment;
-}
-
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 string
 LoopPacket::getBaroTrendString() const {
     switch(baroTrend) {
@@ -449,6 +486,8 @@ LoopPacket::getBaroTrendString() const {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 string
 LoopPacket::getForecastIconString() const {
     switch (forecastIcon) {
@@ -483,49 +522,5 @@ LoopPacket::getForecastIconString() const {
             return "SUNNY";
     }
 }
-        /*
-        String ToString() {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("Next Record: {0}\n", nextRecord);
-            sb.AppendFormat("Barometer: {0}  Trend: {1}\n", barometer, baroTrend);
-            sb.AppendFormat("Outdoor Temperature: {0}  Outdoor Humidity: {1}\n", outsideTemp, outsideHum);
-            sb.AppendFormat("Indoor Temperature: {0}  Indoor Humidity: {1}\n", insideTemp, insideHum);
-            sb.AppendFormat("Extra Temperatures:");
-            for (int i = 0; i < NUM_EXTRA_TEMPERATURES; i++)
-                sb.AppendFormat(" [{0}]: {1}", i, tempExtra[i]);
-            sb.Append("\n");
-            sb.AppendFormat("Extra Humidities:");
-            for (int i = 0; i < NUM_EXTRA_HUMIDITIES; i++)
-                sb.AppendFormat(" [{0}]: {1}", i, humidityExtra[i]);
-            sb.Append("\n");
-            sb.AppendFormat("Wind: {0} MPH from {1}  10 Minute Avg Speed: {2}\n", windSpeed, windDirection, avgWindSpeed10Min);
-            sb.AppendFormat("Rain: Rate: {0}  Storm: {1}  Day: {2}  Month: {3}  Year: {4}\n", rainRate, stormRain, dayRain, monthRain, yearRain);
-            sb.AppendFormat("Leaf Wetnesses:");
-            for (int i = 0; i < NUM_LEAF_WETNESSES; i++)
-                sb.AppendFormat(" [{0}]: {1}", i, leafWetness[i]);
-            sb.Append("\n");
-            sb.AppendFormat("Soil Moistures:");
-            for (int i = 0; i < NUM_SOIL_MOISTURES; i++)
-                sb.AppendFormat(" [{0}]: {1}", i, soilMoist[i]);
-            sb.Append("\n");
-            sb.AppendFormat("Soil Temperatures:");
-            for (int i = 0; i < NUM_SOIL_TEMPERATURES; i++)
-                sb.AppendFormat(" [{0}]: {1}", i, soilTemp[i]);
-            sb.Append("\n");
-            sb.AppendFormat("Leaf Temperatures:");
-            for (int i = 0; i < NUM_LEAF_TEMPERATURES; i++)
-                sb.AppendFormat("  [{0}]: {1}", i, leafTemp[i]);
-            sb.Append("\n");
-            sb.AppendFormat("Transmitter Battery Status: 0x{0:x}\n", transmitterBatteryStatus);
-            sb.AppendFormat("Console Battery Voltage: {0}\n", consoleBatteryVoltage);
-            sb.AppendFormat("Forecast: {0}\n", forecastIcon);
-            sb.AppendFormat("Forecast Rule: {0}\n", forecastRule);
-            sb.AppendFormat("Sunrise: {0}  Sunset: {1}", sunRiseTime, sunSetTime);
-            sb.Append("=========================\n");
 
-            return sb.ToString();
-        }
-        
-    }
-    */
 }

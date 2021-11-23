@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,19 +24,19 @@ namespace vp2 {
 //
 // Typedefs for the various weather types
 //
-typedef double Speed;
-typedef double Rainfall;
-typedef double Temperature;
-typedef double Pressure;
-typedef double Humidity;
-typedef double SolarRadiation;
-typedef float  UvIndex;
-typedef int    LeafWetness;
-typedef int    SoilMoisture;
-typedef float  Heading;
-typedef char   byte;
-typedef time_t DateTime;
-typedef double Evapotranspiration;
+using Speed = double;
+using Rainfall = double;
+using Temperature = double;
+using Pressure = double;
+using Humidity = double;
+using SolarRadiation = double;
+using UvIndex = float;
+using LeafWetness = int;
+using SoilMoisture = int;
+using Heading = float;
+using byte = char;
+using DateTime = time_t;
+using Evapotranspiration = double;
 
 /**
  * Utility container class for various functions.
@@ -82,6 +82,14 @@ public:
      * @param The time structure that will be filled in
      */
     static void localtime(time_t t, struct tm & tm);
+
+    /**
+     * Extract a DateTime values from a console time value.
+     *
+     * @param time The time as reported by the console in HHMM integer format
+     * @return The converted time
+     */
+    static DateTime extractDate(int time);
 };
 }
 

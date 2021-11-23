@@ -45,7 +45,7 @@ import static org.junit.Assert.*;
  *
  * @author Bruce
  */
-public class MessageProcessorTest implements WeatherDataWriter, WeatherUploader {
+public class MessageProcessorTest implements WeatherDataWriter {
     private static DBConnection dbcon;
     private static DatabaseUtilities utils;
 
@@ -110,7 +110,7 @@ public class MessageProcessorTest implements WeatherDataWriter, WeatherUploader 
     @Test
     public void testConsumeDataString() throws JAXBException {
         System.out.println("consumeDataString");
-        MessageProcessor instance = new MessageProcessor("jdbc:derby:memory:weathersense24;create=true", "", "", this, this);
+        MessageProcessor instance = new MessageProcessor("jdbc:derby:memory:weathersense24;create=true", "", "", this);
         LocalDateTime expectedTime = LocalDate.now().minusYears(1).atStartOfDay();
         String expResult = DateTimeFormatter.ofPattern(CollectorConstants.NEWEST_RECORD_DATE_FORMAT).format(expectedTime);
         String result = instance.consumeMessages(Arrays.asList(INITIALIZE_MESSAGE));
@@ -128,7 +128,7 @@ public class MessageProcessorTest implements WeatherDataWriter, WeatherUploader 
     public void testConsumeDataXML() throws JAXBException {
         System.out.println("consumeDataXML");
         String s = "<?xml bad XML";
-        MessageProcessor instance = new MessageProcessor("jdbc:derby:memory:weathersense24;create=true", "", "", this, this);
+        MessageProcessor instance = new MessageProcessor("jdbc:derby:memory:weathersense24;create=true", "", "", this);
         String result = instance.consumeMessages(Arrays.asList(s));
         assertNull(result);
 
@@ -171,7 +171,7 @@ public class MessageProcessorTest implements WeatherDataWriter, WeatherUploader 
     public void testFindToken() throws JAXBException {
         System.out.println("findToken");
         String s = "Hello World\nMore Stuff\n";
-        MessageProcessor instance = new MessageProcessor("jdbc:derby:memory:weathersense24;create=true", "", "", this, this);
+        MessageProcessor instance = new MessageProcessor("jdbc:derby:memory:weathersense24;create=true", "", "", this);
         int expResult = 11;
         int result = instance.findToken(s);
         assertEquals(expResult, result);
@@ -224,9 +224,4 @@ public class MessageProcessorTest implements WeatherDataWriter, WeatherUploader 
     public void summarizeDay(LocalDate day) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-    @Override
-    public void uploadCurrentWeather(CurrentWeather cw) {
-    }
-    
 }

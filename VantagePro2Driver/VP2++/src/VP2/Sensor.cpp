@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,11 +35,15 @@ static const char *SENSOR_NAMES[] = {
     "BAROMETER"
 };
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Sensor::Sensor(SensorType type, int id) {
     sensorType = type;
     sensorId = id;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 Sensor::detectSensors(LoopPacket loop, vector<Sensor> & sensors) {
     sensors.push_back(Sensor(THERMOMETER, OUTDOOR_THERMOMETER_SENSOR_ID));
@@ -56,42 +60,39 @@ Sensor::detectSensors(LoopPacket loop, vector<Sensor> & sensors) {
     if (loop.isSolarRadiationValid())
         sensors.push_back(Sensor(SOLAR_RADIATION, SOLAR_RADIATION_SENSOR_ID));
 
-    for (int i = 0; i < LoopPacket::NUM_EXTRA_HUMIDITIES; i++) {
+    for (int i = 0; i < VP2Constants::MAX_EXTRA_HUMIDITIES; i++) {
         if (loop.isExtraHumidityValid(i))
             sensors.push_back(Sensor(HYGROMETER, HYGROMETER_BASE_SENSOR_ID + i));
     }
 
-    for (int i = 0; i < LoopPacket::NUM_EXTRA_TEMPERATURES; i++) {
+    for (int i = 0; i < VP2Constants::MAX_EXTRA_TEMPERATURES; i++) {
         if (loop.isExtraTemperatureValid(i))
             sensors.push_back(Sensor(THERMOMETER, THERMOMETER_BASE_SENSOR_ID + i));
     }
 
-    for (int i = 0; i < LoopPacket::NUM_LEAF_WETNESSES; i++) {
+    for (int i = 0; i < VP2Constants::MAX_LEAF_WETNESSES; i++) {
         if (loop.isLeafWetnessValid(i))
             sensors.push_back(Sensor(LEAF_WETNESS, LEAF_WETNESS_BASE_SENSOR_ID + i));
     }
 
-    for (int i = 0; i < LoopPacket::NUM_SOIL_MOISTURES; i++) {
+    for (int i = 0; i < VP2Constants::MAX_SOIL_MOISTURES; i++) {
         if (loop.isSoilMoistureValid(i))
             sensors.push_back(Sensor(SOIL_MOISTURE, SOIL_MOISTURE_BASE_SENSOR_ID + i));
     }
 
-    for (int i = 0; i < LoopPacket::NUM_SOIL_TEMPERATURES; i++) {
+    for (int i = 0; i < VP2Constants::MAX_SOIL_TEMPERATURES; i++) {
         if (loop.isSoilTemperatureValid(i))
             sensors.push_back(Sensor(SOIL_TEMPERATURE, SOIL_TEMPERATURE_BASE_SENSOR_ID + i));
     }
 
-    for (int i = 0; i < LoopPacket::NUM_LEAF_TEMPERATURES; i++) {
+    for (int i = 0; i < VP2Constants::MAX_LEAF_TEMPERATURES; i++) {
         if (loop.isLeafTemperatureValid(i))
             sensors.push_back(Sensor(LEAF_TEMPERATURE, LEAF_TEMPERATURE_BASE_SENSOR_ID + i));
     }
 }
 
-/// <summary>
-/// Format the sensor message
-/// </summary>
-/// <param name="list">The list from which to build the message</param>
-/// <returns>The message as a string</returns>
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 string
 Sensor::formatMessage(const vector<Sensor> & list) {
     ostringstream sb;

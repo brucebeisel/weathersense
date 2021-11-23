@@ -104,7 +104,7 @@ public class DataMonitorTest implements WeatherDataWriter {
         utils.createSensorTable();
         cctbl = new CollectorCommandsTable(dbcon);
         wsTbl = new WeatherStationTable(dbcon);
-        monitor = new DataMonitor(DatabaseUtilities.DERBY_URL, "", "", null, null, this);
+        monitor = new DataMonitor(DatabaseUtilities.DERBY_URL, "", "", null, this);
         monitor.init(100);
     }
     

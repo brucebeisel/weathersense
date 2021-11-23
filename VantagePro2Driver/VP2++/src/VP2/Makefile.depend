@@ -1,0 +1,66 @@
+../../target/VP2/ArchiveManager.o: ArchiveManager.cpp ArchivePacket.h \
+ Weather.h VP2Constants.h ArchiveManager.h VP2Logger.h \
+ VantagePro2Station.h LoopPacket.h Loop2Packet.h WindDirectionSlices.h \
+ WindSlice.h ParametersMessage.h SensorStation.h Sensor.h SerialPort.h
+../../target/VP2/ArchivePacket.o: ArchivePacket.cpp VP2Logger.h \
+ VP2Constants.h Weather.h VP2Decoder.h BitConverter.h UnitConverter.h \
+ ArchivePacket.h
+../../target/VP2/BitConverter.o: BitConverter.cpp BitConverter.h \
+ Weather.h
+../../target/VP2/CurrentWeather.o: CurrentWeather.cpp ForecastRule.h \
+ CurrentWeather.h LoopPacket.h VP2Logger.h Weather.h Loop2Packet.h \
+ WindDirectionSlices.h WindSlice.h
+../../target/VP2/CurrentWeatherPublisher.o: CurrentWeatherPublisher.cpp \
+ VP2Logger.h CurrentWeatherPublisher.h Weather.h CurrentWeather.h \
+ LoopPacket.h Loop2Packet.h WindDirectionSlices.h WindSlice.h
+../../target/VP2/ForecastRule.o: ForecastRule.cpp ForecastRule.h
+../../target/VP2/HiLowPacket.o: HiLowPacket.cpp BitConverter.h Weather.h \
+ VP2Decoder.h HiLowPacket.h VP2Logger.h
+../../target/VP2/Loop2Packet.o: Loop2Packet.cpp BitConverter.h Weather.h \
+ UnitConverter.h VP2Constants.h VantagePro2CRC.h Loop2Packet.h \
+ VP2Logger.h
+../../target/VP2/LoopPacket.o: LoopPacket.cpp BitConverter.h Weather.h \
+ UnitConverter.h VP2Constants.h VP2Decoder.h VantagePro2CRC.h \
+ LoopPacket.h VP2Logger.h
+../../target/VP2/main.o: main.cpp VP2Logger.h ArchiveManager.h Weather.h \
+ VantagePro2Driver.h WeatherSenseSocket.h ParametersMessage.h \
+ SensorStation.h VantagePro2Station.h ArchivePacket.h VP2Constants.h \
+ LoopPacket.h Loop2Packet.h WindDirectionSlices.h WindSlice.h Sensor.h \
+ SerialPort.h CurrentWeatherPublisher.h
+../../target/VP2/ParametersMessage.o: ParametersMessage.cpp \
+ UnitConverter.h Weather.h ParametersMessage.h
+../../target/VP2/ProtocolException.o: ProtocolException.cpp \
+ ProtocolException.h
+../../target/VP2/Sensor.o: Sensor.cpp Sensor.h LoopPacket.h VP2Logger.h \
+ Weather.h
+../../target/VP2/SensorStation.o: SensorStation.cpp SensorStation.h \
+ Weather.h
+../../target/VP2/SerialPort.o: SerialPort.cpp VP2Logger.h Weather.h \
+ SerialPort.h
+../../target/VP2/UnitConverter.o: UnitConverter.cpp UnitConverter.h \
+ Weather.h
+../../target/VP2/VantagePro2CRC.o: VantagePro2CRC.cpp VP2Logger.h \
+ BitConverter.h Weather.h VantagePro2CRC.h
+../../target/VP2/VantagePro2Driver.o: VantagePro2Driver.cpp \
+ CurrentWeather.h LoopPacket.h VP2Logger.h Weather.h Loop2Packet.h \
+ WindDirectionSlices.h WindSlice.h CurrentWeatherPublisher.h \
+ HiLowPacket.h SensorStation.h VantagePro2Driver.h WeatherSenseSocket.h \
+ ArchiveManager.h ParametersMessage.h VantagePro2Station.h \
+ ArchivePacket.h VP2Constants.h Sensor.h SerialPort.h
+../../target/VP2/VantagePro2Station.o: VantagePro2Station.cpp \
+ VP2Constants.h Weather.h CurrentWeather.h LoopPacket.h VP2Logger.h \
+ Loop2Packet.h WindDirectionSlices.h WindSlice.h HiLowPacket.h \
+ VantagePro2CRC.h BitConverter.h ProtocolException.h VantagePro2Station.h \
+ ArchivePacket.h ParametersMessage.h SensorStation.h Sensor.h \
+ SerialPort.h
+../../target/VP2/VP2Constants.o: VP2Constants.cpp VP2Constants.h \
+ Weather.h
+../../target/VP2/VP2Logger.o: VP2Logger.cpp Weather.h VP2Logger.h
+../../target/VP2/VP2Decoder.o: VP2Decoder.cpp BitConverter.h Weather.h \
+ UnitConverter.h VP2Constants.h VP2Decoder.h
+../../target/VP2/Weather.o: Weather.cpp Weather.h
+../../target/VP2/WeatherSenseSocket.o: WeatherSenseSocket.cpp \
+ WeatherSenseSocket.h VP2Logger.h Weather.h
+../../target/VP2/WindDirectionSlices.o: WindDirectionSlices.cpp \
+ WindDirectionSlices.h Weather.h WindSlice.h
+../../target/VP2/WindSlice.o: WindSlice.cpp Weather.h WindSlice.h

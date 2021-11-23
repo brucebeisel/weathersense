@@ -5,3 +5,5 @@
 *.log
 /WeatherSenseDisplayJavaFX/target/
 /Uploaders/target/
+/VantagePro2Driver/VP2++/target
+*.o

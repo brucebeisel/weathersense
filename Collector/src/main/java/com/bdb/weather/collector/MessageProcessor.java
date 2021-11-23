@@ -16,7 +16,6 @@
  */
 package com.bdb.weather.collector;
 
-import com.bdb.weather.uploader.WeatherUploader;
 import com.bdb.weather.collector.messages.SensorStationMessage;
 import com.bdb.weather.collector.messages.SensorStationStatusMessage;
 import com.bdb.weather.collector.messages.SensorMessage;
@@ -56,7 +55,6 @@ final class MessageProcessor implements SocketDataProcessor {
     private final WeatherDataWriter writer;
     private final DBConnection connection;
     private final HistoryTable historyTable;
-    private final WeatherUploader weatherUploader;
     private static final Logger logger = Logger.getLogger(MessageProcessor.class.getName());
 
     /**
@@ -69,7 +67,7 @@ final class MessageProcessor implements SocketDataProcessor {
      * @param uploader The object that uploads weather to the Internet
      * @throws JAXBException An exception occurred while de-marshaling a message
      */
-    public MessageProcessor(String dbUrl, String dbUser, String dbPassword, WeatherDataWriter writer, WeatherUploader uploader) throws JAXBException {
+    public MessageProcessor(String dbUrl, String dbUser, String dbPassword, WeatherDataWriter writer) throws JAXBException {
         this.writer = writer;
         JAXBContext jaxbContext = JAXBContext.newInstance(com.bdb.weather.common.CurrentWeather.class,
                                                           com.bdb.weather.common.measurement.LeafWetness.class,
@@ -84,7 +82,6 @@ final class MessageProcessor implements SocketDataProcessor {
         connection = new DBConnection(dbUrl, dbUser, dbPassword);
 
         historyTable = new HistoryTable(connection);
-        weatherUploader = uploader;
     }
     
     /**
@@ -198,7 +195,6 @@ final class MessageProcessor implements SocketDataProcessor {
                 logger.fine("################ Received Current Weather ################");
                 CurrentWeather cw = (CurrentWeather)msg;
                 writer.setCurrentWeather(cw, s);
-                weatherUploader.uploadCurrentWeather(cw);
             }
             else if (msg instanceof WsParametersMessage) {
                 logger.fine("**************** Received Weather Station Parameters **************");

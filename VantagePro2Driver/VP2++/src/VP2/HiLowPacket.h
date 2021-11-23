@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,30 +20,26 @@
 #include <string>
 #include "VP2Logger.h"
 #include "Weather.h"
+#include "VP2Constants.h"
 
 namespace vp2 {
 /**
- * Class that parses and stores the data from the LOOP packet.
+ * Class that decodes and stores the data from the High/Low packet.
  */
-class LoopPacket {
+class HiLowPacket {
 public:
-    static const int NUM_EXTRA_TEMPERATURES = 7;
-    static const int NUM_EXTRA_HUMIDITIES = 7;
-    static const int NUM_SOIL_TEMPERATURES = 4;
-    static const int NUM_LEAF_TEMPERATURES = 3;
-    static const int NUM_SOIL_MOISTURES = 4;
-    static const int NUM_LEAF_WETNESSES = 3;
-
     HiLowPacket();
     ~HiLowPacket();
 
     /**
      * Parse the High/Lows packet buffer.
      * 
-     * @param buffer The buffer to parse
-     * @return True if the LOOP packet was parsed successfully
+     * @param buffer The buffer to decodes
+     * @return True if the Hi/Low packet was decodes successfully
      */
-    bool parseHiLowPacket(byte buffer[]);
+    bool decodeHiLowPacket(byte buffer[]);
+
+    std::string formatMessage() const;
 
     //
     // Barometer High/Lows
@@ -78,6 +74,18 @@ public:
     Temperature getYearHighInsideTemperature() const;
 
     //
+    // Outside Temperature High/Lows
+    //
+    Temperature getDayLowOutsideTemperature() const;
+    DateTime    getDayLowOutsideTemperatureTime() const;
+    Temperature getDayHighOutsideTemperature() const;
+    DateTime    getDayHighOutsideTemperatureTime() const;
+    Temperature getMonthLowOutsideTemperature() const;
+    Temperature getMonthHighOutsideTemperature() const;
+    Temperature getYearLowOutsideTemperature() const;
+    Temperature getYearHighOutsideTemperature() const;
+
+    //
     // Inside Humidity High/Lows
     //
     Humidity getDayLowInsideHumidity() const;
@@ -90,16 +98,16 @@ public:
     Humidity getYearHighInsideHumidity() const;
 
     //
-    // Outside Temperature High/Lows
+    // Outside Humidity High/Lows
     //
-    Temperature getDayLowOutsideTemperature() const;
-    DateTime    getDayLowOutsideTemperatureTime() const;
-    Temperature getDayHighOutsideTemperature() const;
-    DateTime    getDayHighOutsideTemperatureTime() const;
-    Temperature getMonthLowOutsideTemperature() const;
-    Temperature getMonthHighOutsideTemperature() const;
-    Temperature getYearLowOutsideTemperature() const;
-    Temperature getYearHighOutsideTemperature() const;
+    Humidity getDayLowOutsideHumidity() const;
+    DateTime getDayLowOutsideHumidityTime() const;
+    Humidity getDayHighOutsideHumidity() const;
+    DateTime getDayHighOutsideHumidityTime() const;
+    Humidity getMonthLowOutsideHumidity() const;
+    Humidity getMonthHighOutsideHumidity() const;
+    Humidity getYearLowOutsideHumidity() const;
+    Humidity getYearHighOutsideHumidity() const;
 
     //
     // Dew Point High/Lows
@@ -166,55 +174,50 @@ public:
     //
 
 private:
-    static DateTime extractDate(int time);
 
-    Pressure       dayLowBarometer;
-    DateTime       dayLowBarometerTime;
-    Pressure       dayHighBarometer;
-    DateTime       dayHighBarometerTime;
-    Pressure       monthHighBarometer;
-    Pressure       yearHighBarometer;
+    template<typename T>
+    struct Values {
+        T           dayExtremeValue;
+        DateTime    dayExtremeValueTime;
+        T           monthExtremeValue;
+        T           yearExtremeValue;
+        std::string formatXML(bool low) const;
+    };
 
-    Temperature        outsideTemperature;
-    Temperature        insideTemperature;
-    Humidity           outsideHumidity;
-    Humidity           insideHumidity;
-    Speed              windSpeed;
-    Heading            windDirection;
-    Pressure           barometricPressure;
-    BaroTrend          baroTrend;
-    Rainfall           rainRate;
-    Rainfall           stormRain;
-    Rainfall           dayRain;
-    Rainfall           monthRain;
-    Rainfall           yearRain;
-    int                uvIndex;
-    SolarRadiation     solarRadiation;
-    Evapotranspiration dayET;
-    Evapotranspiration monthET;
-    Evapotranspiration yearET;
-    Forecast           forecastIcon;
-    int                forecastRule;
-    DateTime           sunRiseTime;
-    DateTime           sunSetTime;
-    DateTime           stormStart;
-    Speed              avgWindSpeed10Min;
-    Speed              avgWindSpeed2Min;
+    template<typename T> using LowValues = Values<T>;
+    template<typename T> using HighValues = Values<T>;
 
-    SoilMoisture       soilMoisture[NUM_SOIL_MOISTURES];
-    LeafWetness        leafWetness[NUM_LEAF_WETNESSES];
-    Temperature        leafTemperature[NUM_LEAF_TEMPERATURES];
-    bool               leafTemperatureValid[NUM_LEAF_TEMPERATURES];
-    Temperature        soilTemperature[NUM_SOIL_TEMPERATURES];
-    bool               soilTemperatureValid[NUM_SOIL_TEMPERATURES];
-    Temperature        temperatureExtra[NUM_EXTRA_TEMPERATURES];
-    bool               temperatureExtraValid[NUM_EXTRA_TEMPERATURES];
-    Humidity           humidityExtra[NUM_EXTRA_HUMIDITIES];
-    int                transmitterBatteryStatus;
-    float              consoleBatteryVoltage;
+    template<typename T>
+    struct HighLowValues {
+        Values<T>   lows;
+        Values<T>   highs;
+        std::string formatXML() const;
+    };
+
+    bool decodeHiLowTemperature(const byte buffer[], HighLowValues<Temperature> & values, int baseOffset);
+
+    HighLowValues<Pressure>     barometer;
+    LowValues<Speed>            wind;
+    HighLowValues<Temperature>  insideTemperature;
+    HighLowValues<Humidity>     insideHumidity;
+    HighLowValues<Temperature>  outsideTemperature;
+    HighLowValues<Humidity>     outsideHumidity;
+    HighLowValues<Temperature>  dewPoint;
+    HighValues<Temperature>     heatIndex;
+    LowValues<Temperature>      windChill;
+    HighValues<Temperature>     thsw;
+    HighValues<SolarRadiation>  solarRadiation;
+    HighValues<UvIndex>         uvIndex;
+    HighValues<Rainfall>        rainRate;
+    Rainfall                    highHourRainRate;
+    HighLowValues<Temperature>  extraTemperature[VP2Constants::MAX_EXTRA_TEMPERATURES];
+    HighLowValues<Temperature>  soilTemperature[VP2Constants::MAX_SOIL_TEMPERATURES];
+    HighLowValues<Temperature>  leafTemperature[VP2Constants::MAX_LEAF_TEMPERATURES];
+    HighLowValues<Humidity>     extraHumidity[VP2Constants::MAX_EXTRA_HUMIDITIES];
+    HighLowValues<SoilMoisture> soilMoisture[VP2Constants::MAX_SOIL_MOISTURES];
+    HighLowValues<LeafWetness>  leafWetness[VP2Constants::MAX_LEAF_WETNESSES];
+
     VP2Logger          log;
-
-    static Rainfall    rainfallIncrement;
 };
 }
 #endif

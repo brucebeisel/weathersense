@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -211,23 +211,14 @@ const std::string ForecastRule::FORECAST[] = {
     "Partly cloudy with little temperature change.",
     "Mostly clear with little temperature change.",
     "Mostly cloudy and cooler. Precipitation possible within 12 hours possibly heavy at times. Windy.",
-    "FORECAST REQUIRES 3 HOURS OF RECENT DATA."
+    "Forecast requires 3 hours of recent data."
 };
 
 static const std::string EMPTY_STRING = "";
 const int ForecastRule::NUM_RULES = sizeof(FORECAST) / sizeof(FORECAST[0]);
 
-ForecastRule::ForecastRule(int rule) : rule(rule) {
-}
-
-ForecastRule::~ForecastRule() {
-}
-
-int
-ForecastRule::getRule() const {
-    return rule;
-}
-
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 const std::string &
 ForecastRule::forecastString(int rule) {
     if (rule < 0 || rule >= NUM_RULES)

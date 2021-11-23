@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 
 namespace vp2 {
 class CurrentWeather;
+class HiLowPacket;
 
 /**
  * Class that handles the command protocols with the VP2 console.
@@ -60,6 +61,13 @@ public:
     virtual ~VantagePro2Station();
 
     /**
+     * Set the callback object that will be called when current weather, archive packets are received.
+     * 
+     * @param callback The callback object
+     */
+    void setCallback(Callback & callback);
+
+    /**
      * Open the VP2 console.
      * 
      * @return True if the console was opened
@@ -77,6 +85,193 @@ public:
      * @return True of the console is awake
      */
     bool wakeupStation();
+
+
+    //
+    // The following methods correspond to the commands in section VIII of the Vantage Serial Protocol Document, version 2.6.1
+    //
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // Testing Commands
+    /////////////////////////////////////////////////////////////////////////////////
+    bool sendTestCommand();
+
+    bool retrieveConsoleDiagnosticsReport();
+
+    bool performReceiveTest();
+
+    bool retrieveReceiverList();
+
+    void retrieveFirmwareVersion();
+    void retrieveFirmwareDate();
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // Current Data Commands
+    /////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Retrieve the current weather by reading the LOOP and LOOP2 packet in a loop.
+     * 
+     * @param records The number of times to execute the loop before returning
+     */
+    void currentValuesLoop(int records);
+
+    bool retrieveHiLowValues(HiLowPacket &packet);
+
+    bool putYearlyRain(Rainfall rain);
+
+    bool putYearlyET(Evapotranspiration et);
+
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // Download Commands
+    /////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Dump the entire archive.
+     *
+     * @param list The list that will contain the entire archive
+     */
+    void dump(std::vector<ArchivePacket> & list);
+
+    /**
+     * Perform a dump of the archive after the specified time.
+     * 
+     * @param time    The time after which to dump the archive
+     * @param archive The vector into which the dumped archive packets will be returned
+     * @return True if successful
+     */
+    bool dumpAfter(DateTime time, std::vector<ArchivePacket> & archive);
+
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // EEPROM Commands
+    /////////////////////////////////////////////////////////////////////////////////
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // Calibration Commands
+    /////////////////////////////////////////////////////////////////////////////////
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // Clearing Commands
+    /////////////////////////////////////////////////////////////////////////////////
+    bool clearArchive();
+    bool clearAlarmThresholds();
+    bool clearTemperatureHumidityCalibrationOffsets();
+    bool clearGraphPoints();
+    bool clearCumulativeValue(int valueType);
+    bool clearHighValues(int valueType);
+    bool clearLowValues(int valueType);
+    bool clearActiveAlarms();
+    bool clearCurrentData();
+
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // Configuration Commands
+    /////////////////////////////////////////////////////////////////////////////////
+    bool updateBaudRate(int rate);
+    
+
+    /**
+     * Set the console's time.
+     * 
+     * @return True if successful
+     */
+    bool setConsoleTime();
+
+    /**
+     * Get the clock time on the console.
+     * 
+     * @return The time
+     */
+    DateTime retrieveConsoleTime();
+
+
+    /**
+     * Update the archive period to one of the allowed intervals.
+     *
+     * @param period The interval at which the archive data will saved
+     *
+     * @return True if successful
+     */
+    bool updateArchivePeriod(VP2Constants::ArchivePeriod period);
+
+    /**
+     * Reinitialize the console after making any of the following changes to the configuration:
+     *      1. Lat/Lon
+     *      2. Elevation
+     *      3. TBD
+     *
+     * @return True if successful
+     */
+    bool initializeSetup();
+
+    /**
+     * Turn the console lamp on or off.
+     *
+     * @param on Turn the lamp on if true
+     *
+     * @return True if successful
+     */
+    bool controlConsoleLamp(bool on);
+
+    //
+    // End of console commands
+    //
+
+    //
+    // EEPROM retrieval commands
+    //
+    bool retrieveISSLocation();
+
+    bool retrieveTimezone();
+
+    bool retrieveDaylightSavingsTimeMode();
+
+    /**
+     * Retrieve the state of the manual setting for daylight savings time.
+     * If the DST mode is automatic, this entry is not used.
+     *
+     * @return True if successful
+     */
+    bool retrieveDaylightSavingsState();
+
+    bool retrieveGMTOffset();
+
+    /**
+     * Retrieve whether the time zone offset is set by GMT offset or specifying a time zone.
+     *
+     * @return True if successful
+     */
+    bool retrieveTimeZoneMode();
+
+    bool retrieveTransmitterListenBits();
+
+    bool retrieveRetransmitID();
+
+    bool retrieveStationList();
+
+    bool retrieveUnits();
+
+    bool retrieveSetupBits();
+
+    bool retrieveRainSeasonStart();
+    /**
+     * Retrieve the archive period from the console.
+     * 
+     * @return True if the archive period was stored successfully
+     */
+    bool retrieveArchivePeriod();
+
+
+    bool retrieveAlarmSettings();
+
+
+
+
+
+
+
 
     /**
      * Get the archive period (in minutes)
@@ -99,22 +294,16 @@ public:
      */
     const std::vector<Sensor> & getSensors() const;
 
-    /**
-     * Get the clock time on the console.
-     * 
-     * @return The time
-     */
-    DateTime getTime();
 
+    /**
+     * Decode a buffer into a single archive packet.
+     *
+     * @param buffer The buffer from which to decode the archive packet
+     * @param index  The index within the buffer to start decoding the archive packet
+     *
+     * @return The decoded archive packet
+     */
     ArchivePacket convertBufferToArchivePacket(const byte * buffer, int index) const;
-
-    /**
-     * Perform a dump of the archive after the specified time.
-     * 
-     * @param time the time after which to dump the archive
-     * @return True if successful
-     */
-    bool dumpAfter(DateTime time, std::vector<ArchivePacket> & archive);
 
     /**
      * Retrieve various parameters from the console.
@@ -125,27 +314,6 @@ public:
     bool getParameters(ParametersMessage & message);
 
     /**
-     * Set the console's time.
-     * 
-     * @return True if successful
-     */
-    bool setConsoleTime();
-
-    /**
-     * Retrieve the current weather by reading the LOOP and LOOP2 packet in a loop.
-     * 
-     * @param records The number of times to execute the loop before returning
-     */
-    void currentValuesLoop(int records);
-
-    /**
-     * Set the callback object that will be called when current weather, archive packets are received.
-     * 
-     * @param callback The callback object
-     */
-    void setCallback(Callback & callback);
-
-    /**
      * Retrieve the rain collector size from the console.
      * 
      * @return True if the rain collector size was stored successfully
@@ -153,11 +321,11 @@ public:
     bool retrieveRainCollectorSize();
 
     /**
-     * Retrieve the archive period from the console.
-     * 
-     * @return True if the archive period was stored successfully
+     * Get the size of the rain collector that was previously retrieved
+     *
+     * @return The size of the rain collector in inches
      */
-    bool retrieveArchivePeriod();
+    Rainfall    getRainCollectorSize() const;
 
     /**
      * Retrieve information about the sensor stations that are communicating with the console.
@@ -167,35 +335,69 @@ public:
     bool retrieveSensorStationInfo();
 
 
-private:
-    static const int NUM_ARCHIVE_PAGES = 512;
-    static const int ARCHIVE_PAGE_SIZE = 265;
-    static const int LOOP_PACKET_SIZE = 99;
-    static const int RECORDS_PER_ARCHIVE_PAGE = 5;
-    static const int BYTES_PER_ARCHIVE_RECORD = 52;
-    static const int CRC_BYTES = 2;
-    static const int TIME_RESPONSE_LENGTH = 6;
-    static const int DUMP_AFTER_RESPONSE_LENGTH = 4;
-    static const int TIME_LENGTH = 4;
-    static const int WAKEUP_TRIES = 5;
-    static const int SET_TIME_LENGTH = 6;
-    static const int LOOP_PACKET_WAIT = 2000;
-    static const int VP2_YEAR_OFFSET = 2000;
-    static const int HILOW_PACKET_SIZE = 436;
 
-    bool        sendOKedCommand(const std::string &);
-    bool        sendAckedCommand(const std::string &);
+
+private:
+    static constexpr int WAKEUP_TRIES = 5;               // The number of times to try to wake up the console before performing a disconnect/reconnect cycle
+    static constexpr int CRC_BYTES = 2;                  // The number of bytes in the CRC
+
+    static constexpr int NUM_ARCHIVE_PAGES = 512;        // The total number of pages in the console's memory
+    static constexpr int ARCHIVE_PAGE_SIZE = 265;        // 1 sequence byte, 5 52 byte records (260 bytes) and 4 spare bytes. 1 + 260 + 4 = 265 bytes
+    static constexpr int BYTES_PER_ARCHIVE_RECORD = 52;  // The size of each archive record
+    static constexpr int RECORDS_PER_ARCHIVE_PAGE = 5;   // The number of archive records per archive page
+    static constexpr int DUMP_AFTER_RESPONSE_LENGTH = 4; // The length of the response to the DUMP AFTER command
+
+    static constexpr int LOOP_PACKET_SIZE = 99;
+    static constexpr int TIME_RESPONSE_LENGTH = 6;
+    static constexpr int TIME_LENGTH = 4;
+    static constexpr int SET_TIME_LENGTH = 6;
+    static constexpr int LOOP_PACKET_WAIT = 2000;
+    static constexpr int VP2_YEAR_OFFSET = 2000;
+    static constexpr int HILOW_PACKET_SIZE = 436;
+    static constexpr int NO_VALUE = 0xFF;
+
+
+    /**
+     * Send a command that expects on "OK" response.
+
+     * @param command The command to be sent to the VP2 console
+     * @return True if the command was sent successfully
+     */
+    bool sendOKedCommand(const std::string & command);
+
+    /**
+     * Send a command that expects on "OK" response followed by a "DONE" after a period of time.
+
+     * @param command The command to be sent to the VP2 console
+     * @return True if the command was sent successfully
+     */
+    bool sendOKedWithDoneCommand(const std::string & command);
+
+    /**
+     * Send a command that expects an ACK response.
+     *
+     * @param command The command to be sent to the VP2 console
+     * @return True if the command was sent successfully
+     */
+    bool        sendAckedCommand(const std::string & command);
     bool        consumeAck();
+
     bool        readLoopPacket(LoopPacket & loopPacket);
     bool        readLoop2Packet(Loop2Packet & loop2Packet);
-    void        parseArchivePage(std::vector<ArchivePacket> &, const byte * buffer, int firstRecord, DateTime newestPacketTime);
+
+    void        decodeArchivePage(std::vector<ArchivePacket> &, const byte * buffer, int firstRecord, DateTime newestPacketTime);
     bool        processArchivePage(std::vector<ArchivePacket> &, int firstRecord, DateTime newestPacketTime);
-    std::string getStringValue(const std::string & command);
-    Rainfall    getRainCollectorSize() const;
-    bool        readEEPROM(const std::string & address, int count);
-    void        dump(std::vector<ArchivePacket> & list);
     bool        archivePacketContainsData(const byte * buffer, int offset);
-    bool        requestHiLowPacket();
+
+    /**
+     * Send the command to retrieve a string value.
+     *
+     * @param command The command to send
+     * @return The string value returned by the console
+     */
+    std::string sendStringValueCommand(const std::string & command);
+
+    bool        readEEPROM(const std::string & address, int count);
 
     SerialPort                 serialPort;
     std::string                portName;
@@ -211,6 +413,13 @@ private:
     std::vector<Sensor>        sensors;
     float                      consoleBatteryVoltage;
     bool                       firstLoopPacket;
+    double                     issLatitude;
+    double                     issLongitude;
+    int                        issElevation;
+    bool                       north;
+    bool                       east;
+    std::string                firmwareDate;
+    std::string                firmwareVersion;
     VP2Logger                  log;
 };
 }

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,8 +42,9 @@ public:
      * Constructor.
      * 
      * @param archiveManager The archive manager that will maintain the file containing the raw archive packets
-     * @param socket The object that communicates with the WeatherSense collector
-     * @param station The object that handles the command protocols with the VP2 console
+     * @param socket         The object that communicates with the WeatherSense collector
+     * @param cwp            The publisher that will be called each time a current weather record has been received
+     * @param station        The object that handles the command protocols with the VP2 console
      */
     VantagePro2Driver(ArchiveManager & archiveManager, WeatherSenseSocket & socket, CurrentWeatherPublisher & cwp, VantagePro2Station & station);
 
@@ -80,10 +81,11 @@ private:
      * the loop packet cycle will be interrupted early.
      */
     static const int LOOP_PACKET_CYCLES = 12;
+
     /**
      * How often to set the time on the console.
      */
-    static const int TIME_SET_INTERVAL = 86400;
+    static const int TIME_SET_INTERVAL = 3600;
 
     /**
      * Called when a valid LOOP/LOOP2 packet pair is received.
@@ -108,20 +110,20 @@ private:
      */
     void connected(DateTime newestArchiveTimeFromCollector);
 
-    VantagePro2Station & station;
-    WeatherSenseSocket & socket;
+    VantagePro2Station &      station;
+    WeatherSenseSocket &      socket;
     CurrentWeatherPublisher & currentWeatherPublisher;
-    ArchiveManager & archiveManager;
-    bool exitLoop;
-    bool receivedFirstLoopPacket;
-    int thread;
-    int nextRecord;
-    int previousNextRecord;
-    DateTime lastPacketTime;
-    DateTime consoleTimeSetTime;
-    DateTime sensorStationSendTime;
-    ParametersMessage parameters;
-    VP2Logger log;
+    ArchiveManager &          archiveManager;
+    bool                      exitLoop;
+    bool                      receivedFirstLoopPacket;
+    int                       thread;
+    int                       nextRecord;
+    int                       previousNextRecord;
+    DateTime                  lastPacketTime;
+    DateTime                  consoleTimeSetTime;
+    DateTime                  sensorStationSendTime;
+    ParametersMessage         parameters;
+    VP2Logger                 log;
 };
 
 }

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ using namespace std;
 
 namespace vp2 {
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 ArchiveManager::ArchiveManager(const std::string & archiveFilename, VantagePro2Station & station) :
                                                                     archiveFile(archiveFilename),
                                                                     station(station),
@@ -35,9 +37,13 @@ ArchiveManager::ArchiveManager(const std::string & archiveFilename, VantagePro2S
     
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 ArchiveManager::~ArchiveManager() {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 ArchiveManager::readArchive() {
     vector<ArchivePacket> list;
@@ -58,11 +64,15 @@ ArchiveManager::readArchive() {
     return result;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 ArchiveManager::setNewestRecordTime(DateTime time) {
     timeOfLastPacketSent = time;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 ArchiveManager::addPacket(const ArchivePacket & packet) {
     vector<ArchivePacket> list;
@@ -70,6 +80,8 @@ ArchiveManager::addPacket(const ArchivePacket & packet) {
     addPackets(list);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 ArchiveManager::addPackets(const vector<ArchivePacket> & packets) {
     if (packets.size() == 0)
@@ -79,7 +91,7 @@ ArchiveManager::addPackets(const vector<ArchivePacket> & packets) {
     stream.open(archiveFile.c_str(), ofstream::out | ios::app | ios::binary);
     for (vector<ArchivePacket>::const_iterator it = packets.begin(); it != packets.end(); ++it) {
         if (newestPacketTime < it->getDateTime()) {
-            stream.write(it->getBuffer(), VP2Constants::APB_BYTES_PER_RECORD);
+            stream.write(it->getBuffer(), ArchivePacket::BYTES_PER_PACKET);
             newestPacketTime = it->getDateTime();
             log.log(VP2Logger::VP2_DEBUG1) << "Archived packet with time: " << Weather::formatDateTime(it->getDateTime()) << endl;
         }
@@ -89,18 +101,20 @@ ArchiveManager::addPackets(const vector<ArchivePacket> & packets) {
     stream.close();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 ArchiveManager::findPacketTimeRange() {
     ifstream stream(archiveFile.c_str(), ios::in | ios::binary | ios::ate);
     streampos fileSize = stream.tellg();
-    if (fileSize > VP2Constants::APB_BYTES_PER_RECORD) {
-        byte buffer[VP2Constants::APB_BYTES_PER_RECORD];
+    if (fileSize > ArchivePacket::BYTES_PER_PACKET) {
+        byte buffer[ArchivePacket::BYTES_PER_PACKET];
         stream.seekg(0, ios::beg);
         stream.read(buffer, sizeof(buffer));
         ArchivePacket packet = station.convertBufferToArchivePacket(buffer, 0);
         oldestPacketTime = packet.getDateTime();
 
-        stream.seekg(-VP2Constants::APB_BYTES_PER_RECORD, ios::end);
+        stream.seekg(-ArchivePacket::BYTES_PER_PACKET, ios::end);
         stream.read(buffer, sizeof(buffer));
         packet = station.convertBufferToArchivePacket(buffer, 0);
         newestPacketTime = packet.getDateTime();
@@ -113,18 +127,22 @@ ArchiveManager::findPacketTimeRange() {
     stream.close();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 ArchiveManager::getArchiveRecords(std::vector<ArchivePacket>& list) {
     if (timeOfLastPacketSent != 0)
         readPackets(list, timeOfLastPacketSent);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 ArchiveManager::readPackets(vector<ArchivePacket> & list, DateTime startTime) {
     log.log(VP2Logger::VP2_DEBUG1) << "Reading packets after " << Weather::formatDateTime(startTime) << endl;
-    byte buffer[VP2Constants::APB_BYTES_PER_RECORD];
+    byte buffer[ArchivePacket::BYTES_PER_PACKET];
     ifstream stream(archiveFile.c_str(), ios::in | ios::binary);
-    stream.seekg(-VP2Constants::APB_BYTES_PER_RECORD, ios::end);
+    stream.seekg(-ArchivePacket::BYTES_PER_PACKET, ios::end);
     streampos streamPosition;
     DateTime packetTime;
 
@@ -139,7 +157,7 @@ ArchiveManager::readPackets(vector<ArchivePacket> & list, DateTime startTime) {
             streamPosition = stream.tellg();
             stream.read(buffer, sizeof(buffer));
             ArchivePacket packet = station.convertBufferToArchivePacket(buffer, 0);
-            stream.seekg(-(VP2Constants::APB_BYTES_PER_RECORD * 2), ios::cur);
+            stream.seekg(-(ArchivePacket::BYTES_PER_PACKET * 2), ios::cur);
             packetTime = packet.getDateTime();
         } while (startTime < packetTime && streamPosition > 0);
 
@@ -152,7 +170,7 @@ ArchiveManager::readPackets(vector<ArchivePacket> & list, DateTime startTime) {
             stream.seekg(0, ios::beg);
         }
         else
-            stream.seekg(VP2Constants::APB_BYTES_PER_RECORD * 2, ios::cur);
+            stream.seekg(ArchivePacket::BYTES_PER_PACKET * 2, ios::cur);
     }
     else
         stream.seekg(0, ios::beg);

@@ -101,7 +101,7 @@ public class HistoryTableTest {
             rec.setIndoorTemperature(new Temperature(inTemp));
             rec.setRainfall(new Depth(rain));
             rec.setAvgUvIndex(5.5f);
-            rec.setHighUvIndex(UvIndex.getUvIndex(6));
+            rec.setHighUvIndex(new UvIndex(6));
             rec.setAvgSolarRadiation(new SolarRadiation(1.0));
             rec.setHighSolarRadiation(new SolarRadiation(9.0));
             rec.setEvapotranspiration(new Depth(20.0));

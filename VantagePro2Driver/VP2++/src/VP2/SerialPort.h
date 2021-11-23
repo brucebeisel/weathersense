@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 #ifndef SERIAL_PORT_H
 #define SERIAL_PORT_H
-#ifdef _WIN32
+#ifdef __CYGWIN__
 #include <windows.h>
 #else
 typedef int HANDLE;

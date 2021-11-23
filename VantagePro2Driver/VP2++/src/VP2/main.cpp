@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2021 Bruce Beisel
+ * Copyright (C) 2022 Bruce Beisel
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,15 +32,19 @@ using namespace vp2;
 
 extern "C" {
 bool signalCaught = false;
-#ifndef WIN32
+//#ifndef WIN32
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void
 sigHandler(int sig) {
     if (sig == SIGINT || sig == SIGTERM)
         signalCaught = true;
 }
-#endif
+//#endif
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 int
 main(int argc, char *argv[]) {
 #ifdef _WIN32
