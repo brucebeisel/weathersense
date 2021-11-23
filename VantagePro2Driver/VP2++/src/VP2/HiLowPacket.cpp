@@ -28,14 +28,14 @@ HiLowPacket::Values<T>::formatXML(bool low) const {
 
     string which = low ? "low" : "high";
 
-    ss << "<" << which << ">"
-       << "<day>"
-       << "<value>" << dayExtremeValue << "</value>"
-       <<  "<time>" << dayExtremeValueTime << "</time>"
-       <<  "</day>"
-       <<  "<month>" << monthExtremeValue << "</month>"
-       <<  "<year>" << yearExtremeValue <<"</year>"
-       <<  "</" << which << ">";
+    ss << "    <" << which << ">" << endl
+       << "        <day>" << endl
+       << "            <value>" << dayExtremeValue << "</value>" << endl
+       << "            <time>" << Weather::formatDateTime(dayExtremeValueTime) << "</time>" << endl
+       << "        </day>" << endl
+       << "        <month>" << monthExtremeValue << "</month>" << endl
+       << "        <year>" << yearExtremeValue <<"</year>" << endl
+       << "    </" << which << ">" << endl;
 
     return ss.str();
 }
@@ -54,14 +54,48 @@ HiLowPacket::HighLowValues<T>::formatXML() const {
 std::string
 HiLowPacket::formatMessage() const {
     ostringstream ss;
-    ss << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-    ss << "<hiLowPacket>";
-    ss << "<barometer>";
+    ss << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" << endl;
+    ss << "<hiLowPacket>" << endl;
+    ss << "<barometer>" << endl;
     ss << barometer.formatXML();
-    ss << "</barometer>";
-    ss << "<wind>";
-    ss << wind.formatXML(false);
-    ss << "</wind>";
+    ss << "</barometer>" << endl;
+    ss << "<wind>" << endl;
+    ss << wind.formatXML(false) << endl;
+    ss << "</wind>" << endl;
+    ss << "<insideTemperature>" << endl;
+    ss << insideTemperature.formatXML();
+    ss << "</insideTemperature>" << endl;
+    ss << "<outsideTemperature>" << endl;
+    ss << outsideTemperature.formatXML();
+    ss << "</outsideTemperature>" << endl;
+    ss << "<insideHumidity>" << endl;
+    ss << insideHumidity.formatXML();
+    ss << "</insideHumidity>" << endl;
+    ss << "<outsideHumidity>" << endl;
+    ss << outsideHumidity.formatXML();
+    ss << "</outsideHumidity>" << endl;
+    ss << "<dewPoint>" << endl;
+    ss << dewPoint.formatXML();
+    ss << "</dewPoint>" << endl;
+    ss << "<windChill>" << endl;
+    ss << windChill.formatXML(true);
+    ss << "</windChill>" << endl;
+    ss << "<heatIndex>" << endl;
+    ss << heatIndex.formatXML(false);
+    ss << "</heatIndex>" << endl;
+    ss << "<thsw>" << endl;
+    ss << thsw.formatXML(false);
+    ss << "</thsw>" << endl;
+    ss << "<solarRadiation>" << endl;
+    ss << solarRadiation.formatXML(false);
+    ss << "</solarRadiation>" << endl;
+    ss << "<uvIndex>" << endl;
+    ss << uvIndex.formatXML(false);
+    ss << "</uvIndex>" << endl;
+    ss << "<rainfallRate>" << endl;
+    ss << "    <hour>" << highHourRainRate <<"</hour>" << endl;
+    ss << rainRate.formatXML(false);
+    ss << "</rainfallRate>" << endl;
     ss << "</hiLowPacket>";
 
    return ss.str();

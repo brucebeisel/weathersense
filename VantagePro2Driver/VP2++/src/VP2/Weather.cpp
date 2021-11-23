@@ -62,8 +62,11 @@ Weather::formatDate(DateTime timeValue) {
 string
 Weather::dumpBuffer(const byte buffer[], int nbytes) {
     ostringstream ss;
-    ss << hex;
+    ss << endl << hex;
     for (int i = 0; i < nbytes; i++) {
+        if (i % 16 == 0)
+            ss << setw(3) << setfill('0') << dec << i << hex << ": ";
+
         ss <<  setw(2) << setfill('0') << (((int)buffer[i]) & 0xFF) << " ";
 	if ((i + 1) % 16 == 0)
 	    ss << endl;

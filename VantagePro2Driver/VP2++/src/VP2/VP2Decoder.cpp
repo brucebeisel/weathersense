@@ -1,3 +1,4 @@
+#include <iostream>
 #include "BitConverter.h"
 #include "UnitConverter.h"
 #include "VP2Constants.h"
@@ -167,10 +168,11 @@ VP2Decoder::decodeWindSpeed(const byte buffer[], int offset, bool &valid) {
     int value8 = BitConverter::toInt8(buffer, offset);
 
     if (value8 != VP2Constants::INVALID_WIND_SPEED) {
-        windSpeed = UnitConverter::toMetersPerSecond(static_cast<Speed>(windSpeed));
+        windSpeed = UnitConverter::toMetersPerSecond(static_cast<Speed>(value8));
         valid = true;
     }
 
+    std::cout << "Wind speed decode. Value: " << value8 << " Speed: " << windSpeed << std::endl;
     return windSpeed;
 }
 
@@ -184,7 +186,7 @@ VP2Decoder::decodeAvgWindSpeed(const byte buffer[], int offset, bool &valid) {
     int value16 = BitConverter::toInt16(buffer, offset);
 
     if (value16 != VP2Constants::INVALID_WIND_SPEED) {
-        windSpeed = UnitConverter::toMetersPerSecond(static_cast<Speed>(windSpeed) / VP2Constants::AVG_WIND_SPEED_SCALE);
+        windSpeed = UnitConverter::toMetersPerSecond(static_cast<Speed>(value16) / VP2Constants::AVG_WIND_SPEED_SCALE);
         valid = true;
     }
 

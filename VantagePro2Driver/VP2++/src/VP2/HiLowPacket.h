@@ -197,7 +197,7 @@ private:
     bool decodeHiLowTemperature(const byte buffer[], HighLowValues<Temperature> & values, int baseOffset);
 
     HighLowValues<Pressure>     barometer;
-    LowValues<Speed>            wind;
+    HighValues<Speed>           wind;
     HighLowValues<Temperature>  insideTemperature;
     HighLowValues<Humidity>     insideHumidity;
     HighLowValues<Temperature>  outsideTemperature;
