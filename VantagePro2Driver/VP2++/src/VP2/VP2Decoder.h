@@ -2,6 +2,7 @@
 #define VP2_DECODER_H
 
 #include "Weather.h"
+#include "VP2Logger.h"
 
 namespace vp2 {
 
@@ -50,6 +51,8 @@ private:
     VP2Decoder();
     ~VP2Decoder();
     VP2Decoder(const VP2Decoder &);
+
+    static VP2Logger log;
 };
 
 }

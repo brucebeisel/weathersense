@@ -31,13 +31,25 @@ namespace vp2 {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-ArchivePacket::ArchivePacket(const byte buffer[], int offset, Rainfall rainInterval, int archivePeriod, Speed windGust, Heading windGustDirection) :
-                    log(&VP2Logger::getLogger("ArchivePacket")) {
-    this->archivePeriod = archivePeriod;
-    this->rainInterval = rainInterval;
-    this->windGust = windGust;
-    this->windGustDirection = windGustDirection;
+ArchivePacket::ArchivePacket() : buffer(""), log(&VP2Logger::getLogger("ArchivePacket")) {
+}
 
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+ArchivePacket::ArchivePacket(const byte buffer[], int offset) : log(&VP2Logger::getLogger("ArchivePacket")) {
+    updateArchiveData(buffer, offset);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+ArchivePacket::~ArchivePacket() {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void
+ArchivePacket::updateArchiveData(const byte buffer[], int offset) {
     //
     // Copy the packet from the passed in buffer to the buffer member
     //
@@ -47,11 +59,6 @@ ArchivePacket::ArchivePacket(const byte buffer[], int offset, Rainfall rainInter
 
     windSampleCount = BitConverter::toInt16(this->buffer, 18);
     packetTime = extractArchiveDate();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-ArchivePacket::~ArchivePacket() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +121,6 @@ ArchivePacket::formatMessage() const {
     ss << "<historicalRecord>";
     DateTime archiveTime = extractArchiveDate();
     ss << "<time>" << Weather::formatDateTime(archiveTime) << "</time>";
-    ss << "<duration>" << (archivePeriod * 60) << "</duration>";
 
     bool valid;
 
@@ -130,11 +136,11 @@ ArchivePacket::formatMessage() const {
     if (valid)
         ss << "<lowOutdoorTemperature>" << t << "</lowOutdoorTemperature>";
 
-    int value16 = BitConverter::toInt16(buffer, RAINFALL_OFFSET);
-    ss << "<rainfall>" << UnitConverter::toMillimeter((Rainfall)value16 * rainInterval) << "</rainfall>";
+    Rainfall r = VP2Decoder::decodeRain(buffer, RAINFALL_OFFSET);
+    ss << "<rainfall>" << r << "</rainfall>";
 
-    value16 = BitConverter::toInt16(buffer, HIGH_RAIN_RATE_OFFSET);
-    ss << "<highRainfallRate>" << UnitConverter::toMillimeter((Rainfall)value16 * rainInterval) << "</highRainfallRate>";
+    r = VP2Decoder::decodeRain(buffer, HIGH_RAIN_RATE_OFFSET);
+    ss << "<highRainfallRate>" << r << "</highRainfallRate>";
 
     Pressure baroPressure = VP2Decoder::decodeBarometricPressure(buffer, BAROMETER_OFFSET, valid);
     if (valid)
@@ -178,34 +184,6 @@ ArchivePacket::formatMessage() const {
            << "</highWind>";
     }
 
-/* Decided to remove the wind gust element as the high wind speed is essentially the wind gust
-    //
-    // Use the wind gust data from the LOOP 2 packet if this archive packet is less than 10 minutes old,
-    // otherwise just use the high wind speed as the gust
-    //
-    DateTime now = time(0);
-    DateTime span = now - archiveTime;
-    if (span < 10 * 60) {
-        log->log(VP2Logger::VP2_DEBUG1) << "Using gust from LOOP2 packet" << endl;
-        if (windGust != 0.0)
-            ss << "<windGust><speed>" << windGust << "</speed><direction>" << windGustDirection << "</direction></windGust>";
-    }
-    else {
-        log->log(VP2Logger::VP2_DEBUG1) << "Setting gust to max wind speed/direction" << endl;
-        windSpeed = BitConverter::toInt8(buffer, HIGH_WIND_SPEED_OFFSET);
-        if (windSpeed == VP2Constants::APB_INVALID_WIND_SPEED)
-            windSpeed = 0;
-
-        windDirection = BitConverter::toInt8(buffer, DIR_OF_HIGH_WIND_SPEED_OFFSET);
-        ss << "<windGust><speed>" << UnitConverter::toMetersPerSecond(windSpeed) << "</speed>";
-
-        if (windDirection != VP2Constants::APB_INVALID_WIND_DIRECTION)
-            ss << "<direction>" << (windDirection * DEGREES_PER_SLICE) << "</direction>";
-
-        ss << "</windGust>";
-    }
-*/
-
     UvIndex uvIndex = VP2Decoder::decodeUvIndex(buffer, AVG_UV_INDEX_OFFSET, valid);
     if (valid)
         ss << "<avgUvIndex>" << uvIndex << "</avgUvIndex>";
@@ -216,7 +194,7 @@ ArchivePacket::formatMessage() const {
 
     sr = VP2Decoder::decodeSolarRadiation(buffer, HIGH_SOLAR_RADIATION_OFFSET, valid);
     if (valid)
-        ss << "<highSolarRadiation>" << value16 << "</highSolarRadiation>";
+        ss << "<highSolarRadiation>" << sr << "</highSolarRadiation>";
 
     uvIndex = VP2Decoder::decodeUvIndex(buffer, HIGH_UV_INDEX_OFFSET, valid);
     if (valid)

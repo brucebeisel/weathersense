@@ -18,7 +18,6 @@
 #define	ARCHIVEPACKET_H
 #include <string>
 #include "Weather.h"
-#include "VP2Constants.h"
 
 namespace vp2 {
 
@@ -33,21 +32,30 @@ public:
     static constexpr int BYTES_PER_PACKET = 52;
 
     /**
+     * Default constructor required for STL containers and arrays.
+     */
+    ArchivePacket();
+
+    /**
      * Constructor.
      * 
      * @param buffer The buffer containing the raw archive packet
      * @param offset The offset into the buffer that the archive packet begins
-     * @param rainInterval The amount of rainfall each tip of the rain bucket is equivalent to
-     * @param archivePeriod The duration over which this archive packet was collected
-     * @param windGust The speed of the wind gust as reported by the weather station
-     * @param windGustDirection The direction of the wind gust
      */
-    ArchivePacket(const byte buffer[], int offset, Rainfall rainInterval, int archivePeriod, Speed windGust, Heading windGustDirection);
+    ArchivePacket(const byte buffer[], int offset);
 
     /**
      * Destructor.
      */
     virtual ~ArchivePacket();
+
+    /**
+     * Update the underlying data of this archive packet.
+     *
+     * @param buffer The buffer with which to update the archive data
+     * @param offset The offset within the specified buffer from which to copy the data
+     */
+    void updateArchiveData(const byte buffer[], int offset);
 
     /**
      * Get the raw packet data used to extract the archive data.
@@ -91,12 +99,6 @@ private:
     static const int UNKNOWN_ET = 0;
     static const int UNKNOWN_SOLAR_RADIATION = 0;
 
-    //static const int EXTRA_TEMPERATURE_OFFSET = 90;
-    //static const Temperature TEMPERATURE_SCALE;
-    //static const Pressure BAROMETER_SCALE;
-    //static const UvIndex UV_INDEX_SCALE;
-    //static const Evapotranspiration ET_SCALE;
-    //static const Heading DEGREES_PER_SLICE;
     //
     // Archive packet (Rev B)
     //
@@ -132,50 +134,19 @@ private:
     static constexpr int EXTRA_TEMPERATURES_BASE_OFFSET = 45;
     static constexpr int SOIL_MOISTURES_BASE_OFFSET = 48;
 
-    //static const int EXTRA_TEMPERATURE_OFFSET = 90;
-
-/*
-    static const int INVALID_TEMPERATURE = 32767;
-    static const int INVALID_HIGH_TEMPERATURE = -32768;
-    static const int INVALID_EXTRA_TEMPERATURE = 255;
-    static const int INVALID_HUMIDITY = 255;
-    static const int INVALID_WIND_DIRECTION = 255;
-    static const int INVALID_WIND_SPEED = 255;
-    static const int INVALID_UV_INDEX = 255;
-    static const int INVALID_LEAF_WETNESS = 255;
-    static const int INVALID_LEAF_TEMPERATURE = 255;
-    static const int INVALID_SOIL_TEMPERATURE = 255;
-    static const int INVALID_SOIL_MOISTURE = 255;
-    static const int INVALID_BAROMETER = 0;
-    static const int INVALID_SOLAR_RADIATION = 32767;
-*/
-
     static const int MAX_EXTRA_TEMPERATURES = 3;
     static const int MAX_EXTRA_HUMIDITIES = 2;
 
     // The serial protocol document says this is 4, but the 4th value is not set to the Dash value when there
     // are not soil temperature sensors.
-/* All things dealing with leaf wetness/temperature and soil wetness/temperature are being disabled due to lack
- * of clarity in the documentation.
-    static const int APB_MAX_SOIL_TEMPERATURES = 3;
-    static const int APB_MAX_SOIL_MOISTURES = 4;
-    static const int APB_MAX_LEAF_WETNESSES = 2;
-    static const int APB_MAX_LEAF_TEMPERATURES = 2;
+    static const int MAX_SOIL_TEMPERATURES = 3;
+    static const int MAX_SOIL_MOISTURES = 4;
+    static const int MAX_LEAF_WETNESSES = 2;
+    static const int MAX_LEAF_TEMPERATURES = 2;
 
-    static const int MIN_LEAF_WETNESS = 0;
-    static const int MAX_LEAF_WETNESS = 15;
-*/
-
-    //static const int ET_SCALE = 1000;
-
-
-    DateTime packetTime;
-    int windSampleCount;
-    int archivePeriod;
-    Rainfall rainInterval;
-    Speed windGust;
-    Heading windGustDirection;
-    byte buffer[BYTES_PER_PACKET];
+    DateTime    packetTime;
+    int         windSampleCount;
+    byte        buffer[BYTES_PER_PACKET];
     VP2Logger * log;
 };
 

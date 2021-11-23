@@ -1,6 +1,6 @@
 CC= g++
 #CXXFLAGS= -g -std=c++11
-CXXFLAGS= -g 
+CXXFLAGS= -g -Wno-psabi
 
 SRCS=ArchiveManager.cpp \
 	ArchivePacket.cpp \

@@ -27,8 +27,8 @@ class ArchivePacket;
 class VantagePro2Station;
 
 /**
- * The ArchiveManager class manages a file that contains the raw data read dump and dmpaft command of the Vantage Pro 2 weather console.
- * This archive acts as a fail-safe in case the data is not able to be saved by the collector. 
+ * The ArchiveManager class manages a file that contains the raw data read from the DUMP and DMPAFT command of the Vantage Pro 2 weather console.
+ * This archive acts as a augmented storage for the console.
  */
 class ArchiveManager {
 public:
@@ -44,20 +44,29 @@ public:
      */
     ~ArchiveManager();
 
-    bool readArchive();
-
-    void setNewestRecordTime(DateTime time);
-
-    void getArchiveRecords(std::vector<ArchivePacket> & list);
+    /**
+     * Synchronize the archive file with the contents from the weather station.
+     *
+     * @return True if successful
+     */
+    bool synchronizeArchive();
 
     /**
-     * Return the packets that fall between the specified start end end time (inclusive).
+     * Get the archive records after the specified time.
+     *
+     * @param afterTime The time that is used to find archive records that are older
+     * @param list      The list into which any found archive records will be added
+     * @return The time of the last record in the list
+     */ 
+    DateTime getArchiveRecordsAfter(DateTime afterTime, std::vector<ArchivePacket> & list);
+
+    /**
+     * Return the packets that fall after the specified time
      * 
      * @param packets The container to which the read packets will be added
      * @param startTime The start time of the search
-     * @return A reference to the packets argument that will allow the return value to be used in a cascaded call
      */
-    void readPackets(std::vector<ArchivePacket> & packets, DateTime startTime);
+    //void readPackets(std::vector<ArchivePacket> & packets, DateTime startTime);
 
 private:
     /**
@@ -69,22 +78,21 @@ private:
     /**
      * Add a list of packets to the archive.
      * 
-     * @param packets The packets to the added to the archive
+     * @param packets The list packets to be added to the archive
      */
     void addPackets(const std::vector<ArchivePacket> & packets);
 
     /**
      * Finds the time range of the archive.
-     * 
      */
     void findPacketTimeRange();
 
-    std::string archiveFile;
-    DateTime newestPacketTime;
-    DateTime oldestPacketTime;
-    DateTime timeOfLastPacketSent;
+    std::string          archiveFile;
+    DateTime             newestPacketTime;
+    DateTime             oldestPacketTime;
+    //DateTime             timeOfLastPacketSent;
     VantagePro2Station & station;
-    VP2Logger log;
+    VP2Logger            log;
 };
 }
 

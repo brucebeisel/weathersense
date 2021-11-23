@@ -119,7 +119,7 @@ private:
     int                       thread;
     int                       nextRecord;
     int                       previousNextRecord;
-    DateTime                  lastPacketTime;
+    DateTime                  lastArchivePacketTime;
     DateTime                  consoleTimeSetTime;
     DateTime                  sensorStationSendTime;
     ParametersMessage         parameters;
