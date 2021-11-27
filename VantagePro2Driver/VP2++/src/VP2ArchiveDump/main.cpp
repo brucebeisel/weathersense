@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include "../VP2/VP2Constants.h"
 #include "../VP2/Weather.h"
@@ -23,6 +24,8 @@
 using namespace std;
 using namespace vp2;
 
+bool signalCaught;
+
 int
 main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -30,7 +33,7 @@ main(int argc, char *argv[]) {
     }
 
     char *file = argv[1];
-    char buffer[vp2::VP2Constants::APB_BYTES_PER_RECORD];
+    char buffer[vp2::ArchivePacket::BYTES_PER_PACKET];
 
     ifstream stream(file, ifstream::in | ios::binary);
 
@@ -41,9 +44,9 @@ main(int argc, char *argv[]) {
             stream.close();
             exit(0);
         }
-        ArchivePacket packet(buffer, 0, 0.0, 0, 0.0, 0.0);
+        ArchivePacket packet(buffer, 0);
 
-        cout << record << " - " << Weather::formatDateTime(packet.getDateTime()) << endl;
+        cout << setw(5) << setfill('0') << record << " - " << Weather::formatDateTime(packet.getDateTime()) << endl;
         record++;
     }
 }
