@@ -126,6 +126,7 @@ CurrentWeather::formatMessage() const {
     ss << "</humiditySensorEntries>"
        << "<soilMoistureSensorEntries>";
 
+    /*
     for (int i = 0; i < VP2Constants::MAX_SOIL_MOISTURES; i++) {
         if (loopPacket.isSoilMoistureValid(i)) {
             ss << "<entry><key>" << 600 + i << "</key><value><sensorId>" << 600 + i << "</sensorId><sensorType>SOIL_MOISTURE</sensorType>"
@@ -133,8 +134,10 @@ CurrentWeather::formatMessage() const {
                << loopPacket.getSoilMoisture(i) << "</measurement></value></entry>";
         }
     }
+    */
     ss << "</soilMoistureSensorEntries>"
        << "<leafWetnessSensorEntries>";
+        /*
 
     for (int i = 0; i < VP2Constants::MAX_LEAF_WETNESSES; i++) {
         if (loopPacket.isLeafWetnessValid(i)) {
@@ -143,6 +146,7 @@ CurrentWeather::formatMessage() const {
                << loopPacket.getLeafWetness(i) << "</measurement></value></entry>";
         }
     }
+    */
 
     ss << "</leafWetnessSensorEntries>"
        << "</currentWeather>";

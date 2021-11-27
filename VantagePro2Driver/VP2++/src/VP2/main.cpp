@@ -52,8 +52,8 @@ main(int argc, char *argv[]) {
     string serialPortName("COM3");
     string logFile("C:\\WeatherSense\\2.4\\logs\\vp2_driver.log");
 #else
-    string archiveFile("/weathersense/2.4/archive/vp2.archive");
-    string logFile("/weathersense/2.4/log/vp2_driver.log");
+    string archiveFile("/weathersense/3.0/archive/vp2.archive");
+    string logFile("/weathersense/3.0/log/vp2_driver.log");
     string serialPortName("/dev/ttyUSB0");
     signal(SIGPIPE, sigHandler);
     signal(SIGINT, sigHandler);

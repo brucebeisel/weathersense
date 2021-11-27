@@ -7,7 +7,7 @@
 namespace vp2 {
 
 Rainfall VP2Decoder::rainCollectorSize = static_cast<Rainfall>(0.0);
-VP2Logger VP2Decoder::log(VP2Logger::getLogger("VP2Decoder"));
+VP2Logger * log = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -180,6 +180,21 @@ VP2Decoder::decodeWindSpeed(const byte buffer[], int offset, bool &valid) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 Speed
+VP2Decoder::decode16BitWindSpeed(const byte buffer[], int offset, bool &valid) {
+    Speed windSpeed = 0.0;
+    valid = true;
+
+    int value16 = BitConverter::toInt16(buffer, offset);
+
+    windSpeed = UnitConverter::toMetersPerSecond(static_cast<Speed>(value16));
+
+    std::cout << "Wind speed decode. Value: " << value16 << " Speed: " << windSpeed << std::endl;
+    return windSpeed;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+Speed
 VP2Decoder::decodeAvgWindSpeed(const byte buffer[], int offset, bool &valid) {
     Speed windSpeed = 0.0;
     valid = false;
@@ -190,6 +205,7 @@ VP2Decoder::decodeAvgWindSpeed(const byte buffer[], int offset, bool &valid) {
         windSpeed = UnitConverter::toMetersPerSecond(static_cast<Speed>(value16) / VP2Constants::AVG_WIND_SPEED_SCALE);
         valid = true;
     }
+    std::cout << "======Avg Wind speed decode. Value: " << value16 << " Speed: " << windSpeed << std::endl;
 
     return windSpeed;
 }
@@ -253,8 +269,12 @@ VP2Decoder::setRainCollectorSize(Rainfall collectorSize) {
 ////////////////////////////////////////////////////////////////////////////////
 Rainfall
 VP2Decoder::decodeRain(const byte buffer[], int offset) {
+
+    if (log == NULL)
+        log = &VP2Logger::getLogger("VP2Decoder");
+
     if (rainCollectorSize == 0.0)
-        log.log(VP2Logger::VP2_WARNING) << "Decoding rain value before rain collector size has been set" << std::endl;
+        log->log(VP2Logger::VP2_WARNING) << "Decoding rain value before rain collector size has been set" << std::endl;
     
     int value16 = BitConverter::toInt16(buffer, offset);
     Rainfall rain = UnitConverter::toMillimeter(static_cast<Rainfall>(value16) * rainCollectorSize);

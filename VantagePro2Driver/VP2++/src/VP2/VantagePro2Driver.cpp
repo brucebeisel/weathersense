@@ -304,11 +304,13 @@ VantagePro2Driver::mainLoop() {
             //
             if (previousNextRecord != nextRecord) {
                 if (archiveManager.synchronizeArchive()) {
-                    do {
-                        lastArchivePacketTime = archiveManager.getArchiveRecordsAfter(lastArchivePacketTime, list);
-                        if (!processArchive(list))
-                            break;
-                    } while (list.size() > 0);
+                    if (lastArchivePacketTime != 0) {
+                        do {
+                            lastArchivePacketTime = archiveManager.getArchiveRecordsAfter(lastArchivePacketTime, list);
+                            if (!processArchive(list))
+                                break;
+                        } while (list.size() > 0);
+                    }
                     previousNextRecord = nextRecord;
                 }
             }

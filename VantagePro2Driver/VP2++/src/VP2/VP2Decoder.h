@@ -24,6 +24,7 @@ public:
     static SolarRadiation decodeSolarRadiation(const byte buffer[], int offset, bool &valid);
 
     static Speed decodeWindSpeed(const byte buffer[], int offset, bool &valid);
+    static Speed decode16BitWindSpeed(const byte buffer[], int offset, bool &valid);
     static Speed decodeAvgWindSpeed(const byte buffer[], int offset, bool &valid);
 
     static Heading decodeWindDirectionSlice(const byte buffer[], int offset, bool &valid);
@@ -51,8 +52,6 @@ private:
     VP2Decoder();
     ~VP2Decoder();
     VP2Decoder(const VP2Decoder &);
-
-    static VP2Logger log;
 };
 
 }
