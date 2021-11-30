@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef VP2_CONSTANTS_H
-#define	VP2_CONSTANTS_H
+#define VP2_CONSTANTS_H
 #include <string>
 #include "Weather.h"
 
@@ -92,14 +92,15 @@ public:
     //
     // EEPROM Addresses
     //
-    static const std::string EE_LATITUDE;
-    static const std::string EE_LONGITUDE;
-    static const std::string EE_ELEVATION;
-    static const std::string EE_TIMEZONE;
-    static const std::string EE_STATION_LIST;
-    static const std::string EE_SETUP_BITS;
-    static const std::string EE_RAIN_SEASON_START;
-    static const std::string EE_ARCHIVE_PERIOD;
+    static const unsigned EE_LATITUDE = 0x0B;
+    static const unsigned EE_LONGITUDE = 0x0D;
+    static const unsigned EE_ELEVATION = 0x0F;
+    static const unsigned EE_TIMEZONE = 0x11;
+    static const unsigned EE_STATION_LIST = 0x19;
+    static const unsigned EE_SETUP_BITS = 0x2B;
+    static const unsigned EE_RAIN_SEASON_START = 0x2C;
+    static const unsigned EE_ARCHIVE_PERIOD = 0x2D;
+    static const unsigned EE_ALARM_THRESHOLDS = 0x52;
 
     static const int NUM_ARCHIVE_RECORDS = 2560;
 
@@ -162,4 +163,4 @@ public:
 };
 }
 
-#endif	/* VP2_CONSTANTS_H */
+#endif /* VP2_CONSTANTS_H */

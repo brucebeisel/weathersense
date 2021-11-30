@@ -52,7 +52,7 @@ CurrentWeather::formatMessage() const {
        << "<time>" << Weather::formatDateTime(time(0)) << "</time>"
        << "<indoorTemperature>" << loopPacket.getInsideTemperature() << "</indoorTemperature>"
        << "<indoorHumidity>" << loopPacket.getInsideHumidity() << "</indoorHumidity>"
-       << "<outdoorTemperature>" << loopPacket.getOutsideTemperature() << "</outdoorTemperature>"
+       << loopPacket.getOutsideTemperature().formatXML("outdoorTemperature")
        << "<outdoorHumidity>" << loopPacket.getOutsideHumidity() << "</outdoorHumidity>"
        << "<dewPoint>" << loop2Packet.getDewPoint() << "</dewPoint>"
        << "<windChill>" << loop2Packet.getWindChill() << "</windChill>"
@@ -106,10 +106,10 @@ CurrentWeather::formatMessage() const {
         << "<temperatureSensorEntries>";
 
     for (int i = 0; i < VP2Constants::MAX_EXTRA_TEMPERATURES; i++) {
-        if (loopPacket.isExtraTemperatureValid(i)) {
+        if (loopPacket.getExtraTemperature(i).isValid()) {
             ss << "<entry><key>" << 100 + i << "</key><value><sensorId>" << 100 + i << "</sensorId><sensorType>THERMOMETER</sensorType>"
                << "<measurement xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"temperature\">"
-               << loopPacket.getExtraTemperature(i) << "</measurement></value></entry>";
+               << loopPacket.getExtraTemperature(i).getValue() << "</measurement></value></entry>";
         }
     }
     ss << "</temperatureSensorEntries>"

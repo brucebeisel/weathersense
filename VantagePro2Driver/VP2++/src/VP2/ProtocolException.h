@@ -15,16 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef PROTOCOL_EXCEPTION_H
-#define	PROTOCOL_EXCEPTION_H
+#define PROTOCOL_EXCEPTION_H
 
 #include <string>
 #include <stdexcept>
 
 namespace vp2 {
+
 class ProtocolException : public std::exception {
 public:
+    /**
+     * Constructor.
+     *
+     * @param what The message associated with exception
+     */
     ProtocolException(const std::string & what);
+
+    /**
+     * Destructor.
+     */
     virtual ~ProtocolException() throw();
+
+    /**
+     * Get the message associated with the exception.
+     *
+     * @return The message
+     */
     virtual const char *what() const throw();
 
 private:
@@ -32,4 +48,4 @@ private:
 
 };
 }
-#endif	/* PROTOCOL_EXCEPTION_H */
+#endif /* PROTOCOL_EXCEPTION_H */

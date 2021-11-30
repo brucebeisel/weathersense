@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef CURRENTWEATHER_H
-#define	CURRENTWEATHER_H
+#define CURRENTWEATHER_H
 
 #include <string>
 #include "LoopPacket.h"
@@ -48,6 +48,8 @@ public:
      * Get the next packet field that was extracted from the LOOP packet.
      * 
      * @return The next packet field
+     * TODO Can this be removed in favor of passing the next packet value in as a constructor argument or passed as an 
+     * argument to processCurrentWeather()
      */
     int getNextPacket() const;
 
@@ -59,10 +61,10 @@ public:
     std::string formatMessage() const;
 
 private:
-    LoopPacket loopPacket;
-    Loop2Packet loop2Packet;
+    LoopPacket          loopPacket;
+    Loop2Packet         loop2Packet;
     WindDirectionSlices pastWindDirs;
 };
 }
 
-#endif	/* CURRENTWEATHER_H */
+#endif /* CURRENTWEATHER_H */

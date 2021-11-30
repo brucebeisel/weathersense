@@ -66,7 +66,7 @@ Sensor::detectSensors(LoopPacket loop, vector<Sensor> & sensors) {
     }
 
     for (int i = 0; i < VP2Constants::MAX_EXTRA_TEMPERATURES; i++) {
-        if (loop.isExtraTemperatureValid(i))
+        if (loop.getExtraTemperature(i).isValid())
             sensors.push_back(Sensor(THERMOMETER, THERMOMETER_BASE_SENSOR_ID + i));
     }
 

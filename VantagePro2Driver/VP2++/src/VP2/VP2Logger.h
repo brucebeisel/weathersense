@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef VP2_LOGGER_H
-#define	VP2_LOGGER_H
+#define VP2_LOGGER_H
 #include <map>
 #include <string>
 #include <iostream>
@@ -80,7 +80,7 @@ public:
      * @param The level
      * @return True if the level is currently enabled
      */
-    bool isLogEnabled(Level level);
+    bool isLogEnabled(Level level) const;
 
     /**
      * Create a log entry.
@@ -88,7 +88,7 @@ public:
      * @param level The level of the log entry
      * @return The stream so that standard c++ stream mechanisms can be used
      */
-    std::ostream & log(Level level);
+    std::ostream & log(Level level) const;
 
 private:
     static const int MAX_FILE_SIZE_INFINITE = -1;
@@ -130,4 +130,4 @@ private:
 };
 } /* End namespace */
 
-#endif	/* VP2_LOGGER_H */
+#endif /* VP2_LOGGER_H */

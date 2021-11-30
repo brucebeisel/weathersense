@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef SENSOR_H
-#define	SENSOR_H
+#define SENSOR_H
 
 #include <vector>
 #include "LoopPacket.h"
@@ -50,7 +50,7 @@ public:
     Sensor(SensorType type, int id);
 
     /**
-     * Desructor.
+     * Destructor.
      */
     virtual ~Sensor() {};
 
@@ -99,4 +99,4 @@ private:
     int sensorId;
 };
 }
-#endif	/* SENSOR_H */
+#endif /* SENSOR_H */

@@ -26,6 +26,7 @@
 #include "VantagePro2Driver.h"
 #include "VP2Decoder.h"
 #include "VP2Constants.h"
+#include "Alarm.h"
 
 using namespace std;
 extern "C" {
@@ -66,6 +67,11 @@ VantagePro2Driver::~VantagePro2Driver() {
 ////////////////////////////////////////////////////////////////////////////////
 void
 VantagePro2Driver::connected(DateTime newestArchiveTimeFromCollector) {
+    //
+    // This method needs to be removed as the RESTful interface requires each command to be stateless.
+    // If the client wants the data sent below, then it must send a request.
+    //
+/*
     log.log(VP2Logger::VP2_DEBUG1) << "Connected with collector. Archive time = " << Weather::formatDateTime(newestArchiveTimeFromCollector) << endl;
     //archiveManager.setNewestRecordTime(newestArchiveTimeFromCollector);
     lastArchivePacketTime = newestArchiveTimeFromCollector;
@@ -79,6 +85,7 @@ VantagePro2Driver::connected(DateTime newestArchiveTimeFromCollector) {
     const vector<SensorStation> & sensorStations = station.getSensorStations();
     string message = SensorStation::formatSensorStationMessage(sensorStations);
     socket.sendData(message);
+*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -109,6 +116,7 @@ VantagePro2Driver::initialize() {
     //
     // Get the information from the console that we will need for future calculations
     //
+/*
     if (!station.retrieveRainCollectorSize()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to retrieve rain collector size" << endl;
         return 3;
@@ -120,14 +128,22 @@ VantagePro2Driver::initialize() {
         log.log(VP2Logger::VP2_ERROR) << "Failed to retrieve archive period" << endl;
         return 4;
     }
+*/
 
     if (!station.retrieveSensorStationInfo()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to retrieve sensor station information" << endl;
         return 5;
     }
 
+/*
     if (!station.getParameters(parameters)) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to retrieve weather station parameters" << endl;
+        return 6;
+    }
+*/
+
+    if (!station.retrieveConfigurationParameters()) {
+        log.log(VP2Logger::VP2_ERROR) << "Failed to retrieve configuration parameters" << endl;
         return 6;
     }
 
@@ -147,6 +163,8 @@ VantagePro2Driver::initialize() {
         log.log(VP2Logger::VP2_ERROR) << "Failed to read the archive during initialization" << endl;
         return 8;
     }
+
+    AlarmManager::getInstance().initialize();
 
     if (!station.wakeupStation()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to wake up console after initialization" << endl;
@@ -171,19 +189,18 @@ VantagePro2Driver::stop() {
 ////////////////////////////////////////////////////////////////////////////////
 bool
 VantagePro2Driver::processCurrentWeather(const CurrentWeather & cw) {
-    //string currentWeatherMessage = cw.formatMessage();
     nextRecord = cw.getNextPacket();
 
     if (receivedFirstLoopPacket)
         currentWeatherPublisher.sendCurrentWeather(cw);
-        //socket.sendData(currentWeatherMessage);
 
     log.log(VP2Logger::VP2_DEBUG1) << "Previous Next Record: " << previousNextRecord << " Next Record: " << nextRecord << endl;
-    //log.log(VP2Logger::VP2_DEBUG3) << currentWeatherMessage << endl;
     receivedFirstLoopPacket = true;
+
     return signalCaught || previousNextRecord != nextRecord;
 }
 
+/*
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 bool
@@ -223,6 +240,7 @@ VantagePro2Driver::processArchive(const vector<ArchivePacket> & archive) {
 
     return true;
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -270,15 +288,14 @@ VantagePro2Driver::mainLoop() {
             //lampOn = !lampOn;
 
             //
-            // If it has been more than a day since the time was set, set the time
+            // If it has been a while since the time was set, set the time
             //
             DateTime now = time(0);
             if (consoleTimeSetTime + TIME_SET_INTERVAL < now) {
-                if (!station.setConsoleTime())
-                    log.log(VP2Logger::VP2_ERROR) << "Failed to set station time: " << endl;
+                if (!station.updateConsoleTime())
+                    log.log(VP2Logger::VP2_ERROR) << "Failed to set station time " << endl;
 
                 consoleTimeSetTime = now;
-
             }
 
             //
@@ -304,13 +321,11 @@ VantagePro2Driver::mainLoop() {
             //
             if (previousNextRecord != nextRecord) {
                 if (archiveManager.synchronizeArchive()) {
-                    if (lastArchivePacketTime != 0) {
-                        do {
-                            lastArchivePacketTime = archiveManager.getArchiveRecordsAfter(lastArchivePacketTime, list);
-                            if (!processArchive(list))
-                                break;
-                        } while (list.size() > 0);
-                    }
+                    ArchivePacket packet;
+                    archiveManager.getNewestRecord(packet);
+                    log.log(VP2Logger::VP2_DEBUG1) << "Most recent archive packet time is: "
+                                                   << Weather::formatDateTime(packet.getDateTime())
+                                                   << " ISS Reception: " << station.calculateISSReception(packet.getWindSampleCount()) << endl;
                     previousNextRecord = nextRecord;
                 }
             }
@@ -321,3 +336,12 @@ VantagePro2Driver::mainLoop() {
     }
 }
 }
+/*
+                    if (lastArchivePacketTime != 0) {
+                        do {
+                            lastArchivePacketTime = archiveManager.getArchiveRecordsAfter(lastArchivePacketTime, list);
+                            if (!processArchive(list))
+                                break;
+                        } while (list.size() > 0);
+                    }
+*/

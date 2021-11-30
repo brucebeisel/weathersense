@@ -27,6 +27,170 @@ using namespace std;
 
 namespace vp2 {
 
+static const char *ALARM_STRINGS[16][8] = {
+    {
+        "Falling Barometer Trend",
+        "Rising Barometer Trend",
+        "Low Indoor Temperature",
+        "High Indoor Temperature",
+        "Low Indoor Humidity",
+        "High Indoor Humidity",
+        "Time",
+        NULL
+    },
+    {
+        "High Rain Rate",
+        "15 Minute Rain",
+        "24 Hour Rain",
+        "Storm Total Rain",
+        "Daily ET",
+        NULL,
+        NULL,
+        NULL
+    },
+    {
+        "Low Outdoor Temperature",
+        "High Outdoor Temperature",
+        "Wind Speed",
+        "10 Minute Average Wind Speed",
+        "Low Dew Point",
+        "High Dew Point",
+        "High Heat Index",
+        "Low Wind Chill"
+    },
+    {
+        "High THSW",
+        "High Solar Radiation",
+        "High UV",
+        "UV Dose",
+        "UV Dose Manually Cleared",
+        NULL,
+        NULL,
+        NULL
+    },
+    {
+        "Low Outdoor Humidity",
+        "High Outdoor Humidity",
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL
+    },
+    {
+        "Extra Temperature/Humidity 1 - Low Temperature",
+        "Extra Temperature/Humidity 1 - High Temperature",
+        "Extra Temperature/Humidity 1 - Low Humidity",
+        "Extra Temperature/Humidity 1 - High Humidity",
+        NULL,
+        NULL,
+        NULL,
+        NULL
+    },
+    {
+        "Extra Temperature/Humidity 2 - Low Temperature",
+        "Extra Temperature/Humidity 2 - High Temperature",
+        "Extra Temperature/Humidity 2 - Low Humidity",
+        "Extra Temperature/Humidity 2 - High Humidity",
+        NULL,
+        NULL,
+        NULL,
+        NULL
+    },
+    {
+        "Extra Temperature/Humidity 3 - Low Temperature",
+        "Extra Temperature/Humidity 3 - High Temperature",
+        "Extra Temperature/Humidity 3 - Low Humidity",
+        "Extra Temperature/Humidity 3 - High Humidity",
+        NULL,
+        NULL,
+        NULL,
+        NULL
+    },
+    {
+        "Extra Temperature/Humidity 4 - Low Temperature",
+        "Extra Temperature/Humidity 4 - High Temperature",
+        "Extra Temperature/Humidity 4 - Low Humidity",
+        "Extra Temperature/Humidity 4 - High Humidity",
+        NULL,
+        NULL,
+        NULL,
+        NULL
+    },
+    {
+        "Extra Temperature/Humidity 5 - Low Temperature",
+        "Extra Temperature/Humidity 5 - High Temperature",
+        "Extra Temperature/Humidity 5 - Low Humidity",
+        "Extra Temperature/Humidity 5 - High Humidity",
+        NULL,
+        NULL,
+        NULL,
+        NULL
+    },
+    {
+        "Extra Temperature/Humidity 6 - Low Temperature",
+        "Extra Temperature/Humidity 6 - High Temperature",
+        "Extra Temperature/Humidity 6 - Low Humidity",
+        "Extra Temperature/Humidity 6 - High Humidity",
+        NULL,
+        NULL,
+        NULL,
+        NULL
+    },
+    {
+        "Extra Temperature/Humidity 7 - Low Temperature",
+        "Extra Temperature/Humidity 7 - High Temperature",
+        "Extra Temperature/Humidity 7 - Low Humidity",
+        "Extra Temperature/Humidity 7 - High Humidity",
+        NULL,
+        NULL,
+        NULL,
+        NULL
+    },
+    {
+        "Soil/Leaf 1 - Low Leaf Wetness",
+        "Soil/Leaf 1 - High Leaf Wetness",
+        "Soil/Leaf 1 - Low Soil Moisture",
+        "Soil/Leaf 1 - High Soil Moisture",
+        "Soil/Leaf 1 - Low Leaf Temperature",
+        "Soil/Leaf 1 - High Leaf Temperature",
+        "Soil/Leaf 1 - Low Soil Temperature",
+        "Soil/Leaf 1 - High Soil Temperature",
+    },
+    {
+        "Soil/Leaf 2 - Low Leaf Wetness",
+        "Soil/Leaf 2 - High Leaf Wetness",
+        "Soil/Leaf 2 - Low Soil Moisture",
+        "Soil/Leaf 2 - High Soil Moisture",
+        "Soil/Leaf 2 - Low Leaf Temperature",
+        "Soil/Leaf 2 - High Leaf Temperature",
+        "Soil/Leaf 2 - Low Soil Temperature",
+        "Soil/Leaf 2 - High Soil Temperature",
+    },
+    {
+        "Soil/Leaf 3 - Low Leaf Wetness",
+        "Soil/Leaf 3 - High Leaf Wetness",
+        "Soil/Leaf 3 - Low Soil Moisture",
+        "Soil/Leaf 3 - High Soil Moisture",
+        "Soil/Leaf 3 - Low Leaf Temperature",
+        "Soil/Leaf 3 - High Leaf Temperature",
+        "Soil/Leaf 3 - Low Soil Temperature",
+        "Soil/Leaf 3 - High Soil Temperature",
+    },
+    {
+        "Soil/Leaf 4 - Low Leaf Wetness",
+        "Soil/Leaf 4 - High Leaf Wetness",
+        "Soil/Leaf 4 - Low Soil Moisture",
+        "Soil/Leaf 4 - High Soil Moisture",
+        "Soil/Leaf 4 - Low Leaf Temperature",
+        "Soil/Leaf 4 - High Leaf Temperature",
+        "Soil/Leaf 4 - Low Soil Temperature",
+        "Soil/Leaf 4 - High Soil Temperature",
+    }
+};
+
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 LoopPacket::LoopPacket(void) : log(VP2Logger::getLogger("LoopPacket")) {
@@ -53,7 +217,7 @@ LoopPacket::getBaroTrend() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Temperature
+Measurement<Temperature>
 LoopPacket::getOutsideTemperature() const {
     return outsideTemperature;
 }
@@ -228,16 +392,9 @@ LoopPacket::isTransmitterBatteryGood(int index) const {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-bool
-LoopPacket::isExtraTemperatureValid(int index) const {
-    return temperatureExtraValid[index];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-Temperature
+Measurement<Temperature>
 LoopPacket::getExtraTemperature(int index) const {
-    return temperatureExtra[index];
+    return extraTemperature[index];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -387,13 +544,17 @@ LoopPacket::decodeLoopPacket(byte buffer[]) {
     barometricPressure = VP2Decoder::decodeBarometricPressure(buffer, 7, valid);
     insideTemperature = VP2Decoder::decode16BitTemperature(buffer, 9, valid);
     insideHumidity = VP2Decoder::decodeHumidity(buffer, 11, valid);
-    outsideTemperature = VP2Decoder::decode16BitTemperature(buffer, 12, valid);
+
+
+    Temperature t = VP2Decoder::decode16BitTemperature(buffer, 12, valid);
+    outsideTemperature.setValue(t, valid);
+
     windSpeed = VP2Decoder::decodeWindSpeed(buffer, 14, valid);
     avgWindSpeed10Min = VP2Decoder::decodeWindSpeed(buffer, 15, valid);
     windDirection = VP2Decoder::decodeWindDirection(buffer, 16, valid);
 
     for (int i = 0; i < VP2Constants::MAX_EXTRA_TEMPERATURES; i++)
-        temperatureExtra[i] = VP2Decoder::decode8BitTemperature(buffer, 18 + i, temperatureExtraValid[i]);
+        VP2Decoder::decode8BitTemperature(buffer, 18 + i, extraTemperature[i]);
 
     for (int i = 0; i < VP2Constants::MAX_SOIL_TEMPERATURES; i++)
         soilTemperature[i] = VP2Decoder::decode8BitTemperature(buffer, 25 + i, soilTemperatureValid[i]);
@@ -428,22 +589,14 @@ LoopPacket::decodeLoopPacket(byte buffer[]) {
     for (int i = 0; i < VP2Constants::MAX_LEAF_WETNESSES; i++)
         leafWetness[i] = VP2Decoder::decodeLeafWetness(buffer, 66 + i, valid);
 
-/*
-    int indoorAlarms = (int)BitConverter::toInt8(buffer, 70);
-    int rainAlarms = (int)BitConverter::toInt8(buffer, 71);
-    int outsideAlarms1 = (int)BitConverter::toInt8(buffer, 72);
-    int outsideAlarms2 = (int)BitConverter::toInt8(buffer, 73);
-
-    int extraTemperatureHumidityAlarms[8];
-    int alarmIndex = 74;
-    for (int i = 0; i <= 8; i++)
-        extraTemperatureHumidityAlarms[i] = BitConverter::toInt8(buffer, alarmIndex + i);
-
-    int soilLeafAlarms[4];
-    alarmIndex = 82;
-    for (int i = 0; i <= 4; i++)
-        soilLeafAlarms[i] = BitConverter::toInt8(buffer, alarmIndex + i);
-*/
+    for (int i = 0; i < 16; i++) {
+        int alarms = BitConverter::toInt8(buffer, 70 + i);
+        for (int j = 0; j < 8; j++) {
+            if (alarms & (1 << j)) {
+                std::cout << lookupAlarm(i, j) << std::endl;
+            }
+        }
+    }
 
     transmitterBatteryStatus = BitConverter::toInt8(buffer, 86);
     log.log(VP2Logger::VP2_DEBUG2) << "Transmitter Battery Status: " << transmitterBatteryStatus << endl;
@@ -460,6 +613,20 @@ LoopPacket::decodeLoopPacket(byte buffer[]) {
     return true;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+string
+LoopPacket::lookupAlarm(int byte, int bit) const {
+    if (byte < 0 || byte >= 16 || bit < 0 || bit >= 8)
+        return "Invalid Alarm Index";
+
+    const char * alarmString = ALARM_STRINGS[byte][bit];
+
+    if (alarmString == NULL)
+        return "Invalid Alarm Index";
+    else
+        return alarmString;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

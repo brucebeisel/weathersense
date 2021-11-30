@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef WEATHERSENSE_SOCKET_H
-#define	WEATHERSENSE_SOCKET_H
+#define WEATHERSENSE_SOCKET_H
 
 #include <string>
 #include "VP2Logger.h"
@@ -105,4 +105,4 @@ private:
 };
 }
 
-#endif	/* WEATHERSENSE_SOCKET_H */
+#endif /* WEATHERSENSE_SOCKET_H */

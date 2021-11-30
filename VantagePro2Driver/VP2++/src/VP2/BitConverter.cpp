@@ -56,11 +56,11 @@ BitConverter::getBytes(int value, byte buffer[], int index, int nbytes, bool lit
     int bufferIndex;
     for (int i = 0; i < nbytes; i++) {
         if (littleEndian)
-	        bufferIndex = index + i;
-	    else
-	        bufferIndex = index + (nbytes - 1 - i);
+            bufferIndex = index + i;
+        else
+            bufferIndex = index + (nbytes - 1 - i);
 
-	    buffer[bufferIndex] = (value >> (8 * i)) & 0xFF;
+        buffer[bufferIndex] = (value >> (8 * i)) & 0xFF;
     }
 
 }

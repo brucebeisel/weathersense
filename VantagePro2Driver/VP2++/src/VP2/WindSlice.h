@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef WIND_SLICE_H
-#define	WIND_SLICE_H
+#define WIND_SLICE_H
 
 #include <vector>
 #include <iostream>
@@ -136,4 +136,4 @@ private:
 };
 }
 
-#endif	/* WIND_SLICE_H */
+#endif /* WIND_SLICE_H */

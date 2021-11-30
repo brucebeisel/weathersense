@@ -177,7 +177,7 @@ SerialPort::read(byte buffer[], int index, int nbytes) {
     }
     else {
         if (FD_ISSET(comPort, &readSet)) {
-	    bytesRead = ::read(comPort, &buffer[index], nbytes);
+            bytesRead = ::read(comPort, &buffer[index], nbytes);
             log.log(VP2Logger::VP2_DEBUG2) << "Read " << bytesRead << " bytes" << endl;
         }
     }

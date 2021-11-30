@@ -2,7 +2,10 @@ CC= g++
 #CXXFLAGS= -g -std=c++11
 CXXFLAGS= -g -Wno-psabi
 
-SRCS=ArchiveManager.cpp \
+SRCS=\
+	Alarm.cpp \
+	Api.cpp \
+	ArchiveManager.cpp \
 	ArchivePacket.cpp \
 	BitConverter.cpp \
 	CurrentWeather.cpp \

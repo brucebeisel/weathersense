@@ -22,7 +22,7 @@
 namespace vp2 {
 /**
  * Class to convert bytes to various size of integers
- */	 
+ */
 class BitConverter {
 public:
     virtual ~BitConverter();
@@ -41,7 +41,7 @@ public:
      * 
      * @param buffer The buffer from which to do the conversion
      * @param index The index within the buffer to do the conversion
-     * @param littleEndian True of the buffer holds the integer in little endian format
+     * @param littleEndian True if the buffer holds the integer in little endian format
      * @return The converted integer
      */
     static int toInt16(const byte buffer[], int index, bool littleEndian = true);
@@ -51,7 +51,7 @@ public:
      * 
      * @param buffer The buffer from which to do the conversion
      * @param index The index within the buffer to do the conversion
-     * @param littleEndian True of the buffer holds the integer in little endian format
+     * @param littleEndian True if the buffer holds the integer in little endian format
      * @return The converted integer
      */
     static int toInt32(const byte buffer[], int index, bool littleEndian = true);

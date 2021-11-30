@@ -20,6 +20,7 @@
 #include <string>
 #include "VP2Logger.h"
 #include "Weather.h"
+#include "Measurement.h"
 #include "VP2Constants.h"
 
 namespace vp2 {
@@ -80,10 +81,9 @@ public:
     bool               decodeLoopPacket(byte buffer[]);
 
     int                getNextRecord() const;
-    Temperature        getOutsideTemperature() const;
+    Measurement<Temperature> getOutsideTemperature() const;
     Temperature        getInsideTemperature() const;
-    Temperature        getExtraTemperature(int index) const;
-    bool               isExtraTemperatureValid(int index) const;
+    Measurement<Temperature>        getExtraTemperature(int index) const;
     Humidity           getOutsideHumidity() const;
     Humidity           getInsideHumidity() const;
     bool               isExtraHumidityValid(int index) const;
@@ -123,12 +123,14 @@ public:
     Evapotranspiration getYearET() const;
 
 private:
+    std::string lookupAlarm(int byte, int bit) const;
+
     static const int LOOP_PACKET_TYPE = 0;
 
     VP2Logger          log;
 
     int                nextRecord;
-    Temperature        outsideTemperature;
+    Measurement<Temperature>        outsideTemperature;
     Temperature        insideTemperature;
     Humidity           outsideHumidity;
     Humidity           insideHumidity;
@@ -169,8 +171,10 @@ private:
     Temperature        soilTemperature[VP2Constants::MAX_SOIL_TEMPERATURES];
     bool               soilTemperatureValid[VP2Constants::MAX_SOIL_TEMPERATURES];
 
-    Temperature        temperatureExtra[VP2Constants::MAX_EXTRA_TEMPERATURES];
-    bool               temperatureExtraValid[VP2Constants::MAX_EXTRA_TEMPERATURES];
+    Measurement<Temperature> extraTemperature[VP2Constants::MAX_EXTRA_TEMPERATURES];
+
+    //Temperature        temperatureExtra[VP2Constants::MAX_EXTRA_TEMPERATURES];
+    //bool               temperatureExtraValid[VP2Constants::MAX_EXTRA_TEMPERATURES];
 
     Humidity           humidityExtra[VP2Constants::MAX_EXTRA_HUMIDITIES];
     bool               humidityExtraValid[VP2Constants::MAX_EXTRA_HUMIDITIES];

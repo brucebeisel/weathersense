@@ -25,8 +25,6 @@ typedef int HANDLE;
 
 namespace vp2 {
 
-class VP2Logger;
-
 /**
  * Class to communicate over the serial port to the VP2 console.
  */
@@ -61,8 +59,9 @@ public:
      * Read from the serial port.
      * 
      * @param buffer The buffer into which the data will be read
-     * @param index The index into the buffer where bytes read will be stored
+     * @param index  The index into the buffer where bytes read will be stored
      * @param nbytes The number of bytes to read
+     *
      * @return The number of bytes actually read
      */
     int read(byte * buffer, int index, int nbytes);
@@ -72,6 +71,7 @@ public:
      * 
      * @param buffer The buffer into which the data will be read
      * @param nbytes The number of bytes to read
+     *
      * @return The number of bytes actually read
      */
     bool read(byte * buffer, int nbytes);
@@ -80,6 +80,7 @@ public:
      * Write a string to the serial port.
      * 
      * @param s The string to be converted to bytes then written to the serial port
+     *
      * @return The number of bytes that were written
      */
     int write(const std::string & s);
@@ -89,6 +90,7 @@ public:
      * 
      * @param buffer The bytes to write to the serial port
      * @param nbytes The number of bytes to write
+     *
      * @return The number of bytes that were written
      */
     int write(const void * buffer, int nbytes);
@@ -97,11 +99,12 @@ public:
      * Discard any bytes in the read buffer.
      */
     void discardInBuffer();
+
 private:
-    HANDLE comPort;
-    std::string device;
-    int baudRate;
-    VP2Logger log;
+    HANDLE      comPort;    // The file descriptor of the open port
+    std::string device;     // The name of the serial port to be opened
+    int         baudRate;   // The baud rate used to communicate over the serial port
+    VP2Logger   log;
 };
 }
 #endif

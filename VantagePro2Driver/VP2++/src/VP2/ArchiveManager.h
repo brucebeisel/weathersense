@@ -40,7 +40,7 @@ public:
     ArchiveManager(const std::string & archiveFilename, VantagePro2Station & station);
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~ArchiveManager();
 
@@ -61,12 +61,12 @@ public:
     DateTime getArchiveRecordsAfter(DateTime afterTime, std::vector<ArchivePacket> & list);
 
     /**
-     * Return the packets that fall after the specified time
-     * 
-     * @param packets The container to which the read packets will be added
-     * @param startTime The start time of the search
+     * Get the newest record from the archive.
+     *
+     * @param packet The packet to which the newest record will be written
+     * @return True if data was written to the "packet" argument
      */
-    //void readPackets(std::vector<ArchivePacket> & packets, DateTime startTime);
+    bool getNewestRecord(ArchivePacket & packet) const;
 
 private:
     /**
@@ -83,14 +83,13 @@ private:
     void addPackets(const std::vector<ArchivePacket> & packets);
 
     /**
-     * Finds the time range of the archive.
+     * Finds the time range of the archive and set the packet time members.
      */
     void findPacketTimeRange();
 
     std::string          archiveFile;
     DateTime             newestPacketTime;
     DateTime             oldestPacketTime;
-    //DateTime             timeOfLastPacketSent;
     VantagePro2Station & station;
     VP2Logger            log;
 };

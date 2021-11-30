@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef SENSOR_STATION_H
-#define	SENSOR_STATION_H
+#define SENSOR_STATION_H
 
 #include <iostream>
 #include <vector>
@@ -117,22 +117,26 @@ public:
      * 
      * @param list The list of sensor stations
      * @param time The time that the data was collected
-     * @return  The message
+     * @return The message
      */
     static std::string formatSensorStationStatusMessage(const std::vector<SensorStation> & list, DateTime time);
 
     /**
      * ostream operator.
+     *
+     * @param os The output stream
+     * @param ss The sensor station for which the text will be generated
+     * @return The output stream passed in
      */
     friend std::ostream & operator<<(std::ostream & os, const SensorStation & ss);
 
 private:
     SensorStationType type;
-    int sensorIndex;
-    bool batteryStatus;
-    int linkQuality;
+    int               sensorIndex;
+    bool              batteryStatus;
+    int               linkQuality;
 
 };
 }
 
-#endif	/* SENSOR_STATION_H */
+#endif /* SENSOR_STATION_H */

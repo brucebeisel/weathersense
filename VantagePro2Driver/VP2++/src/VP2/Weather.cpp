@@ -68,8 +68,9 @@ Weather::dumpBuffer(const byte buffer[], int nbytes) {
             ss << setw(3) << setfill('0') << dec << i << hex << ": ";
 
         ss <<  setw(2) << setfill('0') << (((int)buffer[i]) & 0xFF) << " ";
-	if ((i + 1) % 16 == 0)
-	    ss << endl;
+
+        if ((i + 1) % 16 == 0)
+            ss << endl;
     }
 
     ss << dec << endl;

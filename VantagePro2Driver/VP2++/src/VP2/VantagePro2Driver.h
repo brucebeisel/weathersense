@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef VANTAGE_PRO2_DRIVER_H
-#define	VANTAGE_PRO2_DRIVER_H
+#define VANTAGE_PRO2_DRIVER_H
 #ifdef _WIN32
 #pragma warning(disable : 4512)
 #endif
@@ -101,7 +101,7 @@ private:
      * @param archive The collection of archive packets
      * @return True if the archive packets were processed successfully
      */
-    bool processArchive(const std::vector<ArchivePacket> & archive);
+    //bool processArchive(const std::vector<ArchivePacket> & archive);
 
     /**
      * Called when a connection is established with the WeatherSense collector.
@@ -127,4 +127,4 @@ private:
 };
 
 }
-#endif	/* VANTAGE_PRO2_DRIVER_H */
+#endif /* VANTAGE_PRO2_DRIVER_H */

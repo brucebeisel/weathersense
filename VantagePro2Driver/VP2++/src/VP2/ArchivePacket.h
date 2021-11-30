@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef ARCHIVEPACKET_H
-#define	ARCHIVEPACKET_H
+#define ARCHIVEPACKET_H
 #include <string>
 #include "Weather.h"
 
@@ -152,4 +152,4 @@ private:
 
 }
 
-#endif	/* ARCHIVEPACKET_H */
+#endif /* ARCHIVEPACKET_H */

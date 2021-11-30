@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef VANTAGE_PRO2_STATION_H
-#define	VANTAGE_PRO2_STATION_H
+#define VANTAGE_PRO2_STATION_H
 
 #include <string>
 #include <vector>
@@ -32,6 +32,29 @@
 namespace vp2 {
 class CurrentWeather;
 class HiLowPacket;
+
+class StationConfiguration {
+public:
+private:
+    double                     issLatitude;
+    double                     issLongitude;
+    int                        issElevation;
+    int                        timeZoneIndex;
+    bool                       automaticDaylightSavingsTime;
+    bool                       manualDaylightSavingsTimeOn;
+    float                      gmtOffset;
+    bool                       useTimezone;
+    std::vector<SensorStation> sensorStations;
+    int                        retransmitId;                 // 0 = no retransmission
+
+    Rainfall                   rainCollectorSize;
+    int                        archivePeriod;
+    bool                       north;
+    bool                       east;
+    std::string                firmwareDate;
+    std::string                firmwareVersion;
+    VP2Logger                  log;
+};
 
 /**
  * Class that handles the command protocols with the VP2 console.
@@ -86,6 +109,11 @@ public:
      */
     bool wakeupStation();
 
+    /**
+     * Retrieve the configuration parameters.
+     */
+    bool retrieveConfigurationParameters();
+
 
     //
     // The following methods correspond to the commands in section VIII of the Vantage Serial Protocol Document, version 2.6.1
@@ -102,8 +130,9 @@ public:
 
     bool retrieveReceiverList();
 
-    void retrieveFirmwareVersion();
-    void retrieveFirmwareDate();
+    bool retrieveFirmwareVersion();
+
+    bool retrieveFirmwareDate();
 
     /////////////////////////////////////////////////////////////////////////////////
     // Current Data Commands
@@ -173,11 +202,11 @@ public:
     
 
     /**
-     * Set the console's time.
+     * Update the console's time.
      * 
      * @return True if successful
      */
-    bool setConsoleTime();
+    bool updateConsoleTime();
 
     /**
      * Get the clock time on the console.
@@ -197,16 +226,18 @@ public:
      */
     bool updateArchivePeriod(VP2Constants::ArchivePeriod period);
 
+private:
     /**
      * Reinitialize the console after making any of the following changes to the configuration:
      *      1. Lat/Lon
      *      2. Elevation
-     *      3. TBD
+     *      3. Any value in the EEPROM byte 0x2B (Decimal 43)
      *
      * @return True if successful
      */
     bool initializeSetup();
 
+public:
     /**
      * Turn the console lamp on or off.
      *
@@ -221,13 +252,35 @@ public:
     //
 
     //
-    // EEPROM retrieval commands
+    // EEPROM commands
     //
-    bool retrieveISSLocation();
 
-    bool retrieveTimezone();
+    bool eepromReadDataBlock();
 
-    bool retrieveDaylightSavingsTimeMode();
+    /**
+     * Read part of the EEPROM memory.
+     *
+     * @param The EEPROM address at which the reading will begin
+     * @return True if the read is successful
+     */
+    bool eepromRead(unsigned address, unsigned count);
+
+    /**
+     * Read part of the EEPROM memory.
+     *
+     * @param The EEPROM address at which the reading will begin
+     * @return True if the read is successful
+     */
+    bool eepromBinaryRead(unsigned address, unsigned count);
+
+    bool eepromWriteByte(unsigned address, int value);
+
+    bool eepromBinaryWrite(unsigned address, const byte buffer[], unsigned count);
+
+
+    //
+    // End of EEPROM commands
+    //
 
     /**
      * Retrieve the state of the manual setting for daylight savings time.
@@ -235,51 +288,50 @@ public:
      *
      * @return True if successful
      */
-    bool retrieveDaylightSavingsState();
+    //bool retrieveDaylightSavingsState();
 
-    bool retrieveGMTOffset();
+    //bool retrieveGMTOffset();
 
     /**
      * Retrieve whether the time zone offset is set by GMT offset or specifying a time zone.
      *
      * @return True if successful
      */
-    bool retrieveTimeZoneMode();
+    //bool retrieveTimeZoneMode();
 
-    bool retrieveTransmitterListenBits();
+    //bool retrieveTransmitterListenBits();
 
-    bool retrieveRetransmitID();
+    //bool retrieveRetransmitID();
 
-    bool retrieveStationList();
+    //bool retrieveStationList();
 
-    bool retrieveUnits();
+    //bool retrieveUnits();
 
-    bool retrieveSetupBits();
+    //bool retrieveSetupBits();
 
-    bool retrieveRainSeasonStart();
-    /**
-     * Retrieve the archive period from the console.
-     * 
-     * @return True if the archive period was stored successfully
-     */
-    bool retrieveArchivePeriod();
-
-
-    bool retrieveAlarmSettings();
-
-
-
-
-
-
+    //bool retrieveRainSeasonStart();
+    //bool retrieveArchivePeriod();
+    //bool retrieveAlarmThresholds();
 
 
     /**
-     * Get the archive period (in minutes)
+     * Get the archive period (in minutes).
      * 
      * @return The archive period
      */
     int getArchivePeriod() const;
+
+    /**
+     * Get the size of the rain collector.
+     *
+     * @return The size of the rain collector in inches
+     */
+    Rainfall getRainCollectorSize() const;
+
+    bool getISSLocation(double & issLatitude, double & issLongitude, int & issElevation);
+
+    bool areWindCupsLarge() const;
+    bool getDaylightSavingsTimeMode();
 
     /**
      * Get the list of sensor stations.
@@ -296,35 +348,12 @@ public:
     const std::vector<Sensor> & getSensors() const;
 
     /**
-     * Retrieve various parameters from the console.
-     * 
-     * @param message The message in which the parameters are to be stored
-     * @return True if successful
-     */
-    bool getParameters(ParametersMessage & message);
-
-    /**
      * Retrieve the rain collector size from the console.
      * 
      * @return True if the rain collector size was stored successfully
      */
-    bool retrieveRainCollectorSize();
 
-    /**
-     * Get the size of the rain collector that was previously retrieved
-     *
-     * @return The size of the rain collector in inches
-     */
-    Rainfall    getRainCollectorSize() const;
-
-    /**
-     * Retrieve information about the sensor stations that are communicating with the console.
-     * 
-     * @return True if the sensor station information was stored successfully
-     */
-    bool retrieveSensorStationInfo();
-
-
+    int calculateISSReception(int loopPacketWindSamples) const;
 
 
 private:
@@ -345,6 +374,10 @@ private:
     static constexpr int VP2_YEAR_OFFSET = 2000;
     static constexpr int HILOW_PACKET_SIZE = 436;
     static constexpr int NO_VALUE = 0xFF;
+    static constexpr int EEPROM_DATA_BLOCK_SIZE = 4096;
+    static constexpr int EEPROM_NON_GRAPH_DATA_SIZE = 176;
+
+    static constexpr int ALARM_THRESHOLDS_SIZE = 94; 
 
 
     /**
@@ -369,49 +402,76 @@ private:
      * @param command The command to be sent to the VP2 console
      * @return True if the command was sent successfully
      */
-    bool        sendAckedCommand(const std::string & command);
-    bool        consumeAck();
+    bool sendAckedCommand(const std::string & command);
 
-    bool        readLoopPacket(LoopPacket & loopPacket);
-    bool        readLoop2Packet(Loop2Packet & loop2Packet);
+    /**
+     * Read exactly one byte, checking for an ACK.
+     *
+     * @return True if one character was read and it was an ACK
+     */
+    bool consumeAck();
+
+    /**
+     * Read the LOOP packet and save off a few values for later use.
+     *
+     * @param loopPacket The LoopPacket into which the data will be copied
+     *
+     * @return True if the packet was read succesfully
+     */
+    bool readLoopPacket(LoopPacket & loopPacket);
+
+    /**
+     * Read the LOOP2 packet.
+     *
+     * @param loop2Packet The Loop2Packet into which the data will be copied
+     *
+     * @return True if the packet was read succesfully
+     */
+    bool readLoop2Packet(Loop2Packet & loop2Packet);
 
     void        decodeArchivePage(std::vector<ArchivePacket> &, const byte * buffer, int firstRecord, DateTime newestPacketTime);
+
     bool        processArchivePage(std::vector<ArchivePacket> &, int firstRecord, DateTime newestPacketTime);
+
     bool        archivePacketContainsData(const byte * buffer, int offset);
+
+
+public:
+    bool        retrieveSensorStationInfo();
+private:
+
 
     /**
      * Send the command to retrieve a string value.
      *
      * @param command The command to send
-     * @return The string value returned by the console
+     * @param results The string value returned for the given command
+     * @return True if successful
      */
-    std::string sendStringValueCommand(const std::string & command);
+    bool sendStringValueCommand(const std::string & command, std::string & results);
 
-    bool        readEEPROM(const std::string & address, int count);
+    bool readNonGraphEepromData();
+
 
     SerialPort                 serialPort;
     std::string                portName;
     int                        baudRate;
     byte                       buffer[512];
-    Rainfall                   rainCollectorSize;
+    byte                       eepromBuffer[EEPROM_DATA_BLOCK_SIZE + CRC_BYTES];
+    byte                       eepromNonGraphData[EEPROM_NON_GRAPH_DATA_SIZE + CRC_BYTES];
     WindDirectionSlices        pastWindDirs;
     Speed                      windGust10Minute;
     Heading                    windGustDirection10Minute;
     Callback *                 callback;
     std::vector<SensorStation> sensorStations;
-    int                        archivePeriod;
     std::vector<Sensor>        sensors;
     float                      consoleBatteryVoltage;
     bool                       firstLoopPacket;
-    double                     issLatitude;
-    double                     issLongitude;
-    int                        issElevation;
-    bool                       north;
-    bool                       east;
     std::string                firmwareDate;
     std::string                firmwareVersion;
+    byte                       alarmThresholds[ALARM_THRESHOLDS_SIZE];
     VP2Logger                  log;
 };
 }
 
-#endif	/* VANTAGE_PRO2_STATION_H */
+#endif /* VANTAGE_PRO2_STATION_H */

@@ -17,17 +17,4 @@
 #include "VP2Constants.h"
 
 namespace vp2 {
-
-    //
-    // EEPROM addresses
-    //
-    const std::string VP2Constants::EE_LATITUDE = "0B";
-    const std::string VP2Constants::EE_LONGITUDE = "0D";
-    const std::string VP2Constants::EE_ELEVATION = "0F";
-    const std::string VP2Constants::EE_TIMEZONE = "11";
-    const std::string VP2Constants::EE_STATION_LIST = "19";
-    const std::string VP2Constants::EE_SETUP_BITS = "2B";
-    const std::string VP2Constants::EE_RAIN_SEASON_START = "2C";
-    const std::string VP2Constants::EE_ARCHIVE_PERIOD = "2D";
-
 }

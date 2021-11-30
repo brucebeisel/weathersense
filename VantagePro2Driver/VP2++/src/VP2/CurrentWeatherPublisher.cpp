@@ -33,7 +33,7 @@ const std::string CurrentWeatherPublisher::MULTICAST_HOST = "224.0.0.120";
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-CurrentWeatherPublisher::CurrentWeatherPublisher() : logger(VP2Logger::getLogger("CurrentWeatherPublisher"))
+CurrentWeatherPublisher::CurrentWeatherPublisher() : log(VP2Logger::getLogger("CurrentWeatherPublisher"))
 {
     createSocket();
 }
@@ -43,7 +43,7 @@ CurrentWeatherPublisher::CurrentWeatherPublisher() : logger(VP2Logger::getLogger
 CurrentWeatherPublisher::~CurrentWeatherPublisher()
 {
     if (socketId != NO_SOCKET)
-	close(socketId);
+        close(socketId);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,11 +58,11 @@ CurrentWeatherPublisher::sendCurrentWeather(const CurrentWeather & cw)
     const char * data = s.c_str();
     size_t length = strlen(data);
     if (sendto(socketId, data, length, 0, (struct sockaddr *)&groupAddr, sizeof(groupAddr)) != length) {
-	int e = errno;
-	logger.log(VP2Logger::VP2_WARNING) <<  "sendto() for current weather failed. Errno = " << e << endl;
+        int e = errno;
+        log.log(VP2Logger::VP2_WARNING) <<  "sendto() for current weather failed. Errno = " << e << endl;
     }
     else
-        logger.log(VP2Logger::VP2_INFO) << "Published current weather: " << data << endl;
+        log.log(VP2Logger::VP2_INFO) << "Published current weather: " << data << endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,6 @@ CurrentWeatherPublisher::getLocalIpAddress(struct sockaddr_in & saddr)
                 rv = true;
                 break;
             }
-                
         }
 
         tmp = tmp->ifa_next;
@@ -114,15 +113,15 @@ CurrentWeatherPublisher::createSocket()
 
     struct sockaddr_in saddr;
     if (!getLocalIpAddress(saddr)) {
-	logger.log(VP2Logger::VP2_ERROR) <<  "setsockopt() getting local IP address failed." << endl;
+        log.log(VP2Logger::VP2_ERROR) <<  "setsockopt() getting local IP address failed." << endl;
         close(socketId);
         socketId = NO_SOCKET;
         return false;
     }
 
     if (setsockopt(socketId, IPPROTO_IP, IP_MULTICAST_IF, (char *)&saddr.sin_addr, sizeof(saddr.sin_addr)) < 0) {
-	int e = errno;
-	logger.log(VP2Logger::VP2_ERROR) <<  "setsockopt() for local interface failed. Errno = " << e << endl;
+        int e = errno;
+        log.log(VP2Logger::VP2_ERROR) <<  "setsockopt() for local interface failed. Errno = " << e << endl;
         close(socketId);
         socketId = NO_SOCKET;
         return false;
@@ -130,14 +129,14 @@ CurrentWeatherPublisher::createSocket()
 
     unsigned char ttl = 2;
     if (setsockopt(socketId, IPPROTO_IP, IP_MULTICAST_TTL, (char *)&ttl, sizeof(ttl)) < 0) {
-	int e = errno;
-	logger.log(VP2Logger::VP2_ERROR) <<  "setsockopt() for TTL failed. Errno = " << e << endl;
+        int e = errno;
+        log.log(VP2Logger::VP2_ERROR) <<  "setsockopt() for TTL failed. Errno = " << e << endl;
         close(socketId);
         socketId = NO_SOCKET;
         return false;
     }
 
-    logger.log(VP2Logger::VP2_INFO) << "Multicast socket created successfully" << endl;
+    log.log(VP2Logger::VP2_INFO) << "Multicast socket created successfully" << endl;
     return true;
 }
 

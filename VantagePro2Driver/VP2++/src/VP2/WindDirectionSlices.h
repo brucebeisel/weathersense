@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef WIND_DIRECTION_SLICES_H
-#define	WIND_DIRECTION_SLICES_H
+#define WIND_DIRECTION_SLICES_H
 
 #include <vector>
 #include "Weather.h"
@@ -94,4 +94,4 @@ private:
 };
 }
 
-#endif	/* WIND_DIRECTION_SLICES_H */
+#endif /* WIND_DIRECTION_SLICES_H */

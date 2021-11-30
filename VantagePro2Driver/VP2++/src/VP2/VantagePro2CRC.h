@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef VANTAGE_PRO2_CRC_H
-#define	VANTAGE_PRO2_CRC_H
+#define VANTAGE_PRO2_CRC_H
 
 #include "Weather.h"
 
@@ -54,4 +54,4 @@ private:
     virtual ~VantagePro2CRC();
 };
 }
-#endif	/* VANTAGE_PRO2_CRC_H */
+#endif /* VANTAGE_PRO2_CRC_H */

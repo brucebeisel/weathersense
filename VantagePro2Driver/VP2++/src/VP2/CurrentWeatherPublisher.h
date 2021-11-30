@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef CURRENT_WEATHER_PUBLISHER_H
-#define	CURRENT_WEATHER_PUBLISHER_H
+#define CURRENT_WEATHER_PUBLISHER_H
 
 #include <netinet/in.h>
 #include <string>
@@ -71,8 +71,8 @@ private:
     static const int         NO_SOCKET = -1;
     int                      socketId;
     struct sockaddr_in       groupAddr;
-    VP2Logger                logger;
+    VP2Logger                log;
 };
 }
 
-#endif	/* CURRENT_WEATHER_PUBLISHER_H */
+#endif /* CURRENT_WEATHER_PUBLISHER_H */

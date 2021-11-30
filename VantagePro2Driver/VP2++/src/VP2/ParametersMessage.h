@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef PARAMETERS_MESSAGE_H
-#define	PARAMETERS_MESSAGE_H
+#define PARAMETERS_MESSAGE_H
 #include <string>
 
 namespace vp2 {
@@ -84,4 +84,4 @@ private:
     Rainfall    rainCollectorSize;
 };
 }
-#endif	/* PARAMETERS_MESSAGE_H */
+#endif /* PARAMETERS_MESSAGE_H */

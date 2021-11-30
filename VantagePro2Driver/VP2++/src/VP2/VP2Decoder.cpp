@@ -28,6 +28,20 @@ VP2Decoder::decode16BitTemperature(const byte buffer[], int offset, bool & valid
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+bool
+VP2Decoder::decode16BitTemperature(const byte buffer[], int offset, Measurement<Temperature> & measurement) {
+    int value16 = BitConverter::toInt16(buffer, offset);
+
+    if (value16 != VP2Constants::INVALID_16BIT_TEMPERATURE)
+        measurement = UnitConverter::toCelsius(static_cast<Temperature>(value16) / VP2Constants::TEMPERATURE_16BIT_SCALE);
+    else
+        measurement.invalidate();
+
+    return measurement.isValid();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Temperature
 VP2Decoder::decodeNonScaled16BitTemperature(const byte buffer[], int offset, bool & valid) {
     Temperature t = 0.0;
@@ -58,6 +72,20 @@ VP2Decoder::decode8BitTemperature(const byte buffer[], int offset, bool &valid) 
     }
 
     return t;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+bool
+VP2Decoder::decode8BitTemperature(const byte buffer[], int offset, Measurement<Temperature> & measurement) {
+    int value8 = BitConverter::toInt8(buffer, offset);
+
+    if (value8 != VP2Constants::INVALID_8BIT_TEMPERATURE)
+        measurement = UnitConverter::toCelsius(static_cast<Temperature>(value8 - VP2Constants::TEMPERATURE_8BIT_OFFSET));
+    else
+        measurement.invalidate();
+
+    return measurement.isValid();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
