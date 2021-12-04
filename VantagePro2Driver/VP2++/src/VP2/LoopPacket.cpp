@@ -27,7 +27,7 @@ using namespace std;
 
 namespace vp2 {
 
-static const char *ALARM_STRINGS[16][8] = {
+static const char *ALARM_STRINGS[][8] = {
     {
         "Falling Barometer Trend",
         "Rising Barometer Trend",
@@ -217,56 +217,56 @@ LoopPacket::getBaroTrend() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Measurement<Temperature>
+const Measurement<Temperature> &
 LoopPacket::getOutsideTemperature() const {
     return outsideTemperature;
 }
         
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Temperature
+const Measurement<Temperature> &
 LoopPacket::getInsideTemperature() const {
     return insideTemperature;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Humidity
+const Measurement<Humidity> &
 LoopPacket::getOutsideHumidity() const {
     return outsideHumidity;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Humidity
+const Measurement<Humidity> &
 LoopPacket::getInsideHumidity() const {
     return insideHumidity;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Speed
+const Measurement<Speed> &
 LoopPacket::getWindSpeed() const {
     return windSpeed;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Speed
+const Measurement<Speed> &
 LoopPacket::getAvgWindSpeed10Min() const {
     return avgWindSpeed10Min;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Heading
+const Measurement<Heading> &
 LoopPacket::getWindDirection() const {
     return windDirection;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Pressure
+const Measurement<Pressure> &
 LoopPacket::getBarometricPressure() const {
     return barometricPressure;
 }
@@ -315,51 +315,38 @@ LoopPacket::getYearRain() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-UvIndex
+const Measurement<UvIndex> &
 LoopPacket::getUvIndex() const {
     return uvIndex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Evapotranspiration
+const Measurement<Evapotranspiration> &
 LoopPacket::getYearET() const {
     return yearET;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Evapotranspiration
+const Measurement<Evapotranspiration> &
 LoopPacket::getMonthET() const {
     return monthET;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Evapotranspiration
+const Measurement<Evapotranspiration> &
 LoopPacket::getDayET() const {
     return dayET;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-bool
-LoopPacket::isUvIndexValid() const {
-    return uvIndexValid;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-SolarRadiation
+const Measurement<SolarRadiation> &
 LoopPacket::getSolarRadiation() const {
     return solarRadiation;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-bool
-LoopPacket::isSolarRadiationValid() const {
-    return solarRadiation != VP2Constants::INVALID_SOLAR_RADIATION;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -392,79 +379,44 @@ LoopPacket::isTransmitterBatteryGood(int index) const {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Measurement<Temperature>
+const Measurement<Temperature> &
 LoopPacket::getExtraTemperature(int index) const {
     return extraTemperature[index];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-bool
-LoopPacket::isExtraHumidityValid(int index) const {
-    return humidityExtraValid[index];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-Humidity
+const Measurement<Humidity> &
 LoopPacket::getExtraHumidity(int index) const {
-    return humidityExtra[index];
+    return extraHumidity[index];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-LeafWetness
+const Measurement<LeafWetness> &
 LoopPacket::getLeafWetness(int index) const {
     return leafWetness[index];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-bool
-LoopPacket::isLeafWetnessValid(int index) const {
-    return leafWetnessValid[index];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-int
+const Measurement<SoilMoisture> &
 LoopPacket::getSoilMoisture(int index) const {
     return soilMoisture[index];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-bool
-LoopPacket::isSoilMoistureValid(int index) const {
-    return soilMoistureValid[index];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-Temperature
+const Measurement<Temperature> &
 LoopPacket::getSoilTemperature(int index) const {
     return soilTemperature[index];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-bool
-LoopPacket::isSoilTemperatureValid(int index) const {
-    return soilTemperatureValid[index];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-Temperature
+const Measurement<Temperature> &
 LoopPacket::getLeafTemperature(int index) const {
     return leafTemperature[index];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-bool
-LoopPacket::isLeafTemperatureValid(int index) const {
-    return leafTemperatureValid[index];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -541,36 +493,33 @@ LoopPacket::decodeLoopPacket(byte buffer[]) {
     nextRecord = BitConverter::toInt16(buffer,5);
 
     bool valid;
-    barometricPressure = VP2Decoder::decodeBarometricPressure(buffer, 7, valid);
-    insideTemperature = VP2Decoder::decode16BitTemperature(buffer, 9, valid);
-    insideHumidity = VP2Decoder::decodeHumidity(buffer, 11, valid);
+    VP2Decoder::decodeBarometricPressure(buffer, 7, barometricPressure);
+    VP2Decoder::decode16BitTemperature(buffer, 9, insideTemperature);
+    VP2Decoder::decodeHumidity(buffer, 11, insideHumidity);
+    VP2Decoder::decode16BitTemperature(buffer, 12, outsideTemperature);
 
-
-    Temperature t = VP2Decoder::decode16BitTemperature(buffer, 12, valid);
-    outsideTemperature.setValue(t, valid);
-
-    windSpeed = VP2Decoder::decodeWindSpeed(buffer, 14, valid);
-    avgWindSpeed10Min = VP2Decoder::decodeWindSpeed(buffer, 15, valid);
-    windDirection = VP2Decoder::decodeWindDirection(buffer, 16, valid);
+    windSpeed = VP2Decoder::decodeWindSpeed(buffer, 14);
+    avgWindSpeed10Min = VP2Decoder::decodeWindSpeed(buffer, 15);
+    windDirection = VP2Decoder::decodeWindDirection(buffer, 16);
 
     for (int i = 0; i < VP2Constants::MAX_EXTRA_TEMPERATURES; i++)
         VP2Decoder::decode8BitTemperature(buffer, 18 + i, extraTemperature[i]);
 
     for (int i = 0; i < VP2Constants::MAX_SOIL_TEMPERATURES; i++)
-        soilTemperature[i] = VP2Decoder::decode8BitTemperature(buffer, 25 + i, soilTemperatureValid[i]);
+        VP2Decoder::decode8BitTemperature(buffer, 25 + i, soilTemperature[i]);
 
     for (int i = 0; i < VP2Constants::MAX_LEAF_TEMPERATURES; i++)
-        leafTemperature[i] = VP2Decoder::decode8BitTemperature(buffer, 29 + i, leafTemperatureValid[i]);
+        VP2Decoder::decode8BitTemperature(buffer, 29 + i, leafTemperature[i]);
 
-    outsideHumidity = VP2Decoder::decodeHumidity(buffer, 33, valid);
+    VP2Decoder::decodeHumidity(buffer, 33, outsideHumidity);
 
     for (int i = 0; i < VP2Constants::MAX_EXTRA_HUMIDITIES; i++)
-        humidityExtra[i] = VP2Decoder::decodeHumidity(buffer, 34 + i, humidityExtraValid[i]);
+        VP2Decoder::decodeHumidity(buffer, 34 + i, extraHumidity[i]);
 
     rainRate = VP2Decoder::decodeRain(buffer, 41);
 
-    uvIndex = VP2Decoder::decodeUvIndex(buffer, 43, uvIndexValid);
-    solarRadiation = VP2Decoder::decodeSolarRadiation(buffer, 44, valid);
+    VP2Decoder::decodeUvIndex(buffer, 43, uvIndex);
+    VP2Decoder::decodeSolarRadiation(buffer, 44, solarRadiation);
 
     stormRain = VP2Decoder::decodeStormRain(buffer, 46);
     stormStart = VP2Decoder::decodeStormStartDate(buffer, 48);
@@ -579,15 +528,15 @@ LoopPacket::decodeLoopPacket(byte buffer[]) {
     monthRain = VP2Decoder::decodeRain(buffer, 52);
     yearRain = VP2Decoder::decodeRain(buffer, 54);
 
-    dayET = VP2Decoder::decodeDayET(buffer, 56, valid);
-    monthET = VP2Decoder::decodeMonthYearET(buffer, 58, valid);
-    yearET = VP2Decoder::decodeMonthYearET(buffer, 60, valid);
+    dayET = VP2Decoder::decodeDayET(buffer, 56);
+    monthET = VP2Decoder::decodeMonthYearET(buffer, 58);
+    yearET = VP2Decoder::decodeMonthYearET(buffer, 60);
 
     for (int i = 0; i < VP2Constants::MAX_SOIL_MOISTURES; i++)
-        soilMoisture[i] = VP2Decoder::decodeSoilMoisture(buffer, 62 + i, valid);
+        VP2Decoder::decodeSoilMoisture(buffer, 62 + i, soilMoisture[i]);
 
     for (int i = 0; i < VP2Constants::MAX_LEAF_WETNESSES; i++)
-        leafWetness[i] = VP2Decoder::decodeLeafWetness(buffer, 66 + i, valid);
+        VP2Decoder::decodeLeafWetness(buffer, 66 + i, leafWetness[i]);
 
     for (int i = 0; i < 16; i++) {
         int alarms = BitConverter::toInt8(buffer, 70 + i);

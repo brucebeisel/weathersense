@@ -80,47 +80,40 @@ public:
      */
     bool               decodeLoopPacket(byte buffer[]);
 
-    int                getNextRecord() const;
-    Measurement<Temperature> getOutsideTemperature() const;
-    Temperature        getInsideTemperature() const;
-    Measurement<Temperature>        getExtraTemperature(int index) const;
-    Humidity           getOutsideHumidity() const;
-    Humidity           getInsideHumidity() const;
-    bool               isExtraHumidityValid(int index) const;
-    Humidity           getExtraHumidity(int index) const;
-    Rainfall           getRainRate() const;
-    Rainfall           getDayRain() const;
-    Rainfall           getMonthRain() const;
-    Rainfall           getYearRain() const;
-    Rainfall           getStormRain() const;
+    int                              getNextRecord() const;
+    const Measurement<Temperature> & getOutsideTemperature() const;
+    const Measurement<Temperature> & getInsideTemperature() const;
+    const Measurement<Temperature> & getExtraTemperature(int index) const;
+    const Measurement<Humidity> &    getOutsideHumidity() const;
+    const Measurement<Humidity> &    getInsideHumidity() const;
+    const Measurement<Humidity> &    getExtraHumidity(int index) const;
+    Rainfall                         getRainRate() const;
+    Rainfall                         getDayRain() const;
+    Rainfall                         getMonthRain() const;
+    Rainfall                         getYearRain() const;
+    Rainfall                         getStormRain() const;
+    const Measurement<Speed> &       getWindSpeed() const;
+    const Measurement<Speed> &       getAvgWindSpeed10Min() const;
+    const Measurement<Heading> &     getWindDirection() const;
+    const Measurement<Pressure> &    getBarometricPressure() const;
+    const Measurement<UvIndex> &     getUvIndex() const;
+    const Measurement<Temperature> &        getLeafTemperature(int index) const;
+    const Measurement<SoilMoisture> &       getSoilMoisture(int index) const;
+    const Measurement<LeafWetness> &        getLeafWetness(int index) const;
+    const Measurement<Temperature> &        getSoilTemperature(int index) const;
+    const Measurement<SolarRadiation> &     getSolarRadiation() const;
+    const Measurement<Evapotranspiration> & getDayET() const;
+    const Measurement<Evapotranspiration> & getMonthET() const;
+    const Measurement<Evapotranspiration> & getYearET() const;
+    bool               isTransmitterBatteryGood(int index) const;
+    float              getConsoleBatteryVoltage() const;
     DateTime           getStormStart() const;
     bool               isStormOngoing() const;
-    Speed              getWindSpeed() const;
-    Speed              getAvgWindSpeed10Min() const;
-    Heading            getWindDirection() const;
-    Pressure           getBarometricPressure() const;
-    UvIndex            getUvIndex() const;
-    bool               isUvIndexValid() const;
     Forecast           getForecastIcon() const;
     std::string        getForecastIconString() const;
     int                getForecastRule() const;
     BaroTrend          getBaroTrend() const;
     std::string        getBaroTrendString() const;
-    Temperature        getLeafTemperature(int index) const;
-    bool               isLeafTemperatureValid(int index) const;
-    bool               isSoilTemperatureValid(int index) const;
-    SoilMoisture       getSoilMoisture(int index) const;
-    bool               isSoilMoistureValid(int index) const;
-    LeafWetness        getLeafWetness(int index) const;
-    bool               isLeafWetnessValid(int index) const;
-    Temperature        getSoilTemperature(int index) const;
-    bool               isTransmitterBatteryGood(int index) const;
-    float              getConsoleBatteryVoltage() const;
-    SolarRadiation     getSolarRadiation() const;
-    bool               isSolarRadiationValid() const;
-    Evapotranspiration getDayET() const;
-    Evapotranspiration getMonthET() const;
-    Evapotranspiration getYearET() const;
 
 private:
     std::string lookupAlarm(int byte, int bit) const;
@@ -129,55 +122,42 @@ private:
 
     VP2Logger          log;
 
-    int                nextRecord;
+    int                             nextRecord;
     Measurement<Temperature>        outsideTemperature;
-    Temperature        insideTemperature;
-    Humidity           outsideHumidity;
-    Humidity           insideHumidity;
-    Speed              windSpeed;
-    Heading            windDirection;
-    Pressure           barometricPressure;
-    BaroTrend          baroTrend;
-    Rainfall           rainRate;
-    Rainfall           stormRain;
-    Rainfall           dayRain;
-    Rainfall           monthRain;
-    Rainfall           yearRain;
-    UvIndex            uvIndex;
-    bool               uvIndexValid;
-    SolarRadiation     solarRadiation;
-    Evapotranspiration dayET;
-    Evapotranspiration monthET;
-    Evapotranspiration yearET;
+    Measurement<Temperature>        insideTemperature;
+    Measurement<Humidity>           outsideHumidity;
+    Measurement<Humidity>           insideHumidity;
+    Measurement<Speed>              windSpeed;
+    Measurement<Heading>            windDirection;
+    Measurement<Pressure>           barometricPressure;
+    BaroTrend                       baroTrend;
+    Rainfall                        rainRate;
+    Rainfall                        stormRain;
+    Rainfall                        dayRain;
+    Rainfall                        monthRain;
+    Rainfall                        yearRain;
+    Measurement<UvIndex>            uvIndex;
+    Measurement<SolarRadiation>     solarRadiation;
+    Measurement<Evapotranspiration> dayET;
+    Measurement<Evapotranspiration> monthET;
+    Measurement<Evapotranspiration> yearET;
+    Measurement<Speed>              avgWindSpeed10Min;
+    Measurement<Speed>              avgWindSpeed2Min;
+    Measurement<SoilMoisture>       soilMoisture[VP2Constants::MAX_SOIL_MOISTURES];
+    Measurement<LeafWetness>        leafWetness[VP2Constants::MAX_LEAF_WETNESSES];
+    Measurement<Temperature>        leafTemperature[VP2Constants::MAX_LEAF_TEMPERATURES];
+    Measurement<Temperature>        soilTemperature[VP2Constants::MAX_SOIL_TEMPERATURES];
+    Measurement<Temperature>        extraTemperature[VP2Constants::MAX_EXTRA_TEMPERATURES];
+    Measurement<Humidity>           extraHumidity[VP2Constants::MAX_EXTRA_HUMIDITIES];
+
     Forecast           forecastIcon;
     int                forecastRule;
     DateTime           sunriseTime;
     DateTime           sunsetTime;
     DateTime           stormStart;
-    Speed              avgWindSpeed10Min;
-    Speed              avgWindSpeed2Min;
     int                transmitterBatteryStatus;
     float              consoleBatteryVoltage;
 
-    SoilMoisture       soilMoisture[VP2Constants::MAX_SOIL_MOISTURES];
-    bool               soilMoistureValid[VP2Constants::MAX_SOIL_MOISTURES];
-
-    LeafWetness        leafWetness[VP2Constants::MAX_LEAF_WETNESSES];
-    bool               leafWetnessValid[VP2Constants::MAX_LEAF_WETNESSES];
-
-    Temperature        leafTemperature[VP2Constants::MAX_LEAF_TEMPERATURES];
-    bool               leafTemperatureValid[VP2Constants::MAX_LEAF_TEMPERATURES];
-
-    Temperature        soilTemperature[VP2Constants::MAX_SOIL_TEMPERATURES];
-    bool               soilTemperatureValid[VP2Constants::MAX_SOIL_TEMPERATURES];
-
-    Measurement<Temperature> extraTemperature[VP2Constants::MAX_EXTRA_TEMPERATURES];
-
-    //Temperature        temperatureExtra[VP2Constants::MAX_EXTRA_TEMPERATURES];
-    //bool               temperatureExtraValid[VP2Constants::MAX_EXTRA_TEMPERATURES];
-
-    Humidity           humidityExtra[VP2Constants::MAX_EXTRA_HUMIDITIES];
-    bool               humidityExtraValid[VP2Constants::MAX_EXTRA_HUMIDITIES];
 };
 }
 #endif

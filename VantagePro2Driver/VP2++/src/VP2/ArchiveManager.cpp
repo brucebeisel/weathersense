@@ -26,6 +26,8 @@ using namespace std;
 
 namespace vp2 {
 
+static constexpr int SYNC_RETRIES = 5;
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 ArchiveManager::ArchiveManager(const std::string & archiveFilename, VantagePro2Station & station) :
@@ -48,7 +50,7 @@ ArchiveManager::synchronizeArchive() {
     vector<ArchivePacket> list;
     bool result = false;
 
-    for (int i = 0; i < 5 && !result; i++) {
+    for (int i = 0; i < SYNC_RETRIES && !result; i++) {
         list.clear();
         if (station.wakeupStation() && station.dumpAfter(newestPacketTime, list)) {
             addPackets(list);

@@ -38,28 +38,28 @@ Loop2Packet::~Loop2Packet() {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Speed
+const Measurement<Speed> &
 Loop2Packet::getWindGust10Minute() const {
     return windGust10Minute;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Heading
+const Measurement<Heading> &
 Loop2Packet::getWindGustHeading10Minute() const {
     return windGustHeading10Minute;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Speed
+const Measurement<Speed> &
 Loop2Packet::getWindSpeed2MinuteAvg() const {
     return windSpeed2MinuteAvg;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Speed
+const Measurement<Speed> &
 Loop2Packet::getWindSpeed10MinuteAvg() const {
     return windSpeed10MinuteAvg;
 }
@@ -87,42 +87,35 @@ Loop2Packet::getRain24Hour() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Temperature
+const Measurement<Temperature> &
 Loop2Packet::getDewPoint() const {
     return dewPoint;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Temperature
+const Measurement<Temperature> &
 Loop2Packet::getHeatIndex() const {
     return heatIndex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Temperature
+const Measurement<Temperature> &
 Loop2Packet::getWindChill() const {
     return windChill;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Temperature
+const Measurement<Temperature> &
 Loop2Packet::getThsw() const {
     return thsw;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-bool
-Loop2Packet::isThswValid() const {
-    return thswValid;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-Pressure
+const Measurement<Pressure> &
 Loop2Packet::getAtmPressure() const {
     return atmPressure;
 }
@@ -159,38 +152,21 @@ Loop2Packet::decodeLoop2Packet(const byte buffer[]) {
     }
 
 
-    bool valid;
-    windSpeed10MinuteAvg = VP2Decoder::decodeAvgWindSpeed(buffer, 18, valid);
-    windSpeed2MinuteAvg = VP2Decoder::decodeAvgWindSpeed(buffer, 20, valid);
-    windGust10Minute = VP2Decoder::decode16BitWindSpeed(buffer, 22, valid);
-    windGustHeading10Minute = VP2Decoder::decodeWindDirection(buffer, 24, valid);
+    windSpeed10MinuteAvg = VP2Decoder::decodeAvgWindSpeed(buffer, 18);
+    windSpeed2MinuteAvg = VP2Decoder::decodeAvgWindSpeed(buffer, 20);
+    windGust10Minute = VP2Decoder::decode16BitWindSpeed(buffer, 22);
+    windGustHeading10Minute = VP2Decoder::decodeWindDirection(buffer, 24);
 
     rain15Minute = VP2Decoder::decodeRain(buffer, 52);
     rainHour = VP2Decoder::decodeRain(buffer, 54);
     rain24Hour = VP2Decoder::decodeRain(buffer, 58);
 
-    dewPoint = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 30, valid);
-    heatIndex = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 35, valid);
-    windChill = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 37, valid);
-    thsw = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 39, valid);
+    VP2Decoder::decodeNonScaled16BitTemperature(buffer, 30, dewPoint);
+    VP2Decoder::decodeNonScaled16BitTemperature(buffer, 35, heatIndex);
+    VP2Decoder::decodeNonScaled16BitTemperature(buffer, 37, windChill);
+    VP2Decoder::decodeNonScaled16BitTemperature(buffer, 39, thsw);
 
-    atmPressure = VP2Decoder::decodeBarometricPressure(buffer, 65, valid);
-
-    //windGust10Minute = UnitConverter::toMetersPerSecond(static_cast<Speed>(BitConverter::toInt16(buffer, 22)));
-    //windGustHeading10Minute = static_cast<Heading>(BitConverter::toInt16(buffer, 24));
-    //if (windGustHeading10Minute == 360)
-    //    windGustHeading10Minute = 0;
-    //windSpeed2MinuteAvg = UnitConverter::toMetersPerSecond((Speed)BitConverter::toInt16(buffer, 20) / 10.0F);
-    //rain15Minute = UnitConverter::toMillimeter((Rainfall)BitConverter::toInt16(buffer, 52) * rainfallIncrement);
-    //rainHour = UnitConverter::toMillimeter((Rainfall)BitConverter::toInt16(buffer, 54) * rainfallIncrement);
-    //rain24Hour = UnitConverter::toMillimeter((Rainfall)BitConverter::toInt16(buffer, 58) * rainfallIncrement);
-    //atmPressure = (Pressure)BitConverter::toInt16(buffer, 65) / 1000.0F;
-    //dewPoint = UnitConverter::toCelsius(BitConverter::toInt16(buffer, 30));
-    //heatIndex = UnitConverter::toCelsius(BitConverter::toInt16(buffer, 35));
-    //windChill = UnitConverter::toCelsius(BitConverter::toInt16(buffer, 37));
-    //int thswRaw = BitConverter::toInt16(buffer, 37);
-    //thswValid = thswRaw != 32767;
-    //thsw = UnitConverter::toCelsius(thswRaw);
+    VP2Decoder::decodeBarometricPressure(buffer, 65, atmPressure);
 
     return true;
 }

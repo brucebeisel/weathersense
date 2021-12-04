@@ -21,6 +21,7 @@
 #include <vector>
 #include "VP2Logger.h"
 #include "ArchivePacket.h"
+#include "CurrentWeather.h"
 #include "LoopPacket.h"
 #include "Loop2Packet.h"
 #include "WindDirectionSlices.h"
@@ -30,7 +31,6 @@
 #include "SerialPort.h"
 
 namespace vp2 {
-class CurrentWeather;
 class HiLowPacket;
 
 class StationConfiguration {
@@ -46,15 +46,15 @@ private:
     bool                       useTimezone;
     std::vector<SensorStation> sensorStations;
     int                        retransmitId;                 // 0 = no retransmission
-
     Rainfall                   rainCollectorSize;
     int                        archivePeriod;
-    bool                       north;
-    bool                       east;
-    std::string                firmwareDate;
-    std::string                firmwareVersion;
-    VP2Logger                  log;
 };
+
+    //bool                       north;
+    //bool                       east;
+    //std::string                firmwareDate;
+    //std::string                firmwareVersion;
+    //VP2Logger                  log;
 
 /**
  * Class that handles the command protocols with the VP2 console.
@@ -66,9 +66,10 @@ public:
      */
     class Callback {
     public:
+        virtual ~Callback() {}
         virtual bool processCurrentWeather(const CurrentWeather & cw) = 0;
-        //virtual bool processArchivePage(const std::vector<ArchivePacket> & page) = 0;
     };
+    static const int MAX_STATION_RECEPTION = 100;
 
     /**
      * Constructor.
@@ -128,11 +129,15 @@ public:
 
     bool performReceiveTest();
 
-    bool retrieveReceiverList();
+    /**
+     * Retrieve the list of receivers the console can hear. Note that this is not the set of stations that the console is
+     * reading from. There can be other sensor stations in the area that do not belong to this Vantage station.
+     */
+    bool retrieveReceiverList(std::vector<StationId> * sensorStations);
 
-    bool retrieveFirmwareVersion();
+    bool retrieveFirmwareVersion(std::string * firmwareVersion);
 
-    bool retrieveFirmwareDate();
+    bool retrieveFirmwareDate(std::string * firmwareDate);
 
     /////////////////////////////////////////////////////////////////////////////////
     // Current Data Commands
@@ -200,7 +205,6 @@ public:
     /////////////////////////////////////////////////////////////////////////////////
     bool updateBaudRate(int rate);
     
-
     /**
      * Update the console's time.
      * 
@@ -215,7 +219,6 @@ public:
      * @return True if the time was retrieved successfully
      */
     bool retrieveConsoleTime(DateTime &stationTime);
-
 
     /**
      * Update the archive period to one of the allowed intervals.
@@ -251,10 +254,15 @@ public:
     // End of console commands
     //
 
-    //
+    /////////////////////////////////////////////////////////////////////////////////
     // EEPROM commands
-    //
+    /////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Read the entire EEPROM data block.
+     *
+     * @return True if the read was successful
+     */
     bool eepromReadDataBlock();
 
     /**
@@ -283,38 +291,6 @@ public:
     //
 
     /**
-     * Retrieve the state of the manual setting for daylight savings time.
-     * If the DST mode is automatic, this entry is not used.
-     *
-     * @return True if successful
-     */
-    //bool retrieveDaylightSavingsState();
-
-    //bool retrieveGMTOffset();
-
-    /**
-     * Retrieve whether the time zone offset is set by GMT offset or specifying a time zone.
-     *
-     * @return True if successful
-     */
-    //bool retrieveTimeZoneMode();
-
-    //bool retrieveTransmitterListenBits();
-
-    //bool retrieveRetransmitID();
-
-    //bool retrieveStationList();
-
-    //bool retrieveUnits();
-
-    //bool retrieveSetupBits();
-
-    //bool retrieveRainSeasonStart();
-    //bool retrieveArchivePeriod();
-    //bool retrieveAlarmThresholds();
-
-
-    /**
      * Get the archive period (in minutes).
      * 
      * @return The archive period
@@ -331,6 +307,7 @@ public:
     bool getISSLocation(double & issLatitude, double & issLongitude, int & issElevation);
 
     bool areWindCupsLarge() const;
+
     bool getDaylightSavingsTimeMode();
 
     /**
@@ -355,6 +332,8 @@ public:
 
     int calculateISSReception(int loopPacketWindSamples) const;
 
+    const CurrentWeather & getCurrentWeather() const;
+
 
 private:
     static constexpr int WAKEUP_TRIES = 5;               // The number of times to try to wake up the console before performing a disconnect/reconnect cycle
@@ -371,6 +350,7 @@ private:
     static constexpr int TIME_LENGTH = 4;
     static constexpr int SET_TIME_LENGTH = 6;
     static constexpr int LOOP_PACKET_WAIT = 2000;
+    static constexpr int WAKEUP_WAIT = 1000;
     static constexpr int VP2_YEAR_OFFSET = 2000;
     static constexpr int HILOW_PACKET_SIZE = 436;
     static constexpr int NO_VALUE = 0xFF;
@@ -378,6 +358,24 @@ private:
     static constexpr int EEPROM_NON_GRAPH_DATA_SIZE = 176;
 
     static constexpr int ALARM_THRESHOLDS_SIZE = 94; 
+    static constexpr int MAX_STATION_ID = 8;
+    static constexpr int STATION_DATA_SIZE = 16;
+
+    static constexpr int COMMAND_RETRIES = 5;
+    static constexpr int ARCHIVE_PAGE_READ_RETRIES = 3;
+    static constexpr int BUFFER_SIZE = 512;
+
+    static constexpr double LAT_LON_SCALE = 10.0;
+
+    enum RainCupSizeType {
+        POINT_01_INCH = 0,
+        POINT_02_MM = 1,
+        POINT_01_MM = 2
+    };
+
+    static constexpr Rainfall POINT_01_INCH_SIZE = 0.1;        // Inches
+    static constexpr Rainfall POINT_02_MM_SIZE   = 0.2 / 25.4; // Inches
+    static constexpr Rainfall POINT_01_MM_SIZE   = 0.1 / 25.4; // Inches
 
 
     /**
@@ -429,17 +427,40 @@ private:
      */
     bool readLoop2Packet(Loop2Packet & loop2Packet);
 
-    void        decodeArchivePage(std::vector<ArchivePacket> &, const byte * buffer, int firstRecord, DateTime newestPacketTime);
+    /**
+     * Read the next archive page that is part of the one of the dump commands.
+     *
+     * @param packets          The vector into which the processed archive packets will be returned
+     * @param firstRecord      The first record to process, which may not be zero if this is the first page that is being dumped
+     * @param newestPacketTime The newest packet used to detect if the page contains the end of the ring buffer
+     *
+     * @return True if the page was read successfully
+     */
+    bool readNextArchivePage(std::vector<ArchivePacket> & packets, int firstRecord, DateTime newestPacketTime);
 
-    bool        processArchivePage(std::vector<ArchivePacket> &, int firstRecord, DateTime newestPacketTime);
+    /**
+     * Decode an archive page that contains up to 5 packets.
+     *
+     * @param packets          The vector into which the processed archive packets will be returned
+     * @param firstRecord      The first record to process, which may not be zero if this is the first page that is being dumped
+     * @param newestPacketTime The newest packet used to detect if the page contains the end of the ring buffer
+     */
+    void decodeArchivePage(std::vector<ArchivePacket> &, const byte * buffer, int firstRecord, DateTime newestPacketTime);
 
-    bool        archivePacketContainsData(const byte * buffer, int offset);
+    /**
+     * Checks if an archive packet contains data.
+     *
+     * @param buffer The buffer containing the packet
+     * @param offset The offset within the buffer where the packet starts
+     *
+     * @return True if the packet contains data
+     */
+    bool archivePacketContainsData(const byte * buffer, int offset);
 
 
 public:
-    bool        retrieveSensorStationInfo();
+    bool retrieveSensorStationInfo();
 private:
-
 
     /**
      * Send the command to retrieve a string value.
@@ -450,26 +471,30 @@ private:
      */
     bool sendStringValueCommand(const std::string & command, std::string & results);
 
+    /**
+     * Read the portion of the EEPROM that does not contain the graph data.
+     *
+     * @return True if the EEPROM was read successfully
+     */
     bool readNonGraphEepromData();
 
 
+    Callback *                 callback;
     SerialPort                 serialPort;
-    std::string                portName;
     int                        baudRate;
-    byte                       buffer[512];
+    byte                       buffer[BUFFER_SIZE];
     byte                       eepromBuffer[EEPROM_DATA_BLOCK_SIZE + CRC_BYTES];
     byte                       eepromNonGraphData[EEPROM_NON_GRAPH_DATA_SIZE + CRC_BYTES];
+    byte                       alarmThresholds[ALARM_THRESHOLDS_SIZE];
     WindDirectionSlices        pastWindDirs;
-    Speed                      windGust10Minute;
-    Heading                    windGustDirection10Minute;
-    Callback *                 callback;
-    std::vector<SensorStation> sensorStations;
-    std::vector<Sensor>        sensors;
+    CurrentWeather             currentWeather;
     float                      consoleBatteryVoltage;
     bool                       firstLoopPacket;
     std::string                firmwareDate;
     std::string                firmwareVersion;
-    byte                       alarmThresholds[ALARM_THRESHOLDS_SIZE];
+    std::vector<SensorStation> sensorStations;
+    std::vector<Sensor>        sensors;
+    std::vector<StationId>     stationIds;
     VP2Logger                  log;
 };
 }

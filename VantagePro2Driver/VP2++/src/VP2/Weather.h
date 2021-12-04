@@ -37,6 +37,10 @@ using Heading = float;
 using byte = char;
 using DateTime = time_t;
 using Evapotranspiration = double;
+using StationId = unsigned;
+
+const int SECONDS_PER_HOUR = 3600;
+const int TIME_STRUCT_YEAR_OFFSET = 1900;
 
 /**
  * Utility container class for various functions.

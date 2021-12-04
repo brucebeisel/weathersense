@@ -37,9 +37,8 @@ namespace vp2 {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-VantagePro2Driver::VantagePro2Driver(ArchiveManager & archiveManager, WeatherSenseSocket & socket, CurrentWeatherPublisher & cwp, VantagePro2Station & station) :
+VantagePro2Driver::VantagePro2Driver(ArchiveManager & archiveManager, CurrentWeatherPublisher & cwp, VantagePro2Station & station) :
                                                                 station(station),
-                                                                socket(socket),
                                                                 currentWeatherPublisher(cwp),
                                                                 archiveManager(archiveManager),
                                                                 exitLoop(false),
@@ -55,7 +54,7 @@ VantagePro2Driver::VantagePro2Driver(ArchiveManager & archiveManager, WeatherSen
     // has not had a chance to synchronize its time with the Internet. This is most important with
     // computers like the Raspberry Pi.
     //
-    consoleTimeSetTime = time(0) - TIME_SET_INTERVAL + (1 * 3600);
+    consoleTimeSetTime = time(0) - TIME_SET_INTERVAL + (1 * SECONDS_PER_HOUR);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -65,41 +64,15 @@ VantagePro2Driver::~VantagePro2Driver() {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-void
-VantagePro2Driver::connected(DateTime newestArchiveTimeFromCollector) {
-    //
-    // This method needs to be removed as the RESTful interface requires each command to be stateless.
-    // If the client wants the data sent below, then it must send a request.
-    //
-/*
-    log.log(VP2Logger::VP2_DEBUG1) << "Connected with collector. Archive time = " << Weather::formatDateTime(newestArchiveTimeFromCollector) << endl;
-    //archiveManager.setNewestRecordTime(newestArchiveTimeFromCollector);
-    lastArchivePacketTime = newestArchiveTimeFromCollector;
-    nextRecord = -1;
-    string sensorMessage = Sensor::formatMessage(station.getSensors());
-    socket.sendData(sensorMessage);
-
-    string parametersMessage = parameters.formatMessage();
-    socket.sendData(parametersMessage);
-
-    const vector<SensorStation> & sensorStations = station.getSensorStations();
-    string message = SensorStation::formatSensorStationMessage(sensorStations);
-    socket.sendData(message);
-*/
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 int
 VantagePro2Driver::initialize() {
     log.log(VP2Logger::VP2_INFO) << "Initializing..." << endl;
 
-    socket.setHistoricalReader(*this);
     station.setCallback(*this);
 
     if (!station.openStation()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to open weather station" << endl;
-        return 1;
+        return OPEN_STATION_FAILURE;
     }
     else {
         log.log(VP2Logger::VP2_INFO) << "Port is open" << endl;
@@ -107,68 +80,39 @@ VantagePro2Driver::initialize() {
 
     if (!station.wakeupStation()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to wake up weather station" << endl;
-        return 2;
+        return WAKEUP_STATION_FAILURE;
     }
     else {
         log.log(VP2Logger::VP2_INFO) << "Weather Station is awake" << endl;
     }
 
-    //
-    // Get the information from the console that we will need for future calculations
-    //
-/*
-    if (!station.retrieveRainCollectorSize()) {
-        log.log(VP2Logger::VP2_ERROR) << "Failed to retrieve rain collector size" << endl;
-        return 3;
-    }
-
-    VP2Decoder::setRainCollectorSize(station.getRainCollectorSize());
-
-    if (!station.retrieveArchivePeriod()) {
-        log.log(VP2Logger::VP2_ERROR) << "Failed to retrieve archive period" << endl;
-        return 4;
-    }
-*/
-
-    if (!station.retrieveSensorStationInfo()) {
-        log.log(VP2Logger::VP2_ERROR) << "Failed to retrieve sensor station information" << endl;
-        return 5;
-    }
-
-/*
-    if (!station.getParameters(parameters)) {
-        log.log(VP2Logger::VP2_ERROR) << "Failed to retrieve weather station parameters" << endl;
-        return 6;
-    }
-*/
-
     if (!station.retrieveConfigurationParameters()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to retrieve configuration parameters" << endl;
-        return 6;
+        return CONFIGURATION_RETRIEVAL_FAILURE;
     }
 
     //
     // Get one current weather record so that the sensors are detected
     //
-    for (int i = 0; i < 5 && !receivedFirstLoopPacket; i++) {
+    for (int i = 0; i < INITIAL_LOOP_PACKET_RETRIES && !receivedFirstLoopPacket; i++) {
         station.currentValuesLoop(1);
     }
 
     if (!receivedFirstLoopPacket) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to receive a LOOP packet needed to determine current sensor suite" << endl;
-        return 7;
+        return INITIAL_LOOP_PACKET_RECEIVE_FAILURE;
     }
 
     if (!archiveManager.synchronizeArchive()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to read the archive during initialization" << endl;
-        return 8;
+        return SYNCHRONIZE_ARCHIVE_FAILURE;
     }
 
     AlarmManager::getInstance().initialize();
 
     if (!station.wakeupStation()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to wake up console after initialization" << endl;
-        return 9;
+        return POST_INIT_WAKEUP_FAILURE;
     }
 
     log.log(VP2Logger::VP2_INFO) << "Initialization complete." << endl;
@@ -182,7 +126,6 @@ void
 VantagePro2Driver::stop() {
     exitLoop = true;
     station.closeStation();
-    socket.disconnectSocket();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -211,7 +154,7 @@ VantagePro2Driver::processArchive(const vector<ArchivePacket> & archive) {
     for (vector<ArchivePacket>::const_iterator it = archive.begin(); it != archive.end(); ++it) {
         DateTime now = time(0);
         DateTime age = now - it->getDateTime();
-        if (age < 3600) {
+        if (age < SECONDS_PER_HOUR) {
             int maxPackets = static_cast<int>(((static_cast<float>(station.getArchivePeriod()) * 60.0F) / ((41.0F + 1.0F - 1.0F) / 16.0F)));
             int actualPackets = it->getWindSampleCount();
             int issReception = (actualPackets * 100) / maxPackets;
@@ -310,6 +253,9 @@ VantagePro2Driver::mainLoop() {
             //
             station.currentValuesLoop(LOOP_PACKET_CYCLES);
 
+            //
+            // If an asynchronous signal was caught, then exit the loop
+            //
             if (signalCaught) {
                 exitLoop = true;
                 continue;
@@ -336,12 +282,3 @@ VantagePro2Driver::mainLoop() {
     }
 }
 }
-/*
-                    if (lastArchivePacketTime != 0) {
-                        do {
-                            lastArchivePacketTime = archiveManager.getArchiveRecordsAfter(lastArchivePacketTime, list);
-                            if (!processArchive(list))
-                                break;
-                        } while (list.size() > 0);
-                    }
-*/

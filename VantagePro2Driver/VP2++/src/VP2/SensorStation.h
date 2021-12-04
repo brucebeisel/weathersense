@@ -41,7 +41,8 @@ public:
         LEAF = 6,
         SOIL = 7,
         SOIL_LEAF = 8,
-        NO_STATION = 10
+        NO_STATION = 10,
+        UNKNOWN = 99       // The sensor station has been heard, but not identified
     };
 
     /**
@@ -49,7 +50,8 @@ public:
      * 
      * @param type The type of sensor station
      * @param sensorIndex The index of the station as reported by the console, these are usually determined by
-     *                    DIP switches within the hardware.
+     *                    DIP switches within the hardware. Note that sensor stations may be heard, but are not
+     *                    part of this Vantage network.
      */
     SensorStation(SensorStationType type, int sensorIndex);
 

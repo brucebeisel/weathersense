@@ -97,7 +97,7 @@ public:
      *
      * @return The value of the measurement that is assumed to be in a valid range
      */
-    operator T() {
+    operator T() const {
         return value;
     }
 
@@ -117,7 +117,7 @@ public:
      * @param element The XML element name to be used
      * @return An XML element with the element name provided and the value OR a blank string if the measurement is not valid
      */
-    std::string formatXML(const std::string & element) {
+    std::string formatXML(const std::string & element) const {
         std::ostringstream ss;
         if (valid) 
             ss << "<" << element << ">" << value << "</" << element << ">";
@@ -131,12 +131,19 @@ public:
      * @param element The JSON element name to be used
      * @return An JSON element with the element name provided and the value OR a blank string if the measurement is not valid
      */
-    std::string formatJSON(const std::string & element) {
+    std::string formatJSON(const std::string & element) const {
         std::ostringstream ss;
         if (valid) 
             ss << '"' << element << "\" : " << value;
 
         return ss.str();
+    }
+
+    std::ostream & operator<<(std::ostream & os) const {
+        if (valid)
+            os << value;
+
+        return os;
     }
             
 private:

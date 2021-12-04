@@ -30,6 +30,12 @@ public:
     Api(VantagePro2Station & station);
 
     /**
+     * Request the list of sensor stations that the console can hear.
+     * This data should be requested the first time the software starts.
+     */
+    void requestSensorStationIds();
+
+    /**
      * Request the current weather, that will be sent in the response.
      */
     void requestCurrentWeather();
@@ -46,6 +52,12 @@ public:
      * the sensor stations and sensors that the console is monitoring.
      */
     void requestConfigurationInformation();
+
+    /**
+     * Update the configuration information. This will include a number of parameters, such as wind cup size, and
+     * the sensor stations and sensors that the console is monitoring.
+     */
+    void updateConfigurationInformation();
 
     /**
      * Request the current status of the sensor stations. This will include whether the sensor is currently online, 

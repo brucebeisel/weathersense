@@ -18,6 +18,9 @@
 
 namespace vp2 {
 
+static constexpr int ONE_BYTE_MASK = 0xFF;
+static constexpr int BITS_PER_BYTE = 8;
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 BitConverter::BitConverter() {
@@ -32,7 +35,7 @@ BitConverter::~BitConverter() {
 ////////////////////////////////////////////////////////////////////////////////
 int
 BitConverter::toInt8(const byte buffer[], int index) {
-    return static_cast<int>(buffer[index]) & 0xFF;
+    return static_cast<int>(buffer[index]) & ONE_BYTE_MASK;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +63,7 @@ BitConverter::getBytes(int value, byte buffer[], int index, int nbytes, bool lit
         else
             bufferIndex = index + (nbytes - 1 - i);
 
-        buffer[bufferIndex] = (value >> (8 * i)) & 0xFF;
+        buffer[bufferIndex] = (value >> (BITS_PER_BYTE * i)) & ONE_BYTE_MASK;
     }
 
 }
@@ -73,12 +76,12 @@ BitConverter::bitsToInt(const byte * bits, bool littleEndian) {
     int result = 0;
     if (littleEndian) {
         for (int n = sizeof(T) - 1; n >= 0; n--) {
-            result = (result << 8) + (static_cast<int>(bits[n]) & 0xFF);
+            result = (result << BITS_PER_BYTE) + (static_cast<int>(bits[n]) & ONE_BYTE_MASK);
         }
     }
     else {
         for (int n = 0; n < sizeof(T); n++)
-            result = (result << 8) + (static_cast<int>(bits[n]) & 0xFF);
+            result = (result << BITS_PER_BYTE) + (static_cast<int>(bits[n]) & ONE_BYTE_MASK);
     }
 
     return result;

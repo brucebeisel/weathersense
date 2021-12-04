@@ -54,14 +54,14 @@ Sensor::detectSensors(LoopPacket loop, vector<Sensor> & sensors) {
     sensors.push_back(Sensor(ANEMOMETER, WIND_SENSOR_ID));
     sensors.push_back(Sensor(RAIN_COLLECTOR, RAIN_COLLECTOR_SENSOR_ID));
 
-    if (loop.isUvIndexValid())
+    if (loop.getUvIndex().isValid())
         sensors.push_back(Sensor(ULTRAVIOLET, UV_SENSOR_ID));
 
-    if (loop.isSolarRadiationValid())
+    if (loop.getSolarRadiation().isValid())
         sensors.push_back(Sensor(SOLAR_RADIATION, SOLAR_RADIATION_SENSOR_ID));
 
     for (int i = 0; i < VP2Constants::MAX_EXTRA_HUMIDITIES; i++) {
-        if (loop.isExtraHumidityValid(i))
+        if (loop.getExtraHumidity(i).isValid())
             sensors.push_back(Sensor(HYGROMETER, HYGROMETER_BASE_SENSOR_ID + i));
     }
 
@@ -71,22 +71,22 @@ Sensor::detectSensors(LoopPacket loop, vector<Sensor> & sensors) {
     }
 
     for (int i = 0; i < VP2Constants::MAX_LEAF_WETNESSES; i++) {
-        if (loop.isLeafWetnessValid(i))
+        if (loop.getLeafWetness(i).isValid())
             sensors.push_back(Sensor(LEAF_WETNESS, LEAF_WETNESS_BASE_SENSOR_ID + i));
     }
 
     for (int i = 0; i < VP2Constants::MAX_SOIL_MOISTURES; i++) {
-        if (loop.isSoilMoistureValid(i))
+        if (loop.getSoilMoisture(i).isValid())
             sensors.push_back(Sensor(SOIL_MOISTURE, SOIL_MOISTURE_BASE_SENSOR_ID + i));
     }
 
     for (int i = 0; i < VP2Constants::MAX_SOIL_TEMPERATURES; i++) {
-        if (loop.isSoilTemperatureValid(i))
+        if (loop.getSoilTemperature(i).isValid())
             sensors.push_back(Sensor(SOIL_TEMPERATURE, SOIL_TEMPERATURE_BASE_SENSOR_ID + i));
     }
 
     for (int i = 0; i < VP2Constants::MAX_LEAF_TEMPERATURES; i++) {
-        if (loop.isLeafTemperatureValid(i))
+        if (loop.getLeafTemperature(i).isValid())
             sensors.push_back(Sensor(LEAF_TEMPERATURE, LEAF_TEMPERATURE_BASE_SENSOR_ID + i));
     }
 }

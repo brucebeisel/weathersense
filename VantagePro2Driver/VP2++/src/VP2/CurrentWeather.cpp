@@ -26,13 +26,27 @@ namespace vp2 {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-CurrentWeather::CurrentWeather(const LoopPacket & loopPacket, const Loop2Packet & loop2Packet, WindDirectionSlices  & pastWindDirs) :
-        loopPacket(loopPacket), loop2Packet(loop2Packet), pastWindDirs(pastWindDirs){
+CurrentWeather::CurrentWeather() {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+CurrentWeather::CurrentWeather(const LoopPacket & loopPacket, const Loop2Packet & loop2Packet, const WindDirectionSlices  & pastWindDirs) :
+        loopPacket(loopPacket), loop2Packet(loop2Packet), pastWindDirs(pastWindDirs) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 CurrentWeather::~CurrentWeather() {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void
+CurrentWeather::setData(const LoopPacket & loopPacket, const Loop2Packet & loop2Packet, const WindDirectionSlices  & pastWindDirs) {
+    this->loopPacket = loopPacket;
+    this->loop2Packet = loop2Packet;
+    this->pastWindDirs = pastWindDirs;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -50,16 +64,14 @@ CurrentWeather::formatMessage() const {
     ss << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
        << "<currentWeather>"
        << "<time>" << Weather::formatDateTime(time(0)) << "</time>"
-       << "<indoorTemperature>" << loopPacket.getInsideTemperature() << "</indoorTemperature>"
-       << "<indoorHumidity>" << loopPacket.getInsideHumidity() << "</indoorHumidity>"
+       << loopPacket.getInsideTemperature().formatXML("indoorTemperature")
+       << loopPacket.getInsideHumidity().formatXML("indoorHumidity")
        << loopPacket.getOutsideTemperature().formatXML("outdoorTemperature")
-       << "<outdoorHumidity>" << loopPacket.getOutsideHumidity() << "</outdoorHumidity>"
-       << "<dewPoint>" << loop2Packet.getDewPoint() << "</dewPoint>"
-       << "<windChill>" << loop2Packet.getWindChill() << "</windChill>"
-       << "<heatIndex>" << loop2Packet.getHeatIndex() << "</heatIndex>";
-
-    if (loop2Packet.isThswValid())
-       ss << "<thsw>" << loop2Packet.getThsw() << "</thsw>";
+       << loopPacket.getOutsideHumidity().formatXML("outdoorHumidity")
+       << loop2Packet.getDewPoint().formatXML("dewPoint")
+       << loop2Packet.getWindChill().formatXML("windChill")
+       << loop2Packet.getHeatIndex().formatXML("heatIndex")
+       << loop2Packet.getThsw().formatXML("thsw");
 
     ss << "<wind><speed>" << loopPacket.getWindSpeed() << "</speed><direction>" << loopPacket.getWindDirection() << "</direction></wind>"
        << "<windGust><speed>" << loop2Packet.getWindGust10Minute() << "</speed><direction>" << loop2Packet.getWindGustHeading10Minute() << "</direction></windGust>"
@@ -80,10 +92,8 @@ CurrentWeather::formatMessage() const {
        << "<rainHour>" << loop2Packet.getRainHour() << "</rainHour>"
        << "<rain24Hour>" << loop2Packet.getRain24Hour() << "</rain24Hour>"
        << "<rainMonth>" << loopPacket.getMonthRain() << "</rainMonth>" 
-       << "<rainWeatherYear>" << loopPacket.getYearRain() << "</rainWeatherYear>";
-    
-    if (loopPacket.isSolarRadiationValid())
-        ss << "<solarRadiation>" << loopPacket.getSolarRadiation() << "</solarRadiation>";
+       << "<rainWeatherYear>" << loopPacket.getYearRain() << "</rainWeatherYear>"
+       << loopPacket.getSolarRadiation().formatXML("solarRadiation");
 
     if (loopPacket.getDayET() > 0.0)
         ss << "<dayET>" << loopPacket.getDayET() << "</dayET>";
@@ -94,8 +104,7 @@ CurrentWeather::formatMessage() const {
     if (loopPacket.getYearET() > 0.0)
         ss << "<yearET>" << loopPacket.getYearET() << "</yearET>";
 
-    if (loopPacket.isUvIndexValid())
-        ss << "<uvIndex>" << loopPacket.getUvIndex() << "</uvIndex>";
+    ss << loopPacket.getUvIndex().formatXML("uvIndex");
 
     if (loopPacket.isStormOngoing())
         ss << "<stormStart>" << Weather::formatDate(loopPacket.getStormStart()) << "</stormStart><stormRain>" << loopPacket.getStormRain() << "</stormRain>";
@@ -103,27 +112,22 @@ CurrentWeather::formatMessage() const {
 
      ss << "<forecastRule>" << ForecastRule::forecastString(loopPacket.getForecastRule()) << "</forecastRule>"
         << "<forecast>" << loopPacket.getForecastIconString() << "</forecast>" 
-        << "<temperatureSensorEntries>";
+        << "<extraTemperatures>";
 
     for (int i = 0; i < VP2Constants::MAX_EXTRA_TEMPERATURES; i++) {
         if (loopPacket.getExtraTemperature(i).isValid()) {
-            ss << "<entry><key>" << 100 + i << "</key><value><sensorId>" << 100 + i << "</sensorId><sensorType>THERMOMETER</sensorType>"
-               << "<measurement xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"temperature\">"
-               << loopPacket.getExtraTemperature(i).getValue() << "</measurement></value></entry>";
+            ss << "<temperature><index>" << i << "</index><value>" << loopPacket.getExtraTemperature(i).getValue() << "</value></temperature>";
         }
     }
-    ss << "</temperatureSensorEntries>"
-       << "<humiditySensorEntries>";
+    ss << "</extraTemperatures>"
+       << "<extraHumidities>";
 
     for (int i = 0; i < VP2Constants::MAX_EXTRA_HUMIDITIES; i++) {
-        if (loopPacket.isExtraHumidityValid(i)) {
-            ss << "<entry><key>" << 200 + i << "</key><value><sensorId>" << 200 + i << "</sensorId><sensorType>HYGROMETER</sensorType>"
-               << "<measurement xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"humidity\">"
-               << loopPacket.getExtraHumidity(i) << "</measurement></value></entry>";
-        }
+        if (loopPacket.getExtraHumidity(i).isValid())
+            ss << "<humidity><index>" << i << "</index><value>" << loopPacket.getExtraHumidity(i).getValue() << "</value></humidity>";
     }
 
-    ss << "</humiditySensorEntries>"
+    ss << "</extraHumidities>"
        << "<soilMoistureSensorEntries>";
 
     /*

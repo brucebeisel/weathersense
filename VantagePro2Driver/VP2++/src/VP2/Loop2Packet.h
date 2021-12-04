@@ -45,36 +45,34 @@ public:
      */
     bool decodeLoop2Packet(const byte[]);
 
-    Speed       getWindGust10Minute() const;
-    Heading     getWindGustHeading10Minute() const;
-    Speed       getWindSpeed2MinuteAvg() const;
-    Speed       getWindSpeed10MinuteAvg() const;
-    Rainfall    getRainHour() const;
-    Rainfall    getRain15Minute() const;
-    Rainfall    getRain24Hour() const;
-    Temperature getDewPoint() const;
-    Temperature getHeatIndex() const;
-    Temperature getWindChill() const;
-    bool        isThswValid() const;
-    Temperature getThsw() const;
-    Pressure    getAtmPressure() const;
+    const Measurement<Speed> &       getWindGust10Minute() const;
+    const Measurement<Heading> &     getWindGustHeading10Minute() const;
+    const Measurement<Speed> &       getWindSpeed2MinuteAvg() const;
+    const Measurement<Speed> &       getWindSpeed10MinuteAvg() const;
+    Rainfall                         getRainHour() const;
+    Rainfall                         getRain15Minute() const;
+    Rainfall                         getRain24Hour() const;
+    const Measurement<Temperature> & getDewPoint() const;
+    const Measurement<Temperature> & getHeatIndex() const;
+    const Measurement<Temperature> & getWindChill() const;
+    const Measurement<Temperature> & getThsw() const;
+    const Measurement<Pressure> &    getAtmPressure() const;
 
 private:
     static const int LOOP2_PACKET_TYPE = 1;
 
-    Speed       windGust10Minute;
-    Heading     windGustHeading10Minute;
-    Speed       windSpeed2MinuteAvg;
-    Speed       windSpeed10MinuteAvg;
-    Rainfall    rain15Minute;
-    Rainfall    rainHour;
-    Rainfall    rain24Hour;
-    Temperature dewPoint;
-    Temperature heatIndex;
-    Temperature windChill;
-    Temperature thsw;
-    bool        thswValid;
-    Pressure    atmPressure;
+    Measurement<Speed>       windGust10Minute;
+    Measurement<Heading>     windGustHeading10Minute;
+    Measurement<Speed>       windSpeed2MinuteAvg;
+    Measurement<Speed>       windSpeed10MinuteAvg;
+    Rainfall                 rain15Minute;
+    Rainfall                 rainHour;
+    Rainfall                 rain24Hour;
+    Measurement<Temperature> dewPoint;
+    Measurement<Temperature> heatIndex;
+    Measurement<Temperature> windChill;
+    Measurement<Temperature> thsw;
+    Measurement<Pressure>    atmPressure;
     VP2Logger   log;
 };
 }

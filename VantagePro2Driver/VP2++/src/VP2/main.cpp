@@ -63,11 +63,10 @@ main(int argc, char *argv[]) {
     ofstream logStream(logFile.c_str(), ios::app | ios::ate | ios::out);
     //VP2Logger::setLogStream(logStream);
     VP2Logger::setLogLevel(VP2Logger::VP2_DEBUG3);
-    WeatherSenseSocket socket("127.0.0.1", 11461);
     CurrentWeatherPublisher cwPublisher;
     VantagePro2Station station(serialPortName, 19200);
     ArchiveManager archiveManager(archiveFile, station);
-    VantagePro2Driver driver(archiveManager, socket, cwPublisher, station);
+    VantagePro2Driver driver(archiveManager, cwPublisher, station);
 
     VP2Logger & log = VP2Logger::getLogger("VP2 Main");
 

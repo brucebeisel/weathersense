@@ -40,6 +40,7 @@ public:
      */
     class HistoricalReader {
     public:
+    	virtual ~HistoricalReader() {}
         virtual void connected(DateTime time) = 0;
     };
 
@@ -97,11 +98,11 @@ private:
      */
     void writeString(const std::string &);
 
-    std::string host;
-    unsigned short port;
-    int socketId;
+    std::string        host;
+    unsigned short     port;
+    int                socketId;
     HistoricalReader * reader;
-    VP2Logger logger;
+    VP2Logger          logger;
 };
 }
 

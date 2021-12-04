@@ -171,7 +171,7 @@ WeatherSenseSocket::connectSocket() {
 #else
             sscanf(buffer, "%4d%2d%2d %2d%2d", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min);
 #endif
-            tm.tm_year -= 1900;
+            tm.tm_year -= TIME_STRUCT_YEAR_OFFSET;
             tm.tm_mon--;
             tm.tm_sec = 0;
             DateTime time = mktime(&tm);

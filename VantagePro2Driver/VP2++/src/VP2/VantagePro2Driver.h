@@ -21,7 +21,6 @@
 #endif
 
 #include <string>
-#include "WeatherSenseSocket.h"
 #include "Weather.h"
 #include "ArchiveManager.h"
 #include "ParametersMessage.h"
@@ -36,17 +35,23 @@ class CurrentWeatherPublisher;
 /**
  * Class that coordinates the communications with the Vantage Pro 2 console.
  */
-class VantagePro2Driver : public WeatherSenseSocket::HistoricalReader, public VantagePro2Station::Callback {
+class VantagePro2Driver : public VantagePro2Station::Callback {
 public:
+    static constexpr int OPEN_STATION_FAILURE = 1;
+    static constexpr int WAKEUP_STATION_FAILURE = 2;
+    static constexpr int CONFIGURATION_RETRIEVAL_FAILURE = 3;
+    static constexpr int INITIAL_LOOP_PACKET_RECEIVE_FAILURE = 4;
+    static constexpr int SYNCHRONIZE_ARCHIVE_FAILURE = 5;
+    static constexpr int POST_INIT_WAKEUP_FAILURE = 6;
+
     /**
      * Constructor.
      * 
      * @param archiveManager The archive manager that will maintain the file containing the raw archive packets
-     * @param socket         The object that communicates with the WeatherSense collector
      * @param cwp            The publisher that will be called each time a current weather record has been received
      * @param station        The object that handles the command protocols with the VP2 console
      */
-    VantagePro2Driver(ArchiveManager & archiveManager, WeatherSenseSocket & socket, CurrentWeatherPublisher & cwp, VantagePro2Station & station);
+    VantagePro2Driver(ArchiveManager & archiveManager, CurrentWeatherPublisher & cwp, VantagePro2Station & station);
 
     /**
      * Destructor.
@@ -82,6 +87,8 @@ private:
      */
     static const int LOOP_PACKET_CYCLES = 12;
 
+    static const int INITIAL_LOOP_PACKET_RETRIES = 5;
+
     /**
      * How often to set the time on the console.
      */
@@ -95,28 +102,11 @@ private:
      */
     bool processCurrentWeather(const CurrentWeather & cw);
 
-    /**
-     * Process a page of archive packets, the VP2 archive page is up to 5 packets.
-     * 
-     * @param archive The collection of archive packets
-     * @return True if the archive packets were processed successfully
-     */
-    //bool processArchive(const std::vector<ArchivePacket> & archive);
-
-    /**
-     * Called when a connection is established with the WeatherSense collector.
-     * 
-     * @param newestArchiveTimeFromCollector The time of the collector reported as the latest in the database
-     */
-    void connected(DateTime newestArchiveTimeFromCollector);
-
     VantagePro2Station &      station;
-    WeatherSenseSocket &      socket;
     CurrentWeatherPublisher & currentWeatherPublisher;
     ArchiveManager &          archiveManager;
     bool                      exitLoop;
     bool                      receivedFirstLoopPacket;
-    int                       thread;
     int                       nextRecord;
     int                       previousNextRecord;
     DateTime                  lastArchivePacketTime;

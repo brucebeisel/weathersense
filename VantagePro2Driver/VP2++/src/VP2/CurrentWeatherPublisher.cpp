@@ -57,7 +57,7 @@ CurrentWeatherPublisher::sendCurrentWeather(const CurrentWeather & cw)
     std::string s = cw.formatMessage();
     const char * data = s.c_str();
     size_t length = strlen(data);
-    if (sendto(socketId, data, length, 0, (struct sockaddr *)&groupAddr, sizeof(groupAddr)) != length) {
+    if (sendto(socketId, data, length, 0, reinterpret_cast<struct sockaddr *>(&groupAddr), sizeof(groupAddr)) != length) {
         int e = errno;
         log.log(VP2Logger::VP2_WARNING) <<  "sendto() for current weather failed. Errno = " << e << endl;
     }
@@ -79,7 +79,7 @@ CurrentWeatherPublisher::getLocalIpAddress(struct sockaddr_in & saddr)
 
     while (tmp) {
         if (tmp->ifa_addr && tmp->ifa_addr->sa_family == AF_INET) {
-            struct sockaddr_in *pAddr = (struct sockaddr_in *)tmp->ifa_addr;
+            struct sockaddr_in *pAddr = reinterpret_cast<struct sockaddr_in *>(tmp->ifa_addr);
             if (strncmp(tmp->ifa_name, "lo", 2) != 0) {
                 printf("%s: %s\n", tmp->ifa_name, inet_ntoa(pAddr->sin_addr));
                 saddr = *pAddr;
@@ -106,7 +106,7 @@ CurrentWeatherPublisher::createSocket()
         return false;
     }
 
-    memset((char *)&groupAddr, 0, sizeof(groupAddr));
+    memset(reinterpret_cast<char *>(&groupAddr), 0, sizeof(groupAddr));
     groupAddr.sin_family = AF_INET;
     groupAddr.sin_addr.s_addr = inet_addr(MULTICAST_HOST.c_str());
     groupAddr.sin_port = htons(MULTICAST_PORT);
@@ -119,7 +119,7 @@ CurrentWeatherPublisher::createSocket()
         return false;
     }
 
-    if (setsockopt(socketId, IPPROTO_IP, IP_MULTICAST_IF, (char *)&saddr.sin_addr, sizeof(saddr.sin_addr)) < 0) {
+    if (setsockopt(socketId, IPPROTO_IP, IP_MULTICAST_IF, reinterpret_cast<char *>(&saddr.sin_addr), sizeof(saddr.sin_addr)) < 0) {
         int e = errno;
         log.log(VP2Logger::VP2_ERROR) <<  "setsockopt() for local interface failed. Errno = " << e << endl;
         close(socketId);
@@ -128,7 +128,7 @@ CurrentWeatherPublisher::createSocket()
     }
 
     unsigned char ttl = 2;
-    if (setsockopt(socketId, IPPROTO_IP, IP_MULTICAST_TTL, (char *)&ttl, sizeof(ttl)) < 0) {
+    if (setsockopt(socketId, IPPROTO_IP, IP_MULTICAST_TTL, reinterpret_cast<char *>(&ttl), sizeof(ttl)) < 0) {
         int e = errno;
         log.log(VP2Logger::VP2_ERROR) <<  "setsockopt() for TTL failed. Errno = " << e << endl;
         close(socketId);

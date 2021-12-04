@@ -17,13 +17,21 @@ public:
      *
      * @param buffer The buffer from which to decode the temperature
      * @param offset The offset into "buffer" from which to decode the temperature
-     * @param valid  Reference to a boolean that returns whether the temperature value is NOT the "dashed" value
      *
-     * @return The converted temperture or 0.0 if not valid
+     * @return The converted measurement value along with a valid flag
      */
-    static Temperature decode16BitTemperature(const byte buffer[], int offset, bool & valid);
+    static Measurement<Temperature> decode16BitTemperature(const byte buffer[], int offset);
 
-    static bool decode16BitTemperature(const byte buffer[], int offset, Measurement<Temperature> & measurement);
+    /**
+     * Decode a Vantage Pro 2 16 bit temperature.
+     *
+     * @param buffer      The buffer from which to decode the temperature
+     * @param offset      The offset into "buffer" from which to decode the temperature
+     * @param measurement The measurement object used to store the results of the decoding
+     *
+     * @return The converted measurement value along with a valid flag
+     */
+    static const Measurement<Temperature> & decode16BitTemperature(const byte buffer[], int offset, Measurement<Temperature> & measurement);
 
     /**
      * Decode a Vantage Pro 2 16 bit temperature that is not scaled.
@@ -34,31 +42,48 @@ public:
      *
      * @return The converted temperture or 0.0 if not valid
      */
-    static Temperature decodeNonScaled16BitTemperature(const byte buffer[], int offset, bool & valid);
+    static Measurement<Temperature> decodeNonScaled16BitTemperature(const byte buffer[], int offset);
+    static const Measurement<Temperature> & decodeNonScaled16BitTemperature(const byte buffer[], int offset, Measurement<Temperature> & measurement);
 
-    static Temperature decode8BitTemperature(const byte buffer[], int offset, bool &valid); 
+    static Measurement<Temperature> decode8BitTemperature(const byte buffer[], int offset);
+    static const Measurement<Temperature> & decode8BitTemperature(const byte buffer[], int offset, Measurement<Temperature> & measurement);
 
-    static bool decode8BitTemperature(const byte buffer[], int offset, Measurement<Temperature> & measurement);
 
-    static Humidity decodeHumidity(const byte buffer[], int offset, bool &valid);
+    static Measurement<Humidity> decodeHumidity(const byte buffer[], int offset);
+    static const Measurement<Humidity> & decodeHumidity(const byte buffer[], int offset, Measurement<Humidity> & measurement);
 
-    static Pressure decodeBarometricPressure(const byte buffer[], int offset, bool &valid);
+    static Measurement<Pressure> decodeBarometricPressure(const byte buffer[], int offset);
+    static const Measurement<Pressure> & decodeBarometricPressure(const byte buffer[], int offset, Measurement<Pressure> & measurement);
 
-    static UvIndex decodeUvIndex(const byte buffer[], int offset, bool &valid);
+    static Measurement<UvIndex> decodeUvIndex(const byte buffer[], int offset);
+    static const Measurement<UvIndex> & decodeUvIndex(const byte buffer[], int offset, Measurement<UvIndex> & measurement);
 
-    static Evapotranspiration decodeDayET(const byte buffer[], int offset, bool &valid);
-    static Evapotranspiration decodeMonthYearET(const byte buffer[], int offset, bool &valid);
+    static Measurement<Evapotranspiration> decodeDayET(const byte buffer[], int offset);
+    static const Measurement<Evapotranspiration> & decodeDayET(const byte buffer[], int offset, Measurement<Evapotranspiration> & measurement);
 
-    static SolarRadiation decodeSolarRadiation(const byte buffer[], int offset, bool &valid);
+    static Measurement<Evapotranspiration> decodeMonthYearET(const byte buffer[], int offset);
+    static const Measurement<Evapotranspiration> & decodeMonthYearET(const byte buffer[], int offset, Measurement<Evapotranspiration> & measurement);
 
-    static Speed decodeWindSpeed(const byte buffer[], int offset, bool &valid);
-    static Speed decode16BitWindSpeed(const byte buffer[], int offset, bool &valid);
-    static Speed decodeAvgWindSpeed(const byte buffer[], int offset, bool &valid);
+    static Measurement<SolarRadiation> decodeSolarRadiation(const byte buffer[], int offset);
+    static const Measurement<SolarRadiation> & decodeSolarRadiation(const byte buffer[], int offset, Measurement<SolarRadiation> & measurement);
 
-    static Heading decodeWindDirectionSlice(const byte buffer[], int offset, bool &valid);
-    static Heading decodeWindDirection(const byte buffer[], int offset, bool &valid);
+    static Measurement<Speed> decodeWindSpeed(const byte buffer[], int offset);
+    static const Measurement<Speed> & decodeWindSpeed(const byte buffer[], int offset, Measurement<Speed> & measurement);
+
+    static Measurement<Speed> decode16BitWindSpeed(const byte buffer[], int offset);
+    static const Measurement<Speed> & decode16BitWindSpeed(const byte buffer[], int offset, Measurement<Speed> & measurement);
+
+    static Measurement<Speed> decodeAvgWindSpeed(const byte buffer[], int offset);
+    static const Measurement<Speed> & decodeAvgWindSpeed(const byte buffer[], int offset, Measurement<Speed> & measurement);
+
+    static Measurement<Heading> decodeWindDirectionSlice(const byte buffer[], int offset);
+    static const Measurement<Heading> & decodeWindDirectionSlice(const byte buffer[], int offset, Measurement<Heading> & measurement);
+
+    static Measurement<Heading> decodeWindDirection(const byte buffer[], int offset);
+    static const Measurement<Heading> & decodeWindDirection(const byte buffer[], int offset, Measurement<Heading> & measurement);
 
     static Rainfall decodeStormRain(const byte buffer[], int offset);
+
     static void setRainCollectorSize(Rainfall collectorSize);
     static Rainfall decodeRain(const byte buffer[], int offset);
 
@@ -66,8 +91,11 @@ public:
 
     static float decodeConsoleBatteryVoltage(const byte buffer[], int offset);
 
-    static LeafWetness decodeLeafWetness(const byte buffer[], int offset, bool &valid);
-    static SoilMoisture decodeSoilMoisture(const byte buffer[], int offset, bool &valid);
+    static Measurement<LeafWetness> decodeLeafWetness(const byte buffer[], int offset);
+    static const Measurement<LeafWetness> & decodeLeafWetness(const byte buffer[], int offset, Measurement<LeafWetness> & measurement);
+
+    static Measurement<SoilMoisture> decodeSoilMoisture(const byte buffer[], int offset);
+    static const Measurement<SoilMoisture> & decodeSoilMoisture(const byte buffer[], int offset, Measurement<SoilMoisture> & measurement);
     
 
     static DateTime decodeTime(const byte buffer[], int offset);
