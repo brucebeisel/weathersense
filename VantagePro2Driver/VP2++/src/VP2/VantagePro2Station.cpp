@@ -224,7 +224,7 @@ VantagePro2Station::initialize() {
     if (!eepromBinaryRead(VP2Constants::EE_ARCHIVE_PERIOD, 1))
         return false;
 
-    archivePeriod = buffer[0];
+    archivePeriod = BitConverter::toInt8(buffer, 0);
 
     log.log(VP2Logger::VP2_INFO) << "Initialize results: Rain Collector Size: " << rainCollectorSize << " Archive Period: " << archivePeriod << endl;
 
@@ -576,7 +576,7 @@ VantagePro2Station::eepromReadDataBlock(byte buffer[]) {
 bool
 VantagePro2Station::eepromRead(unsigned address, unsigned count) {
     ostringstream command;
-    command << READ_EEPROM_CMD << " " << hex << address << " " << count;
+    command << READ_EEPROM_CMD << " " << uppercase << hex << address << " " << count << nouppercase;
     if (!sendOKedCommand(command.str()))
         return false;
 
@@ -603,7 +603,8 @@ VantagePro2Station::eepromRead(unsigned address, unsigned count) {
 bool
 VantagePro2Station::eepromBinaryRead(unsigned address, unsigned count) {
     ostringstream command;
-    command << READ_EEPROM_AS_BINARY_CMD << " " << hex << address << " " << count;
+    command << READ_EEPROM_AS_BINARY_CMD << " " << uppercase << hex << address << " " << count << nouppercase;
+
     if (!sendAckedCommand(command.str()))
         return false;
 
@@ -627,7 +628,7 @@ VantagePro2Station::eepromWriteByte(unsigned address, byte value) {
 bool 
 VantagePro2Station::eepromBinaryWrite(unsigned address, const byte data[], unsigned count) {
     ostringstream command;
-    command << WRITE_EEPROM_AS_BINARY_CMD << " " << hex << address << " " << count;
+    command << WRITE_EEPROM_AS_BINARY_CMD << " " << uppercase << hex << address << " " << count << nouppercase;
 
     if (!sendAckedCommand(command.str()))
         return false;
