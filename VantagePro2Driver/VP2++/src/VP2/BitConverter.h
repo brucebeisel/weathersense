@@ -25,6 +25,9 @@ namespace vp2 {
  */
 class BitConverter {
 public:
+    static constexpr int ONE_BYTE_MASK = 0xFF;
+    static constexpr int BITS_PER_BYTE = 8;
+
     virtual ~BitConverter();
 
     /**

@@ -1,3 +1,33 @@
+#include "Weather.h"
+
+namespace vp2 {
+class EepromManager {
+public:
+    static constexpr int EEPROM_DATA_BLOCK_SIZE = 4096;
+    static constexpr int EEPROM_NON_GRAPH_DATA_SIZE = 176;
+    static constexpr int EEPROM_GRAPH_DATA_OFFSET = 176;
+    static constexpr int EEPROM_GRAPH_DATA_SIZE = EEPROM_DATA_BLOCK_SIZE - EEPROM_GRAPH_DATA_OFFSET;
+
+    static constexpr int ALARM_THRESHOLDS_OFFSET = 82;
+    static constexpr int ALARM_THRESHOLDS_SIZE = 94;
+    static constexpr int CRC_BYTES = 2;
+
+    void setLatitude(double latitude);
+    double getLatitude() const;
+
+    void setLongitude(double longitude);
+    double getLongitutde() const;
+
+private:
+    static constexpr int protectedBytes[] = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0x2d};
+    byte eepromBuffer[EEPROM_DATA_BLOCK_SIZE + CRC_BYTES];
+    byte eepromNonGraphData[EEPROM_NON_GRAPH_DATA_SIZE + CRC_BYTES];
+    byte eepromGraphData[EEPROM_NON_GRAPH_DATA_SIZE + CRC_BYTES];
+    byte alarmThresholds[ALARM_THRESHOLDS_SIZE];
+};
+
+}
+
 struct EepromEntry {
      std::string vantagePro2Name;
      std::string readableName;

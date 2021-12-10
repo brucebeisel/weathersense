@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <iostream>
+#include "Weather.h"
 #include "VantagePro2Station.h"
 #include "Api.h"
 
@@ -44,14 +45,16 @@ Api::requestSensorStationIds() {
     }
     oss << "]}";
 
-    std::string response(oss.str());
-
+    sendResponse(oss.str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 void
 Api::requestCurrentWeather() {
+    const CurrentWeather & cw = station.getCurrentWeather();
+    std::string response = cw.formatXML();
+    sendResponse(response);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,12 +85,16 @@ Api::requestSensorStationStatus() {
 ////////////////////////////////////////////////////////////////////////////////
 void
 Api::updateYearlyET(double yearlyET) {
+    bool result = station.putYearlyET(yearlyET);
+    sendCommandResponse("update-yearly-et", result);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 void
 Api::updateYearlyRainfall(double yearlyRain) {
+    bool result = station.putYearlyRain(yearlyRain);
+    sendCommandResponse("update-yearly-rainfall", result);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -100,6 +107,8 @@ Api::requestHighLowData() {
 ////////////////////////////////////////////////////////////////////////////////
 void
 Api::clearArchive() {
+    bool result = station.clearArchive();
+    sendCommandResponse("clear-archive", result);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,34 +121,65 @@ Api::clearExtremeValues(bool dailyLows, bool monthlyLows, bool yearlyLows, bool 
 ////////////////////////////////////////////////////////////////////////////////
 void
 Api::clearAlarms() {
+    bool result = station.clearActiveAlarms();
+    sendCommandResponse("clear-alarms", result);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 void
 Api::clearCurrentData() {
-    if (station.clearCurrentData())
-        sendResponse("SUCCESS");
-    else
-        sendResponse("FAILURE");
+    bool result = station.clearCurrentData();
+    sendCommandResponse("clear-current-data", result);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 void
 Api::clearGraphData() {
+    bool result = station.clearGraphPoints();
+    sendCommandResponse("clear-graph-data", result);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 void
-Api::clearCumulativeValue(int which) {
+Api::clearCumulativeValue(const std::string & which) {
+
+    VP2Constants::CumulativeValue cumValue = VP2Constants::DAILY_RAIN_CUM;
+
+    bool result = station.clearCumulativeValue(cumValue);
+    sendCommandResponse("clear-cumulative-value", result);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 void
-Api::synchronizeTime() {
+Api::synchronizeConsoleTime() {
+    ostringstream ss;
+
+    ss << "{ \"time-response\" : ";
+    if (station.updateConsoleTime()) {
+        DateTime consoleTime;
+        station.retrieveConsoleTime(consoleTime);
+        ss << "\"SUCCESS\", \"console-time\" : \"" << Weather::formatDateTime(consoleTime) << "\" }";
+    }
+    else
+        ss << "\"FAILURE\" }";
+
+    sendResponse(ss.str());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void
+Api::requestConsoleTime() {
+    ostringstream ss;
+    DateTime consoleTime;
+    station.retrieveConsoleTime(consoleTime);
+
+    ss << "{ \"console-time\" : \"" << Weather::formatDateTime(consoleTime) << "\" }";
+    sendResponse(ss.str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -152,10 +192,27 @@ Api::updateArchiveInterval(int intervalMinutes) {
 ////////////////////////////////////////////////////////////////////////////////
 void
 Api::controlConsoleLamp(bool on) {
-    if (station.controlConsoleLamp(on))
-        sendResponse("SUCCESS");
-    else
-        sendResponse("FAILURE");
+    bool result = station.controlConsoleLamp(on);
+    sendCommandResponse("control-console-lamp", result);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void
+Api::sendCommandResponse(const std::string & command, const std::string & result) {
+    ostringstream ss;
+
+    ss << "{ \"response\" : { \"command\" : \"" << command << "\", \"result\" : \"" << result << "\" } }";
+    sendResponse(ss.str());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void
+Api::sendCommandResponse(const std::string & command, bool result) {
+    ostringstream ss;
+    const char * resultString = result ? "SUCCESS" : "FAILURE";
+    sendCommandResponse(command, resultString);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -165,4 +222,19 @@ Api::sendResponse(const std::string & response) {
     cout << "Sending RESTful response: " << response << endl;
 }
 
+void
+Api::requestTimeZoneChoices() {
+    ostringstream ss;
+
+    ss << "{ \"time-zones\" : [";
+    for (int i = 0; i < sizeof(TIME_ZONES) / sizeof(TIME_ZONES[0]); i++) {
+        if (i != 0)
+            ss << ", ";
+        ss << "\"" << TIME_ZONES[i].name << "\"";
+    }
+
+    ss << "] }";
+
+    sendResponse(ss.str());
+}
 }

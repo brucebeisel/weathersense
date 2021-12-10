@@ -44,6 +44,27 @@ HiLowPacket::Values<T>::formatXML(bool low) const {
 ////////////////////////////////////////////////////////////////////////////////
 template<typename T>
 string
+HiLowPacket::Values<T>::formatJSON(bool low) const {
+    ostringstream ss;
+
+    string which = low ? "low" : "high";
+
+    ss << "    { \"" << which << "\" : " << endl
+       << "        { \"day\" : " << endl
+       << "            {\"value\" : " << dayExtremeValue << "}," << endl
+       << "            {\"time\"  : \"" << Weather::formatDateTime(dayExtremeValueTime) << "\" }" << endl
+       << "        }," << endl
+       << "        { \"month\" : " << monthExtremeValue << "}," << endl
+       << "        { \"year\"  : " << yearExtremeValue <<"}" << endl
+       << "    }" << endl;
+
+    return ss.str();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+template<typename T>
+string
 HiLowPacket::HighLowValues<T>::formatXML() const {
     string s = lows.formatXML(true).append(highs.formatXML(false));
     return s;
@@ -51,8 +72,17 @@ HiLowPacket::HighLowValues<T>::formatXML() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+template<typename T>
+string
+HiLowPacket::HighLowValues<T>::formatJSON() const {
+    string s = lows.formatJSON(true).append(highs.formatJSON(false));
+    return s;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 std::string
-HiLowPacket::formatMessage() const {
+HiLowPacket::formatXML() const {
     ostringstream ss;
     ss << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" << endl;
     ss << "<hiLowPacket>" << endl;
@@ -96,9 +126,28 @@ HiLowPacket::formatMessage() const {
     ss << "    <hour>" << highHourRainRate <<"</hour>" << endl;
     ss << rainRate.formatXML(false);
     ss << "</rainfallRate>" << endl;
+    ss << "<extraTemperatures><extraTemperature><index>0</index><values>";
+    ss << extraTemperature[0].formatXML();
+    ss << "/values></extraTemperature></extraTemperatures>";
     ss << "</hiLowPacket>";
 
    return ss.str();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+std::string
+HiLowPacket::formatJSON() const {
+    ostringstream ss;
+    ss << "{" << endl
+       << "    {\"high-low\" : " << endl
+       << "        { \"barometer\" : " << endl
+       << barometer.formatJSON() << endl
+       << "        }" << endl
+       << "    }" << endl
+       << "}" << endl;
+
+    return ss.str();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -166,38 +215,38 @@ HiLowPacket::decodeHiLowPacket(byte buffer[]) {
     //
     // Dew point section
     //
-    dewPoint.lows.dayExtremeValue      = VP2Decoder::decode16BitTemperature(buffer, 63);
-    dewPoint.highs.dayExtremeValue     = VP2Decoder::decode16BitTemperature(buffer, 65);
+    dewPoint.lows.dayExtremeValue      = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 63);
+    dewPoint.highs.dayExtremeValue     = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 65);
     dewPoint.lows.dayExtremeValueTime  = VP2Decoder::decodeTime(buffer, 67);
     dewPoint.highs.dayExtremeValueTime = VP2Decoder::decodeTime(buffer, 69);
-    dewPoint.highs.monthExtremeValue   = VP2Decoder::decode16BitTemperature(buffer, 71);
-    dewPoint.lows.monthExtremeValue    = VP2Decoder::decode16BitTemperature(buffer, 73);
-    dewPoint.highs.yearExtremeValue    = VP2Decoder::decode16BitTemperature(buffer, 75);
-    dewPoint.lows.yearExtremeValue     = VP2Decoder::decode16BitTemperature(buffer, 77);
+    dewPoint.highs.monthExtremeValue   = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 71);
+    dewPoint.lows.monthExtremeValue    = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 73);
+    dewPoint.highs.yearExtremeValue    = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 75);
+    dewPoint.lows.yearExtremeValue     = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 77);
 
     //
     // Wind chill section
     //
-    windChill.dayExtremeValue      = VP2Decoder::decode16BitTemperature(buffer, 79);
+    windChill.dayExtremeValue      = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 79);
     windChill.dayExtremeValueTime  = VP2Decoder::decodeTime(buffer, 81);
-    windChill.monthExtremeValue    = VP2Decoder::decode16BitTemperature(buffer, 83);
-    windChill.yearExtremeValue     = VP2Decoder::decode16BitTemperature(buffer, 85);
+    windChill.monthExtremeValue    = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 83);
+    windChill.yearExtremeValue     = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 85);
 
     //
     // Heat index section
     //
-    heatIndex.dayExtremeValue      = VP2Decoder::decode16BitTemperature(buffer, 87);
+    heatIndex.dayExtremeValue      = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 87);
     heatIndex.dayExtremeValueTime  = VP2Decoder::decodeTime(buffer, 89);
-    heatIndex.monthExtremeValue    = VP2Decoder::decode16BitTemperature(buffer, 91);
-    heatIndex.yearExtremeValue     = VP2Decoder::decode16BitTemperature(buffer, 93);
+    heatIndex.monthExtremeValue    = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 91);
+    heatIndex.yearExtremeValue     = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 93);
 
     //
     // THSW index section
     //
-    thsw.dayExtremeValue      = VP2Decoder::decode16BitTemperature(buffer, 95);
+    thsw.dayExtremeValue      = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 95);
     thsw.dayExtremeValueTime  = VP2Decoder::decodeTime(buffer, 97);
-    thsw.monthExtremeValue    = VP2Decoder::decode16BitTemperature(buffer, 99);
-    thsw.yearExtremeValue     = VP2Decoder::decode16BitTemperature(buffer, 101);
+    thsw.monthExtremeValue    = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 99);
+    thsw.yearExtremeValue     = VP2Decoder::decodeNonScaled16BitTemperature(buffer, 101);
 
     //
     // Solar radiation section

@@ -106,9 +106,10 @@ public:
      *
      * @param value The value of the measurement that is assumed to be in a valid range
      */
-    void operator=(const T & value) {
+    Measurement & operator=(const T & value) {
         this->value = value;
         this->valid = true;
+        return *this;
     }
 
     /**

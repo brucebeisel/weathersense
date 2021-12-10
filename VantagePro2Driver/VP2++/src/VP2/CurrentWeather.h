@@ -68,11 +68,18 @@ public:
     int getNextPacket() const;
 
     /**
-     * Format the Current Weather message to tbe sent to the collector.
-     * 
-     * @return The Current Weather message
+     * Format the Current Weather XML message.
+     *
+     * @return The formatted Current Weather message
      */
-    std::string formatMessage() const;
+    std::string formatXML() const;
+
+    /**
+     * Format the Current Weather JSON message.
+     * 
+     * @return The formatted current weather message
+     */
+    std::string formatJSON() const;
 
 private:
     LoopPacket          loopPacket;

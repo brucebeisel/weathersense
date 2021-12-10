@@ -100,8 +100,22 @@ public:
      */
     void discardInBuffer();
 
+    /**
+     * Set the baud rate. Note the serial port must be closed or it must be closed then opened for this to take effect.
+     *
+     * @param rate The new baud rate
+     */
+    void setBaudRate(int rate);
+
+    /**
+     * Check if the serial port is open.
+     *
+     * @return True if the port is open
+     */
+    bool isOpen() const;
+
 private:
-    HANDLE      comPort;    // The file descriptor of the open port
+    HANDLE      commPort;    // The file descriptor of the open port
     std::string device;     // The name of the serial port to be opened
     int         baudRate;   // The baud rate used to communicate over the serial port
     VP2Logger   log;

@@ -41,7 +41,7 @@ namespace vp2 {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-WeatherSenseSocket::WeatherSenseSocket(const string & host, unsigned short port) : reader(NULL),
+WeatherSenseSocket::WeatherSenseSocket(const string & host, unsigned short port) : reader(nullptr),
                                                                         host(host),
                                                                         port(port),
                                                                         socketId(NO_SOCKET),

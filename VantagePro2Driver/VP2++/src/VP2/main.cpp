@@ -21,6 +21,7 @@
 #include <stdio.h>
 #endif
 #include <iostream>
+#include <thread>
 #include <fstream>
 #include "VP2Logger.h"
 #include "ArchiveManager.h"
@@ -43,53 +44,20 @@ sigHandler(int sig) {
 //#endif
 }
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-int
-main(int argc, char *argv[]) {
-#ifdef _WIN32
-    string archiveFile("C:\\WeatherSense\\2.4\\archive\\archive.vp2");
-    string serialPortName("COM3");
-    string logFile("C:\\WeatherSense\\2.4\\logs\\vp2_driver.log");
-#else
-    string archiveFile("/weathersense/3.0/archive/vp2.archive");
-    string logFile("/weathersense/3.0/log/vp2_driver.log");
-    string serialPortName("/dev/ttyUSB0");
-    signal(SIGPIPE, sigHandler);
-    signal(SIGINT, sigHandler);
-    signal(SIGTERM, sigHandler);
-#endif
+void
+consoleThreadEntry(const string & archiveFile, const string & serialPortName, const string & logFile, int baudRate) {
+    VP2Logger & log = VP2Logger::getLogger("VP2 Main");
+    log.log(VP2Logger::VP2_INFO) << "Starting console thread" << endl;
 
-    ofstream logStream(logFile.c_str(), ios::app | ios::ate | ios::out);
-    //VP2Logger::setLogStream(logStream);
-    VP2Logger::setLogLevel(VP2Logger::VP2_DEBUG3);
     CurrentWeatherPublisher cwPublisher;
-    VantagePro2Station station(serialPortName, 19200);
+    VantagePro2Station station(serialPortName, baudRate);
     ArchiveManager archiveManager(archiveFile, station);
     VantagePro2Driver driver(archiveManager, cwPublisher, station);
 
-    VP2Logger & log = VP2Logger::getLogger("VP2 Main");
 
-    /*
-    vector<ArchivePacket> list;
-
-    archiveManager.setNewestRecordTime(time(0) - (86400 * 12));
-    int total = 0;
-    do {
-        list.clear();
-        archiveManager.getArchiveRecords(list);
-        cout << "Received " << list.size() << " records" << endl;
-        if (list.size() > 0)
-            cout << "First record: " << Weather::formatDateTime(list.at(0).getDateTime()) << " Last Record: " << Weather::formatDateTime(list.at(list.size() - 1).getDateTime()) << endl;
-        total += list.size();
-    } while (list.size() > 0);
-    cout << "Received " << total << " total records" << endl;
-    Sleep(100000);
-*/
     try {
-        int rv;
-        if ((rv = driver.initialize()) != 0)
-            return rv;
+        if (driver.initialize() != 0)
+            return;
 
         driver.mainLoop();
         log.log(VP2Logger::VP2_INFO) << "Main loop returned" << endl;
@@ -98,5 +66,34 @@ main(int argc, char *argv[]) {
         log.log(VP2Logger::VP2_ERROR) << "Caught exception from main loop " << e.what() << endl;
     }
     catch (...) {
+        log.log(VP2Logger::VP2_ERROR) << "Caught unknown exception from main loop" << endl;
     }
+
+    log.log(VP2Logger::VP2_INFO) << "Ending console thread" << endl;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+int
+main(int argc, char *argv[]) {
+
+#ifdef _WIN32
+    const string archiveFile("C:\\WeatherSense\\2.4\\archive\\archive.vp2");
+    const string serialPortName("COM3");
+    const string logFile("C:\\WeatherSense\\2.4\\logs\\vp2_driver.log");
+#else
+    const string archiveFile("/weathersense/3.0/archive/vp2.archive");
+    const string logFile("/weathersense/3.0/log/vp2_driver.log");
+    const string serialPortName("/dev/ttyUSB0");
+    signal(SIGPIPE, sigHandler);
+    signal(SIGINT, sigHandler);
+    signal(SIGTERM, sigHandler);
+#endif
+    ofstream logStream(logFile.c_str(), ios::app | ios::ate | ios::out);
+    //VP2Logger::setLogStream(logStream);
+    VP2Logger::setLogLevel(VP2Logger::VP2_DEBUG3);
+
+    thread consoleThread(consoleThreadEntry, archiveFile, serialPortName, logFile, 19200);
+
+    consoleThread.join();
 }

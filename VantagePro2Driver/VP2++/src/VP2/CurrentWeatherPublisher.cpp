@@ -54,7 +54,7 @@ CurrentWeatherPublisher::sendCurrentWeather(const CurrentWeather & cw)
     if (socketId == NO_SOCKET)
         return;
 
-    std::string s = cw.formatMessage();
+    std::string s = cw.formatXML();
     const char * data = s.c_str();
     size_t length = strlen(data);
     if (sendto(socketId, data, length, 0, reinterpret_cast<struct sockaddr *>(&groupAddr), sizeof(groupAddr)) != length) {

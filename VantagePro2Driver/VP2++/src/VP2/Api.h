@@ -122,15 +122,20 @@ public:
     /**
      * Clear the rain or ET accumlation value.
      *
-     * @param which Which acculated value to clear
+     * @param which The name of the cumulative value to clear
      */
-    void clearCumulativeValue(int which);
+    void clearCumulativeValue(const std::string & which);
 
     /**
-     * Synchronize the time with the host computer. It is assumed the host computer's time has been synchronized with
+     * Synchronize the console time with the host computer. It is assumed the host computer's time has been synchronized with
      * the Internet.
      */
-    void synchronizeTime();
+    void synchronizeConsoleTime();
+
+    /**
+     * Request the console time.
+     */
+    void requestConsoleTime();
 
     /**
      * Change how often records are written to the archive. Note that this command will clear the archive memory.
@@ -146,7 +151,14 @@ public:
      */
     void controlConsoleLamp(bool on);
 
+    /**
+     * Return the time zones that the console supports.
+     */
+    void requestTimeZoneChoices();
+
 private:
+    void sendCommandResponse(const std::string & command, const std::string & result);
+    void sendCommandResponse(const std::string & command, bool success);
     void sendResponse(const std::string & response);
     VantagePro2Station & station;
 };

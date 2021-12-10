@@ -37,13 +37,6 @@ class CurrentWeatherPublisher;
  */
 class VantagePro2Driver : public VantagePro2Station::Callback {
 public:
-    static constexpr int OPEN_STATION_FAILURE = 1;
-    static constexpr int WAKEUP_STATION_FAILURE = 2;
-    static constexpr int CONFIGURATION_RETRIEVAL_FAILURE = 3;
-    static constexpr int INITIAL_LOOP_PACKET_RECEIVE_FAILURE = 4;
-    static constexpr int SYNCHRONIZE_ARCHIVE_FAILURE = 5;
-    static constexpr int POST_INIT_WAKEUP_FAILURE = 6;
-
     /**
      * Constructor.
      * 
@@ -61,9 +54,9 @@ public:
     /**
      * Initialize the driver.
      * 
-     * @return 0 on success or non-zero on error
+     * @return True on success
      */
-    int initialize();
+    bool initialize();
 
     /**
      * Close and open the station.

@@ -23,10 +23,10 @@
 #include "HiLowPacket.h"
 #include "SensorStation.h"
 #include "VP2Logger.h"
-#include "VantagePro2Driver.h"
 #include "VP2Decoder.h"
 #include "VP2Constants.h"
 #include "Alarm.h"
+#include "VantagePro2Driver.h"
 
 using namespace std;
 extern "C" {
@@ -64,7 +64,7 @@ VantagePro2Driver::~VantagePro2Driver() {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-int
+bool
 VantagePro2Driver::initialize() {
     log.log(VP2Logger::VP2_INFO) << "Initializing..." << endl;
 
@@ -72,7 +72,7 @@ VantagePro2Driver::initialize() {
 
     if (!station.openStation()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to open weather station" << endl;
-        return OPEN_STATION_FAILURE;
+        return false;
     }
     else {
         log.log(VP2Logger::VP2_INFO) << "Port is open" << endl;
@@ -80,16 +80,20 @@ VantagePro2Driver::initialize() {
 
     if (!station.wakeupStation()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to wake up weather station" << endl;
-        return WAKEUP_STATION_FAILURE;
+        return false;
     }
     else {
         log.log(VP2Logger::VP2_INFO) << "Weather Station is awake" << endl;
     }
 
+    /*
     if (!station.retrieveConfigurationParameters()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to retrieve configuration parameters" << endl;
-        return CONFIGURATION_RETRIEVAL_FAILURE;
+        return false;
     }
+
+    VP2Decoder::setRainCollectorSize(station.getStationConfiguration().rainCollectorSize);
+    */
 
     //
     // Get one current weather record so that the sensors are detected
@@ -100,24 +104,24 @@ VantagePro2Driver::initialize() {
 
     if (!receivedFirstLoopPacket) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to receive a LOOP packet needed to determine current sensor suite" << endl;
-        return INITIAL_LOOP_PACKET_RECEIVE_FAILURE;
+        return false;
     }
 
     if (!archiveManager.synchronizeArchive()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to read the archive during initialization" << endl;
-        return SYNCHRONIZE_ARCHIVE_FAILURE;
+        return false;
     }
 
     AlarmManager::getInstance().initialize();
 
     if (!station.wakeupStation()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to wake up console after initialization" << endl;
-        return POST_INIT_WAKEUP_FAILURE;
+        return false;
     }
 
     log.log(VP2Logger::VP2_INFO) << "Initialization complete." << endl;
 
-    return 0;
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -202,12 +206,6 @@ VantagePro2Driver::reopenStation() {
 ////////////////////////////////////////////////////////////////////////////////
 void
 VantagePro2Driver::mainLoop() {
-    DateTime consoleTime;
-    if (station.retrieveConsoleTime(consoleTime))
-        log.log(VP2Logger::VP2_INFO) << "Station Time: " << Weather::formatDateTime(consoleTime) << endl;
-    else
-        log.log(VP2Logger::VP2_INFO) << "Station Time retrieval failed" << endl;
-
     vector<ArchivePacket> list;
     list.reserve(VP2Constants::NUM_ARCHIVE_RECORDS);
     //bool lampOn = true;
@@ -226,6 +224,12 @@ VantagePro2Driver::mainLoop() {
                 reopenStation();
                 continue;
             }
+
+            DateTime consoleTime;
+            if (station.retrieveConsoleTime(consoleTime))
+                log.log(VP2Logger::VP2_INFO) << "Station Time: " << Weather::formatDateTime(consoleTime) << endl;
+            else
+                log.log(VP2Logger::VP2_INFO) << "Station Time retrieval failed" << endl;
 
             //station.controlConsoleLamp(lampOn);
             //lampOn = !lampOn;
@@ -271,7 +275,7 @@ VantagePro2Driver::mainLoop() {
                     archiveManager.getNewestRecord(packet);
                     log.log(VP2Logger::VP2_DEBUG1) << "Most recent archive packet time is: "
                                                    << Weather::formatDateTime(packet.getDateTime())
-                                                   << " ISS Reception: " << station.calculateISSReception(packet.getWindSampleCount()) << endl;
+                                                   << " ISS Reception: " << station.calculateISSReception(packet.getWindSampleCount()) << endl; // TBD Get the actual archive period
                     previousNextRecord = nextRecord;
                 }
             }

@@ -26,8 +26,7 @@ namespace vp2 {
  * Version 2.6.1
  * Date: 3/29/2013
  */
-class VP2Constants {
-public:
+namespace VP2Constants {
     //
     // Various values used generically in various command protocols
     //
@@ -70,6 +69,25 @@ public:
         ONE_HOUR = 60,
         TWO_HOURS = 120,
     };
+
+    enum class BaudRate : int {
+        BAUD_1200 = 1200,
+        BAUD_2400 = 2400,
+        BAUD_4800 = 4800,
+        BAUD_9600 = 9600,
+        BAUD_14400 = 14400,
+        BAUD_19200 = 19200
+    };
+
+    enum class RainCupSizeType : int {
+        POINT_01_INCH = 0,
+        POINT_02_MM = 1,
+        POINT_01_MM = 2
+    };
+
+    static constexpr Rainfall POINT_01_INCH_SIZE = 0.1;        // Inches
+    static constexpr Rainfall POINT_02_MM_SIZE   = 0.2 / 25.4; // Inches
+    static constexpr Rainfall POINT_01_MM_SIZE   = 0.1 / 25.4; // Inches
 
     //
     // LOOP packet forecast icons
@@ -133,6 +151,8 @@ public:
     static constexpr Evapotranspiration DAY_ET_SCALE= 1000.0;
     static constexpr Evapotranspiration MONTH_YEAR_ET_SCALE= 100.0;
     static constexpr Rainfall           STORM_RAIN_SCALE= 100.0;
+
+    static const int NORTH_HEADING_VALUE = 360;
 
     static constexpr int INVALID_16BIT_TEMPERATURE = 32767;
     static constexpr int INVALID_16BIT_HIGH_TEMPERATURE = -32768;

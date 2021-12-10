@@ -36,7 +36,7 @@ static const char *ALARM_STRINGS[][8] = {
         "Low Indoor Humidity",
         "High Indoor Humidity",
         "Time",
-        NULL
+        nullptr
     },
     {
         "High Rain Rate",
@@ -44,9 +44,9 @@ static const char *ALARM_STRINGS[][8] = {
         "24 Hour Rain",
         "Storm Total Rain",
         "Daily ET",
-        NULL,
-        NULL,
-        NULL
+        nullptr,
+        nullptr,
+        nullptr
     },
     {
         "Low Outdoor Temperature",
@@ -64,89 +64,89 @@ static const char *ALARM_STRINGS[][8] = {
         "High UV",
         "UV Dose",
         "UV Dose Manually Cleared",
-        NULL,
-        NULL,
-        NULL
+        nullptr,
+        nullptr,
+        nullptr
     },
     {
         "Low Outdoor Humidity",
         "High Outdoor Humidity",
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        NULL
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr
     },
     {
         "Extra Temperature/Humidity 1 - Low Temperature",
         "Extra Temperature/Humidity 1 - High Temperature",
         "Extra Temperature/Humidity 1 - Low Humidity",
         "Extra Temperature/Humidity 1 - High Humidity",
-        NULL,
-        NULL,
-        NULL,
-        NULL
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr
     },
     {
         "Extra Temperature/Humidity 2 - Low Temperature",
         "Extra Temperature/Humidity 2 - High Temperature",
         "Extra Temperature/Humidity 2 - Low Humidity",
         "Extra Temperature/Humidity 2 - High Humidity",
-        NULL,
-        NULL,
-        NULL,
-        NULL
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr
     },
     {
         "Extra Temperature/Humidity 3 - Low Temperature",
         "Extra Temperature/Humidity 3 - High Temperature",
         "Extra Temperature/Humidity 3 - Low Humidity",
         "Extra Temperature/Humidity 3 - High Humidity",
-        NULL,
-        NULL,
-        NULL,
-        NULL
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr
     },
     {
         "Extra Temperature/Humidity 4 - Low Temperature",
         "Extra Temperature/Humidity 4 - High Temperature",
         "Extra Temperature/Humidity 4 - Low Humidity",
         "Extra Temperature/Humidity 4 - High Humidity",
-        NULL,
-        NULL,
-        NULL,
-        NULL
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr
     },
     {
         "Extra Temperature/Humidity 5 - Low Temperature",
         "Extra Temperature/Humidity 5 - High Temperature",
         "Extra Temperature/Humidity 5 - Low Humidity",
         "Extra Temperature/Humidity 5 - High Humidity",
-        NULL,
-        NULL,
-        NULL,
-        NULL
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr
     },
     {
         "Extra Temperature/Humidity 6 - Low Temperature",
         "Extra Temperature/Humidity 6 - High Temperature",
         "Extra Temperature/Humidity 6 - Low Humidity",
         "Extra Temperature/Humidity 6 - High Humidity",
-        NULL,
-        NULL,
-        NULL,
-        NULL
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr
     },
     {
         "Extra Temperature/Humidity 7 - Low Temperature",
         "Extra Temperature/Humidity 7 - High Temperature",
         "Extra Temperature/Humidity 7 - Low Humidity",
         "Extra Temperature/Humidity 7 - High Humidity",
-        NULL,
-        NULL,
-        NULL,
-        NULL
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr
     },
     {
         "Soil/Leaf 1 - Low Leaf Wetness",
@@ -571,7 +571,7 @@ LoopPacket::lookupAlarm(int byte, int bit) const {
 
     const char * alarmString = ALARM_STRINGS[byte][bit];
 
-    if (alarmString == NULL)
+    if (alarmString == nullptr)
         return "Invalid Alarm Index";
     else
         return alarmString;

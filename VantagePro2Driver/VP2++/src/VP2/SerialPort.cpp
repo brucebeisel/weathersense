@@ -19,6 +19,7 @@
 #include <termios.h>
 #include <errno.h>
 #include <unistd.h>
+static const int INVALID_HANDLE_VALUE = -1;
 #else
 #include <winsock2.h>
 #endif
@@ -31,10 +32,9 @@ using namespace std;
 
 namespace vp2 {
 
-
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-SerialPort::SerialPort(const std::string & device, int baudRate) : device(device), baudRate(baudRate), log(VP2Logger::getLogger("SerialPort")) {
+SerialPort::SerialPort(const std::string & device, int baudRate) : commPort(INVALID_HANDLE_VALUE), device(device), baudRate(baudRate), log(VP2Logger::getLogger("SerialPort")) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,18 +47,18 @@ SerialPort::~SerialPort(){
 ////////////////////////////////////////////////////////////////////////////////
 bool
 SerialPort::open() {
-    comPort = CreateFile(device.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
+    commPort = CreateFile(device.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
 
-    if (comPort == INVALID_HANDLE_VALUE)
+    if (commPort == INVALID_HANDLE_VALUE)
         return false;
 
     DCB dcb;
-    GetCommState(comPort, &dcb);
+    GetCommState(commPort, &dcb);
     dcb.BaudRate = baudRate;
     dcb.Parity = NOPARITY;
     dcb.ByteSize = 8;
     dcb.StopBits = ONESTOPBIT;
-    SetCommState(comPort, &dcb);
+    SetCommState(commPort, &dcb);
 
     COMMTIMEOUTS cto;
     cto.ReadIntervalTimeout = 100;
@@ -66,14 +66,14 @@ SerialPort::open() {
     cto.ReadTotalTimeoutConstant = 1000;
     cto.WriteTotalTimeoutConstant = 5000;
     cto.WriteTotalTimeoutMultiplier = 1;
-    return SetCommTimeouts(comPort, &cto) == TRUE;
+    return SetCommTimeouts(commPort, &cto) == TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 void
 SerialPort::close() {
-    CloseHandle(comPort);
+    CloseHandle(commPort);
 }
 
 
@@ -83,7 +83,7 @@ int
 SerialPort::write(const void * buffer, int nbytes) {
     log.log(VP2Logger::VP2_DEBUG2) << "Writing " << nbytes << " bytes" << endl;
     DWORD dwWritten;
-    if (!WriteFile(comPort, (LPCVOID)buffer, nbytes, &dwWritten, NULL))
+    if (!WriteFile(commPort, static_cast<LPCVOID>(buffer), nbytes, &dwWritten, nullptr))
         return -1;
     else
         return dwWritten;
@@ -94,7 +94,7 @@ SerialPort::write(const void * buffer, int nbytes) {
 int
 SerialPort::read(byte buffer[], int index, int nbytes) {
     DWORD dwRead;
-    if (!ReadFile(comPort, &buffer[index], nbytes, &dwRead, NULL)) {
+    if (!ReadFile(commPort, &buffer[index], nbytes, &dwRead, nullptr)) {
         log.log(VP2Logger::VP2_INFO) << "Read " << dwRead << " bytes (failed)" << endl;
         return -1;
     }
@@ -108,19 +108,19 @@ SerialPort::read(byte buffer[], int index, int nbytes) {
 ////////////////////////////////////////////////////////////////////////////////
 void
 SerialPort::discardInBuffer() {
-    PurgeComm(comPort, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);
+    PurgeComm(commPort, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);
 }
 #else
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 bool
 SerialPort::open() {
-    comPort = ::open(device.c_str(), O_RDWR);
-    if (comPort < 0)
+    commPort = ::open(device.c_str(), O_RDWR);
+    if (commPort < 0)
         return false;
 
     struct termios tio;
-    if (tcgetattr(comPort, &tio) != 0) {
+    if (tcgetattr(commPort, &tio) != 0) {
         log.log(VP2Logger::VP2_ERROR) << "tcgetattr() failed" << endl;
         return false;
     }
@@ -130,7 +130,7 @@ SerialPort::open() {
     cfmakeraw(&tio);
     tio.c_cflag &= ~(PARENB | CSTOPB);
     tio.c_cflag != CS8;
-    int rv = tcsetattr(comPort, 0, &tio);
+    int rv = tcsetattr(commPort, 0, &tio);
 
     if (rv != 0) {
         log.log(VP2Logger::VP2_ERROR) << "tcsetattr() failed" << endl;
@@ -146,14 +146,15 @@ SerialPort::open() {
 ////////////////////////////////////////////////////////////////////////////////
 void
 SerialPort::close() {
-    ::close(comPort);
+    ::close(commPort);
+    commPort = -1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 int
 SerialPort::write(const void * buffer, int nbytes) {
-    ssize_t bytesWritten = ::write(comPort, buffer, nbytes);
+    ssize_t bytesWritten = ::write(commPort, buffer, nbytes);
     return bytesWritten;
 }
 
@@ -165,9 +166,9 @@ SerialPort::read(byte buffer[], int index, int nbytes) {
     struct timeval timeout = {2, 0};
     fd_set readSet;
     FD_ZERO(&readSet);
-    FD_SET(comPort, &readSet);
+    FD_SET(commPort, &readSet);
 
-    int numFdsSet = select(comPort + 1, &readSet, NULL, NULL, &timeout);
+    int numFdsSet = select(commPort + 1, &readSet, nullptr, nullptr, &timeout);
     if (numFdsSet < 0) {
         int err = errno;
         log.log(VP2Logger::VP2_WARNING) << "Select() failed. Errno = " << err << endl;
@@ -176,8 +177,8 @@ SerialPort::read(byte buffer[], int index, int nbytes) {
         log.log(VP2Logger::VP2_DEBUG1) << "Select() timed out" << endl;
     }
     else {
-        if (FD_ISSET(comPort, &readSet)) {
-            bytesRead = ::read(comPort, &buffer[index], nbytes);
+        if (FD_ISSET(commPort, &readSet)) {
+            bytesRead = ::read(commPort, &buffer[index], nbytes);
             log.log(VP2Logger::VP2_DEBUG2) << "Read " << bytesRead << " bytes" << endl;
         }
     }
@@ -189,7 +190,7 @@ SerialPort::read(byte buffer[], int index, int nbytes) {
 ////////////////////////////////////////////////////////////////////////////////
 void
 SerialPort::discardInBuffer() {
-    tcflush(comPort, TCIOFLUSH);
+    tcflush(commPort, TCIOFLUSH);
 }
 #endif
 
@@ -232,4 +233,17 @@ SerialPort::read(byte buffer[], int expectedBytes) {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void
+SerialPort::setBaudRate(int rate) {
+    baudRate = rate;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+bool
+SerialPort::isOpen() const {
+    return commPort != INVALID_HANDLE_VALUE;
+}
 }

@@ -42,10 +42,10 @@ static const std::string WAKEUP_RESPONSE = std::string(1, VP2Constants::LINE_FEE
 //
 // Testing Commands
 //
-//static const std::string TEST_CMD = "TEST";                         // Sends the string "TEST\n" back
-//static const std::string STATION_TYPE_CMD = "WRD\0x12\0x4D";        // Responds with a weather station type that is backward compatible with earlier Davis weather products
-//static const std::string RECEIVE_CHECK_CMD = "RXCHECK";             // Console diagnostics report
-//static const std::string RXTEST_CMD = "RXTEST";                     // Move console to main current conditions screen
+static const std::string TEST_CMD = "TEST";                         // Sends the string "TEST\n" back
+//static const std::string STATION_TYPE_CMD = "WRD\0x12\0x4D";      // Responds with a weather station type that is backward compatible with earlier Davis weather products
+static const std::string RECEIVE_CHECK_CMD = "RXCHECK";             // Console diagnostics report
+static const std::string RXTEST_CMD = "RXTEST";                     // Move console to main current conditions screen
 static const std::string FIRMWARE_DATE_CMD = "VER";                 // Firmware date
 static const std::string RECEIVER_LIST_CMD = "RECEIVERS";           // Get the list of receivers as a bitmap, bit 0 represents station ID 1
 static const std::string FIRMWARE_VERSION_CMD = "NVER";             // Get the firmware version
@@ -53,7 +53,7 @@ static const std::string FIRMWARE_VERSION_CMD = "NVER";             // Get the f
 //
 // Current Data Commands
 //
-//static const std::string LOOP_CMD = "LOOP";                         // Get the current data values, alarms, battery status, etc. through the LOOP packet
+//static const std::string LOOP_CMD = "LOOP";                       // Get the current data values, alarms, battery status, etc. through the LOOP packet. Note that the LPS command renders this superfluous.
 static const std::string LPS_CMD = "LPS 3";                         // Get the current values through both the LOOP and LOOP2 packets
 static const std::string HIGH_LOW_CMD = "HILOWS";                   // Get the high and low that includes daily, monthly and yearly
 static const std::string PUT_YEARLY_RAIN_CMD = "PUTRAIN";           // Set the yearly rainfall
@@ -71,7 +71,7 @@ static const std::string DUMP_AFTER_CMD = "DMPAFT";                 // Dump the 
 //
 static const std::string DUMP_EEPROM_CMD = "GETEE";                  // Read the entire EEPROM data block
 static const std::string WRITE_EEPROM_CMD = "EEWR";                  // Write a single byte to EEPROM as hex strings
-//static const std::string READ_EEPROM_CMD = "EERD";                   // Read EEPROM address as hex strings
+static const std::string READ_EEPROM_CMD = "EERD";                   // Read EEPROM address as hex strings
 static const std::string WRITE_EEPROM_AS_BINARY_CMD = "EEBWR";       // Write to EEPROM as binary
 static const std::string READ_EEPROM_AS_BINARY_CMD = "EEBRD";        // Read EEPROM address as binary
 
@@ -99,13 +99,12 @@ static const std::string CLEAR_CURRENT_DATA_VALUES_CMD = "CLRDATA";  // Clear al
 //
 // Configuration Commands
 //
-//static const std::string SET_BAUD_RATE_CMD = "BAUD";                 // Sets the console to a new baud rate. Valid values are 1200, 2400, 4800, 9600, 14400 and 19200
+static const std::string SET_BAUD_RATE_CMD = "BAUD";                 // Sets the console to a new baud rate. Valid values are 1200, 2400, 4800, 9600, 14400 and 19200
 static const std::string SET_TIME_CMD = "SETTIME";                   // Sets the time and date on the console
-//static const std::string SET_GAIN_CMD = "GAIN";                      // Set the gain of the radio receiver. Only Vantage Pro (not VP2 or Vue)
 static const std::string GET_TIME_CMD = "GETTIME";                   // Retrieves the current time and date on the Vantage console. Data is sent in binary format
 static const std::string SET_ARCHIVE_PERIOD_CMD = "SETPER";          // Set how often the console saves an archive record
-//static const std::string STOP_ARCHIVING_CMD = "STOP";                // Disables the creation of archive records
-//static const std::string START_ARCHIVING_CMD = "START";              // Enables the create of archive records
+//static const std::string STOP_ARCHIVING_CMD = "STOP";              // Disables the creation of archive records
+//static const std::string START_ARCHIVING_CMD = "START";            // Enables the create of archive records
 static const std::string REINITIALIZE_CMD = "NEWSETUP";              // Reinitialize the console after making any significant changes to the console's configuration
 static const std::string CONTROL_LAMP_CMD = "LAMPS";                 // Turn on/off the console's light
 
@@ -124,14 +123,17 @@ static const std::string COMMAND_TERMINATOR = std::string(1, VP2Constants::LINE_
 static const std::string RESPONSE_FRAME = std::string(1, VP2Constants::LINE_FEED) + std::string(1, VP2Constants::CARRIAGE_RETURN);;
 static const std::string COMMAND_RECOGNIZED_RESPONSE = RESPONSE_FRAME + "OK" + RESPONSE_FRAME;
 static const std::string DONE_RESPONSE = "DONE" + std::string(1, VP2Constants::LINE_FEED) + std::string(1, VP2Constants::CARRIAGE_RETURN);;
+static const std::string TEST_RESPONSE = "TEST" + std::string(1, VP2Constants::LINE_FEED) + std::string(1, VP2Constants::CARRIAGE_RETURN);;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 VantagePro2Station::VantagePro2Station(const string & portName, int baudRate) :
                                             serialPort(portName, baudRate),
-                                            callback(NULL),
+                                            callback(nullptr),
                                             consoleBatteryVoltage(0.0),
                                             baudRate(baudRate),
+                                            rainCollectorSize(0.0),
+                                            archivePeriod(0),
                                             log(VP2Logger::getLogger("VantagePro2Station")),
                                             firstLoopPacket(true) {
 }
@@ -152,7 +154,10 @@ VantagePro2Station::setCallback(Callback & callback) {
 ////////////////////////////////////////////////////////////////////////////////
 bool
 VantagePro2Station::openStation() {
-    return serialPort.open();
+    if (!serialPort.open())
+        return false;
+    else
+        return initialize();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -188,21 +193,111 @@ VantagePro2Station::wakeupStation() {
     return awake;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 bool
-VantagePro2Station::retrieveConfigurationParameters() {
-    if (eepromBinaryRead(0, EEPROM_NON_GRAPH_DATA_SIZE)) {
-        memcpy(eepromNonGraphData, buffer, EEPROM_NON_GRAPH_DATA_SIZE);
-        return true;
-    }
-    else
+VantagePro2Station::initialize() {
+    if (!wakeupStation())
         return false;
+
+    if (!retrieveSensorStationInfo())
+        return false;
+
+    byte setupBits;
+    if (!eepromBinaryRead(VP2Constants::EE_SETUP_BITS, &setupBits, 1))
+        return false;
+
+    VP2Constants::RainCupSizeType type = static_cast<VP2Constants::RainCupSizeType>((setupBits & 0x30) >> 4);
+
+    switch (type) {
+        case VP2Constants::RainCupSizeType::POINT_01_INCH:
+            rainCollectorSize = VP2Constants::POINT_01_INCH_SIZE;
+            break;
+        case VP2Constants::RainCupSizeType::POINT_02_MM:
+            rainCollectorSize = VP2Constants::POINT_02_MM_SIZE;
+            break;
+        case VP2Constants::RainCupSizeType::POINT_01_MM:
+            rainCollectorSize = VP2Constants::POINT_01_MM_SIZE;
+            break;
+    }
+
+    byte value;
+    if (!eepromBinaryRead(VP2Constants::EE_ARCHIVE_PERIOD, &value, 1))
+        return false;
+
+    archivePeriod = value;
+
+    return true;
 }
 
 //
 // Testing Commands
 //
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+bool
+VantagePro2Station::sendTestCommand() {
+    serialPort.write(TEST_CMD);
+    serialPort.write(COMMAND_TERMINATOR);
+
+    if (serialPort.read(buffer, TEST_RESPONSE.length())) {
+        log.log(VP2Logger::VP2_WARNING) << "sendTestCommand() read failed while waiting for test response" << endl;
+        return false;
+    }
+
+    if (TEST_RESPONSE != buffer) {
+        log.log(VP2Logger::VP2_WARNING) << "sendTestCommand() received unexpected test response: '" << buffer << "'" << endl;
+        return false;
+    }
+
+    return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+bool
+VantagePro2Station::retrieveConsoleDiagnosticsReport(ConsoleDiagnosticReport & report) {
+    string response;
+
+    if (!sendStringValueCommand(RECEIVE_CHECK_CMD, response))
+        return false;
+
+    sscanf(response.c_str(), "%d %d %d %d %d", &report.packetCount,
+                                               &report.missedPacketCount,
+                                               &report.syncCount,
+                                               &report.maxPacketSequence,
+                                               &report.crcErrorCount);
+
+    return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+bool
+VantagePro2Station::performReceiveTest() {
+    //
+    // There is no documentation in the serial protocol document regarding this
+    // command. It does not state if a command terminator must be added or if
+    // there is any response.
+    //
+    serialPort.write(RXTEST_CMD);
+    serialPort.write(COMMAND_TERMINATOR);
+
+    return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+bool
+VantagePro2Station::retrieveFirmwareVersion(std::string * fwVersion) {
+    log.log(VP2Logger::VP2_INFO) << "Retrieving firmware version" << endl;
+    if (!sendStringValueCommand(FIRMWARE_VERSION_CMD, firmwareVersion))
+        return false;
+
+    if (fwVersion != nullptr)
+        *fwVersion = firmwareVersion;
+
+    return true;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,33 +311,19 @@ VantagePro2Station::retrieveReceiverList(std::vector<StationId> * sensorStations
     if (!serialPort.read(&stations, 1))
         return false;
 
-    if (sensorStations != NULL)
+    if (sensorStations != nullptr)
         sensorStations->clear();
 
     stationIds.clear();
 
     for (int i = 0; i < MAX_STATION_ID; i++) {
         if (stations & (1 << i) != 0) {
-            if (sensorStations != NULL)
+            if (sensorStations != nullptr)
                 sensorStations->push_back(i + 1);
 
             stationIds.push_back(i + 1);
         }
     }
-
-    return true;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-bool
-VantagePro2Station::retrieveFirmwareVersion(std::string * fwVersion) {
-    log.log(VP2Logger::VP2_INFO) << "Retrieving firmware version" << endl;
-    if (!sendStringValueCommand(FIRMWARE_VERSION_CMD, firmwareVersion))
-        return false;
-
-    if (fwVersion != NULL)
-        *fwVersion = firmwareVersion;
 
     return true;
 }
@@ -256,7 +337,7 @@ VantagePro2Station::retrieveFirmwareDate(std::string * fwDate) {
     if (!sendStringValueCommand(FIRMWARE_DATE_CMD, firmwareDate))
         return false;
 
-    if (fwDate != NULL)
+    if (fwDate != nullptr)
         *fwDate = firmwareDate;
 
     return true;
@@ -353,7 +434,7 @@ VantagePro2Station::retrieveHiLowValues(HiLowPacket & packet) {
     }
 
     packet.decodeHiLowPacket(buffer);
-    cout << "Hi/Low packet:" << endl << packet.formatMessage() << endl;
+    cout << "Hi/Low packet:" << endl << packet.formatXML() << endl;
     return true;
 }
 
@@ -410,7 +491,6 @@ bool
 VantagePro2Station::dumpAfter(DateTime time, vector<ArchivePacket> & list) {
     log.log(VP2Logger::VP2_DEBUG1) << "Dumping after " << Weather::formatDateTime(time) << endl;
     list.clear();
-    DateTime newestPacketTime = time;
 
     //
     // First send the dump after command and get an ACK back
@@ -467,35 +547,8 @@ VantagePro2Station::dumpAfter(DateTime time, vector<ArchivePacket> & list) {
     if (numPages == 0)
         return true;
 
-    bool rv = true;
-    for (int i = 0; i < numPages; i++) {
-        //
-        // Process a single page. This will return 1 - 5 packets
-        //
-        if (!readNextArchivePage(list, firstRecord, newestPacketTime)) {
-            serialPort.write(DMP_CANCEL_DOWNLOAD);
-            rv = false;
-            break;
-        }
-
-        //
-        // Sometimes the last page of the dump contains zero records. We don't
-        // need to save the newest time because we are at the end of the dump
-        // anyway.
-        //
-        if (list.size() > 0)
-            newestPacketTime = list.at(list.size() - 1).getDateTime();
-
-        serialPort.write(DMP_SEND_NEXT_PAGE);
-
-        firstRecord = 0;
-    }
-
-    log.log(VP2Logger::VP2_INFO) << "Received " << list.size() << " records from DMPAFT " << Weather::formatDateTime(time) << endl;
-
-    return rv;
+    return readAfterArchivePages(time, list, numPages, firstRecord);
 }
-
 
 //
 // EEPROM Commands
@@ -504,11 +557,11 @@ VantagePro2Station::dumpAfter(DateTime time, vector<ArchivePacket> & list) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 bool
-VantagePro2Station::eepromReadDataBlock() {
+VantagePro2Station::eepromReadDataBlock(byte buffer[]) {
     if (!sendAckedCommand(DUMP_EEPROM_CMD))
         return false;
 
-    if (!serialPort.read(eepromBuffer, sizeof(eepromBuffer)) || !VantagePro2CRC::checkCRC(eepromBuffer, EEPROM_DATA_BLOCK_SIZE))
+    if (!serialPort.read(buffer, EEPROM_DATA_BLOCK_SIZE + CRC_BYTES) || !VantagePro2CRC::checkCRC(buffer, EEPROM_DATA_BLOCK_SIZE))
         return false;
 
     return true;
@@ -517,14 +570,34 @@ VantagePro2Station::eepromReadDataBlock() {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 bool
-VantagePro2Station::eepromRead(unsigned address, unsigned count) {
+VantagePro2Station::eepromRead(unsigned address, byte buffer[], unsigned count) {
+    ostringstream command;
+    command << READ_EEPROM_CMD << " " << hex << address << " " << count;
+    if (!sendOKedCommand(command.str()))
+        return false;
+
+    //
+    // Read four bytes at a time, each read will contain a 2 digit hex code and a <LF><CR> sequence.
+    //
+    for (int i = 0; i < count; i++) {
+        if (serialPort.read(this->buffer, EEPROM_READ_LINE_LENGTH) &&
+            this->buffer[EEPROM_READ_LINE_LENGTH - 2] == VP2Constants::LINE_FEED &&
+            this->buffer[EEPROM_READ_LINE_LENGTH - 1] == VP2Constants::CARRIAGE_RETURN) {
+
+            int value = strtol(this->buffer, nullptr, 16);
+            buffer[i] = value & BitConverter::ONE_BYTE_MASK;
+        }
+        else
+            return false;
+    }
+
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 bool
-VantagePro2Station::eepromBinaryRead(unsigned address, unsigned count) {
+VantagePro2Station::eepromBinaryRead(unsigned address, byte buffer[], unsigned count) {
     ostringstream command;
     command << READ_EEPROM_AS_BINARY_CMD << " " << hex << address << " " << count;
     if (!sendAckedCommand(command.str()))
@@ -539,7 +612,7 @@ VantagePro2Station::eepromBinaryRead(unsigned address, unsigned count) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 bool
-VantagePro2Station::eepromWriteByte(unsigned address, int value) {
+VantagePro2Station::eepromWriteByte(unsigned address, byte value) {
     ostringstream command;
     command << WRITE_EEPROM_CMD << " " << hex << address << " " << value;
     return sendOKedCommand(command.str());
@@ -660,8 +733,24 @@ VantagePro2Station::clearCurrentData() {
 //
 // Configuration Commands
 //
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
-VantagePro2Station::updateBaudRate(int baudRate) {
+VantagePro2Station::updateBaudRate(VP2Constants::BaudRate baudRate) {
+    ostringstream command;
+    command << SET_BAUD_RATE_CMD << " " << static_cast<int>(baudRate);
+
+    //
+    // First set the console's baud rate, then reopen the serial port with the
+    // new baud rate
+    //
+    if (sendOKedCommand(CLEAR_CURRENT_DATA_VALUES_CMD)) {
+        serialPort.close();
+        serialPort.setBaudRate(static_cast<int>(baudRate));
+        serialPort.open();
+    }
+
     return true;
 }
 
@@ -752,80 +841,7 @@ VantagePro2Station::controlConsoleLamp(bool on) {
 // EEPROM retrieval commands
 //
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-bool
-VantagePro2Station::getISSLocation(double & issLatitude, double & issLongitude, int & issElevation) {
-    log.log(VP2Logger::VP2_INFO) << "Getting ISS location" << endl;
-
-    short lat = BitConverter::toInt16(eepromNonGraphData, 11);
-    issLatitude = static_cast<double>(lat) / LAT_LON_SCALE;
-
-    short lon = BitConverter::toInt16(eepromNonGraphData, 13);
-    issLongitude = static_cast<double>(lon) / LAT_LON_SCALE;
-
-    int ialt = BitConverter::toInt16(eepromNonGraphData, 15);
-    issElevation = ialt;
-
-    int setupBits = BitConverter::toInt8(eepromNonGraphData, 43);
-
-    bool north = setupBits & 0x20 != 0;
-    bool east = setupBits & 0x40 != 0;
-    cout << "North: " << north << " East: " << east << endl;
-
-    return true;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-Rainfall
-VantagePro2Station::getRainCollectorSize() const {
-    int setupBits = BitConverter::toInt8(eepromNonGraphData, 43);
-
-    Rainfall rainCollectorSize = 0.0;
-
-    RainCupSizeType rainCupSizeType = static_cast<RainCupSizeType>((setupBits & 0x30) >> 4);
-
-    switch (rainCupSizeType) {
-        case POINT_01_INCH:
-            rainCollectorSize = POINT_01_INCH_SIZE;
-            break;
-        case POINT_02_MM:
-            rainCollectorSize = POINT_02_MM_SIZE;
-            break;
-        case POINT_01_MM:
-            rainCollectorSize = POINT_01_MM_SIZE;
-            break;
-        default:
-            rainCollectorSize = POINT_01_INCH_SIZE;
-            break;
-    }
-
-    log.log(VP2Logger::VP2_DEBUG1) << "Rain collector size: " << rainCollectorSize << " inches" << endl;
-
-    return rainCollectorSize;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-int
-VantagePro2Station::getArchivePeriod() const {
-    int archivePeriod = BitConverter::toInt8(eepromNonGraphData, 45);
-
-    log.log(VP2Logger::VP2_DEBUG1) << "Archive interval = " << archivePeriod << " minutes" << endl;
-
-    return archivePeriod;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-bool
-VantagePro2Station::areWindCupsLarge() const {
-    int setupBits = BitConverter::toInt8(eepromNonGraphData, 43);
-
-    return (setupBits & (1 << 3)) != 0;
-}
-
+/*
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 const vector<SensorStation> &
@@ -839,15 +855,48 @@ const vector<Sensor> &
 VantagePro2Station::getSensors() const {
     return sensors;
 }
+ */
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+struct StationData {
+    int repeaterId;
+    int stationType;
+    int humiditySensorNumber;
+    int temperatureSensorNumber;
+};
+
 bool
 VantagePro2Station::retrieveSensorStationInfo() {
-    log.log(VP2Logger::VP2_INFO) << "Retrieving sensor information" << endl;
-    if (!eepromBinaryRead(VP2Constants::EE_STATION_LIST, STATION_DATA_SIZE))
+    log.log(VP2Logger::VP2_INFO) << "Retrieving sensor station information" << endl;
+
+    if (!eepromBinaryRead(VP2Constants::EE_STATION_LIST, this->buffer, STATION_DATA_SIZE))
         return false;
 
+    int windSensorStation = 0;
+    StationData data[MAX_STATION_ID];
+    for (int i = 0; i < MAX_STATION_ID; i++) {
+        data[i].repeaterId = (buffer[i * 2] & 0xF0) >> 4;
+        data[i].stationType = buffer[i * 2] & 0xF;
+        data[i].humiditySensorNumber = (buffer[(i * 2) + 1] & 0xF0) >> 4;
+        data[i].temperatureSensorNumber = buffer[(i * 2) + 1] & 0xF;
+        if (data[i].stationType == SensorStation::ANEMOMETER)
+            windSensorStation = i + 1;
+        else if (data[i].stationType == SensorStation::INTEGRATED_SENSOR_STATION && windSensorStation == 0)
+            windSensorStation = i + 1;
+
+    }
+
+    cout << "@@@@@@@@@@ Station Data:" << endl;
+    cout << "@@@@@@@@@@ Wind Sensor Station ID: " << windSensorStation << endl;
+    for (int i = 0; i < MAX_STATION_ID; i++) {
+        cout << "@@@@@@@@@@ [" << i << "] Repeater ID: " << data[i].repeaterId
+             << " Station Type: " << data[i].stationType
+             << " Humidity Sensor: " << data[i].humiditySensorNumber
+             << " Temperature Sensor: " << data[i].temperatureSensorNumber << endl;
+
+    }
+    /*
     for (int i = 0; i < STATION_DATA_SIZE; i += 2) {
         SensorStation::SensorStationType sensorType = static_cast<SensorStation::SensorStationType>(buffer[i] & 0xF);
         if (sensorType != SensorStation::NO_STATION)
@@ -856,6 +905,7 @@ VantagePro2Station::retrieveSensorStationInfo() {
 
     for (vector<SensorStation>::iterator it = sensorStations.begin(); it != sensorStations.end(); ++it)
         log.log(VP2Logger::VP2_DEBUG1) << *it << endl;
+    */
 
     return true;
 }
@@ -864,7 +914,11 @@ VantagePro2Station::retrieveSensorStationInfo() {
 ////////////////////////////////////////////////////////////////////////////////
 int
 VantagePro2Station::calculateISSReception(int loopPacketWindSamples) const {
-    int maxPackets = static_cast<int>(((static_cast<float>(getArchivePeriod()) * 60.0F) / ((41.0F + 1.0F - 1.0F) / 16.0F)));
+    static const int stationId = 1;
+
+    float archivePeriodSeconds = archivePeriod * 60.0F;
+    float stationIndex = stationId - 1.0F;
+    int maxPackets = static_cast<int>(archivePeriodSeconds / ((41.0F + stationIndex) / 16.0F));
 
     int issReception = (loopPacketWindSamples * 100) / maxPackets;
     if (issReception > MAX_STATION_RECEPTION)
@@ -879,6 +933,15 @@ const CurrentWeather &
 VantagePro2Station::getCurrentWeather() const {
     return currentWeather;
 }
+
+/*
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+const StationConfiguration &
+VantagePro2Station::getStationConfiguration() const {
+    return stationConfiguration;
+}
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -901,7 +964,7 @@ VantagePro2Station::readLoopPacket(LoopPacket & loopPacket) {
     //
     if (firstLoopPacket) {
         firstLoopPacket = false;
-        Sensor::detectSensors(loopPacket, sensors);
+        //Sensor::detectSensors(loopPacket, sensors);
     }
 
     //
@@ -912,9 +975,9 @@ VantagePro2Station::readLoopPacket(LoopPacket & loopPacket) {
     //
     // Pull out the battery status for the sensor stations
     //
-    for (vector<SensorStation>::iterator it = sensorStations.begin(); it != sensorStations.end(); ++it) {
-        it->setBatteryStatus(loopPacket.isTransmitterBatteryGood(it->getSensorIndex()));
-    }
+    //for (vector<SensorStation>::iterator it = sensorStations.begin(); it != sensorStations.end(); ++it) {
+    //    it->setBatteryStatus(loopPacket.isTransmitterBatteryGood(it->getSensorIndex()));
+    //}
 
     log.log(VP2Logger::VP2_DEBUG1) << "LOOP packet read successfully" << endl;
     return true;
@@ -938,20 +1001,73 @@ VantagePro2Station::readLoop2Packet(Loop2Packet & loop2Packet) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 bool
-VantagePro2Station::archivePacketContainsData(const byte * buffer, int offset) {
-    bool containsData = false;
+VantagePro2Station::readAfterArchivePages(DateTime afterTime, vector<ArchivePacket> & list, int firstRecord, int numPages) {
+    DateTime newestPacketTime = afterTime;
+
+    bool rv = true;
+    for (int i = 0; i < numPages; i++) {
+        //
+        // Process a single page. This will return 1 - 5 packets
+        //
+        if (!readNextArchivePage(list, firstRecord, newestPacketTime)) {
+            serialPort.write(DMP_CANCEL_DOWNLOAD);
+            rv = false;
+            break;
+        }
+
+        //
+        // Sometimes the last page of the dump contains zero records. We don't
+        // need to save the newest time because we are at the end of the dump
+        // anyway.
+        //
+        if (list.size() > 0)
+            newestPacketTime = list.at(list.size() - 1).getDateTime();
+
+        serialPort.write(DMP_SEND_NEXT_PAGE);
+
+        firstRecord = 0;
+    }
+
+    if (rv)
+        log.log(VP2Logger::VP2_INFO) << "Received " << list.size() << " records from DMPAFT " << Weather::formatDateTime(afterTime) << endl;
+    else
+        log.log(VP2Logger::VP2_WARNING) << "Read of archive after " << Weather::formatDateTime(afterTime) << " failed" << endl;
+
+    return rv;
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+bool
+VantagePro2Station::readNextArchivePage(vector<ArchivePacket> & list, int firstRecord, DateTime newestPacketTime) {
+    bool rv = true;
+    log.log(VP2Logger::VP2_DEBUG1) << "Processing archive page. Newest packet time = " << Weather::formatDateTime(newestPacketTime) << endl;
 
     //
-    // Any bytes that is not equal to 0xFF means that there is data
+    // Try to read the page. Will attempt 3 tries to correct CRC errors.
     //
-    for (int i = 0; i < BYTES_PER_ARCHIVE_RECORD; i++) {
-        if (BitConverter::toInt8(buffer, offset + i) != NO_VALUE) {
-            containsData = true;
+    for (int i = 0; i < ARCHIVE_PAGE_READ_RETRIES; i++) {
+        if (serialPort.read(buffer, ARCHIVE_PAGE_SIZE + CRC_BYTES)) {
+            if (VantagePro2CRC::checkCRC(buffer, ARCHIVE_PAGE_SIZE)) {
+                decodeArchivePage(list, buffer, firstRecord, newestPacketTime);
+                rv = true;
+                break;
+            }
+            else {
+                log.log(VP2Logger::VP2_WARNING) << "CRC check failed on archive page. Try # " << (i + 1) << endl;
+                serialPort.write(DMP_RESEND_PAGE);
+                rv = false;
+            }
+        }
+        else {
+            serialPort.write(DMP_CANCEL_DOWNLOAD);
+            rv = false;
             break;
         }
     }
 
-    return containsData;
+    return rv;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -994,53 +1110,20 @@ VantagePro2Station::decodeArchivePage(vector<ArchivePacket> & list, const byte *
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 bool
-VantagePro2Station::readNextArchivePage(vector<ArchivePacket> & list, int firstRecord, DateTime newestPacketTime) {
-    bool rv = true;
-    log.log(VP2Logger::VP2_DEBUG1) << "Processing archive page. Newest packet time = " << Weather::formatDateTime(newestPacketTime) << endl;
+VantagePro2Station::archivePacketContainsData(const byte * buffer, int offset) {
+    bool containsData = false;
 
     //
-    // Try to read the page. Will attempt 3 tries to correct CRC errors.
+    // Any bytes that is not equal to 0xFF means that there is data
     //
-    for (int i = 0; i < ARCHIVE_PAGE_READ_RETRIES; i++) {
-        if (serialPort.read(buffer, ARCHIVE_PAGE_SIZE + CRC_BYTES)) {
-            if (VantagePro2CRC::checkCRC(buffer, ARCHIVE_PAGE_SIZE)) {
-                decodeArchivePage(list, buffer, firstRecord, newestPacketTime);
-                rv = true;
-                break;
-            }
-            else {
-                log.log(VP2Logger::VP2_WARNING) << "CRC check failed on archive page. Try # " << (i + 1) << endl;
-                serialPort.write(DMP_RESEND_PAGE);
-                rv = false;
-            }
-        }
-        else {
-            serialPort.write(DMP_CANCEL_DOWNLOAD);
-            rv = false;
+    for (int i = 0; i < BYTES_PER_ARCHIVE_RECORD; i++) {
+        if (BitConverter::toInt8(buffer, offset + i) != NO_VALUE) {
+            containsData = true;
             break;
         }
     }
 
-    return rv;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-bool
-VantagePro2Station::consumeAck() {
-    if (serialPort.read(buffer, 1)) {
-        char response = buffer[0];
-        char expected = VP2Constants::ACK;
-        bool rv = response == expected;
-        if (!rv)
-            log.log(VP2Logger::VP2_WARNING) << "consumeACK() read " << hex << static_cast<int>(response) << dec << " not an ACK" << endl;
-
-        return rv;
-    }
-    else {
-        log.log(VP2Logger::VP2_INFO) << "consumeACK() failed to read ACK" << endl;
-        return false;
-    }
+    return containsData;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1068,58 +1151,6 @@ VantagePro2Station::sendOKedCommand(const string & command) {
         else
             success = true;
 
-        if (!success)
-            wakeupStation();
-    }
-
-    log.log(VP2Logger::VP2_DEBUG1) << "Command " << command << " status is " << success << endl;
-    return success;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-bool
-VantagePro2Station::sendStringValueCommand(const string & command, string & results) {
-    bool rv = false;
-
-    results.clear();
-
-    if (!sendOKedCommand(command))
-        return false;
-
-    //
-    // Read 1 byte at a time, appending to the string value until a CR or LF is detected.
-    // The CR is the indicator that the command is complete.
-    //
-    byte b;
-    while (serialPort.read(&b, 1)) {
-        if (b != VP2Constants::LINE_FEED && b != VP2Constants::CARRIAGE_RETURN)
-            results.append(1, b);
-
-        if (b == VP2Constants::CARRIAGE_RETURN) {
-            rv = true;
-            break;
-        }
-    }
-
-    return rv;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-bool
-VantagePro2Station::sendAckedCommand(const string & command) {
-    log.log(VP2Logger::VP2_DEBUG1) << "Sending command '" << command << "' that expects and ACK response" << endl;
-    bool success = false;
-
-    //
-    // Try multiple times for completeness. If an ACK is not received then wakeup the console and
-    // try again.
-    //
-    for (int i = 0; i < COMMAND_RETRIES && !success; i++) {
-        serialPort.write(command);
-        serialPort.write(COMMAND_TERMINATOR);
-        success = consumeAck();
         if (!success)
             wakeupStation();
     }
@@ -1162,6 +1193,77 @@ VantagePro2Station::sendOKedWithDoneCommand(const string & command) {
 
     log.log(VP2Logger::VP2_DEBUG1) << "Command " << command << " final status is " << success << endl;
     return success;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+bool
+VantagePro2Station::sendAckedCommand(const string & command) {
+    log.log(VP2Logger::VP2_DEBUG1) << "Sending command '" << command << "' that expects and ACK response" << endl;
+    bool success = false;
+
+    //
+    // Try multiple times for completeness. If an ACK is not received then wakeup the console and
+    // try again.
+    //
+    for (int i = 0; i < COMMAND_RETRIES && !success; i++) {
+        serialPort.write(command);
+        serialPort.write(COMMAND_TERMINATOR);
+        success = consumeAck();
+        if (!success)
+            wakeupStation();
+    }
+
+    log.log(VP2Logger::VP2_DEBUG1) << "Command " << command << " status is " << success << endl;
+    return success;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+bool
+VantagePro2Station::sendStringValueCommand(const string & command, string & results) {
+    bool rv = false;
+
+    results.clear();
+
+    if (!sendOKedCommand(command))
+        return false;
+
+    //
+    // Read 1 byte at a time, appending to the string value until a CR or LF is detected.
+    // The CR is the indicator that the command is complete.
+    //
+    byte b;
+    while (serialPort.read(&b, 1)) {
+        if (b != VP2Constants::LINE_FEED && b != VP2Constants::CARRIAGE_RETURN)
+            results.append(1, b);
+
+        if (b == VP2Constants::CARRIAGE_RETURN) {
+            rv = true;
+            break;
+        }
+    }
+
+    return rv;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+bool
+VantagePro2Station::consumeAck() {
+    byte b;
+    bool rv = false;
+    if (!serialPort.read(&b, 1)) {
+        log.log(VP2Logger::VP2_INFO) << "consumeACK() read failed while consuming ACK" << endl;
+        return false;
+    }
+
+    if (b != VP2Constants::ACK) {
+        log.log(VP2Logger::VP2_WARNING) << "consumeACK() read " << hex << static_cast<int>(b) << dec << " not an ACK" << endl;
+        return false;
+    }
+
+    return true;
 }
 
 }

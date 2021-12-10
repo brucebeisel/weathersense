@@ -7,7 +7,8 @@
 namespace vp2 {
 
 Rainfall VP2Decoder::rainCollectorSize = static_cast<Rainfall>(0.0);
-VP2Logger * log = NULL;
+bool VP2Decoder::rainCollectorSizeSet = false;
+VP2Logger * log = nullptr;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -298,7 +299,7 @@ VP2Decoder::decodeWindDirection(const byte buffer[], int offset, Measurement<Hea
 
     if (value16 != VP2Constants::INVALID_WIND_DIRECTION) {
         Heading heading;
-        if (value16 == 360)
+        if (value16 == VP2Constants::NORTH_HEADING_VALUE)
             heading = 0.0;
         else
             heading = static_cast<Heading>(value16);
@@ -334,6 +335,7 @@ VP2Decoder::decodeStormRain(const byte buffer[], int offset) {
 void
 VP2Decoder::setRainCollectorSize(Rainfall collectorSize) {
     rainCollectorSize = collectorSize;
+    rainCollectorSizeSet = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -341,10 +343,10 @@ VP2Decoder::setRainCollectorSize(Rainfall collectorSize) {
 Rainfall
 VP2Decoder::decodeRain(const byte buffer[], int offset) {
 
-    if (log == NULL)
+    if (log == nullptr)
         log = &VP2Logger::getLogger("VP2Decoder");
 
-    if (rainCollectorSize == 0.0)
+    if (!rainCollectorSizeSet)
         log->log(VP2Logger::VP2_WARNING) << "Decoding rain value before rain collector size has been set" << std::endl;
     
     int value16 = BitConverter::toInt16(buffer, offset);

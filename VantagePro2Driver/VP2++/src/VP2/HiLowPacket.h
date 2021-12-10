@@ -39,7 +39,8 @@ public:
      */
     bool decodeHiLowPacket(byte buffer[]);
 
-    std::string formatMessage() const;
+    std::string formatXML() const;
+    std::string formatJSON() const;
 
     //
     // Barometer High/Lows
@@ -182,6 +183,7 @@ private:
         T           monthExtremeValue;
         T           yearExtremeValue;
         std::string formatXML(bool low) const;
+        std::string formatJSON(bool low) const;
     };
 
     template<typename T> using LowValues = Values<T>;
@@ -192,6 +194,7 @@ private:
         Values<T>   lows;
         Values<T>   highs;
         std::string formatXML() const;
+        std::string formatJSON() const;
     };
 
     bool decodeHiLowTemperature(const byte buffer[], HighLowValues<Temperature> & values, int baseOffset);

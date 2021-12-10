@@ -25,36 +25,59 @@
 #include "LoopPacket.h"
 #include "Loop2Packet.h"
 #include "WindDirectionSlices.h"
-#include "ParametersMessage.h"
 #include "SensorStation.h"
 #include "Sensor.h"
+#include "BitConverter.h"
 #include "SerialPort.h"
 
 namespace vp2 {
 class HiLowPacket;
 
-class StationConfiguration {
-public:
-private:
-    double                     issLatitude;
-    double                     issLongitude;
-    int                        issElevation;
-    int                        timeZoneIndex;
-    bool                       automaticDaylightSavingsTime;
-    bool                       manualDaylightSavingsTimeOn;
-    float                      gmtOffset;
-    bool                       useTimezone;
-    std::vector<SensorStation> sensorStations;
-    int                        retransmitId;                 // 0 = no retransmission
-    Rainfall                   rainCollectorSize;
-    int                        archivePeriod;
+struct TimeZoneData {
+    int index;
+    int offsetMinutes;
+    const char * name;
 };
 
-    //bool                       north;
-    //bool                       east;
-    //std::string                firmwareDate;
-    //std::string                firmwareVersion;
-    //VP2Logger                  log;
+static const TimeZoneData TIME_ZONES[] = {
+    0, -1200, "(GMT-12:00) Eniwetok, Kwajalein",
+    1, -1100, "(GMT-11:00) Midway Island, Samoa",
+    2, -1000, "(GMT-10:00) Hawaii",
+    3,  -900, "(GMT-09:00) Alaska",
+    4,  -800, "(GMT-08:00) Pacific Time, Tijuana",
+    5,  -700, "(GMT-07:00) Mountain Time",
+    6,  -600, "(GMT-06:00) Central Time",
+    7,  -600, "(GMT-06:00) Mexico City",
+    8,  -600, "(GMT-06:00) Central America",
+    9,  -500, "(GMT-05.00) Bogota, Lima, Quito",
+    10, -500, "(GMT-05:00) Eastern Time",
+    11, -400, "(GMT-04:00) Atlantic Time",
+    12, -400, "(GMT-04.00) Caracas, La Paz, Santiago",
+    13, -330, "(GMT-03.30) Newfoundland",
+    14, -300, "(GMT-03.00) Brasilia",
+    15, -300, "(GMT-03.00) Buenos Aires, Georgetown, Greenland",
+    16, -200, "(GMT-02.00) Mid-Atlantic",
+    17, -100, "(GMT-01:00) Azores, Cape Verde Island",
+    18,    0, "(GMT) Greenwich Mean Time, Dublin, Edinburgh, Lisbon, London",
+    19,    0, "(GMT) Monrovia, Casablanca",
+    20,  100, "(GMT+01.00) Berlin, Rome, Amsterdam, Bern, Stockholm, Vienna",
+    21,  100, "(GMT+01.00) Paris, Madrid, Brussels, Copenhagen, W Central Africa",
+    22,  100, "(GMT+01.00) Prague, Belgrade, Bratislava, Budapest, Ljubljana",
+    23,  200, "(GMT+02.00) Athens, Helsinki, Istanbul, Minsk, Riga, Tallinn",
+    24,  200, "(GMT+02:00) Cairo",
+    25,  200, "(GMT+02.00) Eastern Europe, Bucharest",
+    26,  200, "(GMT+02:00) Harare, Pretoria",
+    27,  200, "(GMT+02.00) Israel, Jerusalem",
+    28,  300, "(GMT+03:00) Baghdad, Kuwait, Nairobi, Riyadh",
+    29,  300, "(GMT+03.00) Moscow, St. Petersburg, Volgograd",
+    30,  330, "(GMT+03:30) Tehran",
+    31,  400, "(GMT+04:00) Abu Dhabi, Muscat, Baku, Tblisi, Yerevan, Kazan",
+    32,  430, "(GMT+04:30) Kabul",
+    33,  500, "(GMT+05:00) Islamabad, Karachi, Ekaterinburg, Tashkent",
+    34,  530, "(GMT+05:30) Bombay, Calcutta, Madras, New Delhi, Chennai",
+    35,  600, "(GMT+06:00) Almaty, Dhaka, Colombo, Novosibirsk, Astana",
+    36,  700, "(GMT+07:00) Bangkok, Jakarta, Hanoi, Krasnoyarsk"
+};
 
 /**
  * Class that handles the command protocols with the VP2 console.
@@ -70,6 +93,14 @@ public:
         virtual bool processCurrentWeather(const CurrentWeather & cw) = 0;
     };
     static const int MAX_STATION_RECEPTION = 100;
+
+    struct ConsoleDiagnosticReport {
+        int packetCount;
+        int missedPacketCount;
+        int syncCount;
+        int maxPacketSequence;
+        int crcErrorCount;
+    };
 
     /**
      * Constructor.
@@ -111,10 +142,9 @@ public:
     bool wakeupStation();
 
     /**
-     * Retrieve the configuration parameters.
+     * Read any data from the station that is needed for other commands, such as the archive period or rain collector.
      */
-    bool retrieveConfigurationParameters();
-
+    bool initialize();
 
     //
     // The following methods correspond to the commands in section VIII of the Vantage Serial Protocol Document, version 2.6.1
@@ -123,21 +153,61 @@ public:
     /////////////////////////////////////////////////////////////////////////////////
     // Testing Commands
     /////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Send a test command to the console that expects the response "TEST<LF><CR>". This command
+     * is used to test connectivity with the console.
+     *
+     * @return True if the correct response was received
+     */
     bool sendTestCommand();
 
-    bool retrieveConsoleDiagnosticsReport();
+    /**
+     * Retrieve the console diagnostic report.
+     *
+     * @param report The structure into which the report parameters are written
+     *
+     * @return True if the report was successfully retrieved
+     */
+    bool retrieveConsoleDiagnosticsReport(ConsoleDiagnosticReport & report);
 
+    /**
+     * Move the console from the "Receiving from..." screen to the current condition screen and reset
+     * counters in the console diagnostic report.
+     */
     bool performReceiveTest();
+
+    /**
+     * Retrieve the date of the console firmware.
+     *
+     * @param firmwareDate An optional string to return the firmware date. nullptr is allowed.
+     *
+     * @return True if the date was retrieved successfully
+     */
+    bool retrieveFirmwareDate(std::string * firmwareDate);
 
     /**
      * Retrieve the list of receivers the console can hear. Note that this is not the set of stations that the console is
      * reading from. There can be other sensor stations in the area that do not belong to this Vantage station.
+     *
+     * @param sensorStations An optional vector into which the sensor station list will be written. nullptr is allowed.
+     *
+     * @return True if the list of sensor stations was retrieved
      */
     bool retrieveReceiverList(std::vector<StationId> * sensorStations);
 
+    /**
+     * Retrieve the version of the console firmware.
+     *
+     * @param firmwareVersion An optional string to return the firmware version. nullptr is allowed.
+     *
+     * @return True if the version was retrieved successfully
+     */
     bool retrieveFirmwareVersion(std::string * firmwareVersion);
 
-    bool retrieveFirmwareDate(std::string * firmwareDate);
+    /////////////////////////////////////////////////////////////////////////////////
+    // End Testing Commands
+    /////////////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////////////////////
     // Current Data Commands
@@ -150,12 +220,38 @@ public:
      */
     void currentValuesLoop(int records);
 
+    /**
+     * Retrieve the current high/low packet from the console.
+     *
+     * @param packet The packet into which the high/low packet will be written
+     *
+     * @return True if successful
+     */
     bool retrieveHiLowValues(HiLowPacket &packet);
 
+    /**
+     * Write the specified rainfall amount as the current yearly accumulated rainfall.
+     * This can be used when a weather station is installed or reset mid-year.
+     *
+     * @param rain The rainfall amount to write to the console
+     *
+     * @return True if successful
+     */
     bool putYearlyRain(Rainfall rain);
 
+    /**
+     * Write the specified ET as the current yearly accumulated ET.
+     * This can be used when a weather station is installed or reset mid-year.
+     *
+     * @param et The ET to write to the console
+     *
+     * @return True if successful
+     */
     bool putYearlyET(Evapotranspiration et);
 
+    /////////////////////////////////////////////////////////////////////////////////
+    // End Current Data Commands
+    /////////////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////////////////////
     // Download Commands
@@ -173,17 +269,77 @@ public:
      * 
      * @param time    The time after which to dump the archive
      * @param archive The vector into which the dumped archive packets will be returned
+     *
      * @return True if successful
      */
     bool dumpAfter(DateTime time, std::vector<ArchivePacket> & archive);
 
+    /////////////////////////////////////////////////////////////////////////////////
+    // End Download Commands
+    /////////////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////////////////////
     // EEPROM Commands
     /////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Read the entire EEPROM data block.
+     *
+     * @return True if the read was successful
+     */
+    bool eepromReadDataBlock(byte buffer[]);
+
+    /**
+     * Read part of the EEPROM memory.
+     *
+     * @param The EEPROM address at which the reading will begin
+     *
+     * @return True if the read is successful
+     */
+    bool eepromRead(unsigned address, byte buffer[], unsigned count);
+
+    /**
+     * Read part of the EEPROM memory.
+     *
+     * @param The EEPROM address at which the reading will begin
+     *
+     * @return True if the read is successful
+     */
+    bool eepromBinaryRead(unsigned address, byte buffer[], unsigned count);
+
+    /**
+     * Write a single byte to the specified EEPROM address.
+     *
+     * @param address The address within the EEPROM memory
+     * @param value   The value to write to the specified address
+     *
+     * @return True if successful
+     */
+    bool eepromWriteByte(unsigned address, byte value);
+
+    /**
+     * Write a series of bytes to the EEPROM.
+     *
+     * @param address The address within the EEPROM at which the write will start
+     * @param buffer  The buffer to write to the EEPROM
+     * @param count   The number of bytes to write to the EEPROM
+     *
+     * @return bool True if successful
+     */
+    bool eepromBinaryWrite(unsigned address, const byte buffer[], unsigned count);
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // End EEPROM Commands
+    /////////////////////////////////////////////////////////////////////////////////
+
     /////////////////////////////////////////////////////////////////////////////////
     // Calibration Commands
+    /////////////////////////////////////////////////////////////////////////////////
+
+    // Calibration commands are not supported at this time
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // End Calibration Commands
     /////////////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////////////////////
@@ -199,11 +355,22 @@ public:
     bool clearActiveAlarms();
     bool clearCurrentData();
 
+    /////////////////////////////////////////////////////////////////////////////////
+    // End Clearing Commands
+    /////////////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////////////////////
     // Configuration Commands
     /////////////////////////////////////////////////////////////////////////////////
-    bool updateBaudRate(int rate);
+
+    /**
+     * Change the baud rate for communicating with the console.
+     *
+     * @param rate The new baud rate
+     *
+     * @return True if successful
+     */
+    bool updateBaudRate(VP2Constants::BaudRate rate);
     
     /**
      * Update the console's time.
@@ -235,6 +402,7 @@ private:
      *      1. Lat/Lon
      *      2. Elevation
      *      3. Any value in the EEPROM byte 0x2B (Decimal 43)
+     * This command is private as it can only be triggered by a command that changes the configuration.
      *
      * @return True if successful
      */
@@ -250,90 +418,19 @@ public:
      */
     bool controlConsoleLamp(bool on);
 
-    //
-    // End of console commands
-    //
-
     /////////////////////////////////////////////////////////////////////////////////
-    // EEPROM commands
+    // End of Configuration Commands
     /////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Read the entire EEPROM data block.
-     *
-     * @return True if the read was successful
-     */
-    bool eepromReadDataBlock();
-
-    /**
-     * Read part of the EEPROM memory.
-     *
-     * @param The EEPROM address at which the reading will begin
-     * @return True if the read is successful
-     */
-    bool eepromRead(unsigned address, unsigned count);
-
-    /**
-     * Read part of the EEPROM memory.
-     *
-     * @param The EEPROM address at which the reading will begin
-     * @return True if the read is successful
-     */
-    bool eepromBinaryRead(unsigned address, unsigned count);
-
-    bool eepromWriteByte(unsigned address, int value);
-
-    bool eepromBinaryWrite(unsigned address, const byte buffer[], unsigned count);
-
-
-    //
-    // End of EEPROM commands
-    //
-
-    /**
-     * Get the archive period (in minutes).
-     * 
-     * @return The archive period
-     */
-    int getArchivePeriod() const;
-
-    /**
-     * Get the size of the rain collector.
-     *
-     * @return The size of the rain collector in inches
-     */
-    Rainfall getRainCollectorSize() const;
-
-    bool getISSLocation(double & issLatitude, double & issLongitude, int & issElevation);
-
-    bool areWindCupsLarge() const;
-
-    bool getDaylightSavingsTimeMode();
-
-    /**
-     * Get the list of sensor stations.
-     * 
-     * @return the list of sensor stations
-     */
-    const std::vector<SensorStation> & getSensorStations() const;
-
-    /**
-     * Get the list of sensors attached to the sensor stations.
-     * 
-     * @return The list of sensors
-     */
-    const std::vector<Sensor> & getSensors() const;
-
-    /**
-     * Retrieve the rain collector size from the console.
-     * 
-     * @return True if the rain collector size was stored successfully
-     */
 
     int calculateISSReception(int loopPacketWindSamples) const;
 
+    /**
+     * Get the current weather data.
+     *
+     * @return the current weather data
+     */
     const CurrentWeather & getCurrentWeather() const;
-
 
 private:
     static constexpr int WAKEUP_TRIES = 5;               // The number of times to try to wake up the console before performing a disconnect/reconnect cycle
@@ -344,6 +441,7 @@ private:
     static constexpr int BYTES_PER_ARCHIVE_RECORD = 52;  // The size of each archive record
     static constexpr int RECORDS_PER_ARCHIVE_PAGE = 5;   // The number of archive records per archive page
     static constexpr int DUMP_AFTER_RESPONSE_LENGTH = 4; // The length of the response to the DUMP AFTER command
+    static constexpr int EEPROM_READ_LINE_LENGTH = 4; // The length of the response to the DUMP AFTER command
 
     static constexpr int LOOP_PACKET_SIZE = 99;
     static constexpr int TIME_RESPONSE_LENGTH = 6;
@@ -367,47 +465,6 @@ private:
 
     static constexpr double LAT_LON_SCALE = 10.0;
 
-    enum RainCupSizeType {
-        POINT_01_INCH = 0,
-        POINT_02_MM = 1,
-        POINT_01_MM = 2
-    };
-
-    static constexpr Rainfall POINT_01_INCH_SIZE = 0.1;        // Inches
-    static constexpr Rainfall POINT_02_MM_SIZE   = 0.2 / 25.4; // Inches
-    static constexpr Rainfall POINT_01_MM_SIZE   = 0.1 / 25.4; // Inches
-
-
-    /**
-     * Send a command that expects on "OK" response.
-
-     * @param command The command to be sent to the VP2 console
-     * @return True if the command was sent successfully
-     */
-    bool sendOKedCommand(const std::string & command);
-
-    /**
-     * Send a command that expects on "OK" response followed by a "DONE" after a period of time.
-
-     * @param command The command to be sent to the VP2 console
-     * @return True if the command was sent successfully
-     */
-    bool sendOKedWithDoneCommand(const std::string & command);
-
-    /**
-     * Send a command that expects an ACK response.
-     *
-     * @param command The command to be sent to the VP2 console
-     * @return True if the command was sent successfully
-     */
-    bool sendAckedCommand(const std::string & command);
-
-    /**
-     * Read exactly one byte, checking for an ACK.
-     *
-     * @return True if one character was read and it was an ACK
-     */
-    bool consumeAck();
 
     /**
      * Read the LOOP packet and save off a few values for later use.
@@ -426,6 +483,18 @@ private:
      * @return True if the packet was read succesfully
      */
     bool readLoop2Packet(Loop2Packet & loop2Packet);
+
+    /**
+     * Read the archive pages that occur after the specified time.
+     *
+     * @param afterTime   The time after which the archive records will be saved
+     * @param list        The list into which the archive records will be saved
+     * @param firstRecord The first record in the first page that is part of the dump
+     * @param numPages    The number of pages in the archive that are after the specified time
+     *
+     * @return True if successful
+     */
+    bool readAfterArchivePages(DateTime afterTime, std::vector<ArchivePacket> & list, int firstRecord, int numPages);
 
     /**
      * Read the next archive page that is part of the one of the dump commands.
@@ -457,10 +526,29 @@ private:
      */
     bool archivePacketContainsData(const byte * buffer, int offset);
 
+    /**
+     * Send a command that expects on "OK" response.
 
-public:
-    bool retrieveSensorStationInfo();
-private:
+     * @param command The command to be sent to the VP2 console
+     * @return True if the command was sent successfully
+     */
+    bool sendOKedCommand(const std::string & command);
+
+    /**
+     * Send a command that expects on "OK" response followed by a "DONE" after a period of time.
+
+     * @param command The command to be sent to the VP2 console
+     * @return True if the command was sent successfully
+     */
+    bool sendOKedWithDoneCommand(const std::string & command);
+
+    /**
+     * Send a command that expects an ACK response.
+     *
+     * @param command The command to be sent to the VP2 console
+     * @return True if the command was sent successfully
+     */
+    bool sendAckedCommand(const std::string & command);
 
     /**
      * Send the command to retrieve a string value.
@@ -472,28 +560,39 @@ private:
     bool sendStringValueCommand(const std::string & command, std::string & results);
 
     /**
-     * Read the portion of the EEPROM that does not contain the graph data.
+     * Read exactly one byte, checking for an ACK.
      *
-     * @return True if the EEPROM was read successfully
+     * @return True if one character was read and it was an ACK
      */
-    bool readNonGraphEepromData();
+    bool consumeAck();
+
+
+public:
+    bool retrieveSensorStationInfo();
+private:
+
 
 
     Callback *                 callback;
     SerialPort                 serialPort;
+    bool                       firstLoopPacket;
     int                        baudRate;
-    byte                       buffer[BUFFER_SIZE];
-    byte                       eepromBuffer[EEPROM_DATA_BLOCK_SIZE + CRC_BYTES];
-    byte                       eepromNonGraphData[EEPROM_NON_GRAPH_DATA_SIZE + CRC_BYTES];
-    byte                       alarmThresholds[ALARM_THRESHOLDS_SIZE];
     WindDirectionSlices        pastWindDirs;
     CurrentWeather             currentWeather;
+    Rainfall                   rainCollectorSize;
+    int                        archivePeriod;
+
+    byte                       buffer[BUFFER_SIZE];
+    //byte                       eepromBuffer[EEPROM_DATA_BLOCK_SIZE + CRC_BYTES];
+    //byte                       eepromNonGraphData[EEPROM_NON_GRAPH_DATA_SIZE + CRC_BYTES];
+    //byte                       alarmThresholds[ALARM_THRESHOLDS_SIZE];
+
+    //StationConfiguration       stationConfiguration;
     float                      consoleBatteryVoltage;
-    bool                       firstLoopPacket;
     std::string                firmwareDate;
     std::string                firmwareVersion;
-    std::vector<SensorStation> sensorStations;
-    std::vector<Sensor>        sensors;
+    //std::vector<SensorStation> sensorStations;
+    //std::vector<Sensor>        sensors;
     std::vector<StationId>     stationIds;
     VP2Logger                  log;
 };

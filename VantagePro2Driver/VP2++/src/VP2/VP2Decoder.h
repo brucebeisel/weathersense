@@ -85,6 +85,7 @@ public:
     static Rainfall decodeStormRain(const byte buffer[], int offset);
 
     static void setRainCollectorSize(Rainfall collectorSize);
+
     static Rainfall decodeRain(const byte buffer[], int offset);
 
     static DateTime decodeStormStartDate(const byte buffer[], int offset);
@@ -104,6 +105,7 @@ public:
 
 private:
     static Rainfall rainCollectorSize;
+    static bool     rainCollectorSizeSet;
 
     VP2Decoder();
     ~VP2Decoder();
