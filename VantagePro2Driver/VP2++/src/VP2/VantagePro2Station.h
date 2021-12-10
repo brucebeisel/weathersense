@@ -293,20 +293,22 @@ public:
     /**
      * Read part of the EEPROM memory.
      *
-     * @param The EEPROM address at which the reading will begin
+     * @param address The EEPROM address at which the reading will begin
+     * @param count   The number of bytes to read
      *
      * @return True if the read is successful
      */
-    bool eepromRead(unsigned address, byte buffer[], unsigned count);
+    bool eepromRead(unsigned address, unsigned count);
 
     /**
      * Read part of the EEPROM memory.
      *
-     * @param The EEPROM address at which the reading will begin
+     * @param address The EEPROM address at which the reading will begin
+     * @param count   The number of bytes to read
      *
      * @return True if the read is successful
      */
-    bool eepromBinaryRead(unsigned address, byte buffer[], unsigned count);
+    bool eepromBinaryRead(unsigned address, unsigned count);
 
     /**
      * Write a single byte to the specified EEPROM address.

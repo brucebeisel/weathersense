@@ -202,9 +202,10 @@ VantagePro2Station::initialize() {
     if (!retrieveSensorStationInfo())
         return false;
 
-    byte setupBits;
-    if (!eepromBinaryRead(VP2Constants::EE_SETUP_BITS, &setupBits, 1))
+    if (!eepromBinaryRead(VP2Constants::EE_SETUP_BITS, 1))
         return false;
+
+    byte setupBits = buffer[0];
 
     VP2Constants::RainCupSizeType type = static_cast<VP2Constants::RainCupSizeType>((setupBits & 0x30) >> 4);
 
@@ -220,11 +221,13 @@ VantagePro2Station::initialize() {
             break;
     }
 
-    byte value;
-    if (!eepromBinaryRead(VP2Constants::EE_ARCHIVE_PERIOD, &value, 1))
+    if (!eepromBinaryRead(VP2Constants::EE_ARCHIVE_PERIOD, 1))
         return false;
 
-    archivePeriod = value;
+    archivePeriod = buffer[0];
+
+    log.log(VP2Logger::VP2_INFO) << "Initialize results: Rain Collector Size: " << rainCollectorSize << " Archive Period: " << archivePeriod << endl;
+
 
     return true;
 }
@@ -571,7 +574,7 @@ VantagePro2Station::eepromReadDataBlock(byte buffer[]) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 bool
-VantagePro2Station::eepromRead(unsigned address, byte buffer[], unsigned count) {
+VantagePro2Station::eepromRead(unsigned address, unsigned count) {
     ostringstream command;
     command << READ_EEPROM_CMD << " " << hex << address << " " << count;
     if (!sendOKedCommand(command.str()))
@@ -598,7 +601,7 @@ VantagePro2Station::eepromRead(unsigned address, byte buffer[], unsigned count) 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 bool
-VantagePro2Station::eepromBinaryRead(unsigned address, byte buffer[], unsigned count) {
+VantagePro2Station::eepromBinaryRead(unsigned address, unsigned count) {
     ostringstream command;
     command << READ_EEPROM_AS_BINARY_CMD << " " << hex << address << " " << count;
     if (!sendAckedCommand(command.str()))
@@ -871,7 +874,7 @@ bool
 VantagePro2Station::retrieveSensorStationInfo() {
     log.log(VP2Logger::VP2_INFO) << "Retrieving sensor station information" << endl;
 
-    if (!eepromBinaryRead(VP2Constants::EE_STATION_LIST, this->buffer, STATION_DATA_SIZE))
+    if (!eepromBinaryRead(VP2Constants::EE_STATION_LIST, STATION_DATA_SIZE))
         return false;
 
     int windSensorStation = 0;

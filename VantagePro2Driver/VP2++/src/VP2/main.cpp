@@ -56,7 +56,7 @@ consoleThreadEntry(const string & archiveFile, const string & serialPortName, co
 
 
     try {
-        if (driver.initialize() != 0)
+        if (!driver.initialize())
             return;
 
         driver.mainLoop();
