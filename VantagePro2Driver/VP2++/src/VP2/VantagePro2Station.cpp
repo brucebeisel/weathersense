@@ -22,6 +22,7 @@
 #include <time.h>
 #include <math.h>
 #include <sstream>
+#include <cstring>
 #include "VP2Constants.h"
 #include "CurrentWeather.h"
 #include "HiLowPacket.h"
