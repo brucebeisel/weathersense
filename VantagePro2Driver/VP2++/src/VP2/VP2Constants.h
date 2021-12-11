@@ -85,7 +85,7 @@ namespace VP2Constants {
         POINT_01_MM = 2
     };
 
-    static constexpr Rainfall POINT_01_INCH_SIZE = 0.1;        // Inches
+    static constexpr Rainfall POINT_01_INCH_SIZE = 0.01;       // Inches
     static constexpr Rainfall POINT_02_MM_SIZE   = 0.2 / 25.4; // Inches
     static constexpr Rainfall POINT_01_MM_SIZE   = 0.1 / 25.4; // Inches
 

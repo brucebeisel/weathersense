@@ -207,7 +207,7 @@ VantagePro2Station::initialize() {
     if (!eepromBinaryRead(VP2Constants::EE_SETUP_BITS, 1))
         return false;
 
-    byte setupBits = buffer[0];
+    int setupBits = BitConverter::toInt8(buffer, 0);
 
     VP2Constants::RainCupSizeType type = static_cast<VP2Constants::RainCupSizeType>((setupBits & 0x30) >> 4);
 
