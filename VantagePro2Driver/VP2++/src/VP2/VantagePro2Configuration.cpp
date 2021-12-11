@@ -46,6 +46,7 @@ VantagePro2Configuration::decodeData(const byte buffer[]) {
 
 bool
 VantagePro2Configuration::retrieveConfigurationParameters() {
+    byte buffer[EEPROMR::EEPROM_NON_]
     if (station.eepromBinaryRead(0, EEPROM_NON_GRAPH_DATA_SIZE)) {
         memcpy(eepromNonGraphData, buffer, EEPROM_NON_GRAPH_DATA_SIZE);
         stationConfiguration.decodeData(eepromNonGraphData);

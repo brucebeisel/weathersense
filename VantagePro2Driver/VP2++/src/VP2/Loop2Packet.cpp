@@ -146,11 +146,10 @@ Loop2Packet::decodeLoop2Packet(const byte buffer[]) {
         return false;
     }
 
-    if ((char)buffer[95] != VP2Constants::LINE_FEED || (char)buffer[96] != VP2Constants::CARRIAGE_RETURN) {
+    if (buffer[95] != VP2Constants::LINE_FEED || buffer[96] != VP2Constants::CARRIAGE_RETURN) {
         log.log(VP2Logger::VP2_ERROR) << "<LF><CR> not found" << endl;
         return false;
     }
-
 
     windSpeed10MinuteAvg = VP2Decoder::decodeAvgWindSpeed(buffer, 18);
     windSpeed2MinuteAvg = VP2Decoder::decodeAvgWindSpeed(buffer, 20);

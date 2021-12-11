@@ -4,6 +4,7 @@
 #include "SensorStation.h"
 #include "Sensor.h"
 #include "Weather.h"
+#include "VantagePro2Station.h"
 
 namespace vp2 {
 
@@ -22,7 +23,6 @@ public:
     static constexpr Rainfall POINT_02_MM_SIZE   = 0.2 / 25.4; // Inches
     static constexpr Rainfall POINT_01_MM_SIZE   = 0.1 / 25.4; // Inches
 
-    void decodeData(const byte buffer[]);
 
 public:
     double                     issLatitude;
@@ -73,8 +73,10 @@ public:
      */
     const std::vector<Sensor> & getSensors() const;
 
+    void decodeData(const byte buffer[]);
 
 private:
+    VantagePro2Station station;
 };
 
 }

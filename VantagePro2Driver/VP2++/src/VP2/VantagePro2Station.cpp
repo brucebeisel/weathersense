@@ -194,6 +194,8 @@ VantagePro2Station::wakeupStation() {
     return awake;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 bool
 VantagePro2Station::initialize() {
     if (!wakeupStation())
@@ -227,7 +229,6 @@ VantagePro2Station::initialize() {
     archivePeriod = BitConverter::toInt8(buffer, 0);
 
     log.log(VP2Logger::VP2_INFO) << "Initialize results: Rain Collector Size: " << rainCollectorSize << " Archive Period: " << archivePeriod << endl;
-
 
     return true;
 }
@@ -601,7 +602,7 @@ VantagePro2Station::eepromRead(unsigned address, unsigned count) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 bool
-VantagePro2Station::eepromBinaryRead(unsigned address, unsigned count) {
+VantagePro2Station::eepromBinaryRead(unsigned address, unsigned count, char * output) {
     ostringstream command;
     command << READ_EEPROM_AS_BINARY_CMD << " " << uppercase << hex << address << " " << count << nouppercase;
 
@@ -610,6 +611,9 @@ VantagePro2Station::eepromBinaryRead(unsigned address, unsigned count) {
 
     if (!serialPort.read(buffer, count + CRC_BYTES) || !VantagePro2CRC::checkCRC(buffer, count))
         return false;
+
+    if (output != nullptr)
+        memcpy(output, buffer, count);
 
     return true;
 }
@@ -939,6 +943,10 @@ VantagePro2Station::getCurrentWeather() const {
     return currentWeather;
 }
 
+Rainfall
+VantagePro2Station::getRainCollectorSize() const {
+    return rainCollectorSize;
+}
 /*
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

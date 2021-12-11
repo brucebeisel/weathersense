@@ -305,10 +305,11 @@ public:
      *
      * @param address The EEPROM address at which the reading will begin
      * @param count   The number of bytes to read
+     * @param output  Option point to which the results of the read will be copied
      *
      * @return True if the read is successful
      */
-    bool eepromBinaryRead(unsigned address, unsigned count);
+    bool eepromBinaryRead(unsigned address, unsigned count, char * output = nullptr);
 
     /**
      * Write a single byte to the specified EEPROM address.
@@ -434,6 +435,8 @@ public:
      * @return the current weather data
      */
     const CurrentWeather & getCurrentWeather() const;
+
+    Rainfall getRainCollectorSize() const;
 
 private:
     static constexpr int WAKEUP_TRIES = 5;               // The number of times to try to wake up the console before performing a disconnect/reconnect cycle

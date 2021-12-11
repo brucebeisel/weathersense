@@ -86,12 +86,6 @@ VantagePro2Driver::initialize() {
         log.log(VP2Logger::VP2_INFO) << "Weather Station is awake" << endl;
     }
 
-    if (!station.initialize()) {
-        log.log(VP2Logger::VP2_ERROR) << "Failed to initialize weather station" << endl;
-        return false;
-
-    }
-
     /*
     if (!station.retrieveConfigurationParameters()) {
         log.log(VP2Logger::VP2_ERROR) << "Failed to retrieve configuration parameters" << endl;
@@ -124,6 +118,8 @@ VantagePro2Driver::initialize() {
         log.log(VP2Logger::VP2_ERROR) << "Failed to wake up console after initialization" << endl;
         return false;
     }
+
+    VP2Decoder::setRainCollectorSize(station.getRainCollectorSize()); // TBD, this should come from VantagePro2Configuration class
 
     log.log(VP2Logger::VP2_INFO) << "Initialization complete." << endl;
 
