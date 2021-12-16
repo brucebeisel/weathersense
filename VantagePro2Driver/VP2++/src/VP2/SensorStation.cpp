@@ -22,20 +22,28 @@ using namespace std;
 
 namespace vp2 {
 static const char *STATION_TYPES[] = {
-    "INTEGRATED_SENSOR_STATION",
-    "TEMPERATURE_ONLY",
-    "HUMIDITY_ONLY",
-    "TEMPERATURE_HUMIDITY",
-    "ANEMOMETER",
-    "RAIN",
-    "LEAF",
-    "SOIL",
-    "SOIL_LEAF"
+    "Integrated Sensor Station",
+    "Temperature Only",
+    "Humidity Only",
+    "Temperature/Humidity",
+    "Anemometer",
+    "Rain",
+    "Leaf",
+    "Soil",
+    "Soil/Leaf"
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-SensorStation::SensorStation(SensorStation::SensorStationType type, int sensorIndex) : type(type), sensorIndex(sensorIndex) {
+//SensorStation::SensorStation(SensorStation::SensorStationType type, int sensorIndex, RepeaterId repeaterId)
+SensorStation::SensorStation(SensorStationType type, int sensorTransmitterChannel, RepeaterId repeaterId, bool hasAnemometer) : type(type),
+                                                                                                                                sensorTransmitterChannel(sensorTransmitterChannel),
+                                                                                                                                repeaterId(repeaterId),
+                                                                                                                                batteryStatus(true),
+                                                                                                                                isAnemometerConnected(false),
+                                                                                                                                temperatureSensorIndex(-1),
+                                                                                                                                humiditySensorIndex(-1),
+                                                                                                                                linkQuality(NO_LINK_QUALITY) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,14 +56,21 @@ SensorStation::getSensorStationType() const {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 int
-SensorStation::getSensorIndex() const {
-    return sensorIndex;
+SensorStation::getSensorTransmitterChannel() const {
+    return sensorTransmitterChannel;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+SensorStation::RepeaterId
+SensorStation::getRepeaterId() const {
+    return repeaterId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 bool
-SensorStation::getBatteryStatus() const {
+SensorStation::isBatteryGood() const {
     return batteryStatus;
 }
 
@@ -89,7 +104,7 @@ SensorStation::formatSensorStationMessage(const vector<SensorStation> & list) {
     ss << "<sensorStationMessage>";
     for (vector<SensorStation>::const_iterator it = list.begin(); it != list.end(); ++it) {
         ss << "<sensorStation>";
-        ss << "<name>Sensor Station - "<< it->sensorIndex << "</name><type>" << STATION_TYPES[it->type] << "</type><sensorStationId>" << it->sensorIndex << "</sensorStationId>";
+        ss << "<name>Sensor Station - "<< it->sensorTransmitterChannel << "</name><type>" << STATION_TYPES[it->type] << "</type><sensorStationId>" << it->sensorTransmitterChannel << "</sensorStationId>";
         ss <<"</sensorStation>";
     }
 
@@ -109,7 +124,7 @@ SensorStation::formatSensorStationStatusMessage(const vector<SensorStation> & li
 
     for (vector<SensorStation>::const_iterator it = list.begin(); it != list.end(); ++it) {
         ss << "<sensorStationStatus>";
-        ss << "<time>" << Weather::formatDateTime(time) << "</time><sensorStationId>" << it->getSensorIndex() << "</sensorStationId><batteryOk>" << (it->getBatteryStatus() ? "true" : "false") << "</batteryOk>";
+        ss << "<time>" << Weather::formatDateTime(time) << "</time><sensorStationId>" << it->getSensorTransmitterChannel() << "</sensorStationId><batteryOk>" << (it->isBatteryGood() ? "true" : "false") << "</batteryOk>";
         if (it->getSensorStationType() == INTEGRATED_SENSOR_STATION)
             ss << "<linkQuality>" << it->getLinkQuality() << "</linkQuality>";
         ss << "</sensorStationStatus>";
@@ -123,7 +138,7 @@ SensorStation::formatSensorStationStatusMessage(const vector<SensorStation> & li
 ////////////////////////////////////////////////////////////////////////////////
 ostream &
 operator<<(ostream & os, const SensorStation & ss) {
-    os << "Station Type: " << ss.type << ", Station Index: " << ss.sensorIndex;
+    os << "Station Type: " << ss.type << ", Station Transmitter Channel: " << ss.sensorTransmitterChannel;
     return os;
 }
 }

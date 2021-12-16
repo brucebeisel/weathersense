@@ -178,12 +178,13 @@ private:
 
     template<typename T>
     struct Values {
-        T           dayExtremeValue;
-        DateTime    dayExtremeValueTime;
-        T           monthExtremeValue;
-        T           yearExtremeValue;
-        std::string formatXML(bool low) const;
-        std::string formatJSON(bool low) const;
+        Measurement<T> dayExtremeValue;
+        DateTime       dayExtremeValueTime;
+        Measurement<T> monthExtremeValue;
+        Measurement<T> yearExtremeValue;
+        bool isValid() const;
+        std::string    formatXML(bool low) const;
+        std::string    formatJSON(bool low) const;
     };
 
     template<typename T> using LowValues = Values<T>;
@@ -193,6 +194,7 @@ private:
     struct HighLowValues {
         Values<T>   lows;
         Values<T>   highs;
+        bool isValid() const;
         std::string formatXML() const;
         std::string formatJSON() const;
     };

@@ -70,7 +70,15 @@ public:
      */
     static void getBytes(int value, byte buffer[], int index, int nbytes, bool littleEndian = true);
 
+    static int getUpperNibble(byte value);
+
+    static int getLowerNibble(byte value);
+
 private:
+    static const byte UPPER_NIBBLE_MASK = 0xF0;
+    static const byte LOWER_NIBBLE_MASK = 0x0F;
+    static const int NIBBLE_BITS = 4;
+
     /**
      * Constructor for which there is no implementation.
      */

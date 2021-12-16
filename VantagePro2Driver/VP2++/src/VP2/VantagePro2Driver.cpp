@@ -277,7 +277,7 @@ VantagePro2Driver::mainLoop() {
                     archiveManager.getNewestRecord(packet);
                     log.log(VP2Logger::VP2_DEBUG1) << "Most recent archive packet time is: "
                                                    << Weather::formatDateTime(packet.getDateTime())
-                                                   << " ISS Reception: " << station.calculateISSReception(packet.getWindSampleCount()) << endl; // TBD Get the actual archive period
+                                                   << " Station Reception: " << station.calculateStationReceptionPercentage(packet.getWindSampleCount()) << endl; // TBD Get the actual archive period
                     previousNextRecord = nextRecord;
                 }
             }

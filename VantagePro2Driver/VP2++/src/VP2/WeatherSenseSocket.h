@@ -23,8 +23,8 @@
 
 namespace vp2 {
 /**
- * Class that communicates with the WeatherSense collector using a TCP/IP socket.
- * The WeatherSense collector is the server socket.
+ * Class that communicates with a Vantage Pro 2 client using a TCP/IP socket.
+ * The Vantage Pro 2 driver is the server socket.
  */
 class WeatherSenseSocket {
 public:

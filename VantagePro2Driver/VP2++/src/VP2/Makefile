@@ -10,6 +10,7 @@ SRCS=\
 	BitConverter.cpp \
 	CurrentWeather.cpp \
 	CurrentWeatherPublisher.cpp \
+	EventManager.cpp \
 	ForecastRule.cpp \
     HiLowPacket.cpp \
 	Loop2Packet.cpp \

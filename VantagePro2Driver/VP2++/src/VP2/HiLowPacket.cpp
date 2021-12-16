@@ -10,7 +10,7 @@ namespace vp2 {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-HiLowPacket::HiLowPacket() : log(VP2Logger::getLogger("HiLowPacket")) {
+HiLowPacket::HiLowPacket() : highHourRainRate(0.0), log(VP2Logger::getLogger("HiLowPacket")) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -22,19 +22,31 @@ HiLowPacket::~HiLowPacket() {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 template<typename T>
+bool
+HiLowPacket::Values<T>::isValid() const {
+    return dayExtremeValue.isValid() &&  monthExtremeValue.isValid() && yearExtremeValue.isValid();
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+template<typename T>
 string
 HiLowPacket::Values<T>::formatXML(bool low) const {
     ostringstream ss;
+
+    if (!isValid())
+        return "";
 
     string which = low ? "low" : "high";
 
     ss << "    <" << which << ">" << endl
        << "        <day>" << endl
-       << "            <value>" << dayExtremeValue << "</value>" << endl
+       << "            " << dayExtremeValue.formatXML("value") << endl
        << "            <time>" << Weather::formatDateTime(dayExtremeValueTime) << "</time>" << endl
        << "        </day>" << endl
-       << "        <month>" << monthExtremeValue << "</month>" << endl
-       << "        <year>" << yearExtremeValue <<"</year>" << endl
+       << "        " << monthExtremeValue.formatXML("month") << endl
+       << "        " << yearExtremeValue.formatXML("year") << endl
        << "    </" << which << ">" << endl;
 
     return ss.str();
@@ -47,11 +59,14 @@ string
 HiLowPacket::Values<T>::formatJSON(bool low) const {
     ostringstream ss;
 
+    if (!isValid())
+        return "";
+
     string which = low ? "low" : "high";
 
     ss << "    { \"" << which << "\" : " << endl
        << "        { \"day\" : " << endl
-       << "            {\"value\" : " << dayExtremeValue << "}," << endl
+       << "            {\"value\" : " << dayExtremeValue.getValue() << "}," << endl
        << "            {\"time\"  : \"" << Weather::formatDateTime(dayExtremeValueTime) << "\" }" << endl
        << "        }," << endl
        << "        { \"month\" : " << monthExtremeValue << "}," << endl
@@ -59,6 +74,14 @@ HiLowPacket::Values<T>::formatJSON(bool low) const {
        << "    }" << endl;
 
     return ss.str();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+template<typename T>
+bool
+HiLowPacket::HighLowValues<T>::isValid() const {
+    return lows.isValid() && highs.isValid();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,9 +149,18 @@ HiLowPacket::formatXML() const {
     ss << "    <hour>" << highHourRainRate <<"</hour>" << endl;
     ss << rainRate.formatXML(false);
     ss << "</rainfallRate>" << endl;
-    ss << "<extraTemperatures><extraTemperature><index>0</index><values>";
-    ss << extraTemperature[0].formatXML();
-    ss << "/values></extraTemperature></extraTemperatures>";
+    ss << "<extraTemperatures>" << endl;
+    for (int i = 0; i < VP2Constants::MAX_EXTRA_TEMPERATURES; i++) {
+        if (extraTemperature[i].isValid()) {
+            ss << "<extraTemperature>";
+            ss << "    <index>" << i << "</index>" << endl;
+            ss << "    <values>" << endl;
+            ss << extraTemperature[i].formatXML();
+            ss << "    </values>" << endl;
+            ss << "</extraTemperature>";
+        }
+    }
+    ss << "</extraTemperatures>" << endl;
     ss << "</hiLowPacket>";
 
    return ss.str();

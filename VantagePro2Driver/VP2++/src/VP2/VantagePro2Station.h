@@ -426,8 +426,13 @@ public:
     // End of Configuration Commands
     /////////////////////////////////////////////////////////////////////////////////
 
-
-    int calculateISSReception(int loopPacketWindSamples) const;
+    /**
+     * Calculate the percentage of packets that have been received over the past "archive period" minutes.
+     * Note that this percentage is only calculated for the station that contains the wind anemometer.
+     *
+     * @param archivePacketWindSamples The number of samples as reported by the Archive packet
+     */
+    int calculateStationReceptionPercentage(int archivePacketWindSamples) const;
 
     /**
      * Get the current weather data.
@@ -437,6 +442,7 @@ public:
     const CurrentWeather & getCurrentWeather() const;
 
     Rainfall getRainCollectorSize() const;
+    const std::vector<SensorStation> & getSensorStations() const;
 
 private:
     static constexpr int WAKEUP_TRIES = 5;               // The number of times to try to wake up the console before performing a disconnect/reconnect cycle
@@ -467,7 +473,7 @@ private:
 
     static constexpr int COMMAND_RETRIES = 5;
     static constexpr int ARCHIVE_PAGE_READ_RETRIES = 3;
-    static constexpr int BUFFER_SIZE = 512;
+    static constexpr int BUFFER_SIZE = EEPROM_DATA_BLOCK_SIZE + CRC_BYTES;
 
     static constexpr double LAT_LON_SCALE = 10.0;
 
@@ -576,31 +582,25 @@ private:
 public:
     bool retrieveSensorStationInfo();
 private:
-
-
-
     Callback *                 callback;
-    SerialPort                 serialPort;
-    bool                       firstLoopPacket;
-    int                        baudRate;
-    WindDirectionSlices        pastWindDirs;
-    CurrentWeather             currentWeather;
-    Rainfall                   rainCollectorSize;
-    int                        archivePeriod;
+    SerialPort                 serialPort;               // The serial port object that communicates with the console
+    bool                       firstLoopPacketReceived;  // Whether a LOOP packet has been received
+    int                        baudRate;                 // The baud rate for communicating with the console
+    WindDirectionSlices        pastWindDirs;             // The past wind direction measurements used to determine the arrows on the wind display
+    CurrentWeather             currentWeather;           // The most recent current weather data
+    byte                       buffer[BUFFER_SIZE];      // The buffer used for all reads
+    float                      consoleBatteryVoltage;    // The console battery voltage received in the LOOP packet
 
-    byte                       buffer[BUFFER_SIZE];
-    //byte                       eepromBuffer[EEPROM_DATA_BLOCK_SIZE + CRC_BYTES];
-    //byte                       eepromNonGraphData[EEPROM_NON_GRAPH_DATA_SIZE + CRC_BYTES];
-    //byte                       alarmThresholds[ALARM_THRESHOLDS_SIZE];
-
-    //StationConfiguration       stationConfiguration;
-    float                      consoleBatteryVoltage;
-    std::string                firmwareDate;
-    std::string                firmwareVersion;
-    //std::vector<SensorStation> sensorStations;
-    //std::vector<Sensor>        sensors;
-    std::vector<StationId>     stationIds;
+    std::string                firmwareDate;             // TBD - Is this really needed?
+    std::string                firmwareVersion;          // TBD - Is this really needed?
+    std::vector<SensorStation> sensorStations;           // The sensor stations as reported by the console
+    std::vector<StationId>     stationIds;               // The ID of the stations that the console can hear
+    int                        windSensorStationId;      // The ID of the sensor station containing the anemometer
+    Rainfall                   rainCollectorSize;        // The size of the rain collector that is needed for calculating rain amounts
+    int                        archivePeriod;            // The archive period used to calculate reception percentage
     VP2Logger                  log;
+    //StationConfiguration       stationConfiguration;
+    //std::vector<Sensor>        sensors;
 };
 }
 

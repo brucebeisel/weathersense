@@ -45,15 +45,29 @@ public:
         UNKNOWN = 99       // The sensor station has been heard, but not identified
     };
 
+    enum RepeaterId {
+        NO_REPEATER = 0,
+        REPEATER_A = 8,
+        REPEATER_B = 9,
+        REPEATER_C = 10,
+        REPEATER_D = 11,
+        REPEATER_E = 12,
+        REPEATER_F = 13,
+        REPEATER_G = 14,
+        REPEATER_H = 15
+    };
+
+    static constexpr int NO_LINK_QUALITY = 999;
+
     /**
      * Constructor.
      * 
-     * @param type The type of sensor station
-     * @param sensorIndex The index of the station as reported by the console, these are usually determined by
-     *                    DIP switches within the hardware. Note that sensor stations may be heard, but are not
-     *                    part of this Vantage network.
+     * @param type                     The type of sensor station
+     * @param sensorTransmitterChannel The channel on which the station is transmitting.  The channel is usually determined by
+     *                                 DIP switches within the hardware. Note that sensor stations may be heard, but are not
+     *                                 part of this Vantage network.
      */
-    SensorStation(SensorStationType type, int sensorIndex);
+    SensorStation(SensorStationType type, int sensorTransmitterChannel, RepeaterId repeaterId = NO_REPEATER, bool hasAnemometer = false);
 
     /**
      * Destructor.
@@ -72,7 +86,14 @@ public:
      * 
      * @return The index of the sensor station
      */
-    int getSensorIndex() const;
+    int getSensorTransmitterChannel() const;
+
+    /**
+     * Get the repeater ID of this sensor station.
+     *
+     * @return The ID of the repeater, or NONE
+     */
+    RepeaterId getRepeaterId() const;
 
     /**
      * Get the battery status of the sensor station. These stations are typically wireless and the battery will
@@ -81,7 +102,7 @@ public:
      * 
      * @return True if the battery is good
      */
-    bool getBatteryStatus() const;
+    bool isBatteryGood() const;
 
     /**
      * Set the battery status.
@@ -92,18 +113,25 @@ public:
 
     /**
      * Get the link quality of this station. Not all sensor stations are monitored for link quality. The VP2 only
-     * monitors the link quality of the Integrated Sensor Suite station (ISS).
+     * monitors the link quality of the sensor station with the anemometer.
      * 
      * @return The quality of the link between 0 and 100
      */
     int getLinkQuality() const;
 
     /**
-     * Set the link quality for this sensor station.
+     * Set the link quality for this sensor station. If this station does have an anemometer, this call has no effect.
      * 
      * @param value The link quality between 0 and 100
      */
     void setLinkQuality(int value);
+
+    void setTemperatureHumidityIndicies(int temperatureIndex, int HumidityIndex);
+    void setTemperatureIndex(int temperatureIndex);
+    void setHumidityIndex(int HumidityIndex);
+
+    int getTemperatureIndex() const;
+    int getHumidityIndex() const;
 
     /**
      * Build a message to send to the collector that reports which sensor stations are connected (wired or wireless) to the console.
@@ -133,10 +161,14 @@ public:
     friend std::ostream & operator<<(std::ostream & os, const SensorStation & ss);
 
 private:
-    SensorStationType type;
-    int               sensorIndex;
-    bool              batteryStatus;
-    int               linkQuality;
+    SensorStationType type;                     // The type of this sensor station
+    RepeaterId        repeaterId;               // ID of the repeater, if any
+    int               sensorTransmitterChannel; // Sensor index, 1-8
+    bool              isAnemometerConnected;    // True if this sensor station has the anemometer
+    int               humiditySensorIndex;      // The index into the "extra humidities" that this station's values are reported (1 - 8)
+    int               temperatureSensorIndex;   // The index into the "extra temperatures" that this station's values are reported (0 - 7)
+    bool              batteryStatus;            // Battery status
+    int               linkQuality;              // Only reported if this is an ISS or an Anemometer station
 
 };
 }
