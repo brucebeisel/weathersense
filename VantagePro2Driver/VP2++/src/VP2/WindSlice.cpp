@@ -23,7 +23,8 @@ namespace vp2 {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-WindSlice::WindSlice() : slice(0), name(""), lowHeading(0.0), highHeading(0.0), last10MinuteDominantTime(0) {
+WindSlice::WindSlice() : slice(0), name(""), lowHeading(0.0),
+                         highHeading(0.0), sampleSizeAtDominantTime(0), last10MinuteDominantTime(0) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -32,6 +33,7 @@ WindSlice::WindSlice(int slice, const std::string & name, Heading low, Heading h
                                                                                        name(name),
                                                                                        lowHeading(low),
                                                                                        highHeading(high),
+                                                                                       sampleSizeAtDominantTime(0),
                                                                                        last10MinuteDominantTime(0) {
 }
 
@@ -62,7 +64,7 @@ WindSlice::getName() const {
 ////////////////////////////////////////////////////////////////////////////////
 Heading
 WindSlice::getCenter() const {
-    return lowHeading + ((highHeading - lowHeading) / static_cast<Heading>(2.0));
+    return lowHeading + ((highHeading - lowHeading) / static_cast<Heading>(2));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,6 +105,10 @@ WindSlice::getSampleSize() const {
 void
 WindSlice::setLast10MinuteDominantTime(time_t time) {
     last10MinuteDominantTime = time;
+    if (time == 0)
+        sampleSizeAtDominantTime = 0;
+    else
+        sampleSizeAtDominantTime = samples.size();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -110,6 +116,13 @@ WindSlice::setLast10MinuteDominantTime(time_t time) {
 time_t
 WindSlice::getLast10MinuteDominantTime() const {
     return last10MinuteDominantTime;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+int
+WindSlice::getSampleSizeAtDominantTime() const {
+    return sampleSizeAtDominantTime;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

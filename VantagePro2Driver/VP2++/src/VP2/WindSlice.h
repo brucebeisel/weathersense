@@ -115,6 +115,12 @@ public:
      */
     time_t getLast10MinuteDominantTime() const;
 
+    /**
+     * Get the sample size when this slice was last declared the dominant direction.
+     *
+     * @return The sample size when this slice was last declared the dominant direction
+     */
+    int getSampleSizeAtDominantTime() const;
 
     /**
      * Less than operator needed for sorting.
@@ -133,6 +139,7 @@ private:
     Heading               highHeading;
     std::vector<DateTime> samples;
     time_t                last10MinuteDominantTime;
+    int                   sampleSizeAtDominantTime;
 };
 }
 

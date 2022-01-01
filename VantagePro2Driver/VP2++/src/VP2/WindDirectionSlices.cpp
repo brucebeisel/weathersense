@@ -25,8 +25,8 @@ using namespace std;
 
 namespace vp2 {
 
-const Heading WindDirectionSlices::DEGREES_PER_SLICE = static_cast<Heading>(22.5);
-const Heading WindDirectionSlices::HALF_SLICE = DEGREES_PER_SLICE / static_cast<Heading>(2.0);
+//const Heading WindDirectionSlices::DEGREES_PER_SLICE = static_cast<Heading>(22.5);
+//const Heading WindDirectionSlices::HALF_SLICE = DEGREES_PER_SLICE / static_cast<Heading>(2.0);
 
 const std::string WindDirectionSlices::SLICE_NAMES[NUM_SLICES] = {
     "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"
@@ -53,8 +53,8 @@ void
 WindDirectionSlices::addHeading(Heading heading) {
     DateTime now = time(0);
 
-    if (heading > 360.0 - HALF_SLICE)
-        heading -= static_cast<Heading>(360.0);
+    if (heading > MAX_HEADING - HALF_SLICE)
+        heading -= static_cast<Heading>(MAX_HEADING);
 
     removeOldSamples(now);
 
@@ -90,7 +90,7 @@ WindDirectionSlices::find10MinuteDominantWindDirection(DateTime now) {
             highCountIndex = i;
         }
 
-        if (now - windSlices[i].getLast10MinuteDominantTime() > 3600)
+        if (now - windSlices[i].getLast10MinuteDominantTime() > HOUR_SECONDS)
             windSlices[i].setLast10MinuteDominantTime(0);
     }
 
@@ -136,7 +136,9 @@ WindDirectionSlices::pastHeadings(vector<int> & headings) const {
             strcpy(buffer, "Never");
 
         cout << "Direction: " << setw(3) << windSlices[i].getName() << " (" << setw(5) << windSlices[i].getCenter()
-             << ") Count: " << setw(3) << windSlices[i].getSampleSize() << " Last Dominant Time: " << setw(8) << buffer << endl;
+             << ") Count: " << setw(3) << windSlices[i].getSampleSize() << " Last Dominant Time: " << setw(8) << buffer
+             << " (" << windSlices[i].getSampleSizeAtDominantTime() << ")"
+             << endl;
     }
 
     //

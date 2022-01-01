@@ -17,17 +17,62 @@
 #ifndef EVENT_MANAGER_H_
 #define EVENT_MANAGER_H_
 
+#include <queue>
+#include <string>
+#include <mutex>
+
 namespace vp2 {
 
+/**
+ * Class to handle events from the HTTP threads.
+ */
 class EventManager {
 public:
+    /**
+     * Constructor.
+     */
     EventManager();
+
+    /**
+     * Destructor.
+     */
     virtual ~EventManager();
 
+    /**
+     * Check if there is an event on the queue. Note that in a multi-threaded environment
+     * the return value may no longer be valid when the consumeEvent() method is called.
+     *
+     * @return True if the queue is not empty at the moment
+     */
+    bool isEventAvailable() const;
+
+    /**
+     * Queue an event.
+     *
+     * @param event The event to be queued
+     */
+    void queueEvent(const std::string & event);
+
+    /**
+     * Consume the event at the head of the queue.
+     *
+     * @param event The event that was copied from the head of the queue
+     *
+     * @return True if an event was actually copied. If false, the parameter event is not changed.
+     */
+    bool consumeEvent(std::string & event);
+
+    //
+    // Prevent all copying and moving
+    //
     EventManager(const EventManager &) = delete;
     EventManager & operator=(const EventManager &) = delete;
+
+private:
+    std::queue<std::string> commandQueue; // The queue on which to store events
+    mutable std::mutex mutex;             // The mutex to protect the queue against multi-threaded contention
 };
 
 } /* namespace vp2 */
 
-#endif /* SRC_VP2_EVENTMANAGER_H_ */
+#endif /* EVENT_MANAGER_H_ */
