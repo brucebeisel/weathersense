@@ -18,6 +18,7 @@
 #include <time.h>
 #include <iostream>
 #include <vector>
+#include <atomic>
 #include "CurrentWeather.h"
 #include "CurrentWeatherPublisher.h"
 #include "HiLowPacket.h"
@@ -29,18 +30,17 @@
 #include "VantagePro2Driver.h"
 
 using namespace std;
-extern "C" {
-extern bool signalCaught;
-}
+extern atomic_bool signalCaught;
 
 namespace vp2 {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-VantagePro2Driver::VantagePro2Driver(ArchiveManager & archiveManager, CurrentWeatherPublisher & cwp, VantagePro2Station & station) :
+VantagePro2Driver::VantagePro2Driver(ArchiveManager & archiveManager, CurrentWeatherPublisher & cwp, VantagePro2Station & station, EventManager & evtMgr) :
                                                                 station(station),
                                                                 currentWeatherPublisher(cwp),
                                                                 archiveManager(archiveManager),
+                                                                eventManager(evtMgr),
                                                                 exitLoop(false),
                                                                 receivedFirstLoopPacket(false),
                                                                 nextRecord(-1),
@@ -93,8 +93,6 @@ VantagePro2Driver::initialize() {
         log.log(VP2Logger::VP2_ERROR) << "Failed to retrieve configuration parameters" << endl;
         return false;
     }
-
-    VP2Decoder::setRainCollectorSize(station.getStationConfiguration().rainCollectorSize);
     */
 
     //
@@ -146,7 +144,15 @@ VantagePro2Driver::processCurrentWeather(const CurrentWeather & cw) {
     log.log(VP2Logger::VP2_DEBUG1) << "Previous Next Record: " << previousNextRecord << " Next Record: " << nextRecord << endl;
     receivedFirstLoopPacket = true;
 
-    return signalCaught || previousNextRecord != nextRecord;
+    bool sc = signalCaught.load();
+    bool em = eventManager.isEventAvailable();
+    bool nr = previousNextRecord != nextRecord;
+    bool stopCurrentWeatherLoop = sc || em || nr;
+
+    log.log(VP2Logger::VP2_DEBUG1) << "Stop current weather loop: " << stopCurrentWeatherLoop
+                                   << " Signal: " << sc << " Event: " << em << " Next Record: " << nr << endl;
+
+    return signalCaught.load() || eventManager.isEventAvailable() || previousNextRecord != nextRecord;
 }
 
 /*
@@ -210,7 +216,6 @@ void
 VantagePro2Driver::mainLoop() {
     vector<ArchivePacket> list;
     list.reserve(VP2Constants::NUM_ARCHIVE_RECORDS);
-    //bool lampOn = true;
 
     while (!exitLoop) {
         try {
@@ -232,9 +237,6 @@ VantagePro2Driver::mainLoop() {
                 log.log(VP2Logger::VP2_INFO) << "Station Time: " << Weather::formatDateTime(consoleTime) << endl;
             else
                 log.log(VP2Logger::VP2_INFO) << "Station Time retrieval failed" << endl;
-
-            //station.controlConsoleLamp(lampOn);
-            //lampOn = !lampOn;
 
             //
             // If it has been a while since the time was set, set the time
@@ -262,9 +264,14 @@ VantagePro2Driver::mainLoop() {
             //
             // If an asynchronous signal was caught, then exit the loop
             //
-            if (signalCaught) {
+            if (signalCaught.load()) {
                 exitLoop = true;
                 continue;
+            }
+
+            string event;
+            while (eventManager.consumeEvent(event)) {
+
             }
 
             //
@@ -274,10 +281,11 @@ VantagePro2Driver::mainLoop() {
             if (previousNextRecord != nextRecord) {
                 if (archiveManager.synchronizeArchive()) {
                     ArchivePacket packet;
+                    // TBD What if multiple archive packets are received?
                     archiveManager.getNewestRecord(packet);
                     log.log(VP2Logger::VP2_DEBUG1) << "Most recent archive packet time is: "
                                                    << Weather::formatDateTime(packet.getDateTime())
-                                                   << " ISS Reception: " << station.calculateISSReception(packet.getWindSampleCount()) << endl; // TBD Get the actual archive period
+                                                   << " Station Reception: " << station.calculateStationReceptionPercentage(packet.getWindSampleCount()) << endl; // TBD Get the actual archive period
                     previousNextRecord = nextRecord;
                 }
             }

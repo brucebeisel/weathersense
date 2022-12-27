@@ -61,6 +61,8 @@ private:
     void removeOldSamples(DateTime time);
     void find10MinuteDominantWindDirection(DateTime time);
 
+    static constexpr Heading MAX_HEADING = 360.0;
+
     /**
      * Each wind slice (N, NNE, NE...) will be tracked for direction tendency
      */
@@ -71,8 +73,8 @@ private:
     /**
      * The number of degrees each wind slice occupies.
      */
-    static const Heading DEGREES_PER_SLICE;
-    static const Heading HALF_SLICE;
+    static constexpr Heading DEGREES_PER_SLICE = 22.0;
+    static constexpr Heading HALF_SLICE = DEGREES_PER_SLICE / 2.0;
 
     /**
      * The wind over the past 10 minutes is used to determine the direction tendencies.
@@ -89,7 +91,9 @@ private:
      */
     static const int MAX_PAST_HEADINGS = 4;
 
-    int totalSamples;
+    static const int HOUR_SECONDS = 3600;
+
+    int       totalSamples;
     WindSlice windSlices[NUM_SLICES];
 };
 }

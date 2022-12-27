@@ -31,6 +31,26 @@ Api::Api(VantagePro2Station & station) : station(station) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 void
+Api::processCommand(std::string & command) {
+    int pos = command.find_first_of('?');
+    if (pos == string::npos) {
+        cerr << "Did not find '?' in command: '" << command << "'" << endl;
+        return;
+    }
+
+    string localString = command.substr(pos);
+    string commandName;
+
+    if (commandName == "lamp") {
+    }
+    else if (commandName == "current-weather") {
+        requestCurrentWeather();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void
 Api::requestSensorStationIds() {
     ostringstream oss;
     std::vector<StationId> list;

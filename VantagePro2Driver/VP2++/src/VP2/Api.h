@@ -29,6 +29,8 @@ class Api {
 public:
     Api(VantagePro2Station & station);
 
+    void processCommand(std::string & command);
+
     /**
      * Request the list of sensor stations that the console can hear.
      * This data should be requested the first time the software starts.

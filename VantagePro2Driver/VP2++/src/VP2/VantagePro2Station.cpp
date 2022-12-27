@@ -43,28 +43,28 @@ static const std::string WAKEUP_RESPONSE = std::string(1, VP2Constants::LINE_FEE
 //
 // Testing Commands
 //
-static const std::string TEST_CMD = "TEST";                         // Sends the string "TEST\n" back
-//static const std::string STATION_TYPE_CMD = "WRD\0x12\0x4D";      // Responds with a weather station type that is backward compatible with earlier Davis weather products
-static const std::string RECEIVE_CHECK_CMD = "RXCHECK";             // Console diagnostics report
-static const std::string RXTEST_CMD = "RXTEST";                     // Move console to main current conditions screen
-static const std::string FIRMWARE_DATE_CMD = "VER";                 // Firmware date
-static const std::string RECEIVER_LIST_CMD = "RECEIVERS";           // Get the list of receivers as a bitmap, bit 0 represents station ID 1
-static const std::string FIRMWARE_VERSION_CMD = "NVER";             // Get the firmware version
+static const std::string TEST_CMD = "TEST";                          // Sends the string "TEST\n" back
+//static const std::string STATION_TYPE_CMD = "WRD\0x12\0x4D";       // Responds with a weather station type that is backward compatible with earlier Davis weather products
+static const std::string RECEIVE_CHECK_CMD = "RXCHECK";              // Console diagnostics report
+static const std::string RXTEST_CMD = "RXTEST";                      // Move console to main current conditions screen
+static const std::string FIRMWARE_DATE_CMD = "VER";                  // Firmware date
+static const std::string RECEIVER_LIST_CMD = "RECEIVERS";            // Get the list of receivers as a bitmap, bit 0 represents station ID 1
+static const std::string FIRMWARE_VERSION_CMD = "NVER";              // Get the firmware version
 
 //
 // Current Data Commands
 //
-//static const std::string LOOP_CMD = "LOOP";                       // Get the current data values, alarms, battery status, etc. through the LOOP packet. Note that the LPS command renders this superfluous.
-static const std::string LPS_CMD = "LPS 3";                         // Get the current values through both the LOOP and LOOP2 packets
-static const std::string HIGH_LOW_CMD = "HILOWS";                   // Get the high and low that includes daily, monthly and yearly
-static const std::string PUT_YEARLY_RAIN_CMD = "PUTRAIN";           // Set the yearly rainfall
-static const std::string PUT_YEARLY_ET_CMD = "PUTET";               // Set the yearly ET
+//static const std::string LOOP_CMD = "LOOP";                        // Get the current data values, alarms, battery status, etc. through the LOOP packet. Note that the LPS command renders this superfluous.
+static const std::string LPS_CMD = "LPS 3";                          // Get the current values through both the LOOP and LOOP2 packets
+static const std::string HIGH_LOW_CMD = "HILOWS";                    // Get the high and low that includes daily, monthly and yearly
+static const std::string PUT_YEARLY_RAIN_CMD = "PUTRAIN";            // Set the yearly rainfall
+static const std::string PUT_YEARLY_ET_CMD = "PUTET";                // Set the yearly ET
 
 //
 // Download Commands
 //
-static const std::string DUMP_ARCHIVE_CMD = "DMP";                  // Dump the entire archive
-static const std::string DUMP_AFTER_CMD = "DMPAFT";                 // Dump the archive after a given date/time
+static const std::string DUMP_ARCHIVE_CMD = "DMP";                   // Dump the entire archive
+static const std::string DUMP_AFTER_CMD = "DMPAFT";                  // Dump the archive after a given date/time
 
 
 //
@@ -135,8 +135,9 @@ VantagePro2Station::VantagePro2Station(const string & portName, int baudRate) :
                                             baudRate(baudRate),
                                             rainCollectorSize(0.0),
                                             archivePeriod(0),
+                                            windSensorStationId(0),
                                             log(VP2Logger::getLogger("VantagePro2Station")),
-                                            firstLoopPacket(true) {
+                                            firstLoopPacketReceived(false) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -850,7 +851,6 @@ VantagePro2Station::controlConsoleLamp(bool on) {
 // EEPROM retrieval commands
 //
 
-/*
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 const vector<SensorStation> &
@@ -858,6 +858,7 @@ VantagePro2Station::getSensorStations() const {
     return sensorStations;
 }
 
+/*
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 const vector<Sensor> &
@@ -869,10 +870,10 @@ VantagePro2Station::getSensors() const {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 struct StationData {
-    int repeaterId;
-    int stationType;
-    int humiditySensorNumber;
-    int temperatureSensorNumber;
+    SensorStation::RepeaterId        repeaterId;
+    SensorStation::SensorStationType stationType;
+    int                              humiditySensorNumber;
+    int                              temperatureSensorNumber;
 };
 
 bool
@@ -882,22 +883,27 @@ VantagePro2Station::retrieveSensorStationInfo() {
     if (!eepromBinaryRead(VP2Constants::EE_STATION_LIST, STATION_DATA_SIZE))
         return false;
 
-    int windSensorStation = 0;
     StationData data[MAX_STATION_ID];
     for (int i = 0; i < MAX_STATION_ID; i++) {
-        data[i].repeaterId = (buffer[i * 2] & 0xF0) >> 4;
-        data[i].stationType = buffer[i * 2] & 0xF;
-        data[i].humiditySensorNumber = (buffer[(i * 2) + 1] & 0xF0) >> 4;
-        data[i].temperatureSensorNumber = buffer[(i * 2) + 1] & 0xF;
+        data[i].repeaterId = static_cast<SensorStation::RepeaterId>(BitConverter::getUpperNibble(buffer[i * 2]));
+        data[i].stationType = static_cast<SensorStation::SensorStationType>(BitConverter::getLowerNibble(buffer[i * 2]));
+        data[i].humiditySensorNumber = BitConverter::getUpperNibble(buffer[(i * 2) + 1]);
+        data[i].temperatureSensorNumber = BitConverter::getLowerNibble(buffer[(i * 2) + 1]);
         if (data[i].stationType == SensorStation::ANEMOMETER)
-            windSensorStation = i + 1;
-        else if (data[i].stationType == SensorStation::INTEGRATED_SENSOR_STATION && windSensorStation == 0)
-            windSensorStation = i + 1;
+            windSensorStationId = i + 1;
+        else if (data[i].stationType == SensorStation::INTEGRATED_SENSOR_STATION && windSensorStationId == 0)
+            windSensorStationId = i + 1;
 
+    }
+    for (int i = 0; i < MAX_STATION_ID; i++) {
+        if (data[i].stationType != SensorStation::NO_STATION) {
+            bool hasAnemometer = (i + 1) == windSensorStationId;
+            sensorStations.push_back(SensorStation(data[i].stationType, i + 1, data[i].repeaterId, hasAnemometer));
+        }
     }
 
     cout << "@@@@@@@@@@ Station Data:" << endl;
-    cout << "@@@@@@@@@@ Wind Sensor Station ID: " << windSensorStation << endl;
+    cout << "@@@@@@@@@@ Wind Sensor Station ID: " << windSensorStationId << endl;
     for (int i = 0; i < MAX_STATION_ID; i++) {
         cout << "@@@@@@@@@@ [" << i << "] Repeater ID: " << data[i].repeaterId
              << " Station Type: " << data[i].stationType
@@ -906,12 +912,6 @@ VantagePro2Station::retrieveSensorStationInfo() {
 
     }
     /*
-    for (int i = 0; i < STATION_DATA_SIZE; i += 2) {
-        SensorStation::SensorStationType sensorType = static_cast<SensorStation::SensorStationType>(buffer[i] & 0xF);
-        if (sensorType != SensorStation::NO_STATION)
-            sensorStations.push_back(SensorStation(sensorType, (i / 2) + 1));
-    }
-
     for (vector<SensorStation>::iterator it = sensorStations.begin(); it != sensorStations.end(); ++it)
         log.log(VP2Logger::VP2_DEBUG1) << *it << endl;
     */
@@ -922,18 +922,18 @@ VantagePro2Station::retrieveSensorStationInfo() {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 int
-VantagePro2Station::calculateISSReception(int loopPacketWindSamples) const {
+VantagePro2Station::calculateStationReceptionPercentage(int archivePacketWindSamples) const {
     static const int stationId = 1;
 
     float archivePeriodSeconds = archivePeriod * 60.0F;
     float stationIndex = stationId - 1.0F;
     int maxPackets = static_cast<int>(archivePeriodSeconds / ((41.0F + stationIndex) / 16.0F));
 
-    int issReception = (loopPacketWindSamples * 100) / maxPackets;
-    if (issReception > MAX_STATION_RECEPTION)
-        issReception = MAX_STATION_RECEPTION;
+    int stationReception = (archivePacketWindSamples * 100) / maxPackets;
+    if (stationReception > MAX_STATION_RECEPTION)
+        stationReception = MAX_STATION_RECEPTION;
 
-    return issReception;
+    return stationReception;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -943,18 +943,12 @@ VantagePro2Station::getCurrentWeather() const {
     return currentWeather;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 Rainfall
 VantagePro2Station::getRainCollectorSize() const {
     return rainCollectorSize;
 }
-/*
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-const StationConfiguration &
-VantagePro2Station::getStationConfiguration() const {
-    return stationConfiguration;
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -975,8 +969,8 @@ VantagePro2Station::readLoopPacket(LoopPacket & loopPacket) {
     // First time through determine what sensors are attached to the weather station based on the valid data in
     // the LOOP packet.
     //
-    if (firstLoopPacket) {
-        firstLoopPacket = false;
+    if (!firstLoopPacketReceived) {
+        firstLoopPacketReceived = true;
         //Sensor::detectSensors(loopPacket, sensors);
     }
 
@@ -1152,14 +1146,6 @@ VantagePro2Station::sendOKedCommand(const string & command) {
         if (!serialPort.read(buffer, COMMAND_RECOGNIZED_RESPONSE.length()))
             success = false;
         else if (COMMAND_RECOGNIZED_RESPONSE != buffer)
-            /*
-                buffer[0] != VP2Constants::LINE_FEED ||
-                 buffer[1] != VP2Constants::CARRIAGE_RETURN ||
-                 buffer[2] != 'O' ||
-                 buffer[3] != 'K' ||
-                 buffer[4] != VP2Constants::LINE_FEED ||
-                 buffer[5] != VP2Constants::CARRIAGE_RETURN)
-                 */
             success = false;
         else
             success = true;
@@ -1189,14 +1175,6 @@ VantagePro2Station::sendOKedWithDoneCommand(const string & command) {
     if (!serialPort.read(buffer, DONE_RESPONSE.length()))
         success = false;
     else if (DONE_RESPONSE != buffer)
-        /*
-             buffer[0] != 'D' ||
-             buffer[1] != 'O' ||
-             buffer[2] != 'N' ||
-             buffer[3] != 'E' ||
-             buffer[4] != VP2Constants::LINE_FEED ||
-             buffer[5] != VP2Constants::CARRIAGE_RETURN)
-             */
         success = false;
     else
         success = true;

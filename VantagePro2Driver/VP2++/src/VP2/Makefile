@@ -8,8 +8,10 @@ SRCS=\
 	ArchiveManager.cpp \
 	ArchivePacket.cpp \
 	BitConverter.cpp \
+	CommandSocket.cpp \
 	CurrentWeather.cpp \
 	CurrentWeatherPublisher.cpp \
+	EventManager.cpp \
 	ForecastRule.cpp \
     HiLowPacket.cpp \
 	Loop2Packet.cpp \

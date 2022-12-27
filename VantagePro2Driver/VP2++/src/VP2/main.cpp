@@ -22,6 +22,7 @@
 #endif
 #include <iostream>
 #include <thread>
+#include <atomic>
 #include <fstream>
 #include "VP2Logger.h"
 #include "ArchiveManager.h"
@@ -31,18 +32,17 @@
 using namespace std;
 using namespace vp2;
 
-extern "C" {
-bool signalCaught = false;
+atomic_bool signalCaught = false;
+
 //#ifndef WIN32
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 void
 sigHandler(int sig) {
     if (sig == SIGINT || sig == SIGTERM)
-        signalCaught = true;
+        signalCaught.store(true);
 }
 //#endif
-}
 
 void
 consoleThreadEntry(const string & archiveFile, const string & serialPortName, const string & logFile, int baudRate) {
@@ -52,7 +52,8 @@ consoleThreadEntry(const string & archiveFile, const string & serialPortName, co
     CurrentWeatherPublisher cwPublisher;
     VantagePro2Station station(serialPortName, baudRate);
     ArchiveManager archiveManager(archiveFile, station);
-    VantagePro2Driver driver(archiveManager, cwPublisher, station);
+    EventManager eventManager;
+    VantagePro2Driver driver(archiveManager, cwPublisher, station, eventManager);
 
 
     try {

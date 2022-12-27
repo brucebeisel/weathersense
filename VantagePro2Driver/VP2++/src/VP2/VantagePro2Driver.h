@@ -23,7 +23,7 @@
 #include <string>
 #include "Weather.h"
 #include "ArchiveManager.h"
-#include "ParametersMessage.h"
+#include "EventManager.h"
 #include "SensorStation.h"
 #include "VantagePro2Station.h"
 
@@ -44,7 +44,7 @@ public:
      * @param cwp            The publisher that will be called each time a current weather record has been received
      * @param station        The object that handles the command protocols with the VP2 console
      */
-    VantagePro2Driver(ArchiveManager & archiveManager, CurrentWeatherPublisher & cwp, VantagePro2Station & station);
+    VantagePro2Driver(ArchiveManager & archiveManager, CurrentWeatherPublisher & cwp, VantagePro2Station & station, EventManager & eventManager);
 
     /**
      * Destructor.
@@ -98,6 +98,7 @@ private:
     VantagePro2Station &      station;
     CurrentWeatherPublisher & currentWeatherPublisher;
     ArchiveManager &          archiveManager;
+    EventManager &            eventManager;
     bool                      exitLoop;
     bool                      receivedFirstLoopPacket;
     int                       nextRecord;
@@ -105,7 +106,6 @@ private:
     DateTime                  lastArchivePacketTime;
     DateTime                  consoleTimeSetTime;
     DateTime                  sensorStationSendTime;
-    ParametersMessage         parameters;
     VP2Logger                 log;
 };
 
