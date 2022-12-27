@@ -86,7 +86,7 @@ public class WeatherUndergroundUploader implements CurrentWeatherSubscriber.Curr
     private static final String WEATHER_SENSE_PRODUCT_STRING = WeatherSenseConstants.PRODUCT_NAME + "-" + WeatherSenseConstants.PRODUCT_VERSION;
     private static final String WUNDERGROUND_BASE_URL = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php?";
     private static final String WUNDERGROUND_RAPIDFIRE_BASE_URL = "http://rtupdate.wunderground.com/weatherstation/updateweatherstation.php?";
-    private static final String WUNDERGROUND_RAPIDFIRE_FREQ = "&realtime=1&rtfreq=5";
+    private static final String WUNDERGROUND_RAPIDFIRE_FREQ = "&realtime=1&rtfreq=2.5";
     private static final String URL_SPACE = "%20";
     private static final String URL_COLON = "%3A";
     private static final String URL_FIELD_SEPARATOR = "&";
@@ -148,6 +148,7 @@ public class WeatherUndergroundUploader implements CurrentWeatherSubscriber.Curr
         this.password = password;
         this.urlString = url;
         this.statistics = new Statistics();
+        logger.setLevel(Level.FINEST);
         executor = Executors.newSingleThreadExecutor();
     }
 
@@ -187,7 +188,7 @@ public class WeatherUndergroundUploader implements CurrentWeatherSubscriber.Curr
     @Override
     public void handleCurrentWeather(CurrentWeather current) {
         if (wuStationId == null || password == null) {
-            logger.info("Skipping weather underground update. No weather undergroud information in database.");
+            logger.info("Skipping weather underground update. No weather station information provided.");
             return;
         }
 
@@ -210,7 +211,11 @@ public class WeatherUndergroundUploader implements CurrentWeatherSubscriber.Curr
         record.barometer = current.getBaroPressure();
         record.indoorTemp = current.getIndoorTemperature();
         record.indoorHumidity = current.getIndoorHumidity();
-        record.rainRate = current.getRainRate();
+        //
+        // Note the rain rate from the console is ignored due to the ICD published by weather underground.
+        // The rain rate is the amount of rain that has fallen in the past hour.
+        //
+        record.rainRate = current.getRainHour();
         record.rainToday = current.getRainToday();
         record.solarRadiation = current.getSolarRadiation();
         record.uvIndex = current.getUvIndex();
@@ -408,10 +413,22 @@ public class WeatherUndergroundUploader implements CurrentWeatherSubscriber.Curr
     }
 
     public static final void main(String args[]) {
-        final String WEATHER_STATION_ID  = "KNJSTONE14";
-        final String WEATHER_STATION_KEY = "kIv2jqqI";
+        final String DEFAULT_WEATHER_STATION_ID  = "KDELEWES163";
+        final String DEFAULT_WEATHER_STATION_KEY = "cePrrTXh";
+        String stationId;
+        String stationKey;
 
-        WeatherUndergroundUploader weatherUnderground = new WeatherUndergroundUploader(WEATHER_STATION_ID, WEATHER_STATION_KEY);
+        if (args.length > 0)
+            stationId = args[0];
+        else
+            stationId = DEFAULT_WEATHER_STATION_ID;
+
+        if (args.length > 1)
+            stationKey = args[1];
+        else
+            stationKey = DEFAULT_WEATHER_STATION_KEY;
+
+        WeatherUndergroundUploader weatherUnderground = new WeatherUndergroundUploader(stationId, stationKey);
         CurrentWeatherSubscriber subscriber = CurrentWeatherSubscriber.createSubscriber(weatherUnderground);
     }
 }

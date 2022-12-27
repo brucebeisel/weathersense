@@ -22,10 +22,12 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.time.LocalDateTime;
 import java.util.logging.LogManager;
 
 import com.bdb.util.ThreadUtils;
 import com.bdb.weather.common.CurrentWeather;
+import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.uploader.weatherunderground.WeatherUndergroundUploader;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -39,9 +41,10 @@ import static org.junit.Assert.*;
  * @author Bruce
  */
 public class WeatherUndergroundTest {
-    private static int PORT = 11111;
+    private static int PORT = 11100;
     private Thread thread;
     private boolean respondSuccessfully = true;
+    private boolean multipleSamples = false;
     private static final String SUCCESS_RESPONSE = "HTTP/1.1 200 OK\n" +
                                                    "Content-Type: text/xml; charset=utf-8\n" +
                                                    "Content-Length: 8\n\n" +
@@ -84,46 +87,48 @@ public class WeatherUndergroundTest {
     @Before
     public void setUp() throws IOException {
         thread = new Thread(() -> {
-            System.out.println("Creating server socket");
-            Socket socket = null;
-            ServerSocket server = null;
-            try {
-                server = new ServerSocket();
-                server.setReuseAddress(true);
-                SocketAddress addr = new InetSocketAddress(PORT);
-                server.setSoTimeout(5000);
-                server.bind(addr);
-
-                byte buffer[] = new byte[1000];
-                System.out.println("Waiting for connection");
-                socket = server.accept();
-                System.out.println("Accepted a socket");
-                InputStream is = socket.getInputStream();
-                int n = is.read(buffer, 0, buffer.length);
-                String s = new String(buffer, 0, n);
-                System.out.println("Read '" + s + "'");
-                String response;
-                if (respondSuccessfully)
-                    response = SUCCESS_RESPONSE;
-                else
-                    response = FAILURE_RESPONSE;
-                socket.getOutputStream().write(response.getBytes());
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-            finally {
-                System.out.println("Closing sockets");
+            do {
+                System.out.println("Creating server socket");
+                Socket socket = null;
+                ServerSocket server = null;
                 try {
-                    if (socket != null)
-                        socket.close();
-                    
-                    if (server != null)
-                        server.close();
+                    server = new ServerSocket();
+                    server.setReuseAddress(true);
+                    SocketAddress addr = new InetSocketAddress(PORT);
+                    server.setSoTimeout(5000);
+                    server.bind(addr);
+
+                    byte buffer[] = new byte[1000];
+                    System.out.println("Waiting for connection");
+                    socket = server.accept();
+                    System.out.println("Accepted a socket");
+                    InputStream is = socket.getInputStream();
+                    int n = is.read(buffer, 0, buffer.length);
+                    String s = new String(buffer, 0, n);
+                    System.out.println("Read '" + s + "'");
+                    String response;
+                    if (respondSuccessfully)
+                        response = SUCCESS_RESPONSE;
+                    else
+                        response = FAILURE_RESPONSE;
+                    socket.getOutputStream().write(response.getBytes());
                 }
-                catch (IOException ex) {
+                catch (IOException e) {
+                    e.printStackTrace();
                 }
-            }
+                finally {
+                    System.out.println("Closing sockets");
+                    try {
+                        if (socket != null)
+                            socket.close();
+                        
+                        if (server != null)
+                            server.close();
+                    }
+                    catch (IOException ex) {
+                    }
+                }
+            } while (multipleSamples);
         });
         thread.start();
     }
@@ -140,16 +145,19 @@ public class WeatherUndergroundTest {
      */
     @Test
     public void testSuccessfulUpload() {
-        System.out.println("successfulUpload");
+        System.out.println("----------successfulUpload");
         respondSuccessfully = true;
         ThreadUtils.sleep(1000);
         WeatherUndergroundUploader instance = new WeatherUndergroundUploader("http://localhost:" + PORT + "?", "station", "password");
+
         CurrentWeather current = new CurrentWeather();
+        current.setTime(LocalDateTime.now());
         instance.handleCurrentWeather(current);
         ThreadUtils.sleep(2000);
         assertEquals(1, instance.getStatistics().numSuccesses);
         assertEquals(1, instance.getStatistics().numAttempts);
         assertEquals(0, instance.getStatistics().numFailures);
+
         thread.interrupt();
         ThreadUtils.sleep(1000);
     }
@@ -159,11 +167,12 @@ public class WeatherUndergroundTest {
      */
     @Test
     public void testUnsuccessfulUpload() {
-        System.out.println("UnsuccessfulUpload");
+        System.out.println("----------UnsuccessfulUpload");
         respondSuccessfully = false;
         ThreadUtils.sleep(1000);
         WeatherUndergroundUploader instance = new WeatherUndergroundUploader("http://localhost:" + PORT + "?", "station", "password");
         CurrentWeather current = new CurrentWeather();
+        current.setTime(LocalDateTime.now());
         instance.handleCurrentWeather(current);
         ThreadUtils.sleep(2000);
         assertEquals(0, instance.getStatistics().numSuccesses);
@@ -176,11 +185,12 @@ public class WeatherUndergroundTest {
      */
     @Test
     public void testUnsuccessfulConnection() {
-        System.out.println("UnsuccessfulConnection");
+        System.out.println("----------UnsuccessfulConnection");
         respondSuccessfully = false;
         ThreadUtils.sleep(1000);
         WeatherUndergroundUploader instance = new WeatherUndergroundUploader("http://192.168.0.200:" + PORT + "?", "station", "password");
         CurrentWeather current = new CurrentWeather();
+        current.setTime(LocalDateTime.now());
         instance.handleCurrentWeather(current);
         ThreadUtils.sleep(10000);
         assertEquals(0, instance.getStatistics().numSuccesses);
@@ -189,17 +199,4 @@ public class WeatherUndergroundTest {
         thread.interrupt();
         ThreadUtils.sleep(1000);
     }
-
-    /**
-     * Test of shutdown method, of class WeatherUnderground.
-     */
-    //@Test
-    public void testShutdown() {
-        System.out.println("shutdown");
-        WeatherUndergroundUploader instance = new WeatherUndergroundUploader();
-        instance.shutdown();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-    
 }
