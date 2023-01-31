@@ -16,6 +16,8 @@
  */
 package com.bdb.weather.uploaders.weatherunderground;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -25,16 +27,15 @@ import java.net.SocketAddress;
 import java.time.LocalDateTime;
 import java.util.logging.LogManager;
 
-import com.bdb.util.ThreadUtils;
-import com.bdb.weather.common.CurrentWeather;
-import com.bdb.weather.common.measurement.Depth;
-import com.bdb.weather.uploader.weatherunderground.WeatherUndergroundUploader;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import com.bdb.util.ThreadUtils;
+import com.bdb.weather.common.CurrentWeather;
+import com.bdb.weather.uploader.weatherunderground.WeatherUndergroundUploader;
 
 /**
  *

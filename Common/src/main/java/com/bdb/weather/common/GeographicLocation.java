@@ -49,10 +49,6 @@ public class GeographicLocation {
         this.altitude = altitude;
     }
 
-    private GeographicLocation() {
-        this(null, null, null);
-    }
-    
     /**
      * Constructor that defaults the altitude to 0.
      * 

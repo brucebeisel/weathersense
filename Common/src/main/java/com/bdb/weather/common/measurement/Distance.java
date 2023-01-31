@@ -66,7 +66,8 @@ public class Distance extends Depth {
         super(distance, unit);
     }
     
-    private Distance() {
+    @SuppressWarnings("unused")
+	private Distance() {
         this(0.0);
     }
 

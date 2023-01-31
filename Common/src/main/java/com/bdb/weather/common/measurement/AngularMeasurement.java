@@ -123,7 +123,8 @@ public class AngularMeasurement extends Measurement {
         this(angle, getDefaultUnit());
     }
 
-    private AngularMeasurement() {
+    @SuppressWarnings("unused")
+	private AngularMeasurement() {
         this(0.0);
     }
 

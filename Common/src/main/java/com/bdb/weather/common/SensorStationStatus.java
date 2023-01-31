@@ -56,7 +56,8 @@ public class SensorStationStatus {
         linkQuality = link;
     }
 
-    private SensorStationStatus() {
+    @SuppressWarnings("unused")
+	private SensorStationStatus() {
         this(0, LocalDateTime.now(), null, null, null);
     }
 

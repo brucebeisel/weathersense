@@ -49,61 +49,62 @@ public class Location
      * @throws IOException The file could not be read
      */
     public static void importCSVFile(File file, String locationCode, DayWeatherAverages dayWeatherAverages) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        String line1 = br.readLine();
-        String line2 = br.readLine(); // Line 2 is just header information for readability. Ignore it.
-        
-        if (line2 == null || line1 == null) {
-            logger.warning("File is less than 2 lines long");
-            return;
-        }
-        
-        String tokens[] = line1.split(",");
-        
-        if (tokens.length != 6) {
-            logger.warning("First line has " + tokens.length + " tokens not 6");
-            return;
-        }
-        
-        if (!tokens[1].equals(locationCode)) {
-            logger.warning("Location code in file does not match location code");
-            return;
-        }
-        
-        Temperature.Unit temperatureUnit = Temperature.Unit.valueOf(tokens[3]);
-        Depth.Unit rainfallUnit = Depth.Unit.valueOf(tokens[5]);
-        
-        DayOfYearCollection<WeatherAverage> collection = new DayOfYearCollection<>();
-        
-        for (int i = 0; i < 365; i++) {
-            String line = br.readLine();
-            
-            if (line == null) {
-                logger.warning("Less than 365 lines in file. Only found " + (i + 1));
-                return;
-            }
-            
-            tokens = line.split(",");
-            
-            if (tokens.length != TOKENS_PER_LINE) {
-                logger.warning("Incorrect number of tokens on line " + i + ".");
-                return;
-            }
-            
- 
-            Temperature low = new Temperature(Double.parseDouble(tokens[2]), temperatureUnit);
-            Temperature mean = new Temperature(Double.parseDouble(tokens[3]), temperatureUnit);
-            Temperature high = new Temperature(Double.parseDouble(tokens[4]), temperatureUnit);
-            Depth rainfall = new Depth(Double.parseDouble(tokens[5]), rainfallUnit);
-            
-            WeatherAverage avgs = new WeatherAverage(Month.valueOf(tokens[0]), Integer.parseInt(tokens[1]), high, low, mean, rainfall);
-            
-            collection.addItem(avgs.getMonth(), avgs.getDay(), avgs);        
-        }
-        
-        for (WeatherAverage avg : collection.getAverages()) {
-            LocalDate date = LocalDate.of(1970 , avg.getMonth(), avg.getDay());
-            dayWeatherAverages.putAverage(avg, date);
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+			String line1 = br.readLine();
+			String line2 = br.readLine(); // Line 2 is just header information for readability. Ignore it.
+			
+			if (line2 == null || line1 == null) {
+				logger.warning("File is less than 2 lines long");
+				return;
+			}
+			
+			String tokens[] = line1.split(",");
+			
+			if (tokens.length != 6) {
+				logger.warning("First line has " + tokens.length + " tokens not 6");
+				return;
+			}
+			
+			if (!tokens[1].equals(locationCode)) {
+				logger.warning("Location code in file does not match location code");
+				return;
+			}
+			
+			Temperature.Unit temperatureUnit = Temperature.Unit.valueOf(tokens[3]);
+			Depth.Unit rainfallUnit = Depth.Unit.valueOf(tokens[5]);
+			
+			DayOfYearCollection<WeatherAverage> collection = new DayOfYearCollection<>();
+			
+			for (int i = 0; i < 365; i++) {
+				String line = br.readLine();
+				
+				if (line == null) {
+					logger.warning("Less than 365 lines in file. Only found " + (i + 1));
+					return;
+				}
+				
+				tokens = line.split(",");
+				
+				if (tokens.length != TOKENS_PER_LINE) {
+					logger.warning("Incorrect number of tokens on line " + i + ".");
+					return;
+				}
+				
+	 
+				Temperature low = new Temperature(Double.parseDouble(tokens[2]), temperatureUnit);
+				Temperature mean = new Temperature(Double.parseDouble(tokens[3]), temperatureUnit);
+				Temperature high = new Temperature(Double.parseDouble(tokens[4]), temperatureUnit);
+				Depth rainfall = new Depth(Double.parseDouble(tokens[5]), rainfallUnit);
+				
+				WeatherAverage avgs = new WeatherAverage(Month.valueOf(tokens[0]), Integer.parseInt(tokens[1]), high, low, mean, rainfall);
+				
+				collection.addItem(avgs.getMonth(), avgs.getDay(), avgs);        
+			}
+			
+			for (WeatherAverage avg : collection.getAverages()) {
+				LocalDate date = LocalDate.of(1970 , avg.getMonth(), avg.getDay());
+				dayWeatherAverages.putAverage(avg, date);
+			}
         }
     }
     

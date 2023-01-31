@@ -1,6 +1,5 @@
 /* 
- * Copyright (C) 2016 Bruce Beisel
- *
+ * Copyright (C) 2016 Bruce Beisel *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,6 +15,10 @@
  */
 package com.bdb.weather.collector;
 
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -26,9 +29,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.LogManager;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import com.bdb.util.ThreadUtils;
 import com.bdb.util.jdbc.DBConnection;
-
 import com.bdb.weather.collector.socket.SocketReaderThread;
 import com.bdb.weather.common.CurrentWeather;
 import com.bdb.weather.common.DopplerRadarImage;
@@ -49,13 +57,6 @@ import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.common.measurement.UvIndex;
 import com.bdb.weather.common.messages.WsParametersMessage;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *

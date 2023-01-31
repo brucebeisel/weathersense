@@ -16,10 +16,6 @@
  */
 package com.bdb.weather.collector;
 
-import com.bdb.weather.collector.messages.SensorStationMessage;
-import com.bdb.weather.collector.messages.SensorStationStatusMessage;
-import com.bdb.weather.collector.messages.SensorMessage;
-
 import java.io.StringReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,13 +30,15 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import com.bdb.util.jdbc.DBConnection;
-
+import com.bdb.weather.collector.messages.SensorMessage;
+import com.bdb.weather.collector.messages.SensorStationMessage;
+import com.bdb.weather.collector.messages.SensorStationStatusMessage;
+import com.bdb.weather.collector.socket.SocketDataProcessor;
 import com.bdb.weather.common.CurrentWeather;
 import com.bdb.weather.common.HistoricalRecord;
 import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.common.messages.WeatherSenseMessage;
 import com.bdb.weather.common.messages.WsParametersMessage;
-import com.bdb.weather.collector.socket.SocketDataProcessor;
 
 /**
  * Process messages from the weather console driver.

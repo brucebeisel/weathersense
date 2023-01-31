@@ -102,7 +102,8 @@ public class MeasurementStatisticsEntry<M extends Measurement> {
         if (getClass() != obj.getClass())
             return false;
 
-        final MeasurementStatisticsEntry<M> other = (MeasurementStatisticsEntry<M>)obj;
+        @SuppressWarnings("unchecked")
+		final MeasurementStatisticsEntry<M> other = (MeasurementStatisticsEntry<M>)obj;
         if (!Objects.equals(this.date, other.date))
             return false;
 

@@ -123,7 +123,8 @@ public class Depth extends Measurement {
         super(depth, unit, COMPARE_PRECISION, Depth::new);
     }
     
-    private Depth() {
+    @SuppressWarnings("unused")
+	private Depth() {
         this(0.0);
     }
 

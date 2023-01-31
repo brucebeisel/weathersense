@@ -925,7 +925,8 @@ public class CurrentWeather implements Serializable {
      *
      * @return
      */
-    public Collection<MeasurementEntry> getSensorValues() {
+    @SuppressWarnings("rawtypes")
+	public Collection<MeasurementEntry> getSensorValues() {
         List<MeasurementEntry> entries = new ArrayList<>();
         entries.addAll(temperatureSensorEntries.values());
         entries.addAll(humiditySensorEntries.values());

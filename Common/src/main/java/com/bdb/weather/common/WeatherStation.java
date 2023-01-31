@@ -16,17 +16,13 @@
  */
 package com.bdb.weather.common;
 
-import com.bdb.weather.common.astronomical.SolarEventCalculator;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.Month;
-import java.time.ZoneId;
-import java.util.Calendar;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.bdb.weather.common.astronomical.SolarEventCalculator;
 import com.bdb.weather.common.measurement.AngularMeasurement;
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Distance;

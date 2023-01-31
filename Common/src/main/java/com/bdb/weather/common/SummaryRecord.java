@@ -1113,7 +1113,7 @@ public class SummaryRecord {
             case THERMOMETER:
             case LEAF_TEMPERATURE:
             case SOIL_TEMPERATURE:
-                MeasurementStatisticsEntry<Temperature> tstats = (MeasurementStatisticsEntry<Temperature>)sensors.get(sensorId);
+                @SuppressWarnings("unchecked") MeasurementStatisticsEntry<Temperature> tstats = (MeasurementStatisticsEntry<Temperature>)sensors.get(sensorId);
                 if (tstats == null) {
                     tstats = new MeasurementStatisticsEntry<>(time.toLocalDate(), sensorId, sensorType, new MeasurementStatistics<>(new Temperature(0.0)));
                     sensors.put(sensorId, tstats);
@@ -1122,7 +1122,7 @@ public class SummaryRecord {
                 break;
 
             case HYGROMETER:
-                MeasurementStatisticsEntry<Humidity> hstats = (MeasurementStatisticsEntry<Humidity>)sensors.get(sensorId);
+                @SuppressWarnings("unchecked") MeasurementStatisticsEntry<Humidity> hstats = (MeasurementStatisticsEntry<Humidity>)sensors.get(sensorId);
                 if (hstats == null) {
                     hstats = new MeasurementStatisticsEntry<>(time.toLocalDate(), sensorId, sensorType, new MeasurementStatistics<>(new Humidity(0.0)));
                     sensors.put(sensorId, hstats);
@@ -1131,7 +1131,7 @@ public class SummaryRecord {
                 break;
                 
             case SOIL_MOISTURE:
-                MeasurementStatisticsEntry<SoilMoisture> mstats = (MeasurementStatisticsEntry<SoilMoisture>)sensors.get(sensorId);
+                @SuppressWarnings("unchecked") MeasurementStatisticsEntry<SoilMoisture> mstats = (MeasurementStatisticsEntry<SoilMoisture>)sensors.get(sensorId);
                 if (mstats == null) {
                     mstats = new MeasurementStatisticsEntry<>(time.toLocalDate(), sensorId, sensorType, new MeasurementStatistics<>(new SoilMoisture(0.0)));
                     sensors.put(sensorId, mstats);
@@ -1140,7 +1140,7 @@ public class SummaryRecord {
                 break;
 
             case LEAF_WETNESS:
-                MeasurementStatisticsEntry<LeafWetness> wstats = (MeasurementStatisticsEntry<LeafWetness>)sensors.get(sensorId);
+                @SuppressWarnings("unchecked") MeasurementStatisticsEntry<LeafWetness> wstats = (MeasurementStatisticsEntry<LeafWetness>)sensors.get(sensorId);
                 if (wstats == null) {
                     wstats = new MeasurementStatisticsEntry<>(time.toLocalDate(), sensorId, sensorType, new MeasurementStatistics<>(new LeafWetness(0)));
                     sensors.put(sensorId, wstats);
@@ -1162,7 +1162,8 @@ public class SummaryRecord {
 	sensors.put(summary.getSensorId(), summary);
     }
 
-    private void applySensorStatistics(MeasurementStatisticsEntry<? extends Measurement> summary) {
+    @SuppressWarnings("unchecked")
+	private void applySensorStatistics(MeasurementStatisticsEntry<? extends Measurement> summary) {
         SensorType sensorType = summary.getSensorType();
         int sensorId = summary.getSensorId();
 

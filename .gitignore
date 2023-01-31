@@ -1,10 +1,7 @@
-/Common/target/
-/Collector/target/
-/Display/target/
-/HealthMonitor/target/
 *.log
-/WeatherSenseDisplayJavaFX/target/
-/Uploaders/target/
-/VantagePro2Driver/VP2++/target
 *.o
-VantagePro2Driver/VP2++/src/VP2/vp2.exe
+*.exe
+target
+.project
+.classpath
+.settings

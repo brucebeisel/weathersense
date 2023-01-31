@@ -122,7 +122,8 @@ public class Sensor {
         this(sensorId, type, null);
     }
     
-    private Sensor() {
+    @SuppressWarnings("unused")
+	private Sensor() {
     }
     
     /**

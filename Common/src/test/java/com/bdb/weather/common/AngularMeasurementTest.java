@@ -16,10 +16,11 @@
  */
 package com.bdb.weather.common;
 
-import com.bdb.weather.common.measurement.AngularMeasurement;
-import junit.framework.Assert;
-
 import org.junit.Test;
+
+import com.bdb.weather.common.measurement.AngularMeasurement;
+
+import junit.framework.Assert;
 
 public class AngularMeasurementTest {
 

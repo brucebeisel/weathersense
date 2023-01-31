@@ -16,8 +16,6 @@
  */
 package com.bdb.weather.common;
 
-import java.time.format.DateTimeFormatter;
-
 import com.bdb.weather.common.measurement.Humidity;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
@@ -32,7 +30,6 @@ public final class WeatherUtils {
      *
      */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
     /**
      *

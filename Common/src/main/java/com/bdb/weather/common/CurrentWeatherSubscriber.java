@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 import java.time.LocalDateTime;
@@ -98,7 +99,11 @@ public class CurrentWeatherSubscriber implements Runnable {
     private CurrentWeatherSubscriber(CurrentWeatherHandler handler) throws IOException, JAXBException {
         stats = new CurrentWeatherStatistics();
         socket = new MulticastSocket(DEFAULT_PORT);
-        socket.joinGroup (InetAddress.getByName(DEFAULT_ADDRESS));
+        InetAddress mcastAddress = InetAddress.getByName(DEFAULT_ADDRESS);
+        //InetSocketAddress group = new InetSocketAddress(mcastAddress, DEFAULT_PORT);
+        //NetworkInterface netIf = NetworkInterface.getByName("bge0");
+
+        socket.joinGroup (new InetSocketAddress(mcastAddress, 0), null);
         this.handler = handler;
         jaxbContext = JAXBContext.newInstance(com.bdb.weather.common.CurrentWeather.class,
                                               com.bdb.weather.common.measurement.LeafWetness.class,
@@ -113,7 +118,7 @@ public class CurrentWeatherSubscriber implements Runnable {
     private void init() {
         exit = false;
         thread = new Thread(this);
-	thread.setName("current-weather-thread");
+		thread.setName("current-weather-thread");
         thread.start();
     }
     
@@ -169,7 +174,8 @@ public class CurrentWeatherSubscriber implements Runnable {
     /**
      * The statistics collected about the current weather processing.
      */
-    public static class CurrentWeatherStatistics implements Serializable {
+    @SuppressWarnings("serial")
+	public static class CurrentWeatherStatistics implements Serializable {
         private final LocalDateTime collectionStartTime;
         private LocalDateTime lastValidPacketTime;
         private int validPacketsReceived;

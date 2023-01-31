@@ -50,7 +50,8 @@ public class Wind implements Serializable {
     /**
      * Constructor.
      */
-    private Wind() {
+    @SuppressWarnings("unused")
+	private Wind() {
         this(new Speed(0.0), new Heading(0.0F));
     }
 

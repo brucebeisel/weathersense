@@ -16,8 +16,6 @@
  */
 package com.bdb.weather.collector;
 
-import com.bdb.weather.collector.socket.SocketReaderThread;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -28,6 +26,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
+import com.bdb.weather.collector.socket.SocketReaderThread;
 import com.bdb.weather.common.db.DatabaseConstants;
 
 /**

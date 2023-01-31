@@ -51,7 +51,8 @@ public class SensorStation {
         this.sensorStationId = sensorStationId;
     }
 
-    private SensorStation() {
+    @SuppressWarnings("unused")
+	private SensorStation() {
         this(1, SensorStationType.INTEGRATED_SENSOR_STATION, "");
     }
     

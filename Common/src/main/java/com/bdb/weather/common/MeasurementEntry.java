@@ -51,7 +51,8 @@ public class MeasurementEntry<T extends Measurement> {
     /**
      * Constructor.
      */
-    private MeasurementEntry() {
+    @SuppressWarnings("unused")
+	private MeasurementEntry() {
     }
     
     /**
@@ -98,7 +99,8 @@ public class MeasurementEntry<T extends Measurement> {
         if (getClass() != obj.getClass())
             return false;
 
-        final MeasurementEntry<T> other = (MeasurementEntry<T>)obj;
+        @SuppressWarnings("unchecked")
+		final MeasurementEntry<T> other = (MeasurementEntry<T>)obj;
         if (this.sensorId != other.sensorId)
             return false;
 

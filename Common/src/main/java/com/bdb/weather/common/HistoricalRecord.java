@@ -16,9 +16,6 @@
  */
 package com.bdb.weather.common;
 
-import com.bdb.weather.common.xml.LocalDateTimeAdapter;
-import com.bdb.weather.common.xml.DurationAdapter;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -46,6 +42,8 @@ import com.bdb.weather.common.measurement.SolarRadiation;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.common.measurement.UvIndex;
+import com.bdb.weather.common.xml.DurationAdapter;
+import com.bdb.weather.common.xml.LocalDateTimeAdapter;
 
 /**
  *
@@ -53,7 +51,8 @@ import com.bdb.weather.common.measurement.UvIndex;
  */
 @XmlRootElement
 public class HistoricalRecord {
-    private static final long serialVersionUID = -3464537243885145413L;
+    @SuppressWarnings("unused")
+	private static final long serialVersionUID = -3464537243885145413L;
     private LocalDateTime time;
     private Duration duration = Duration.ZERO;
     private Temperature avgOutdoorTemperature;
@@ -85,8 +84,6 @@ public class HistoricalRecord {
     
     @XmlElement(name="soilMoistureSensorValues", type=MeasurementEntry.class)
     private final Map<Integer,MeasurementEntry<SoilMoisture>> soilMoistureSensorEntries = new TreeMap<>();
-
-    private static final Logger logger = Logger.getLogger(HistoricalRecord.class.getName());
 
     /**
      * Constructor.

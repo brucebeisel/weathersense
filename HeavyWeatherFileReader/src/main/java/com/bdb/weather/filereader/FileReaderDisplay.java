@@ -37,7 +37,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import com.bdb.util.LabeledFieldPanel;
-import com.bdb.weather.collector.Collector;
+//import com.bdb.weather.collector.Collector;
 import com.bdb.weather.common.HistoricalRecord;
 
 @SuppressWarnings("serial")
@@ -46,17 +46,17 @@ public class FileReaderDisplay extends JFrame implements ActionListener
     private JTextField m_stationTF = new JTextField("beisel");
     private JTextField m_timeTF = new JTextField(25);
     private JTextArea m_statusTA = new JTextArea();
-    private Collector m_collector;
+    //private Collector m_collector;
     
     public FileReaderDisplay() throws RemoteException, NotBoundException
     {
         super("File Reader");
         this.setLayout(new BorderLayout());
         JPanel fieldPanel = new JPanel(new GridLayout(0,1));
-        JPanel p = new LabeledFieldPanel("Station ID:", m_stationTF);
-        fieldPanel.add(p);
-        p = new LabeledFieldPanel("Time Before Hole: ", m_timeTF);
-        fieldPanel.add(p);
+        //JPanel p = new LabeledFieldPanel("Station ID:", m_stationTF);
+        //fieldPanel.add(p);
+        //p = new LabeledFieldPanel("Time Before Hole: ", m_timeTF);
+        //fieldPanel.add(p);
         add(fieldPanel, BorderLayout.NORTH);
         add(new JScrollPane(m_statusTA), BorderLayout.CENTER);
         
@@ -75,7 +75,7 @@ public class FileReaderDisplay extends JFrame implements ActionListener
         add(buttonPanel, BorderLayout.SOUTH);
         
         Registry registry = LocateRegistry.getRegistry();
-        m_collector = (Collector)registry.lookup(Collector.COLLECTOR_NAME);
+        //m_collector = (Collector)registry.lookup(Collector.COLLECTOR_NAME);
     }
 
     public void actionPerformed(ActionEvent event)
@@ -103,7 +103,7 @@ public class FileReaderDisplay extends JFrame implements ActionListener
                 m_statusTA.append("Found Record: " + record.toString());
                 m_statusTA.append("\n");
                 
-                m_collector.addHistoricalRecord(record);
+                //m_collector.addHistoricalRecord(record);
                 
                 m_statusTA.append("Added Record: " + record.toString());
                 m_statusTA.append("\n");
