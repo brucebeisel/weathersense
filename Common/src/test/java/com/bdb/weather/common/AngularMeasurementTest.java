@@ -16,11 +16,12 @@
  */
 package com.bdb.weather.common;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.bdb.weather.common.measurement.AngularMeasurement;
 
-import junit.framework.Assert;
+
 
 public class AngularMeasurementTest {
 
@@ -39,13 +40,13 @@ public class AngularMeasurementTest {
     @Test
     public void testAngularMeasurementDouble() {
         AngularMeasurement angle = new AngularMeasurement(180.0);       
-        Assert.assertEquals(Math.PI, angle.get(AngularMeasurement.Unit.RADIANS));
+        Assert.assertEquals(Math.PI, angle.get(AngularMeasurement.Unit.RADIANS), .001);
     }
 
     @Test
     public void testAngularMeasurementDoubleUnit() {
         AngularMeasurement angle = new AngularMeasurement(Math.PI, AngularMeasurement.Unit.RADIANS);      
-        Assert.assertEquals(180.0, angle.get());
+        Assert.assertEquals(180.0, angle.get(), .01);
     }
 
 }

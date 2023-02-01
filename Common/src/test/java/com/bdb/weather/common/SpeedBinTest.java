@@ -40,8 +40,8 @@ public class SpeedBinTest {
         
     @Test(expected = IllegalArgumentException.class)
     public void testSpeedBinException() {
-        SpeedBin bin = new SpeedBin(0, null, SpeedBin.MAX_SPEED);
-        bin = new SpeedBin(0, SpeedBin.MIN_SPEED, null);
+        new SpeedBin(0, null, SpeedBin.MAX_SPEED);
+        new SpeedBin(0, SpeedBin.MIN_SPEED, null);
     }
 
 }

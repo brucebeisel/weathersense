@@ -23,12 +23,11 @@ import org.jfree.data.category.CategoryDataset;
 
 /**
  * Generate the labels for the rain bar chart, this is special because no label is created if the rain total is zero.
- * 
- * @author Bruce
- *
  */
 public class RainItemLabelGenerator extends StandardCategoryItemLabelGenerator {
-    /**
+	private static final long serialVersionUID = 3794333849497863956L;
+
+	/**
      * Constructor.
      * 
      * @param labelFormat The format of the label

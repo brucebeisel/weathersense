@@ -16,10 +16,10 @@
  */
 package com.bdb.weather.common;
 
-import com.bdb.weather.common.measurement.Speed;
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
+
+import com.bdb.weather.common.measurement.Speed;
 
 public class SpeedTest {
 
@@ -27,7 +27,7 @@ public class SpeedTest {
     public void testSpeedDouble() {
         Speed s = new Speed(10);
         
-        Assert.assertEquals(10.0, s.get(Speed.getDefaultUnit()));
+        Assert.assertEquals(10.0, s.get(Speed.getDefaultUnit()), .1);
 
         System.out.println("" + s.get(Speed.Unit.MILES_PER_HOUR) + Speed.Unit.MILES_PER_HOUR);
 

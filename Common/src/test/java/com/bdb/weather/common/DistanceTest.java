@@ -16,10 +16,10 @@
  */
 package com.bdb.weather.common;
 
-import com.bdb.weather.common.measurement.Distance;
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
+
+import com.bdb.weather.common.measurement.Distance;
 
 /**
  * This is a special JUnit test because it is the first measurement class to inherit from a class other
@@ -45,13 +45,13 @@ public class DistanceTest {
     @Test
     public void testDistanceDouble() {
         Distance distance = new Distance(1.0);       
-        Assert.assertEquals(1000.0, distance.get(Distance.Unit.MILLIMETERS));
+        Assert.assertEquals(1000.0, distance.get(Distance.Unit.MILLIMETERS), .1);
     }
 
     @Test
     public void testDistanceDoubleUnit() {
         Distance distance = new Distance(1.0, Distance.Unit.KILOMETERS);       
-        Assert.assertEquals(1000000.0, distance.get(Distance.Unit.MILLIMETERS));
+        Assert.assertEquals(1000000.0, distance.get(Distance.Unit.MILLIMETERS), .1);
     }
 
 }

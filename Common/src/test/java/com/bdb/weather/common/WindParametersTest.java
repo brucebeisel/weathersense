@@ -31,8 +31,6 @@ import static org.junit.Assert.*;
  * @author Bruce
  */
 public class WindParametersTest {
-    private WindParameters windParameters;
-    
     public WindParametersTest() {
     }
     

@@ -29,7 +29,9 @@ import com.bdb.weather.common.measurement.Heading;
  *
  */
 public class CompassHeadingFormat extends NumberFormat {
-    /* (non-Javadoc)
+	private static final long serialVersionUID = 2805544232534153298L;
+
+	/* (non-Javadoc)
      * @see java.text.NumberFormat#format(double, java.lang.StringBuffer, java.text.FieldPosition)
      */
     @Override

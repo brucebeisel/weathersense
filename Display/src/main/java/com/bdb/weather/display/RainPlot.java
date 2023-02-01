@@ -54,34 +54,31 @@ import com.bdb.weather.display.axis.RainRangeAxis;
 
 /**
  * Panel to display historical  rain.
- * 
- * @author Bruce
- *
  */
 public class RainPlot extends BorderPane {
-public static class RainEntry {
-    public LocalDateTime time;
-    public Depth    rainfall;
-    public Depth    rainfallRate;
-    public RainEntry(LocalDateTime time, Depth rainfall, Depth rainfallRate) {
-        this.time = time;
-        this.rainfall = rainfall;
-        this.rainfallRate = rainfallRate;
-    }
-};
-private static final String RAIN_DOMAIN = "Rainfall";
-private static final String RAIN_RATE_DOMAIN_PREFIX = "Rate (%s/hr)";
-private JFreeChart           chart;
-private ChartViewer          chartViewer;
-private CombinedDomainXYPlot plot;
-private XYPlot               rainPlot;
-private XYPlot               rainRatePlot;
-private TimeSeriesCollection rainDataset;
-private TimeSeriesCollection rainRateDataset;
-private TimeSeries           rainSeries;
-private TimeSeries           rainRateSeries;
-private String               rateDomain;
-private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:mm"); // TODO use preferences
+	public static class RainEntry {
+		public LocalDateTime time;
+		public Depth    rainfall;
+		public Depth    rainfallRate;
+		public RainEntry(LocalDateTime time, Depth rainfall, Depth rainfallRate) {
+			this.time = time;
+			this.rainfall = rainfall;
+			this.rainfallRate = rainfallRate;
+		}
+	};
+	private static final String RAIN_DOMAIN = "Rainfall";
+	private static final String RAIN_RATE_DOMAIN_PREFIX = "Rate (%s/hr)";
+	private JFreeChart           chart;
+	private ChartViewer          chartViewer;
+	private CombinedDomainXYPlot plot;
+	private XYPlot               rainPlot;
+	private XYPlot               rainRatePlot;
+	private TimeSeriesCollection rainDataset;
+	private TimeSeriesCollection rainRateDataset;
+	private TimeSeries           rainSeries;
+	private TimeSeries           rainRateSeries;
+	private String               rateDomain;
+	private final DateTimeFormatter    formatter = DateTimeFormatter.ofPattern("HH:mm"); // TODO use preferences
     
     /**
      * Class to generate the labels for the tool tips

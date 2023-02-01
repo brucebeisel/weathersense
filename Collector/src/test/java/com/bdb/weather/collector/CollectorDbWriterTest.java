@@ -45,7 +45,6 @@ import com.bdb.weather.common.Sensor;
 import com.bdb.weather.common.SensorStation;
 import com.bdb.weather.common.SensorStationStatus;
 import com.bdb.weather.common.Wind;
-import com.bdb.weather.common.db.DatabaseConstants;
 import com.bdb.weather.common.db.DatabaseUtilities;
 import com.bdb.weather.common.db.HistoryTable;
 import com.bdb.weather.common.measurement.Depth;
@@ -67,7 +66,7 @@ public class CollectorDbWriterTest {
     private static List<HistoricalRecord> historyList = new ArrayList<>();
     private static DatabaseUtilities utils;
     private static HistoryTable historyTable;
-    private static String dbUrl;
+    //private static String dbUrl;
     
     /**
      *
@@ -81,10 +80,10 @@ public class CollectorDbWriterTest {
      */
     @BeforeClass
     public static void setUpClass() throws IOException {
-        dbUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER,
-                              DatabaseConstants.DATABASE_HOST,
-                              DatabaseConstants.DATABASE_PORT,
-                              DatabaseConstants.DATABASE_NAME);
+//        dbUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER,
+//                              DatabaseConstants.DATABASE_HOST,
+//                              DatabaseConstants.DATABASE_PORT,
+//                              DatabaseConstants.DATABASE_NAME);
 
         InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("collector_logging.properties");
 

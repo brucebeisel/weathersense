@@ -603,7 +603,8 @@ final class CollectorDbWriter implements WeatherDataWriter, Runnable {
     }
 
     public static class Statistics implements Serializable {
-        int currentWeatherRecordCount;
+		private static final long serialVersionUID = -4632239502354557025L;
+		int currentWeatherRecordCount;
         LocalDateTime lastCurrentWeatherTime;
         int historicalRecordCount;
         LocalDateTime lastHistoricalRecordTime; 

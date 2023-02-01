@@ -40,7 +40,7 @@ final class WeatherSenseCollector {
     private static final String LOGGING_PROPERTY_FILE = "collector_logging.properties";
     private static final String COLLECTOR_PROPERTY_FILE = "com/bdb/weathersense/weathersense_collector.properties";
     private static final String DATABASE_HOST_PROPERTY = "weathersense.database-host";
-    private static final String DATABASE_PORT_PROPERTY = "weathersense.database-port";
+    //private static final String DATABASE_PORT_PROPERTY = "weathersense.database-port";
     private static final String HELP_ARG = "-h";
 
     /**
@@ -91,7 +91,7 @@ final class WeatherSenseCollector {
 
             dbHost = properties.getProperty(DATABASE_HOST_PROPERTY, dbHost);
 
-            String prop = properties.getProperty(DATABASE_PORT_PROPERTY, dbPort);
+            //String prop = properties.getProperty(DATABASE_PORT_PROPERTY, dbPort);
 
             String dbUrl = String.format(DatabaseConstants.DATABASE_URL_FORMATTER, dbServer, dbHost, dbPort, dbName);
 

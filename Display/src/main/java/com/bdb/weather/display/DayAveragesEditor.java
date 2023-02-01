@@ -51,9 +51,9 @@ import com.bdb.weather.common.db.DailyAveragesTable;
  *
  */
 public final class DayAveragesEditor extends BorderPane implements EventHandler<ActionEvent> {
-    private static final int YEAR_THAT_IS_NOT_A_LEAP_YEAR = 2001;
+    //private static final int YEAR_THAT_IS_NOT_A_LEAP_YEAR = 2001;
     private static final String OK_COMMAND = "OK";
-    private static final String CANCEL_COMMAND = "CANCEL";
+    //private static final String CANCEL_COMMAND = "CANCEL";
     private static final String IMPORT_COMMAND = "IMPORT";
     private static final String EXPORT_COMMAND = "EXPORT";
     private final String                    locationName;
@@ -61,11 +61,10 @@ public final class DayAveragesEditor extends BorderPane implements EventHandler<
     private final DailyAveragesTable        dailyAveragesDbTable;
     private DayWeatherAverages              averages;
     private final ExtensionFilter           fileFilter = new ExtensionFilter("CSV", "csv");
-    private static final String COLUMN_NAMES[] = {
-        "Date", "Avg Low", "Avg Mean", "Avg High", "Rainfall"
-    };
+//    private static final String COLUMN_NAMES[] = {
+//        "Date", "Avg Low", "Avg Mean", "Avg High", "Rainfall"
+//    };
     
-    @SuppressWarnings("LeakingThisInConstructor")
     public DayAveragesEditor(DBConnection connection, String locationName) {
         this.locationName = locationName;
         dailyAveragesDbTable = new DailyAveragesTable(connection);
