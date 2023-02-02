@@ -84,7 +84,7 @@ import com.bdb.weather.common.measurement.Temperature;
  */
 public class WeatherUndergroundUploader implements CurrentWeatherSubscriber.CurrentWeatherHandler {
     private static final String WEATHER_SENSE_PRODUCT_STRING = WeatherSenseConstants.PRODUCT_NAME + "-" + WeatherSenseConstants.PRODUCT_VERSION;
-    private static final String WUNDERGROUND_BASE_URL = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php?";
+    //private static final String WUNDERGROUND_BASE_URL = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php?";
     private static final String WUNDERGROUND_RAPIDFIRE_BASE_URL = "http://rtupdate.wunderground.com/weatherstation/updateweatherstation.php?";
     private static final String WUNDERGROUND_RAPIDFIRE_FREQ = "&realtime=1&rtfreq=2.5";
     private static final String URL_SPACE = "%20";
@@ -207,9 +207,9 @@ public class WeatherUndergroundUploader implements CurrentWeatherSubscriber.Curr
         record.winGustDir10Min = current.getWindGustDirection();
         record.outdoorHumidity = current.getOutdoorHumidity();
         record.dewPoint = current.getDewPoint();
-        record.outdoorTemp = current.getOutdoorTemperature();
-        record.barometer = current.getBaroPressure();
-        record.indoorTemp = current.getIndoorTemperature();
+        record.outdoorTemperature = current.getOutdoorTemperature();
+        record.barometer = current.getBarometricPressure();
+        record.indoorTemperature = current.getIndoorTemperature();
         record.indoorHumidity = current.getIndoorHumidity();
         //
         // Note the rain rate from the console is ignored due to the ICD published by weather underground.
@@ -269,21 +269,21 @@ public class WeatherUndergroundUploader implements CurrentWeatherSubscriber.Curr
         sb.append(ID_URL_TAG).append(record.stationId).append(URL_FIELD_SEPARATOR);
         sb.append(PASSWORD_URL_TAG).append(record.password).append(URL_FIELD_SEPARATOR);
         sb.append(UTC_URL_TAG).append(time).append(URL_FIELD_SEPARATOR);
-        if (record.outdoorTemp != null)
-            sb.append(OUTDOOR_TEMPERATURE_URL_TAG).append(Temperature.Unit.FAHRENHEIT.getFormatter().format(record.outdoorTemp.get(Temperature.Unit.FAHRENHEIT))).append(URL_FIELD_SEPARATOR);
+        if (record.outdoorTemperature != null)
+            sb.append(OUTDOOR_TEMPERATURE_URL_TAG).append(Temperature.Unit.FAHRENHEIT.getFormatter().format(record.outdoorTemperature.get(Temperature.Unit.FAHRENHEIT))).append(URL_FIELD_SEPARATOR);
 
         Temperature dewPoint = null;
         if (record.dewPoint != null)
             dewPoint = record.dewPoint;
-        else if (record.outdoorTemp != null && record.outdoorHumidity != null) {
-            dewPoint = WeatherUtils.dewPoint(record.outdoorTemp, record.outdoorHumidity);
+        else if (record.outdoorTemperature != null && record.outdoorHumidity != null) {
+            dewPoint = WeatherUtils.dewPoint(record.outdoorTemperature, record.outdoorHumidity);
         }
 
         if (dewPoint != null)
             sb.append(DEW_POINT_URL_TAG).append(Temperature.Unit.FAHRENHEIT.getFormatter().format(dewPoint.get(Temperature.Unit.FAHRENHEIT))).append(URL_FIELD_SEPARATOR);
 
-        if (record.indoorTemp != null)
-            sb.append(INDOOR_TEMPERATURE_URL_TAG).append(Temperature.Unit.FAHRENHEIT.getFormatter().format(record.indoorTemp.get(Temperature.Unit.FAHRENHEIT))).append(URL_FIELD_SEPARATOR);
+        if (record.indoorTemperature != null)
+            sb.append(INDOOR_TEMPERATURE_URL_TAG).append(Temperature.Unit.FAHRENHEIT.getFormatter().format(record.indoorTemperature.get(Temperature.Unit.FAHRENHEIT))).append(URL_FIELD_SEPARATOR);
 
         if (record.outdoorHumidity != null)
             sb.append(OUTDOOR_HUMIDITY_URL_TAG).append(record.outdoorHumidity.toString()).append(URL_FIELD_SEPARATOR);
@@ -343,7 +343,6 @@ public class WeatherUndergroundUploader implements CurrentWeatherSubscriber.Curr
      *
      * @param url The URL to which to connect
      */
-    @SuppressWarnings("empty-statement")
     private void performUrlConnection(WeatherUndergroundRecord record) {
         try {
             statistics.numAttempts++;
@@ -429,6 +428,6 @@ public class WeatherUndergroundUploader implements CurrentWeatherSubscriber.Curr
             stationKey = DEFAULT_WEATHER_STATION_KEY;
 
         WeatherUndergroundUploader weatherUnderground = new WeatherUndergroundUploader(stationId, stationKey);
-        CurrentWeatherSubscriber subscriber = CurrentWeatherSubscriber.createSubscriber(weatherUnderground);
+        CurrentWeatherSubscriber.createSubscriber(weatherUnderground);
     }
 }

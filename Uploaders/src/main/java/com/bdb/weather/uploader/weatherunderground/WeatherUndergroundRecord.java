@@ -91,7 +91,7 @@ public class WeatherUndergroundRecord {
     /**
      * The current outdoor temperature
      */
-    public Temperature outdoorTemp;
+    public Temperature outdoorTemperature;
     /**
      * The current barometer reading
      */
@@ -99,7 +99,7 @@ public class WeatherUndergroundRecord {
     /**
      * The current indoor temperature
      */
-    public Temperature indoorTemp;
+    public Temperature indoorTemperature;
     /**
      * The current indoor humidity
      */

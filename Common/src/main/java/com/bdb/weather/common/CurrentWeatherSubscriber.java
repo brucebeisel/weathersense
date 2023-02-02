@@ -17,8 +17,6 @@
 package com.bdb.weather.common;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -29,14 +27,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * A class to subscribe to the current weather multicast UDP current weather packet and process the data in a separate thread.
- *
- * @author Bruce
+ * A class to subscribe to the current weather multicast UDP current weather packet.
  */
 public class CurrentWeatherSubscriber implements Runnable {
     /**
@@ -51,24 +45,17 @@ public class CurrentWeatherSubscriber implements Runnable {
         void handleCurrentWeather(CurrentWeather cw);
     }
     
-    /**
-     *
-     */
     public static final String DEFAULT_ADDRESS = "224.0.0.120";
 
-    /**
-     *
-     */
-    public static final int DEFAULT_PORT = 11461;
-    private static final int RECEIVE_TIMEOUT_MILLIS = 10000;
-    private final MulticastSocket socket;
-    private final CurrentWeatherHandler handler;
-    private Thread thread;
-    private boolean exit;
-    private final JAXBContext jaxbContext;
-    private final Unmarshaller unmarshaller;
-    private final CurrentWeatherStatistics stats;
-    private static final Logger logger = Logger.getLogger(CurrentWeatherSubscriber.class.getName());
+    public static final int                 DEFAULT_PORT = 11461;
+    private static final int                RECEIVE_TIMEOUT_MILLIS = 10000;
+    private final MulticastSocket           socket;
+    private final CurrentWeatherHandler     handler;
+    private Thread                          thread;
+    private boolean                         exit;
+    private final ObjectMapper              objectMapper = new ObjectMapper();
+    private final CurrentWeatherStatistics  stats;
+    private static final Logger             logger = Logger.getLogger(CurrentWeatherSubscriber.class.getName());
     
     /**
      * Factory method for creating a current weather subscriber.
@@ -83,7 +70,7 @@ public class CurrentWeatherSubscriber implements Runnable {
             subscriber.init();
             return subscriber;
         }
-        catch (IOException | JAXBException ex) {
+        catch (IOException ex) {
             logger.log(Level.SEVERE, "Caught I/O exception", ex);
             return null;
         }
@@ -94,9 +81,8 @@ public class CurrentWeatherSubscriber implements Runnable {
      * 
      * @param handler The handler to process the current weather
      * @throws IOException The multicast socket could not be created
-     * @throws JAXBException The JAXB context could not be created
      */
-    private CurrentWeatherSubscriber(CurrentWeatherHandler handler) throws IOException, JAXBException {
+    private CurrentWeatherSubscriber(CurrentWeatherHandler handler) throws IOException {
         stats = new CurrentWeatherStatistics();
         socket = new MulticastSocket(DEFAULT_PORT);
         InetAddress mcastAddress = InetAddress.getByName(DEFAULT_ADDRESS);
@@ -105,10 +91,6 @@ public class CurrentWeatherSubscriber implements Runnable {
 
         socket.joinGroup (new InetSocketAddress(mcastAddress, 0), null);
         this.handler = handler;
-        jaxbContext = JAXBContext.newInstance(com.bdb.weather.common.CurrentWeather.class,
-                                              com.bdb.weather.common.measurement.LeafWetness.class,
-                                              com.bdb.weather.common.measurement.SoilMoisture.class);
-        unmarshaller = jaxbContext.createUnmarshaller();
         socket.setSoTimeout(RECEIVE_TIMEOUT_MILLIS);
     }
     
@@ -151,20 +133,15 @@ public class CurrentWeatherSubscriber implements Runnable {
                 socket.receive(packet);
                 String s = new String(b, 0, packet.getLength());
                 logger.log(Level.FINER, "UDP Packet: {0}", s);
-                Object msg = unmarshaller.unmarshal(new StringReader(s));
-                if (msg instanceof CurrentWeather) {
-                    CurrentWeather cw = (CurrentWeather)msg;
-                    handler.handleCurrentWeather(cw);
-                    logger.log(Level.FINE, "Current weather at {0}", cw.getTime());
-                    stats.receivedValidPacket();
-                }
-                else
-                    logger.log(Level.WARNING, "Current weather UDP packet could not be demarshalled");
+                CurrentWeather cw = objectMapper.readValue(s, CurrentWeather.class);
+				handler.handleCurrentWeather(cw);
+				logger.log(Level.FINE, "Current weather at {0}", cw.getTime());
+				stats.receivedValidPacket();
             }
             catch (SocketTimeoutException e2) {
                 logger.log(Level.INFO, "Timeout while waiting for current weather");
             }
-            catch (IOException | JAXBException e) {
+            catch (IOException e) {
                 logger.log(Level.WARNING, "Caught exception while reading current weather UDP packet", e);
                 stats.receivedInvalidPacket();
             }
@@ -174,8 +151,7 @@ public class CurrentWeatherSubscriber implements Runnable {
     /**
      * The statistics collected about the current weather processing.
      */
-    @SuppressWarnings("serial")
-	public static class CurrentWeatherStatistics implements Serializable {
+	public static class CurrentWeatherStatistics {
         private final LocalDateTime collectionStartTime;
         private LocalDateTime lastValidPacketTime;
         private int validPacketsReceived;

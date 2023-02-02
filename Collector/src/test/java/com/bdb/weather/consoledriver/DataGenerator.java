@@ -92,7 +92,7 @@ public class DataGenerator {
         cw.setWind(new Wind(new Speed(10.0), new Heading(179.0F)));
         cw.setWindGust(new Wind(new Speed(15.0), new Heading(186.0F)));
         cw.setForecastRule("It's raining");
-        cw.setBaroPressure(new Pressure(30.0, Pressure.Unit.IN_HG));
+        cw.setBarometricPressure(new Pressure(30.0, Pressure.Unit.IN_HG));
         cw.setRain15Minute(new Depth(0.0));
         cw.setRain24Hour(new Depth(1.0));
         cw.setRainCalendarYear(new Depth(14.0));
@@ -105,21 +105,24 @@ public class DataGenerator {
         cw.setStormStart(LocalDate.now());
         cw.setSolarRadiation(new SolarRadiation(4.0));
         cw.setUvIndex(new UvIndex(7));
-        cw.setBaroTrend(WeatherTrend.RISING_RAPIDLY);
+        cw.setBarometerTrend(WeatherTrend.RISING_RAPIDLY);
         cw.setForecast(Forecast.MOSTLY_CLOUDY);
         cw.setDewPoint(new Temperature(18.0));
         cw.setWindChill(new Temperature(10.0));
         cw.setHeatIndex(new Temperature(30.0));
+        /*
         cw.setWindDir2(new Heading(170.0F));
         cw.setWindDir3(new Heading(175.0F));
         cw.setWindDir4(new Heading(160.0F));
         cw.setWindDir5(new Heading(150.0F));
+        */
         cw.setWindSpeed10MinAvg(new Speed(12.0));
         cw.setWindSpeed2MinAvg(new Speed(15.0));
         for (Sensor sensor : sensorArray) {
             if (sensor.getSensorId() <= Sensor.LAST_STANDARD_SENSOR_ID)
                 continue;
 
+            /*
             switch (sensor.getType()) {
                 case THERMOMETER:
                 case LEAF_TEMPERATURE:
@@ -138,6 +141,7 @@ public class DataGenerator {
                 case SOIL_MOISTURE:
                     cw.setSoilMoistureForSensor(sensor.getSensorId(), new SoilMoisture(.5));
             }
+            */
         }
 
         LocalDateTime c = LocalDateTime.now().withSecond(0).withNano(0);

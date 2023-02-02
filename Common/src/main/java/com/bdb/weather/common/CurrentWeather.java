@@ -16,24 +16,17 @@
  */
 package com.bdb.weather.common;
 
-import com.bdb.weather.common.xml.LocalDateTimeAdapter;
-import com.bdb.weather.common.xml.LocalDateAdapter;
-
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.TreeMap;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
+import com.bdb.util.measurement.Measurement;
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Heading;
 import com.bdb.weather.common.measurement.Humidity;
@@ -52,15 +45,18 @@ import com.bdb.weather.common.measurement.UvIndex;
  * @since 1.0
  * 
  */
-@XmlRootElement
 public class CurrentWeather implements Serializable {
     private static final long serialVersionUID = -1292217095067065693L;
+    class IndexedMeasurement<T extends Measurement> {
+    	public int index;
+    	public T   value;
+    }
 
     private LocalDateTime time;
-    private Temperature indoorTemp;
+    private Temperature indoorTemperature;
     private Humidity indoorHumidity;
     
-    private Temperature outdoorTemp;
+    private Temperature outdoorTemperature;
     private Temperature heatIndex;
     private Temperature windChill;
     private Temperature dewPoint;
@@ -70,12 +66,10 @@ public class CurrentWeather implements Serializable {
     private Wind gust;
     private Speed windSpeed10MinAvg;
     private Speed windSpeed2MinAvg;
-    private Heading windDir2;
-    private Heading windDir3;
-    private Heading windDir4;
-    private Heading windDir5;
-    private Pressure baroPressure;
-    private WeatherTrend baroTrend;
+    private List<String> dominantWindDirections;
+    private Pressure barometricPressure;
+    private Pressure atmosphericPressure;
+    private WeatherTrend barometerTrend;
     private Forecast forecast;
     private String forecastRule;
     private UvIndex uvIndex;
@@ -94,17 +88,11 @@ public class CurrentWeather implements Serializable {
     private Depth monthET;
     private Depth yearET;
 
-    @XmlElement(name="soilMoistureSensorValues", type=MeasurementEntry.class)
-    private final Map<Integer,MeasurementEntry<SoilMoisture>> soilMoistureSensorEntries = new TreeMap<>();
-
-    @XmlElement(name="temperatureSensorValues", type=MeasurementEntry.class)
-    private final Map<Integer,MeasurementEntry<Temperature>> temperatureSensorEntries = new TreeMap<>();
-    
-    @XmlElement(name="humiditySensorValues", type=MeasurementEntry.class)
-    private final Map<Integer,MeasurementEntry<Humidity>> humiditySensorEntries = new TreeMap<>();
-
-    @XmlElement(name="leafWetnessSensorValues", type=MeasurementEntry.class)
-    private final Map<Integer,MeasurementEntry<LeafWetness>> leafWetnessSensorEntries = new TreeMap<>();
+    private List<IndexedMeasurement<SoilMoisture>> soilMoistures;
+    private List<IndexedMeasurement<Temperature>> soilTemperatures;
+    private List<IndexedMeasurement<LeafWetness>> leafWetnesses;
+    private List<IndexedMeasurement<Temperature>> extraTemperatures;
+    private List<IndexedMeasurement<Humidity>> extraHumdities;
     
     /**
      * Constructor.
@@ -117,7 +105,6 @@ public class CurrentWeather implements Serializable {
      * 
      * @param time The local time
      */
-    @XmlJavaTypeAdapter(type=java.time.LocalDateTime.class, value=LocalDateTimeAdapter.class)
     public void setTime(LocalDateTime time) {
         this.time = time;
     }
@@ -137,7 +124,7 @@ public class CurrentWeather implements Serializable {
      * @param temperature The indoor temperature
      */
     public void setIndoorTemperature(Temperature temperature) {
-        this.indoorTemp = temperature;
+        this.indoorTemperature = temperature;
     }
 
     /**
@@ -146,7 +133,7 @@ public class CurrentWeather implements Serializable {
      * @return The indoor temperature
      */
     public Temperature getIndoorTemperature() {
-        return indoorTemp;
+        return indoorTemperature;
     }
 
     /**
@@ -155,7 +142,7 @@ public class CurrentWeather implements Serializable {
      * @param temperature The outdoor temperature 
      */
     public void setOutdoorTemperature(Temperature temperature) {
-        this.outdoorTemp = temperature;
+        this.outdoorTemperature = temperature;
     }
 
     /**
@@ -164,7 +151,7 @@ public class CurrentWeather implements Serializable {
      * @return The outdoor temperature
      */
     public Temperature getOutdoorTemperature() {
-        return outdoorTemp;
+        return outdoorTemperature;
     }
 
     /**
@@ -298,8 +285,9 @@ public class CurrentWeather implements Serializable {
      * 
      * @param heading The heading
      */
-    public void setWindDir2(Heading heading) {
-        windDir2 = heading;
+    public void setDominantWindDirections(List<String> dominantWindDirectionList) {
+    	dominantWindDirections.clear();
+    	dominantWindDirections.addAll(dominantWindDirectionList);
     }
 
     /**
@@ -307,64 +295,10 @@ public class CurrentWeather implements Serializable {
      * 
      * @return The heading
      */
-    public Heading getWindDir2() {
-        return windDir2;
+    public List<String> getDominantWindDirections() {
+        return Collections.unmodifiableList(dominantWindDirections);
     }
 
-    /**
-     * Set the third most wind direction tendency.
-     * 
-     * @param heading The heading
-     */
-    public void setWindDir3(Heading heading) {
-        windDir3 = heading;
-    }
-
-    /**
-     * Get the third most wind direction tendency.
-     * 
-     * @return The heading
-     */
-    public Heading getWindDir3() {
-        return windDir3;
-    }
-
-    /**
-     * Set the fourth most wind direction tendency.
-     * 
-     * @param heading The heading
-     */
-    public void setWindDir4(Heading heading) {
-        windDir4 = heading;
-    }
-
-    /**
-     * Get the fourth most wind direction tendency.
-     * 
-     * @return The heading
-     */
-    public Heading getWindDir4() {
-        return windDir4;
-    }
-
-    /**
-     * Set the fifth most wind direction tendency.
-     * 
-     * @param heading The heading
-     */
-    public void setWindDir5(Heading heading) {
-        windDir5 = heading;
-    }
-
-    /**
-     * Get the fifth most wind direction tendency.
-     * 
-     * @return The heading
-     */
-    public Heading getWindDir5() {
-        return windDir5;
-    }
-    
     /**
      * Get the wind speed.
      * 
@@ -436,8 +370,8 @@ public class CurrentWeather implements Serializable {
      * 
      * @param pressure The barometric pressure
      */
-    public void setBaroPressure(Pressure pressure) {
-        baroPressure = pressure;
+    public void setBarometricPressure(Pressure pressure) {
+        barometricPressure = pressure;
     }
 
     /**
@@ -445,8 +379,26 @@ public class CurrentWeather implements Serializable {
      * 
      * @return The barometric pressure
      */
-    public Pressure getBaroPressure() {
-        return baroPressure;
+    public Pressure getBarometricPressure() {
+        return barometricPressure;
+    }
+
+    /**
+     * Set the atmospheric pressure.
+     * 
+     * @param pressure The barometric pressure
+     */
+    public void setAtmosphericPressure(Pressure pressure) {
+        atmosphericPressure = pressure;
+    }
+
+    /**
+     * Get the barometric pressure.
+     * 
+     * @return The barometric pressure
+     */
+    public Pressure getAtmosphericPressure() {
+        return atmosphericPressure;
     }
 
     /**
@@ -490,8 +442,8 @@ public class CurrentWeather implements Serializable {
      * 
      * @return The barometric trend
      */
-    public WeatherTrend getBaroTrend() {
-        return baroTrend;
+    public WeatherTrend getBarometerTrend() {
+        return barometerTrend;
     }
 
     /**
@@ -499,8 +451,8 @@ public class CurrentWeather implements Serializable {
      * 
      * @param trend The barometric trend
      */
-    public void setBaroTrend(WeatherTrend trend) {
-        baroTrend = trend;
+    public void setBarometerTrend(WeatherTrend trend) {
+        barometerTrend = trend;
     }
 
     /**
@@ -736,7 +688,6 @@ public class CurrentWeather implements Serializable {
      *
      * @param stormStart The start date of the current storm or null if there is no storm
      */
-    @XmlJavaTypeAdapter(type=java.time.LocalDate.class, value=LocalDateAdapter.class)
     public void setStormStart(LocalDate stormStart) {
         this.stormStart = stormStart;
     }
@@ -818,37 +769,36 @@ public class CurrentWeather implements Serializable {
      *
      * @param sensorId The ID of the sensor
      * @param temperature The temperature
-     */
     public void setTemperatureForSensor(int sensorId, Temperature temperature) {
         temperatureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.THERMOMETER, temperature));
     }
+     */
     
     /**
      * Set the temperature for a soil temperature sensor.
      *
      * @param sensorId The ID of the sensor
      * @param temperature The temperature
-     */
     public void setSoilTemperatureForSensor(int sensorId, Temperature temperature) {
         temperatureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.SOIL_TEMPERATURE, temperature));
     }
+     */
     
     /**
      * Set the temperature for a leaf temperature sensor.
      *
      * @param sensorId The ID of the sensor
      * @param temperature The temperature
-     */
     public void setLeafTemperatureForSensor(int sensorId, Temperature temperature) {
         temperatureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.LEAF_TEMPERATURE, temperature));
     }
+     */
     
     /**
      * Get the temperature for a sensor.
      *
      * @param sensorId The ID of the sensor
      * @return The temperature or null if the sensor does not exist
-     */
     public Temperature getTemperatureForSensor(int sensorId) {
         MeasurementEntry<Temperature> entry = temperatureSensorEntries.get(sensorId);
         if (entry != null)
@@ -856,23 +806,23 @@ public class CurrentWeather implements Serializable {
         else
             return null;
     }
+     */
     
     /**
      * Set the humidity for a given sensor.
      *
      * @param sensorId The ID of the sensor
      * @param humidity The humidity
-     */
     public void setHumidityForSensor(int sensorId, Humidity humidity) {
         humiditySensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.HYGROMETER, humidity));
     }
+     */
     
     /**
      * Get the humidity for a sensor.
      *
      * @param sensorId The ID of the sensor
      * @return The humidity or null if the sensor does not exist
-     */
     public Humidity getHumidityForSensor(int sensorId) {
         MeasurementEntry<Humidity> entry = humiditySensorEntries.get(sensorId);
         if (entry != null)
@@ -880,46 +830,47 @@ public class CurrentWeather implements Serializable {
         else
             return null;
     }
+     */
     
     /**
      * Set the leaf wetness for a given sensor.
      *
      * @param sensorId The ID of the sensor
      * @param leafWetness The leaf wetness
-     */
     public void setLeafWetnessForSensor(int sensorId, LeafWetness leafWetness) {
         leafWetnessSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.LEAF_WETNESS, leafWetness));
     }
+     */
     
     /**
      * Get the leaf wetness for a given sensor.
      *
      * @param sensorId The ID of the sensor
      * @return The leaf wetness
-     */
     public LeafWetness getLeafWetnessForSensor(int sensorId) {
         return leafWetnessSensorEntries.get(sensorId).getMeasurement();
     }
+     */
     
     /**
      * Set the soil moisture for a given sensor.
      *
      * @param sensorId The ID of the sensor
      * @param soilMoisture The soil moisture
-     */
     public void setSoilMoistureForSensor(int sensorId, SoilMoisture soilMoisture) {
         soilMoistureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.SOIL_MOISTURE, soilMoisture));
     }
+     */
    
     /**
      * Get the soil moisture for a given sensor.
      *
      * @param sensorId The ID of the sensor
      * @return The soil moisture
-     */
     public SoilMoisture getSoilMoistureForSensor(int sensorId) {
         return soilMoistureSensorEntries.get(sensorId).getMeasurement();
     }
+     */
     
     /**
      *
@@ -928,10 +879,10 @@ public class CurrentWeather implements Serializable {
     @SuppressWarnings("rawtypes")
 	public Collection<MeasurementEntry> getSensorValues() {
         List<MeasurementEntry> entries = new ArrayList<>();
-        entries.addAll(temperatureSensorEntries.values());
-        entries.addAll(humiditySensorEntries.values());
-        entries.addAll(soilMoistureSensorEntries.values());
-        entries.addAll(leafWetnessSensorEntries.values());
+        //entries.addAll(temperatureSensorEntries.values());
+        //entries.addAll(humiditySensorEntries.values());
+        //entries.addAll(soilMoistureSensorEntries.values());
+        //entries.addAll(leafWetnessSensorEntries.values());
         return entries;
     }
     
@@ -941,7 +892,7 @@ public class CurrentWeather implements Serializable {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Time: ").append(fmt.format(time)).append("\n");
-        sb.append("Baro Trend: ").append(baroTrend);
+        sb.append("Baro Trend: ").append(barometerTrend);
         sb.append("Gust: ").append(gust);
         
         return sb.toString();
@@ -951,9 +902,9 @@ public class CurrentWeather implements Serializable {
     public int hashCode() {
         int hash = 5;
         hash = 97 * hash + Objects.hashCode(this.time);
-        hash = 97 * hash + Objects.hashCode(this.indoorTemp);
+        hash = 97 * hash + Objects.hashCode(this.indoorTemperature);
         hash = 97 * hash + Objects.hashCode(this.indoorHumidity);
-        hash = 97 * hash + Objects.hashCode(this.outdoorTemp);
+        hash = 97 * hash + Objects.hashCode(this.outdoorTemperature);
         hash = 97 * hash + Objects.hashCode(this.heatIndex);
         hash = 97 * hash + Objects.hashCode(this.windChill);
         hash = 97 * hash + Objects.hashCode(this.dewPoint);
@@ -962,12 +913,9 @@ public class CurrentWeather implements Serializable {
         hash = 97 * hash + Objects.hashCode(this.gust);
         hash = 97 * hash + Objects.hashCode(this.windSpeed10MinAvg);
         hash = 97 * hash + Objects.hashCode(this.windSpeed2MinAvg);
-        hash = 97 * hash + Objects.hashCode(this.windDir2);
-        hash = 97 * hash + Objects.hashCode(this.windDir3);
-        hash = 97 * hash + Objects.hashCode(this.windDir4);
-        hash = 97 * hash + Objects.hashCode(this.windDir5);
-        hash = 97 * hash + Objects.hashCode(this.baroPressure);
-        hash = 97 * hash + Objects.hashCode(this.baroTrend);
+        hash = 97 * hash + Objects.hashCode(this.dominantWindDirections);
+        hash = 97 * hash + Objects.hashCode(this.barometricPressure);
+        hash = 97 * hash + Objects.hashCode(this.barometerTrend);
         hash = 97 * hash + Objects.hashCode(this.forecast);
         hash = 97 * hash + Objects.hashCode(this.forecastRule);
         hash = 97 * hash + Objects.hashCode(this.uvIndex);
@@ -985,10 +933,10 @@ public class CurrentWeather implements Serializable {
         hash = 97 * hash + Objects.hashCode(this.dayET);
         hash = 97 * hash + Objects.hashCode(this.monthET);
         hash = 97 * hash + Objects.hashCode(this.yearET);
-        hash = 97 * hash + Objects.hashCode(this.temperatureSensorEntries);
-        hash = 97 * hash + Objects.hashCode(this.humiditySensorEntries);
-        hash = 97 * hash + Objects.hashCode(this.leafWetnessSensorEntries);
-        hash = 97 * hash + Objects.hashCode(this.soilMoistureSensorEntries);
+        //hash = 97 * hash + Objects.hashCode(this.temperatureSensorEntries);
+        //hash = 97 * hash + Objects.hashCode(this.humiditySensorEntries);
+        //hash = 97 * hash + Objects.hashCode(this.leafWetnessSensorEntries);
+        //hash = 97 * hash + Objects.hashCode(this.soilMoistureSensorEntries);
         return hash;
     }
 
@@ -1008,7 +956,7 @@ public class CurrentWeather implements Serializable {
             return false;
         }
 
-        if (!Objects.equals(this.indoorTemp, other.indoorTemp)) {
+        if (!Objects.equals(this.indoorTemperature, other.indoorTemperature)) {
             return false;
         }
 
@@ -1016,7 +964,7 @@ public class CurrentWeather implements Serializable {
             return false;
         }
 
-        if (!Objects.equals(this.outdoorTemp, other.outdoorTemp)) {
+        if (!Objects.equals(this.outdoorTemperature, other.outdoorTemperature)) {
             return false;
         }
 
@@ -1052,27 +1000,15 @@ public class CurrentWeather implements Serializable {
             return false;
         }
 
-        if (!Objects.equals(this.windDir2, other.windDir2)) {
+        if (!Objects.equals(this.dominantWindDirections, other.dominantWindDirections)) {
             return false;
         }
 
-        if (!Objects.equals(this.windDir3, other.windDir3)) {
+        if (!Objects.equals(this.barometricPressure, other.barometricPressure)) {
             return false;
         }
 
-        if (!Objects.equals(this.windDir4, other.windDir4)) {
-            return false;
-        }
-
-        if (!Objects.equals(this.windDir5, other.windDir5)) {
-            return false;
-        }
-
-        if (!Objects.equals(this.baroPressure, other.baroPressure)) {
-            return false;
-        }
-
-        if (this.baroTrend != other.baroTrend) {
+        if (this.barometerTrend != other.barometerTrend) {
             return false;
         }
 
@@ -1144,6 +1080,7 @@ public class CurrentWeather implements Serializable {
             return false;
         }
 
+        /*
         if (!Objects.equals(this.temperatureSensorEntries, other.temperatureSensorEntries)) {
             return false;
         }
@@ -1156,6 +1093,10 @@ public class CurrentWeather implements Serializable {
             return false;
         }
 
-        return Objects.equals(this.soilMoistureSensorEntries, other.soilMoistureSensorEntries);
+        if (!Objects.equals(this.soilMoistureSensorEntries, other.soilMoistureSensorEntries)
+			return false;
+        */
+        
+        return true;
     }
 }

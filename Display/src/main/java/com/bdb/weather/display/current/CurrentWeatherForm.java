@@ -152,6 +152,7 @@ public class CurrentWeatherForm extends GridPane implements CurrentWeatherProces
         else
             thsw.setText(cw.getThsw().toString());
 
+        /*
         for (Sensor sensor : sensorManager.getExtraSensors(SensorType.THERMOMETER)) {
             Temperature t = cw.getTemperatureForSensor(sensor.getSensorId());
             TextField value = sensorTemperatures.get(sensor.getSensorId());
@@ -160,6 +161,7 @@ public class CurrentWeatherForm extends GridPane implements CurrentWeatherProces
             else
                 value.setText(DisplayConstants.UNKNOWN_VALUE_STRING);
         }
+        */
 
         rainRate.setText(cw.getRainRate().toString());
         rain15Minute.setText(cw.getRain15Minute().toString());
@@ -187,6 +189,7 @@ public class CurrentWeatherForm extends GridPane implements CurrentWeatherProces
         outdoorHumidity.setText(cw.getOutdoorHumidity().toString());
         indoorHumidity.setText(cw.getIndoorHumidity().toString());
 
+        /*
         for (Sensor sensor : sensorManager.getExtraSensors(SensorType.HYGROMETER)) {
             Humidity h = cw.getHumidityForSensor(sensor.getSensorId());
             TextField label = sensorHumidities.get(sensor.getSensorId());
@@ -195,12 +198,14 @@ public class CurrentWeatherForm extends GridPane implements CurrentWeatherProces
             else
                 label.setText(DisplayConstants.UNKNOWN_VALUE_STRING);
         }
+        */
 
         windSpeed.setText(cw.getWind().getSpeed().toString());
         windDirection.setText(cw.getWind().getDirection().toString());
         windGust.setText(cw.getWindGust().getSpeed().toString());
         windGustDirection.setText(cw.getWindGust().getDirection().toString());
 
+        /*
         if (cw.getWindDir2() != null)
             windDirection2.setText(cw.getWindDir2().toString());
         else
@@ -220,6 +225,7 @@ public class CurrentWeatherForm extends GridPane implements CurrentWeatherProces
             windDirection5.setText(cw.getWindDir5().toString());
         else
             windDirection5.setText(DisplayConstants.UNKNOWN_VALUE_STRING);
+            */
 
         windAvg2Minute.setText(cw.getWindSpeed2MinAvg().toString());
         windAvg10Minute.setText(cw.getWindSpeed10MinAvg().toString());
@@ -249,8 +255,8 @@ public class CurrentWeatherForm extends GridPane implements CurrentWeatherProces
         else
             yearET.setText(DisplayConstants.UNKNOWN_VALUE_STRING);
 
-        barometer.setText(cw.getBaroPressure().toString());
-        barometerTrend.setText(cw.getBaroTrend().toString());
+        barometer.setText(cw.getBarometricPressure().toString());
+        barometerTrend.setText(cw.getBarometerTrend().toString());
         forecast.setText(cw.getForecast().toString());
         forecastRule.setText(cw.getForecastRule());
     }

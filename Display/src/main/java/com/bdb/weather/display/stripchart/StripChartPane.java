@@ -364,7 +364,7 @@ public class StripChartPane extends BorderPane implements CurrentWeatherProcesso
                 break;
             case PRESSURE:
                 datasetNames = PRESSURE_DATASETS;
-                values[0] = cw.getBaroPressure().get();
+                values[0] = cw.getBarometricPressure().get();
                 break;
             case SOLAR_RADIATION:
                 datasetNames = SOLAR_RADIATION_DATASETS;

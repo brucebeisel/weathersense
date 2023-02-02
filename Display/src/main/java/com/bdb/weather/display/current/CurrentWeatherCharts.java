@@ -243,7 +243,7 @@ public class CurrentWeatherCharts extends HBox implements CurrentWeatherProcesso
         Humidity ohd = null;
         WeatherTrend oht = WeatherTrend.STEADY;
         Pressure pd = null;
-        final WeatherTrend pressureTrend = cw.getBaroTrend();
+        final WeatherTrend pressureTrend = cw.getBarometerTrend();
 
         LocalDateTime hourBegin = now.minusHours(1);
         for (HistoricalRecord record : list) {
@@ -260,7 +260,7 @@ public class CurrentWeatherCharts extends HBox implements CurrentWeatherProcesso
                     ihd = hpair.getSecond();
                 }
 
-                Pair<WeatherTrend, Pressure> ppair = processTrend(cw.getBaroPressure(), record.getBaroPressure(), pd);
+                Pair<WeatherTrend, Pressure> ppair = processTrend(cw.getBarometricPressure(), record.getBaroPressure(), pd);
                 if (hpair != null) {
                     pd = ppair.getSecond();
                 }
@@ -274,6 +274,7 @@ public class CurrentWeatherCharts extends HBox implements CurrentWeatherProcesso
         final Pressure pressureDelta = pd;
 
         List<Heading> headings = new ArrayList<>();
+        /*
         if (cw.getWindDir2() != null)
             headings.add(cw.getWindDir2());
 
@@ -285,6 +286,7 @@ public class CurrentWeatherCharts extends HBox implements CurrentWeatherProcesso
 
         if (cw.getWindDir5() != null)
             headings.add(cw.getWindDir5());
+            */
 
         //
         // If there is no summary record then just use the current temperature for both high and low
@@ -294,7 +296,7 @@ public class CurrentWeatherCharts extends HBox implements CurrentWeatherProcesso
 	    outdoorTemperature.loadData(cw.getOutdoorTemperature(), summary.getMinOutdoorTemp(), summary.getMaxOutdoorTemp());
 	    indoorTemperature.loadData(cw.getIndoorTemperature(), summary.getMinIndoorTemp(), summary.getMaxIndoorTemp());
 	    windGauge.loadData(cw.getWind(), cw.getWindGust(), summary.getMaxWindSpeed(), summary.getMaxWindGust(), summary.getAvgWindSpeed(), headings);
-	    barometer.loadData(cw.getBaroPressure(), summary.getMinBaroPressure(), summary.getMaxBaroPressure(), pressureDelta, pressureTrend);
+	    barometer.loadData(cw.getBarometricPressure(), summary.getMinBaroPressure(), summary.getMaxBaroPressure(), pressureDelta, pressureTrend);
 	    outdoorHumidity.loadData(cw.getOutdoorHumidity(), summary.getMinOutdoorHumidity(), summary.getMaxOutdoorHumidity(), outdoorHumidityDelta, outdoorHumidityTrend);
 	    indoorHumidity.loadData(cw.getIndoorHumidity(), summary.getMinIndoorHumidity(), summary.getMaxIndoorHumidity(), indoorHumidityDelta, indoorHumidityTrend);
 	}
@@ -302,7 +304,7 @@ public class CurrentWeatherCharts extends HBox implements CurrentWeatherProcesso
 	    outdoorTemperature.loadData(cw.getOutdoorTemperature(), cw.getOutdoorTemperature(), cw.getOutdoorTemperature());
 	    indoorTemperature.loadData(cw.getIndoorTemperature(), cw.getIndoorTemperature(), cw.getIndoorTemperature());
 	    windGauge.loadData(cw.getWind(), cw.getWindGust(), null, null, null, headings);
-	    barometer.loadData(cw.getBaroPressure(), cw.getBaroPressure(), cw.getBaroPressure(), new Pressure(0.0), WeatherTrend.STEADY);
+	    barometer.loadData(cw.getBarometricPressure(), cw.getBarometricPressure(), cw.getBarometricPressure(), new Pressure(0.0), WeatherTrend.STEADY);
 	    outdoorHumidity.loadData(cw.getOutdoorHumidity(), cw.getOutdoorHumidity(), cw.getOutdoorHumidity(), new Humidity(0.0), WeatherTrend.STEADY);
 	    indoorHumidity.loadData(cw.getIndoorHumidity(), cw.getIndoorHumidity(), cw.getIndoorHumidity(), new Humidity(0.), WeatherTrend.STEADY);
 	}
