@@ -19,13 +19,11 @@ package com.bdb.weather.common;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
-import javax.xml.bind.annotation.XmlEnum;
 
 /**
  *
  * @author bruce
  */
-@XmlEnum
 public enum Forecast {
     /**
      * Sunny forecast

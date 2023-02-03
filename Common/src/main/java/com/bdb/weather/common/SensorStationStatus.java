@@ -16,28 +16,17 @@
  */
 package com.bdb.weather.common;
 
-import com.bdb.weather.common.xml.LocalDateTimeAdapter;
-
 import java.time.LocalDateTime;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  *
  * @author Bruce
  */
 public class SensorStationStatus {
-    @XmlElement
     private int sensorStationId;
-    @XmlElement
-    @XmlJavaTypeAdapter(type=java.time.LocalDateTime.class, value=LocalDateTimeAdapter.class)
     private LocalDateTime time;
-    @XmlElement
     private Float batteryVoltage;
-    @XmlElement
     private Boolean batteryOk;
-    @XmlElement
     private Integer linkQuality;
     
     /**

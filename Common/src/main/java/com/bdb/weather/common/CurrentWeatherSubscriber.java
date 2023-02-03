@@ -136,11 +136,11 @@ public class CurrentWeatherSubscriber implements Runnable {
             try {
                 socket.receive(packet);
                 String s = new String(b, 0, packet.getLength());
-                logger.log(Level.INFO, "UDP Packet: {0}", s);
+                logger.log(Level.FINER, "UDP Packet: {0}", s);
                 CurrentWeather cw = objectMapper.readValue(s, CurrentWeather.class);
-				handler.handleCurrentWeather(cw);
-				logger.log(Level.FINE, "Current weather at {0}", cw.getTime());
-				stats.receivedValidPacket();
+                handler.handleCurrentWeather(cw);
+                logger.log(Level.FINE, "Current weather at {0}", cw.getTime());
+                stats.receivedValidPacket();
             }
             catch (SocketTimeoutException e2) {
                 logger.log(Level.INFO, "Timeout while waiting for current weather");

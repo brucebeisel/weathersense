@@ -18,8 +18,6 @@ package com.bdb.weather.common;
 
 import java.util.Objects;
 
-import javax.xml.bind.annotation.XmlElement;
-
 /**
  * This class represents a sensor that is attached to a weather station. The standard sensors that come with a
  * professional weather stations are pre-assigned IDs. All other IDs are assigned in groups of ID depending on
@@ -93,11 +91,8 @@ public class Sensor {
      * Statically assigned sensor ID for the outdoor hygrometer
      */
     public static final int OUTDOOR_HYGROMETER_SENSOR_ID = 9;
-    @XmlElement
     private int sensorId;
-    @XmlElement
     private String name;
-    @XmlElement
     private SensorType type;
     static final String SENSOR_NAMES[] = {
         "",

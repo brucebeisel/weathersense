@@ -17,8 +17,6 @@
 package com.bdb.weather.common;
 
 
-import javax.xml.bind.annotation.XmlElement;
-
 import com.bdb.weather.common.measurement.AngularMeasurement;
 import com.bdb.weather.common.measurement.Distance;
 
@@ -29,11 +27,8 @@ import com.bdb.weather.common.measurement.Distance;
  *
  */
 public class GeographicLocation {
-    @XmlElement
     private final AngularMeasurement latitude;
-    @XmlElement
     private final AngularMeasurement longitude;
-    @XmlElement
     private final Distance           altitude;      // Above Sea Level
     
     /**

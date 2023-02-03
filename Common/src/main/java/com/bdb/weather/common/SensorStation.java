@@ -16,18 +16,13 @@
  */
 package com.bdb.weather.common;
 
-import javax.xml.bind.annotation.XmlElement;
-
 /**
  *
  * @author bruce
  */
 public class SensorStation {
-    @XmlElement
     private String name;
-    @XmlElement
     private SensorStationType type;
-    @XmlElement
     private int sensorStationId;
     
     /**

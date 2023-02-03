@@ -27,10 +27,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import com.bdb.util.measurement.Measurement;
 import com.bdb.weather.common.measurement.Depth;
 import com.bdb.weather.common.measurement.Heading;
@@ -42,14 +38,11 @@ import com.bdb.weather.common.measurement.SolarRadiation;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.common.measurement.UvIndex;
-import com.bdb.weather.common.xml.DurationAdapter;
-import com.bdb.weather.common.xml.LocalDateTimeAdapter;
 
 /**
  *
  * @author bruce
  */
-@XmlRootElement
 public class HistoricalRecord {
     @SuppressWarnings("unused")
 	private static final long serialVersionUID = -3464537243885145413L;
@@ -73,16 +66,12 @@ public class HistoricalRecord {
     private Depth rainfall;
     private Depth highRainfallRate;
     
-    @XmlElement(name="temperatureSensorValues", type=MeasurementEntry.class)
     private final Map<Integer,MeasurementEntry<Temperature>> temperatureSensorEntries = new TreeMap<>();
     
-    @XmlElement(name="humiditySensorValues", type=MeasurementEntry.class)
     private final Map<Integer,MeasurementEntry<Humidity>> humiditySensorEntries = new TreeMap<>();
 
-    @XmlElement(name="leafWetnessSensorValues", type=MeasurementEntry.class)
     private final Map<Integer,MeasurementEntry<LeafWetness>> leafWetnessSensorEntries = new TreeMap<>();
     
-    @XmlElement(name="soilMoistureSensorValues", type=MeasurementEntry.class)
     private final Map<Integer,MeasurementEntry<SoilMoisture>> soilMoistureSensorEntries = new TreeMap<>();
 
     /**
@@ -114,7 +103,6 @@ public class HistoricalRecord {
      *
      * @param time The time
      */
-    @XmlJavaTypeAdapter(type=java.time.LocalDateTime.class, value=LocalDateTimeAdapter.class)
     public void setTime(LocalDateTime time) {
         this.time = time;
     }
@@ -124,7 +112,6 @@ public class HistoricalRecord {
      *
      * @param duration The duration
      */
-    @XmlJavaTypeAdapter(type=java.time.Duration.class, value=DurationAdapter.class)
     public void setDuration(Duration duration) {
         this.duration = duration;
     }

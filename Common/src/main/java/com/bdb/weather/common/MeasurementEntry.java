@@ -18,8 +18,6 @@ package com.bdb.weather.common;
 
 import java.util.Objects;
 
-import javax.xml.bind.annotation.XmlElement;
-
 import com.bdb.util.measurement.Measurement;
 
 /**
@@ -28,11 +26,8 @@ import com.bdb.util.measurement.Measurement;
  * @param <T>
  */
 public class MeasurementEntry<T extends Measurement> {
-    @XmlElement
     private int sensorId;
-    @XmlElement
     private SensorType sensorType;
-    @XmlElement
     private T measurement;
 
     /**

@@ -20,9 +20,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import com.bdb.weather.common.GeographicLocation;
 
 
@@ -31,21 +28,13 @@ import com.bdb.weather.common.GeographicLocation;
  *
  * @author Bruce
  */
-@XmlRootElement
 public class WsParametersMessage {
-    @XmlElement
     private final String manufacturer;
-    @XmlElement
     private final String model;
-    @XmlElement
     private final String firmwareDate;
-    @XmlElement
     private final String firmwareVersion;
-    @XmlElement
     private final GeographicLocation location;
-    @XmlElement
     private final int weatherYearStartMonth;
-    @XmlElement(name="parameters", type=String.class)
     private final Map<String,String> parameters;
 
     private WsParametersMessage() {

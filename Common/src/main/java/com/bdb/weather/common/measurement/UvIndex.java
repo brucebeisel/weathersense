@@ -18,8 +18,6 @@ package com.bdb.weather.common.measurement;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlValue;
-
 /**
  * Class the represents a UV index value.
  *
@@ -43,7 +41,6 @@ public class UvIndex implements Serializable {
     }
     */
     
-    @XmlValue
     private final double index;
     
     /**
