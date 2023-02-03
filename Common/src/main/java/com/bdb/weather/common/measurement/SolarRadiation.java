@@ -97,6 +97,10 @@ public class SolarRadiation extends Measurement {
         super(value, SolarRadiation.Unit.WATTS_PER_METER_SQUARED, COMPARE_PRECISION, SolarRadiation::new);
     }
     
+    public SolarRadiation(int value) throws IllegalArgumentException {
+    	this((double)value);
+    }
+
     private SolarRadiation() {
         this(0.0);
     }

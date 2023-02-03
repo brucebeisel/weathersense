@@ -21,7 +21,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +36,7 @@ import com.bdb.weather.common.measurement.SolarRadiation;
 import com.bdb.weather.common.measurement.Speed;
 import com.bdb.weather.common.measurement.Temperature;
 import com.bdb.weather.common.measurement.UvIndex;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * The current weather. This is based on a combination of the Lacrosse 3610 and Davis Vantage Pro 2weather stations.
@@ -47,11 +47,12 @@ import com.bdb.weather.common.measurement.UvIndex;
  */
 public class CurrentWeather implements Serializable {
     private static final long serialVersionUID = -1292217095067065693L;
-    class IndexedMeasurement<T extends Measurement> {
+    static class IndexedMeasurement<T extends Measurement> {
     	public int index;
     	public T   value;
     }
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime time;
     private Temperature indoorTemperature;
     private Humidity indoorHumidity;
@@ -63,14 +64,14 @@ public class CurrentWeather implements Serializable {
     private Temperature thsw;
     private Humidity outdoorHumidity;
     private Wind wind;
-    private Wind gust;
+    private Wind windGust;
     private Speed windSpeed10MinAvg;
     private Speed windSpeed2MinAvg;
-    private List<String> dominantWindDirections;
+    private List<String> dominantWindDirections = new ArrayList<>();
     private Pressure barometricPressure;
     private Pressure atmosphericPressure;
-    private WeatherTrend barometerTrend;
-    private Forecast forecast;
+    private String barometerTrend;
+    private String forecast;
     private String forecastRule;
     private UvIndex uvIndex;
     private SolarRadiation solarRadiation;
@@ -88,11 +89,11 @@ public class CurrentWeather implements Serializable {
     private Depth monthET;
     private Depth yearET;
 
-    private List<IndexedMeasurement<SoilMoisture>> soilMoistures;
-    private List<IndexedMeasurement<Temperature>> soilTemperatures;
-    private List<IndexedMeasurement<LeafWetness>> leafWetnesses;
-    private List<IndexedMeasurement<Temperature>> extraTemperatures;
-    private List<IndexedMeasurement<Humidity>> extraHumdities;
+    private List<IndexedMeasurement<SoilMoisture>> soilMoistures = new ArrayList<>();
+    private List<IndexedMeasurement<Temperature>> soilTemperatures = new ArrayList<>();
+    private List<IndexedMeasurement<LeafWetness>> leafWetnesses = new ArrayList<>();
+    private List<IndexedMeasurement<Temperature>> extraTemperatures = new ArrayList<>();
+    private List<IndexedMeasurement<Humidity>> extraHumidities = new ArrayList<>();
     
     /**
      * Constructor.
@@ -329,7 +330,7 @@ public class CurrentWeather implements Serializable {
      * @param gust The wind gust
      */
     public void setWindGust(Wind gust) {
-        this.gust = gust;
+        this.windGust = gust;
     }
     
     /**
@@ -338,7 +339,7 @@ public class CurrentWeather implements Serializable {
      * @return The wind gust speed and direction
      */
     public Wind getWindGust() {
-        return gust;
+        return windGust;
     }
 
     /**
@@ -347,8 +348,8 @@ public class CurrentWeather implements Serializable {
      * @return The wind gust speed or null
      */
     public Speed getWindGustSpeed() {
-        if (gust != null)
-            return gust.getSpeed();
+        if (windGust != null)
+            return windGust.getSpeed();
         else
             return null;
     }
@@ -359,8 +360,8 @@ public class CurrentWeather implements Serializable {
      * @return The wind gust direction of null
      */
     public Heading getWindGustDirection() {
-        if (gust != null)
-            return gust.getDirection();
+        if (windGust != null)
+            return windGust.getDirection();
         else
             return null;
     }
@@ -393,9 +394,9 @@ public class CurrentWeather implements Serializable {
     }
 
     /**
-     * Get the barometric pressure.
+     * Get the atmospheric pressure.
      * 
-     * @return The barometric pressure
+     * @return The atmospheric pressure
      */
     public Pressure getAtmosphericPressure() {
         return atmosphericPressure;
@@ -442,7 +443,7 @@ public class CurrentWeather implements Serializable {
      * 
      * @return The barometric trend
      */
-    public WeatherTrend getBarometerTrend() {
+    public String getBarometerTrend() {
         return barometerTrend;
     }
 
@@ -451,7 +452,7 @@ public class CurrentWeather implements Serializable {
      * 
      * @param trend The barometric trend
      */
-    public void setBarometerTrend(WeatherTrend trend) {
+    public void setBarometerTrend(String trend) {
         barometerTrend = trend;
     }
 
@@ -460,7 +461,7 @@ public class CurrentWeather implements Serializable {
      *
      * @return The forecast
      */
-    public Forecast getForecast() {
+    public String getForecast() {
         return forecast;
     }
 
@@ -469,7 +470,7 @@ public class CurrentWeather implements Serializable {
      *
      * @param forecast The forecast
      */
-    public void setForecast(Forecast forecast) {
+    public void setForecast(String forecast) {
         this.forecast = forecast;
     }
     
@@ -764,6 +765,32 @@ public class CurrentWeather implements Serializable {
         this.yearET = et;
     }
     
+    public void setExtraTemperatures(List<IndexedMeasurement<Temperature>> list) {
+    	extraTemperatures.clear();
+    	extraTemperatures.addAll(list);
+    }
+    
+    public void setExtraHumidities(List<IndexedMeasurement<Humidity>> list) {
+    	extraHumidities.clear();
+    	extraHumidities.addAll(list);
+    }
+    
+    public void setSoilTemperatures(List<IndexedMeasurement<Temperature>> list) {
+    	soilTemperatures.clear();
+    	soilTemperatures.addAll(list);
+    }
+
+    public void setLeafWetnesses(List<IndexedMeasurement<LeafWetness>> list) {
+    	leafWetnesses.clear();
+    	leafWetnesses.addAll(list);
+    }
+    
+    public void setSoilMoistures(List<IndexedMeasurement<SoilMoisture>> list) {
+    	soilMoistures.clear();
+    	soilMoistures.addAll(list);
+    }
+
+    
     /**
      * Set the temperature for a given sensor.
      *
@@ -870,12 +897,10 @@ public class CurrentWeather implements Serializable {
     public SoilMoisture getSoilMoistureForSensor(int sensorId) {
         return soilMoistureSensorEntries.get(sensorId).getMeasurement();
     }
-     */
     
     /**
      *
      * @return
-     */
     @SuppressWarnings("rawtypes")
 	public Collection<MeasurementEntry> getSensorValues() {
         List<MeasurementEntry> entries = new ArrayList<>();
@@ -885,15 +910,21 @@ public class CurrentWeather implements Serializable {
         //entries.addAll(leafWetnessSensorEntries.values());
         return entries;
     }
+     */
+
     
     @Override
     public String toString() {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         StringBuilder sb = new StringBuilder();
 
         sb.append("Time: ").append(fmt.format(time)).append("\n");
-        sb.append("Baro Trend: ").append(barometerTrend);
-        sb.append("Gust: ").append(gust);
+        sb.append("Baro Trend: ").append(barometerTrend).append("\n");
+        sb.append("Gust: ").append(windGust).append("\n");
+        sb.append("Leaf Wetnesses: ").append(" Count: ").append(leafWetnesses.size()).append("\n");
+        for (IndexedMeasurement<LeafWetness> m : leafWetnesses) {
+        	sb.append("    Index: ").append(m.index).append("  Value: ").append(m.value).append("\n");
+        }
         
         return sb.toString();
     }
@@ -910,7 +941,7 @@ public class CurrentWeather implements Serializable {
         hash = 97 * hash + Objects.hashCode(this.dewPoint);
         hash = 97 * hash + Objects.hashCode(this.outdoorHumidity);
         hash = 97 * hash + Objects.hashCode(this.wind);
-        hash = 97 * hash + Objects.hashCode(this.gust);
+        hash = 97 * hash + Objects.hashCode(this.windGust);
         hash = 97 * hash + Objects.hashCode(this.windSpeed10MinAvg);
         hash = 97 * hash + Objects.hashCode(this.windSpeed2MinAvg);
         hash = 97 * hash + Objects.hashCode(this.dominantWindDirections);
@@ -988,7 +1019,7 @@ public class CurrentWeather implements Serializable {
             return false;
         }
 
-        if (!Objects.equals(this.gust, other.gust)) {
+        if (!Objects.equals(this.windGust, other.windGust)) {
             return false;
         }
 

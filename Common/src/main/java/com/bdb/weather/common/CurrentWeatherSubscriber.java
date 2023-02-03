@@ -28,6 +28,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 /**
  * A class to subscribe to the current weather multicast UDP current weather packet.
@@ -98,6 +100,8 @@ public class CurrentWeatherSubscriber implements Runnable {
      * Initialize the subscriber.
      */
     private void init() {
+		objectMapper.registerModule(new JavaTimeModule());
+		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         exit = false;
         thread = new Thread(this);
 		thread.setName("current-weather-thread");
@@ -132,7 +136,7 @@ public class CurrentWeatherSubscriber implements Runnable {
             try {
                 socket.receive(packet);
                 String s = new String(b, 0, packet.getLength());
-                logger.log(Level.FINER, "UDP Packet: {0}", s);
+                logger.log(Level.INFO, "UDP Packet: {0}", s);
                 CurrentWeather cw = objectMapper.readValue(s, CurrentWeather.class);
 				handler.handleCurrentWeather(cw);
 				logger.log(Level.FINE, "Current weather at {0}", cw.getTime());

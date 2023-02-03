@@ -209,17 +209,12 @@ public class Barometer extends BorderPane {
      * @param delta The change in pressure over the last hour
      * @param trend The direction the value is trending
      */
-    public void loadData(Pressure current, Pressure min, Pressure max, Pressure delta, WeatherTrend trend) {
+    public void loadData(Pressure current, Pressure min, Pressure max, Pressure delta, String trend) {
         dataset.setValue(current.get());
         if (!min.equals(max)) {
             range.setBounds(min.get(), max.get());
         }
         
-        if (trend == WeatherTrend.STEADY)
-            trendAnnotation.setLabel(WeatherTrend.STEADY.toString());
-        else {
-            String trendText = trend.getSymbol() + delta + "/hr";
-            trendAnnotation.setLabel(trendText);
-        }
+		trendAnnotation.setLabel(trend);
     }
 }

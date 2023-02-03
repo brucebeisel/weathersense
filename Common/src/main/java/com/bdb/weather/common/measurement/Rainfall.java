@@ -29,6 +29,10 @@ public class Rainfall extends Depth {
         this(rainfall, getDefaultUnit());
     }
 
+    public Rainfall(int rainfall) {
+        this(rainfall, getDefaultUnit());
+    }
+
     /**
      * Construct a Depth measurement object using the specified unit.
      * 

@@ -427,6 +427,11 @@ public class WeatherUndergroundUploader implements CurrentWeatherSubscriber.Curr
         else
             stationKey = DEFAULT_WEATHER_STATION_KEY;
 
+        Temperature.setDefaultUnit(Temperature.Unit.FAHRENHEIT);
+        Speed.setDefaultUnit(Speed.Unit.MILES_PER_HOUR);
+        Pressure.setDefaultUnit(Pressure.Unit.IN_HG);
+        Depth.setDefaultUnit(Depth.Unit.INCHES);
+
         WeatherUndergroundUploader weatherUnderground = new WeatherUndergroundUploader(stationId, stationKey);
         CurrentWeatherSubscriber.createSubscriber(weatherUnderground);
     }

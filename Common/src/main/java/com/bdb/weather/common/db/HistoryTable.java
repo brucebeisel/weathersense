@@ -544,13 +544,13 @@ public class HistoryTable extends DBTable<HistoricalRecord> {
                     if (fval != null)
                         stmt.setFloat(n++, fval);
                     else
-                        stmt.setNull(n++, Types.FLOAT);
+                        stmt.setNull(n++, Types.DOUBLE);
                     
                     UvIndex uvIndex = record.getHighUvIndex();
                     if (uvIndex != null)
-                        stmt.setFloat(n++, uvIndex.getIndex());
+                        stmt.setDouble(n++, uvIndex.getIndex());
                     else
-                        stmt.setNull(n++, Types.INTEGER);
+                        stmt.setNull(n++, Types.DOUBLE);
                     
                     SolarRadiation sr = record.getAvgSolarRadiation();
                     if (sr != null)
@@ -575,6 +575,7 @@ public class HistoryTable extends DBTable<HistoricalRecord> {
 
                     stmt.addBatch();
 
+                    /*
                     for (MeasurementEntry entry : record.getMeasurementEntries()) {
                         n = 1;
                         mstmt.setTimestamp(n++,  java.sql.Timestamp.valueOf(record.getTime()));
@@ -583,6 +584,7 @@ public class HistoryTable extends DBTable<HistoricalRecord> {
                         mstmt.setDouble(n++, entry.getMeasurement().get(DatabaseUnits.getDatabaseUnit(entry.getMeasurement())));
                         mstmt.addBatch();
                     }
+                    */
                 }
                 int [] results = stmt.executeBatch();
                 for (int result : results)

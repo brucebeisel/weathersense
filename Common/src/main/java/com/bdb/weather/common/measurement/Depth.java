@@ -113,6 +113,10 @@ public class Depth extends Measurement {
         this(depth, getDefaultUnit());
     }
 
+    public Depth(int depth) {
+        this(depth, getDefaultUnit());
+    }
+
     /**
      * Construct a Depth measurement object using the specified unit.
      * 

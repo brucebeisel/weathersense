@@ -152,6 +152,10 @@ public class Heading extends Measurement {
             value %= 360.0;
     }
     
+    public Heading(int value) {
+    	this((double)value);
+    }
+    
     private Heading() {
         this(0.0);
     }

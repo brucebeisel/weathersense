@@ -108,6 +108,10 @@ public class Humidity extends Measurement {
         if (value < 0.0f || value > 100.0f)
             throw new IllegalArgumentException("Out of range humidity (" + value + "). Valid range 0.0 through 100.0");
     }
+
+    public Humidity(int value) {
+    	this((double)value);
+    }
     
     private Humidity() {
         this(100.0);

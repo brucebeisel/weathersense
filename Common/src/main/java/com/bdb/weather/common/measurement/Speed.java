@@ -104,6 +104,10 @@ public class Speed extends Measurement {
         this(speed, getDefaultUnit());
     }
 
+    public Speed(int speed) {
+        this(speed, getDefaultUnit());
+    }
+
     /**
      * Constructor.
      * 

@@ -91,7 +91,6 @@ public class CurrentWeatherCharts extends HBox implements CurrentWeatherProcesso
      * @param ws The weather station
      * @param connection The database connection
      */
-    @SuppressWarnings("LeakingThisInConstructor")
     public CurrentWeatherCharts(WeatherStation ws, DBConnection connection) {
 
 	monthlyAverageTable = new MonthlyAveragesTable(connection);
@@ -243,7 +242,7 @@ public class CurrentWeatherCharts extends HBox implements CurrentWeatherProcesso
         Humidity ohd = null;
         WeatherTrend oht = WeatherTrend.STEADY;
         Pressure pd = null;
-        final WeatherTrend pressureTrend = cw.getBarometerTrend();
+        final String pressureTrend = cw.getBarometerTrend();
 
         LocalDateTime hourBegin = now.minusHours(1);
         for (HistoricalRecord record : list) {
@@ -304,7 +303,7 @@ public class CurrentWeatherCharts extends HBox implements CurrentWeatherProcesso
 	    outdoorTemperature.loadData(cw.getOutdoorTemperature(), cw.getOutdoorTemperature(), cw.getOutdoorTemperature());
 	    indoorTemperature.loadData(cw.getIndoorTemperature(), cw.getIndoorTemperature(), cw.getIndoorTemperature());
 	    windGauge.loadData(cw.getWind(), cw.getWindGust(), null, null, null, headings);
-	    barometer.loadData(cw.getBarometricPressure(), cw.getBarometricPressure(), cw.getBarometricPressure(), new Pressure(0.0), WeatherTrend.STEADY);
+	    barometer.loadData(cw.getBarometricPressure(), cw.getBarometricPressure(), cw.getBarometricPressure(), new Pressure(0.0), "Steady");
 	    outdoorHumidity.loadData(cw.getOutdoorHumidity(), cw.getOutdoorHumidity(), cw.getOutdoorHumidity(), new Humidity(0.0), WeatherTrend.STEADY);
 	    indoorHumidity.loadData(cw.getIndoorHumidity(), cw.getIndoorHumidity(), cw.getIndoorHumidity(), new Humidity(0.), WeatherTrend.STEADY);
 	}

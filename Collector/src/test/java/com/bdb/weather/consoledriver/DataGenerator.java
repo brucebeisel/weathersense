@@ -105,8 +105,8 @@ public class DataGenerator {
         cw.setStormStart(LocalDate.now());
         cw.setSolarRadiation(new SolarRadiation(4.0));
         cw.setUvIndex(new UvIndex(7));
-        cw.setBarometerTrend(WeatherTrend.RISING_RAPIDLY);
-        cw.setForecast(Forecast.MOSTLY_CLOUDY);
+        cw.setBarometerTrend("Rising Rapidly");
+        cw.setForecast("Mostly Cloudy");
         cw.setDewPoint(new Temperature(18.0));
         cw.setWindChill(new Temperature(10.0));
         cw.setHeatIndex(new Temperature(30.0));

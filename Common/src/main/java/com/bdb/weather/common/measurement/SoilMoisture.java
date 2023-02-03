@@ -98,6 +98,10 @@ public class SoilMoisture extends Measurement {
         super(value, SoilMoisture.Unit.CENTIBAR, COMPARE_PRECISION, SoilMoisture::new);
     }
 
+    public SoilMoisture(int value) throws IllegalArgumentException {
+        this((double)value);
+    }
+
     /**
      * Constructor that takes a value and a unit.
      * 

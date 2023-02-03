@@ -56,6 +56,10 @@ public class Distance extends Depth {
         this(distance, getDefaultUnit());
     }
     
+    public Distance(int distance) {
+        this(distance, getDefaultUnit());
+    }
+    
     /**
      * Constructor that requires a unit parameter
      * 

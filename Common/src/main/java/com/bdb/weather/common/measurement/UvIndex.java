@@ -44,7 +44,7 @@ public class UvIndex implements Serializable {
     */
     
     @XmlValue
-    private final float index;
+    private final double index;
     
     /**
      * Get a UvIndex from a integer value.
@@ -64,11 +64,15 @@ public class UvIndex implements Serializable {
      * 
      * @param index The integer equivalent of a UV index
      */
-    public UvIndex(float index) {
+    public UvIndex(double index) {
         if (index < MIN_UV_INDEX || index > MAX_UV_INDEX)
             throw new IllegalArgumentException(String.format("UV Index must be between %d and %d (inclusive)", MIN_UV_INDEX, MAX_UV_INDEX));
         
         this.index = index;
+    }
+
+    public UvIndex(int index) {
+    	this((double)index);
     }
     
     private UvIndex() {
@@ -80,7 +84,7 @@ public class UvIndex implements Serializable {
      * 
      * @return The index
      */
-    public float getIndex() {
+    public double getIndex() {
         return index;
     }
 
@@ -92,7 +96,7 @@ public class UvIndex implements Serializable {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 47 * hash + Math.round(this.index * 10.0F);
+        hash = 47 * hash + (int)Math.round(this.index * 10.0);
         return hash;
     }
 

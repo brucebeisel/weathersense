@@ -114,6 +114,10 @@ public class Temperature extends Measurement {
         this(temperature, getDefaultUnit());
     }
 
+    public Temperature(int temperature) {
+        this(temperature, getDefaultUnit());
+    }
+
     /**
      * Constructor.
      * 

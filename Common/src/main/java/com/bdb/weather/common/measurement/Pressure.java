@@ -109,6 +109,10 @@ public class Pressure extends Measurement {
         this(pressure, getDefaultUnit());
     }
 
+    public Pressure(int pressure) {
+        this(pressure, getDefaultUnit());
+    }
+
     /**
      * Constructor.
      * 

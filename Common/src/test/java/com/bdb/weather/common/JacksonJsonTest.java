@@ -1,11 +1,14 @@
 package com.bdb.weather.common;
 
+import java.io.File;
 import java.util.List;
 
 import com.bdb.util.measurement.Measurement;
 import com.bdb.weather.common.measurement.Humidity;
 import com.bdb.weather.common.measurement.Temperature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class JacksonJsonTest {
 	static class IndexedValue<T extends Measurement> {
@@ -20,7 +23,7 @@ public class JacksonJsonTest {
 	public static void main(String[] args) {
 
 		ObjectMapper objectMapper = new ObjectMapper();
-		String s = new String("{ \"temperature\" : 12.0, \"humidity\" : 90.0, \"extraTemperatures\" : [ {\"index\" : 1, \"value\" : 22.0} ], \"dominantWindDirections\" : [ \"N\", \"W\", \"NW\" ]}");
+		String s = new String("{ \"temperature\" : 12, \"humidity\" : 90.0, \"extraTemperatures\" : [ {\"index\" : 1, \"value\" : 22.0} ], \"dominantWindDirections\" : [ \"N\", \"W\", \"NW\" ]}");
 		
 		Temperature.Unit unit = Temperature.getDefaultUnit();
 		
@@ -34,6 +37,12 @@ public class JacksonJsonTest {
 			for (String d : current.dominantWindDirections) {
 				System.out.println("Dominant Wind Direction: " + d);
 			}
+
+			System.out.println("Current Dir: " + System.getProperty("user.dir"));
+			objectMapper.registerModule(new JavaTimeModule());
+		    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+			CurrentWeather cw = objectMapper.readValue(new File("src/test/java/com/bdb/weather/common/CurrentWeather.json"), CurrentWeather.class);
+			System.out.println(cw);
 		}
 		catch (Exception e) {
 			System.out.println("Caught exception: " + e);
