@@ -199,18 +199,18 @@ public class WeatherUndergroundUploader implements CurrentWeatherSubscriber.Curr
         record.time = ZonedDateTime.now(ZoneOffset.UTC);
         record.windDir = current.getWindDirection();
         record.windSpeedMph = current.getWindSpeed();
-        record.windGustMph = current.getWindGustSpeed();
-        record.windGustDir = current.getWindGustDirection();
+        record.windGustMph = current.getGustSpeed();
+        record.windGustDir = current.getGustDirection();
         record.windSpeedMphAvg2Min = current.getWindSpeed2MinAvg();
         record.windDirAvg2Min = record.windDir;
-        record.windGust10Min = current.getWindGustSpeed();
-        record.winGustDir10Min = current.getWindGustDirection();
-        record.outdoorHumidity = current.getOutdoorHumidity();
+        record.windGust10Min = current.getGustSpeed();
+        record.winGustDir10Min = current.getGustDirection();
+        record.outdoorHumidity = current.getOutsideHumidity();
         record.dewPoint = current.getDewPoint();
-        record.outdoorTemperature = current.getOutdoorTemperature();
+        record.outdoorTemperature = current.getOutsideTemperature();
         record.barometer = current.getBarometricPressure();
-        record.indoorTemperature = current.getIndoorTemperature();
-        record.indoorHumidity = current.getIndoorHumidity();
+        record.indoorTemperature = current.getInsideTemperature();
+        record.indoorHumidity = current.getInsideHumidity();
         //
         // Note the rain rate from the console is ignored due to the ICD published by weather underground.
         // The rain rate is the amount of rain that has fallen in the past hour.

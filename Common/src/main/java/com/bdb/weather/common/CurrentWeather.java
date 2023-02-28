@@ -54,17 +54,19 @@ public class CurrentWeather implements Serializable {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime time;
-    private Temperature indoorTemperature;
-    private Humidity indoorHumidity;
+    private Temperature insideTemperature;
+    private Humidity insideHumidity;
     
-    private Temperature outdoorTemperature;
+    private Temperature outsideTemperature;
     private Temperature heatIndex;
     private Temperature windChill;
     private Temperature dewPoint;
     private Temperature thsw;
-    private Humidity outdoorHumidity;
-    private Wind wind;
-    private Wind windGust;
+    private Humidity outsideHumidity;
+    private Speed windSpeed;
+    private Heading windDirection;
+    private Speed gustSpeed;
+    private Heading gustDirection;
     private Speed windSpeed10MinAvg;
     private Speed windSpeed2MinAvg;
     private List<String> dominantWindDirections = new ArrayList<>();
@@ -92,6 +94,7 @@ public class CurrentWeather implements Serializable {
     private List<IndexedMeasurement<SoilMoisture>> soilMoistures = new ArrayList<>();
     private List<IndexedMeasurement<Temperature>> soilTemperatures = new ArrayList<>();
     private List<IndexedMeasurement<LeafWetness>> leafWetnesses = new ArrayList<>();
+    private List<IndexedMeasurement<Temperature>> leafTemperatures = new ArrayList<>();
     private List<IndexedMeasurement<Temperature>> extraTemperatures = new ArrayList<>();
     private List<IndexedMeasurement<Humidity>> extraHumidities = new ArrayList<>();
     
@@ -120,39 +123,39 @@ public class CurrentWeather implements Serializable {
     }
 
     /**
-     * Set the indoor temperature.
+     * Set the inside temperature.
      * 
-     * @param temperature The indoor temperature
+     * @param temperature The inside temperature
      */
-    public void setIndoorTemperature(Temperature temperature) {
-        this.indoorTemperature = temperature;
+    public void setInsideTemperature(Temperature temperature) {
+        this.insideTemperature = temperature;
     }
 
     /**
-     * Get the indoor temperature.
+     * Get the inside temperature.
      * 
-     * @return The indoor temperature
+     * @return The inside temperature
      */
-    public Temperature getIndoorTemperature() {
-        return indoorTemperature;
+    public Temperature getInsideTemperature() {
+        return insideTemperature;
     }
 
     /**
-     * Set the outdoor temperature.
+     * Set the outside temperature.
      * 
-     * @param temperature The outdoor temperature 
+     * @param temperature The outside temperature 
      */
-    public void setOutdoorTemperature(Temperature temperature) {
-        this.outdoorTemperature = temperature;
+    public void setOutsideTemperature(Temperature temperature) {
+        this.outsideTemperature = temperature;
     }
 
     /**
-     * Get the outdoor temperature.
+     * Get the outside temperature.
      * 
-     * @return The outdoor temperature
+     * @return The outside temperature
      */
-    public Temperature getOutdoorTemperature() {
-        return outdoorTemperature;
+    public Temperature getOutsideTemperature() {
+        return outsideTemperature;
     }
 
     /**
@@ -228,21 +231,39 @@ public class CurrentWeather implements Serializable {
     }
 
     /**
-     * Set the wind speed and direction.
+     * Set the wind speed.
      * 
-     * @param wind The wind
+     * @param windSpeed The wind speed
      */
-    public void setWind(Wind wind) {
-        this.wind = wind;
+    public void setWindSpeed(Speed windSpeed) {
+        this.windSpeed = windSpeed;
+    }
+
+    /**
+     * Set the wind direction.
+     * 
+     * @param direction The wind direction
+     */
+    public void setWindDirection(Heading windDirection) {
+        this.windDirection = windDirection;
     }
 
     /**
      * Get the wind speed and direction.
      * 
-     * @return The wind
+     * @return The wind speed
      */
-    public Wind getWind() {
-        return wind;
+    public Speed getWindSpeed() {
+        return windSpeed;
+    }
+
+    /**
+     * Get the wind speed and direction.
+     * 
+     * @return The wind direction
+     */
+    public Heading getWindDirection() {
+        return windDirection;
     }
 
     /**
@@ -301,71 +322,41 @@ public class CurrentWeather implements Serializable {
     }
 
     /**
-     * Get the wind speed.
+     * Set the wind gust speed.
      * 
-     * @return The wind speed or null if no reading
+     * @param gustSpeed The wind gust speed
      */
-    public Speed getWindSpeed() {
-        if (wind != null)
-            return wind.getSpeed();
-        else
-            return null;
+    public void setGustSpeed(Speed gustSpeed) {
+        this.gustSpeed = gustSpeed;
     }
     
-    /**
-     * Get the wind direction.
-     * 
-     * @return The wind direction of null if no reading
-     */
-    public Heading getWindDirection() {
-        if (wind != null)
-            return wind.getDirection();
-        else
-            return null;
-    }
-    
-    /**
-     * Set the wind gust
-     * 
-     * @param gust The wind gust
-     */
-    public void setWindGust(Wind gust) {
-        this.windGust = gust;
-    }
-    
-    /**
-     * Get the wind gust.
-     * 
-     * @return The wind gust speed and direction
-     */
-    public Wind getWindGust() {
-        return windGust;
-    }
 
     /**
      * Get the wind gust speed.
      * 
-     * @return The wind gust speed or null
+     * @return The wind gust speed
      */
-    public Speed getWindGustSpeed() {
-        if (windGust != null)
-            return windGust.getSpeed();
-        else
-            return null;
+    public Speed getGustSpeed() {
+        return gustSpeed;
     }
     
     /**
      * Get the wind gust direction.
      * 
-     * @return The wind gust direction of null
+     * @return The wind gust direction
      */
-    public Heading getWindGustDirection() {
-        if (windGust != null)
-            return windGust.getDirection();
-        else
-            return null;
+    public Heading getGustDirection() {
+        return gustDirection;
     }
 
+    /**
+     * Set the wind gust direction.
+     * 
+     * @return The wind gust direction
+     */
+    public void setGustDirection(Heading gustDirection) {
+        this.gustDirection = gustDirection;
+    }
     /**
      * Set the barometric pressure.
      * 
@@ -403,39 +394,39 @@ public class CurrentWeather implements Serializable {
     }
 
     /**
-     * Set the indoor humidity.
+     * Set the inside humidity.
      *
-     * @param humidity The indoor humidity
+     * @param humidity The inside humidity
      */
-    public void setIndoorHumidity(Humidity humidity) {
-        indoorHumidity = humidity;
+    public void setInsideHumidity(Humidity humidity) {
+        insideHumidity = humidity;
     }
 
     /**
-     * Get the indoor humidity.
+     * Get the inside humidity.
      *
-     * @return The indoor humidity
+     * @return The inside humidity
      */
-    public Humidity getIndoorHumidity() {
-        return indoorHumidity;
+    public Humidity getInsideHumidity() {
+        return insideHumidity;
     }
 
     /**
-     * Set the outdoor humidity.
+     * Set the outside humidity.
      *
-     * @param humidity The outdoor humidity
+     * @param humidity The outside humidity
      */
-    public void setOutdoorHumidity(Humidity humidity) {
-        outdoorHumidity = humidity;
+    public void setOutsideHumidity(Humidity humidity) {
+        outsideHumidity = humidity;
     }
 
     /**
-     * Get the outdoor humidity. 
+     * Get the outside humidity. 
      *
-     * @return The outdoor humidity
+     * @return The outside humidity
      */
-    public Humidity getOutdoorHumidity() {
-        return outdoorHumidity;
+    public Humidity getOutsideHumidity() {
+        return outsideHumidity;
     }
 
     /**
@@ -780,6 +771,11 @@ public class CurrentWeather implements Serializable {
     	soilTemperatures.addAll(list);
     }
 
+    public void setLeafTemperatures(List<IndexedMeasurement<Temperature>> list) {
+    	leafTemperatures.clear();
+    	leafTemperatures.addAll(list);
+    }
+
     public void setLeafWetnesses(List<IndexedMeasurement<LeafWetness>> list) {
     	leafWetnesses.clear();
     	leafWetnesses.addAll(list);
@@ -920,7 +916,7 @@ public class CurrentWeather implements Serializable {
 
         sb.append("Time: ").append(fmt.format(time)).append("\n");
         sb.append("Baro Trend: ").append(barometerTrend).append("\n");
-        sb.append("Gust: ").append(windGust).append("\n");
+        sb.append("Gust: ").append(gustSpeed).append("\n");
         sb.append("Leaf Wetnesses: ").append(" Count: ").append(leafWetnesses.size()).append("\n");
         for (IndexedMeasurement<LeafWetness> m : leafWetnesses) {
         	sb.append("    Index: ").append(m.index).append("  Value: ").append(m.value).append("\n");
@@ -933,15 +929,17 @@ public class CurrentWeather implements Serializable {
     public int hashCode() {
         int hash = 5;
         hash = 97 * hash + Objects.hashCode(this.time);
-        hash = 97 * hash + Objects.hashCode(this.indoorTemperature);
-        hash = 97 * hash + Objects.hashCode(this.indoorHumidity);
-        hash = 97 * hash + Objects.hashCode(this.outdoorTemperature);
+        hash = 97 * hash + Objects.hashCode(this.insideTemperature);
+        hash = 97 * hash + Objects.hashCode(this.insideHumidity);
+        hash = 97 * hash + Objects.hashCode(this.outsideTemperature);
         hash = 97 * hash + Objects.hashCode(this.heatIndex);
         hash = 97 * hash + Objects.hashCode(this.windChill);
         hash = 97 * hash + Objects.hashCode(this.dewPoint);
-        hash = 97 * hash + Objects.hashCode(this.outdoorHumidity);
-        hash = 97 * hash + Objects.hashCode(this.wind);
-        hash = 97 * hash + Objects.hashCode(this.windGust);
+        hash = 97 * hash + Objects.hashCode(this.outsideHumidity);
+        hash = 97 * hash + Objects.hashCode(this.windSpeed);
+        hash = 97 * hash + Objects.hashCode(this.windDirection);
+        hash = 97 * hash + Objects.hashCode(this.gustSpeed);
+        hash = 97 * hash + Objects.hashCode(this.gustDirection);
         hash = 97 * hash + Objects.hashCode(this.windSpeed10MinAvg);
         hash = 97 * hash + Objects.hashCode(this.windSpeed2MinAvg);
         hash = 97 * hash + Objects.hashCode(this.dominantWindDirections);
@@ -987,15 +985,15 @@ public class CurrentWeather implements Serializable {
             return false;
         }
 
-        if (!Objects.equals(this.indoorTemperature, other.indoorTemperature)) {
+        if (!Objects.equals(this.insideTemperature, other.insideTemperature)) {
             return false;
         }
 
-        if (!Objects.equals(this.indoorHumidity, other.indoorHumidity)) {
+        if (!Objects.equals(this.insideHumidity, other.insideHumidity)) {
             return false;
         }
 
-        if (!Objects.equals(this.outdoorTemperature, other.outdoorTemperature)) {
+        if (!Objects.equals(this.outsideTemperature, other.outsideTemperature)) {
             return false;
         }
 
@@ -1011,15 +1009,21 @@ public class CurrentWeather implements Serializable {
             return false;
         }
 
-        if (!Objects.equals(this.outdoorHumidity, other.outdoorHumidity)) {
+        if (!Objects.equals(this.outsideHumidity, other.outsideHumidity)) {
             return false;
         }
 
-        if (!Objects.equals(this.wind, other.wind)) {
+        if (!Objects.equals(this.windSpeed, other.windSpeed)) {
+            return false;
+        }
+        if (!Objects.equals(this.windDirection, other.windDirection)) {
             return false;
         }
 
-        if (!Objects.equals(this.windGust, other.windGust)) {
+        if (!Objects.equals(this.gustSpeed, other.gustSpeed)) {
+            return false;
+        }
+        if (!Objects.equals(this.gustDirection, other.gustDirection)) {
             return false;
         }
 
