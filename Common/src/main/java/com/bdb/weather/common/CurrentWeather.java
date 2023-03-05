@@ -90,6 +90,8 @@ public class CurrentWeather implements Serializable {
     private Depth dayET;
     private Depth monthET;
     private Depth yearET;
+    private String sunrise;
+    private String sunset;
 
     private List<IndexedMeasurement<SoilMoisture>> soilMoistures = new ArrayList<>();
     private List<IndexedMeasurement<Temperature>> soilTemperatures = new ArrayList<>();
@@ -754,6 +756,22 @@ public class CurrentWeather implements Serializable {
      */
     public void setYearET(Depth et) {
         this.yearET = et;
+    }
+
+    public void setSunrise(String sunrise) {
+        this.sunrise = sunrise;
+    }
+
+    public String getSunrise() {
+        return this.sunrise;
+    }
+    
+    public void setSunset(String sunset) {
+        this.sunset = sunset;
+    }
+
+    public String getSunset() {
+        return this.sunset;
     }
     
     public void setExtraTemperatures(List<IndexedMeasurement<Temperature>> list) {
