@@ -39,7 +39,7 @@ import com.bdb.weather.common.measurement.UvIndex;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * The current weather. This is based on a combination of the Lacrosse 3610 and Davis Vantage Pro 2 weather stations.
+ * The current weather. This is based on a combination of the Lacrosse 3610 and Davis Vantage Pro 2weather stations.
  * 
  * @author Bruce
  * @since 1.0
@@ -50,11 +50,6 @@ public class CurrentWeather implements Serializable {
     static class IndexedMeasurement<T extends Measurement> {
     	public int index;
     	public T   value;
-    }
-    
-    static class ActiveAlarm {
-    	public String name;
-    	public String field;
     }
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -97,7 +92,6 @@ public class CurrentWeather implements Serializable {
     private Depth yearET;
     private String sunrise;
     private String sunset;
-    private List<ActiveAlarm> activeAlarms = new ArrayList<>();
 
     private List<IndexedMeasurement<SoilMoisture>> soilMoistures = new ArrayList<>();
     private List<IndexedMeasurement<Temperature>> soilTemperatures = new ArrayList<>();
@@ -780,11 +774,6 @@ public class CurrentWeather implements Serializable {
         return this.sunset;
     }
     
-    public void setActiveAlarms(List<ActiveAlarm> list) {
-    	activeAlarms.clear();
-    	activeAlarms.addAll(list);
-    }
-
     public void setExtraTemperatures(List<IndexedMeasurement<Temperature>> list) {
     	extraTemperatures.clear();
     	extraTemperatures.addAll(list);
@@ -814,6 +803,129 @@ public class CurrentWeather implements Serializable {
     	soilMoistures.clear();
     	soilMoistures.addAll(list);
     }
+
+    
+    /**
+     * Set the temperature for a given sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @param temperature The temperature
+    public void setTemperatureForSensor(int sensorId, Temperature temperature) {
+        temperatureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.THERMOMETER, temperature));
+    }
+     */
+    
+    /**
+     * Set the temperature for a soil temperature sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @param temperature The temperature
+    public void setSoilTemperatureForSensor(int sensorId, Temperature temperature) {
+        temperatureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.SOIL_TEMPERATURE, temperature));
+    }
+     */
+    
+    /**
+     * Set the temperature for a leaf temperature sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @param temperature The temperature
+    public void setLeafTemperatureForSensor(int sensorId, Temperature temperature) {
+        temperatureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.LEAF_TEMPERATURE, temperature));
+    }
+     */
+    
+    /**
+     * Get the temperature for a sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @return The temperature or null if the sensor does not exist
+    public Temperature getTemperatureForSensor(int sensorId) {
+        MeasurementEntry<Temperature> entry = temperatureSensorEntries.get(sensorId);
+        if (entry != null)
+            return entry.getMeasurement();
+        else
+            return null;
+    }
+     */
+    
+    /**
+     * Set the humidity for a given sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @param humidity The humidity
+    public void setHumidityForSensor(int sensorId, Humidity humidity) {
+        humiditySensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.HYGROMETER, humidity));
+    }
+     */
+    
+    /**
+     * Get the humidity for a sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @return The humidity or null if the sensor does not exist
+    public Humidity getHumidityForSensor(int sensorId) {
+        MeasurementEntry<Humidity> entry = humiditySensorEntries.get(sensorId);
+        if (entry != null)
+            return entry.getMeasurement();
+        else
+            return null;
+    }
+     */
+    
+    /**
+     * Set the leaf wetness for a given sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @param leafWetness The leaf wetness
+    public void setLeafWetnessForSensor(int sensorId, LeafWetness leafWetness) {
+        leafWetnessSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.LEAF_WETNESS, leafWetness));
+    }
+     */
+    
+    /**
+     * Get the leaf wetness for a given sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @return The leaf wetness
+    public LeafWetness getLeafWetnessForSensor(int sensorId) {
+        return leafWetnessSensorEntries.get(sensorId).getMeasurement();
+    }
+     */
+    
+    /**
+     * Set the soil moisture for a given sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @param soilMoisture The soil moisture
+    public void setSoilMoistureForSensor(int sensorId, SoilMoisture soilMoisture) {
+        soilMoistureSensorEntries.put(sensorId, new MeasurementEntry<>(sensorId, SensorType.SOIL_MOISTURE, soilMoisture));
+    }
+     */
+   
+    /**
+     * Get the soil moisture for a given sensor.
+     *
+     * @param sensorId The ID of the sensor
+     * @return The soil moisture
+    public SoilMoisture getSoilMoistureForSensor(int sensorId) {
+        return soilMoistureSensorEntries.get(sensorId).getMeasurement();
+    }
+    
+    /**
+     *
+     * @return
+    @SuppressWarnings("rawtypes")
+	public Collection<MeasurementEntry> getSensorValues() {
+        List<MeasurementEntry> entries = new ArrayList<>();
+        //entries.addAll(temperatureSensorEntries.values());
+        //entries.addAll(humiditySensorEntries.values());
+        //entries.addAll(soilMoistureSensorEntries.values());
+        //entries.addAll(leafWetnessSensorEntries.values());
+        return entries;
+    }
+     */
+
     
     @Override
     public String toString() {
