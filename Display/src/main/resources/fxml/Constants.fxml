@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.lang.*?>
-
-<fx:root type="Integer" fx:id="myConstants" xmlns:fx="http://javafx.com/fxml">
-    <fx:define>
-        <Integer fx:id="CONTENT_SPACING" fx:value="200"/>
-    </fx:define>
-</fx:root>
